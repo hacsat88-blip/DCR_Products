@@ -1,0 +1,198 @@
+{
+  "main": {
+    "id": "2a7c91cc72945908",
+    "type": "split",
+    "children": [
+      {
+        "id": "a1badd79dc3a8dea",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "03909c6b9823f8c8",
+            "type": "leaf",
+            "state": {
+              "type": "markdown",
+              "state": {
+                "file": "02_AI_Prompt/業務改善/Genspark スライド生成AI用 汎用プロンプトテンプレート.md",
+                "mode": "source",
+                "source": false
+              },
+              "icon": "lucide-file",
+              "title": "Genspark スライド生成AI用 汎用プロンプトテンプレート"
+            }
+          },
+          {
+            "id": "95b9ea0c52c27564",
+            "type": "leaf",
+            "state": {
+              "type": "markdown",
+              "state": {
+                "file": "無題のファイル.md",
+                "mode": "source",
+                "source": false
+              },
+              "icon": "lucide-file",
+              "title": "無題のファイル"
+            }
+          }
+        ],
+        "currentTab": 1
+      }
+    ],
+    "direction": "vertical"
+  },
+  "left": {
+    "id": "e9805c902b173a1b",
+    "type": "mobile-drawer",
+    "children": [
+      {
+        "id": "0a704bc6c9601b12",
+        "type": "leaf",
+        "state": {
+          "type": "file-explorer",
+          "state": {
+            "sortOrder": "alphabetical",
+            "autoReveal": false
+          },
+          "icon": "lucide-folder-closed",
+          "title": "ファイルエクスプローラ"
+        }
+      },
+      {
+        "id": "7c9ea322ec003cd6",
+        "type": "leaf",
+        "state": {
+          "type": "search",
+          "state": {
+            "query": "",
+            "matchingCase": false,
+            "explainSearch": false,
+            "collapseAll": false,
+            "extraContext": false,
+            "sortOrder": "alphabetical"
+          },
+          "icon": "lucide-search",
+          "title": "検索"
+        }
+      },
+      {
+        "id": "b97139765bb04b5a",
+        "type": "leaf",
+        "state": {
+          "type": "tag",
+          "state": {
+            "sortOrder": "frequency",
+            "useHierarchy": true,
+            "showSearch": false,
+            "searchQuery": ""
+          },
+          "icon": "lucide-tags",
+          "title": "タグ"
+        }
+      },
+      {
+        "id": "399a5e256def1f14",
+        "type": "leaf",
+        "state": {
+          "type": "bookmarks",
+          "state": {},
+          "icon": "lucide-bookmark",
+          "title": "ブックマーク"
+        }
+      }
+    ],
+    "currentTab": 0
+  },
+  "right": {
+    "id": "024e30ef5a07fca8",
+    "type": "mobile-drawer",
+    "children": [
+      {
+        "id": "9f0e572e399bdf63",
+        "type": "leaf",
+        "state": {
+          "type": "backlink",
+          "state": {
+            "file": "05_Gemini CLI/GEMINI.md",
+            "collapseAll": false,
+            "extraContext": false,
+            "sortOrder": "alphabetical",
+            "showSearch": false,
+            "searchQuery": "",
+            "backlinkCollapsed": false,
+            "unlinkedCollapsed": true
+          },
+          "icon": "links-coming-in",
+          "title": "バックリンク"
+        }
+      },
+      {
+        "id": "eb7777c711f8442b",
+        "type": "leaf",
+        "state": {
+          "type": "outgoing-link",
+          "state": {
+            "file": "05_Gemini CLI/GEMINI.md",
+            "linksCollapsed": false,
+            "unlinkedCollapsed": true
+          },
+          "icon": "links-going-out",
+          "title": "アウトゴーイングリンク"
+        }
+      },
+      {
+        "id": "e7f16e4c54b36507",
+        "type": "leaf",
+        "state": {
+          "type": "outline",
+          "state": {
+            "followCursor": false,
+            "showSearch": false,
+            "searchQuery": ""
+          },
+          "icon": "lucide-list",
+          "title": "アウトライン"
+        }
+      },
+      {
+        "id": "39f2cd403c4c0335",
+        "type": "leaf",
+        "state": {
+          "type": "calendar",
+          "state": {},
+          "icon": "calendar-with-checkmark",
+          "title": "Calendar"
+        }
+      }
+    ],
+    "currentTab": 0
+  },
+  "left-ribbon": {
+    "hiddenItems": {
+      "switcher:クイックスイッチャーを開く": false,
+      "graph:グラフビューを開く": false,
+      "canvas:新規キャンバスを作成": false,
+      "daily-notes:今日のデイリーノートを開く": false,
+      "templates:テンプレートを挿入": false,
+      "command-palette:コマンドパレットを開く": false,
+      "templater-obsidian:Templater": false,
+      "obsidian-excalidraw-plugin:New drawing": false,
+      "mermaid-tools:Open Mermaid Toolbar": false,
+      "obsidian-memos:Thino": false,
+      "homepage:Open homepage": false,
+      "smart-composer:Open smart composer": false,
+      "terminal:Open terminal": false
+    }
+  },
+  "active": "95b9ea0c52c27564",
+  "lastOpenFiles": [
+    "02_AI_Prompt/業務改善/Genspark スライド生成AI用 汎用プロンプトテンプレート.md",
+    "無題のファイル.md",
+    "無題のフォルダ",
+    "05_Gemini CLI/GEMINI_v1.3.md",
+    "06_Claude Code/CLAUDE.md",
+    "06_Claude Code/CLAUDE 1.md",
+    "05_Gemini CLI/GEMINI.md",
+    "07_AIニュース/2025年07月16日（火）.md"
+  ]
+}

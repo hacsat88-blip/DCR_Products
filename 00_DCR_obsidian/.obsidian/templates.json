@@ -1,0 +1,5 @@
+{
+  "folder": "01_DCR_Template",
+  "dateFormat": "<% tp.date.now(\"YYYY-MM-DD\") %>",
+  "timeFormat": "HH:mm"
+}

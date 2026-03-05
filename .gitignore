@@ -1,0 +1,25 @@
+# Obsidian
+.obsidian/workspace.json
+.obsidian/workspace-mobile.json
+.obsidian/plugins/
+.obsidian/themes/
+
+# OS
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Node
+node_modules/
+npm-debug.log*
+
+# 一時ファイル
+*.tmp
+*.bak
+*~
+
+# 秘密情報
+.env
+.env.*
+*.key
+*.pem

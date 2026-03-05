@@ -1,0 +1,89 @@
+{
+  // ------------------------------------------------------------------------
+  // エディタ基本設定 (可読性とコーディング効率)
+  // ------------------------------------------------------------------------
+  "editor.fontSize": 14, // フォントサイズ。長時間の作業でも疲れにくいサイズに調整
+  "editor.fontFamily": "'Fira Code', 'Operator Mono', 'Dank Mono', Consolas, 'Courier New', monospace", // コーディングに適した合字（リガチャ）対応フォントを指定
+  "editor.fontLigatures": true, // `=>` や `!=` などの演算子を合字で表示し、可読性を向上
+  "editor.tabSize": 2, // タブのサイズをスペース2つ分に。モダンなWeb開発で主流
+  "editor.wordWrap": "on", // 長い行をエディタの幅で折り返し、水平スクロールを不要に
+  "editor.minimap.enabled": false, // ミニマップを非表示にし、編集領域を最大化
+  "editor.renderLineHighlight": "all", // 現在のカーソル行を全体的にハイライトし、視認性を向上
+  "editor.guides.bracketPairs": true, // 対応する括弧を線で結び、ネスト構造を分かりやすく
+  "editor.guides.bracketPairsHorizontal": "active", // アクティブな括弧ペアを水平線でも強調
+  "editor.stickyScroll.enabled": true, // スクロール時に現在のスコープ（関数名など）をエディタ上部に固定表示
+  "editor.linkedEditing": true, // 開始タグを編集した際に、対応する閉じタグも自動で変更
+  "editor.inlineSuggest.enabled": true, // GitHub Copilotなどのインライン補完を有効化
+
+  // ------------------------------------------------------------------------
+  // フォーマットと保存アクション (コード品質の自動化)
+  // ------------------------------------------------------------------------
+  "editor.formatOnSave": true, // ファイル保存時に自動でフォーマットを実行
+  "editor.defaultFormatter": "esbenp.prettier-vscode", // デフォルトのフォーマッターとしてPrettierを指定
+  "editor.codeActionsOnSave": {
+    "source.fixAll.eslint": "explicit" // 保存時にESLintの自動修正を実行（明示的な設定）
+  },
+  "files.autoSave": "afterDelay", // 一定時間後に自動でファイルを保存
+  "files.insertFinalNewline": true, // ファイルの末尾に必ず改行を挿入（POSIX標準）
+  "files.trimTrailingWhitespace": true, // 保存時に行末の不要な空白を自動で削除
+
+  // ------------------------------------------------------------------------
+  // ワークベンチ (UI/UXの最適化)
+  // ------------------------------------------------------------------------
+  "workbench.editor.wrapTabs": true, // 開いているタブが多すぎる場合に折り返して表示
+  "workbench.list.openMode": "doubleClick", // ファイルをダブルクリックで開くようにし、誤操作を防止
+  "workbench.startupEditor": "none", // 起動時にウェルカムページなどを表示せず、クリーンな状態で開始
+  "workbench.tree.indent": 16, // ファイルエクスプローラーのインデントを広げ、階層構造を見やすく
+  "workbench.tree.renderIndentGuides": "always", // インデントガイドを常に表示
+  "workbench.activityBar.location": "top", // アクティビティバーを上部に移動し、CursorライクなUIに
+  "explorer.compactFolders": false, // 中にファイルが1つしか無いフォルダを圧縮表示しない
+
+  // ------------------------------------------------------------------------
+  // ターミナル設定
+  // ------------------------------------------------------------------------
+  "terminal.integrated.fontSize": 14, // 統合ターミナルのフォントサイズ
+  "terminal.integrated.cursorStyle": "block", // カーソルスタイルを視認性の高いブロックに
+  "terminal.integrated.scrollback": 10000, // ターミナルのスクロールバック行数を増やし、ログ追跡を容易に
+  "terminal.integrated.stickyScroll.enabled": true, // ターミナルでもスティッキースクロールを有効化
+
+  // ------------------------------------------------------------------------
+  // AI / GitHub Copilot 連携 (バイブコーディングの強化)
+  // ------------------------------------------------------------------------
+  "github.copilot.enable": {
+    "*": true // すべての言語でCopilotを有効化
+  },
+  "github.copilot.chat.mcp.enabled": true, // 外部ツール連携(MCP)を有効化し、Copilotの能力を拡張
+  // 以下の`instructions`は、`.vscode/copilot-instructions.md`ファイルを作成して、より詳細な指示を記述することを推奨
+  "github.copilot.chat.codeGeneration.instructions": {
+    "text": "Follow .vscode/copilot-instructions.md as the primary project policy. Keep changes minimal, secure, and aligned with existing architecture."
+  },
+  "github.copilot.chat.commitMessageGeneration.instructions": {
+    "text": "Use Conventional Commits. Infer type/scope from the diff and keep messages concise and specific."
+  },
+
+  // ------------------------------------------------------------------------
+  // Markdown 専用設定
+  // ------------------------------------------------------------------------
+  "[markdown]": {
+    "editor.defaultFormatter": "yzhang.markdown-all-in-one",
+    "editor.quickSuggestions": {
+      "comments": "off",
+      "strings": "off",
+      "other": "off"
+    },
+    "editor.wordWrap": "on",
+    "editor.wordWrapColumn": 100,
+    "editor.formatOnSave": true,
+    "files.trimTrailingWhitespace": false
+  },
+  "markdown.preview.breaks": true,
+  "markdown.updateLinksOnFileMove.enabled": "always",
+  "markdown.validate.enabled": true,
+
+  // ------------------------------------------------------------------------
+  // その他
+  // ------------------------------------------------------------------------
+  "git.autofetch": true, // 定期的にリモートリポジトリの変更を自動でフェッチ
+  "telemetry.telemetryLevel": "off", // 使用状況データなどのテレメトリ送信を無効化
+  "window.restoreWindows": "none" // 起動時に前回のウィンドウを復元しない
+}
