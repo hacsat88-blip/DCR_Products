@@ -5,12 +5,28 @@
       "path": "01_AI_Prompt/🟡Idea Spark/Idea Spark 付録.md"
     },
     {
-      "basename": "AGENTS",
-      "path": "06_verdent/AGENTS.md"
-    },
-    {
       "basename": "🟡Idea Spark",
       "path": "01_AI_Prompt/🟡Idea Spark/🟡Idea Spark.md"
+    },
+    {
+      "basename": "テスト",
+      "path": "02_notebookLM/テスト.md"
+    },
+    {
+      "basename": "🟢FORGE",
+      "path": "01_AI_Prompt/🟢FORGE/🟢FORGE.md"
+    },
+    {
+      "basename": "🟢Prompt Forge - 設計&改善",
+      "path": "01_AI_Prompt/🟢Prompt Forge - 設計&改善.md"
+    },
+    {
+      "basename": "🔴DCR実務モード シグナル付（運用版）",
+      "path": "01_AI_Prompt/🔴DCR実務モード シグナル付（運用版）.md"
+    },
+    {
+      "basename": "AGENTS",
+      "path": "06_verdent/AGENTS.md"
     },
     {
       "basename": "Settings json",
@@ -79,10 +95,6 @@
     {
       "basename": "🟢PRISM_CORE v2.0",
       "path": "01_AI_Prompt/🟢PRISM v2.0/🟢PRISM_CORE v2.0.md"
-    },
-    {
-      "basename": "テスト",
-      "path": "02_notebookLM/テスト.md"
     },
     {
       "basename": "🟢PRISM_CORE",

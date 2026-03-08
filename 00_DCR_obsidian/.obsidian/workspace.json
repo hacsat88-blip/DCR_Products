@@ -185,12 +185,17 @@
       "obsidian-memos:Thino": false
     }
   },
-  "active": "ddbf429c27b0215f",
+  "active": "821e9a30f9b94a9b",
   "lastOpenFiles": [
-    "06_verdent/AGENTS.md",
-    "01_AI_Prompt/🟡Idea Spark/Idea Spark 付録.md",
-    "06_verdent",
     "01_AI_Prompt/🟡Idea Spark/🟡Idea Spark.md",
+    "01_AI_Prompt/🟡Idea Spark/Idea Spark 付録.md",
+    "02_notebookLM/テスト.md",
+    "01_AI_Prompt/🟢FORGE/🟢FORGE.md",
+    "01_AI_Prompt - ショートカット.lnk",
+    "01_AI_Prompt/🟢Prompt Forge - 設計&改善.md",
+    "01_AI_Prompt/🔴DCR実務モード シグナル付（運用版）.md",
+    "06_verdent/AGENTS.md",
+    "06_verdent",
     "04_claude code/Settings json.md",
     "01_AI_Prompt/🟡Idea Spark",
     "04_claude code/Settings json 1.md",
@@ -213,15 +218,10 @@
     "00_DCR_obsidian/01_AI_Prompt/🟢FORGE/Character Design Sheet v1.0.md",
     "00_DCR_obsidian/01_AI_Prompt/🟢FORGE/🟢02_SYNAPSE_Operations_v1.2.md",
     "00_DCR_obsidian/01_AI_Prompt/🟢FORGE/🟢01_SYNAPSE_Engines_v1.2.md",
-    "00_DCR_obsidian/01_AI_Prompt/退避/🟢PRISM v4.4/Character Design Sheet v2.md",
     "00_DCR_obsidian/01_AI_Prompt/🟢FORGE",
-    "00_DCR_obsidian/01_AI_Prompt/退避/🟢PRISM v4.4/Technique Library v1.0.md",
-    "00_DCR_obsidian/01_AI_Prompt/退避/🟢PRISM v4.4/🟢PRISM v4.4.md",
-    "00_DCR_obsidian/01_AI_Prompt/退避/🟢PRISM v4.3.1.md",
     "00_DCR_obsidian/01_AI_Prompt/退避/🟢PRISM v4.4",
     "generate_prompts.js",
     "ai-prompt-manager/ai-service.js",
-    "ai-prompt-manager/options.js",
-    "ai-prompt-manager/options.html"
+    "ai-prompt-manager/options.js"
   ]
 }
