@@ -1,9 +1,9 @@
-import { useRef, useEffect } from 'react'
-import { useFrame, useThree, useLoader } from '@react-three/fiber'
-import { OrbitControls, Stars } from '@react-three/drei'
+import { useRef } from 'react'
+import { useFrame, useLoader } from '@react-three/fiber'
+import { Stars } from '@react-three/drei'
 import * as THREE from 'three'
+import { CountryBorders } from './CountryBorders'
 import { CountryGlow } from './CountryGlow'
-import type { OrbitControls as OrbitControlsType } from 'three-stdlib'
 
 const GLOBE_RADIUS = 2
 const EARTH_TEXTURE_URL = 'https://unpkg.com/three-globe/example/img/earth-blue-marble.jpg'
@@ -11,6 +11,7 @@ const EARTH_BUMP_URL = 'https://unpkg.com/three-globe/example/img/earth-topology
 
 interface GlobeProps {
     hoveredCountry: string | null
+    globeRotation: { x: number; y: number }
     onRotationChange: (rotation: THREE.Euler) => void
 }
 
@@ -19,23 +20,18 @@ interface GlobeProps {
  * NASA Blue Marbleテクスチャで地球を描画し、
  * OrbitControlsでドラッグ回転を制御する。
  */
-export function Globe({ hoveredCountry, onRotationChange }: GlobeProps) {
-    const controlsRef = useRef<OrbitControlsType>(null)
-    const globeRef = useRef<THREE.Mesh>(null)
-    const { camera } = useThree()
+export function Globe({ hoveredCountry, globeRotation, onRotationChange }: GlobeProps) {
+    const globeRef = useRef<THREE.Group>(null)
 
     // テクスチャの読み込み
     const earthTexture = useLoader(THREE.TextureLoader, EARTH_TEXTURE_URL)
     const bumpTexture = useLoader(THREE.TextureLoader, EARTH_BUMP_URL)
 
-    // 初期カメラ位置
-    useEffect(() => {
-        camera.position.set(0, 0, 5)
-    }, [camera])
-
     // 毎フレーム回転状態をd3-geo側に同期
     useFrame(() => {
         if (globeRef.current) {
+            globeRef.current.rotation.x = THREE.MathUtils.lerp(globeRef.current.rotation.x, globeRotation.x, 0.18)
+            globeRef.current.rotation.y = THREE.MathUtils.lerp(globeRef.current.rotation.y, globeRotation.y, 0.18)
             onRotationChange(globeRef.current.rotation)
         }
     })
@@ -59,46 +55,37 @@ export function Globe({ hoveredCountry, onRotationChange }: GlobeProps) {
             <directionalLight position={[-3, -1, -3]} intensity={0.3} color="#4488ff" />
 
             {/* 地球本体 */}
-            <mesh ref={globeRef}>
-                <sphereGeometry args={[GLOBE_RADIUS, 64, 64]} />
-                <meshPhongMaterial
-                    map={earthTexture}
-                    bumpMap={bumpTexture}
-                    bumpScale={0.015}
-                    specular={new THREE.Color('#333344')}
-                    shininess={15}
-                />
+            <group ref={globeRef}>
+                <mesh>
+                    <sphereGeometry args={[GLOBE_RADIUS, 64, 64]} />
+                    <meshPhongMaterial
+                        map={earthTexture}
+                        bumpMap={bumpTexture}
+                        bumpScale={0.015}
+                        specular={new THREE.Color('#333344')}
+                        shininess={15}
+                    />
 
-                {/* 大気のグロー */}
-                <mesh scale={1.025}>
-                    <sphereGeometry args={[GLOBE_RADIUS, 32, 32]} />
-                    <meshBasicMaterial
-                        color="#4488ff"
-                        transparent
-                        opacity={0.08}
-                        side={THREE.BackSide}
+                    {/* 大気のグロー */}
+                    <mesh scale={1.025}>
+                        <sphereGeometry args={[GLOBE_RADIUS, 32, 32]} />
+                        <meshBasicMaterial
+                            color="#4488ff"
+                            transparent
+                            opacity={0.08}
+                            side={THREE.BackSide}
+                        />
+                    </mesh>
+
+                    <CountryBorders globeRadius={GLOBE_RADIUS} hoveredCountry={hoveredCountry} />
+
+                    {/* 国発光オーバーレイ */}
+                    <CountryGlow
+                        countryId={hoveredCountry}
+                        globeRadius={GLOBE_RADIUS}
                     />
                 </mesh>
-
-                {/* 国発光オーバーレイ */}
-                <CountryGlow
-                    isHovered={hoveredCountry === 'JPN'}
-                    globeRadius={GLOBE_RADIUS}
-                />
-            </mesh>
-
-            {/* 回転コントロール */}
-            <OrbitControls
-                ref={controlsRef}
-                enableZoom={true}
-                enablePan={false}
-                minDistance={3}
-                maxDistance={10}
-                rotateSpeed={0.5}
-                zoomSpeed={0.8}
-                enableDamping
-                dampingFactor={0.08}
-            />
+            </group>
         </>
     )
 }

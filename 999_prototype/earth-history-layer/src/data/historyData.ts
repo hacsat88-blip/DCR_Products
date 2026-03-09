@@ -1,18 +1,28 @@
 import type { HistoryEvent } from '../types'
+import { countries } from './countries'
 
-// ダミー歴史データ（日本のみ — Step 1）
+// Step 1 用の静的データ。最初は日本5件で品質を固める。
 export const historyEvents: HistoryEvent[] = [
     {
         id: 'jp-1',
         countryId: 'JPN',
         year: 710,
-        title_kids: 'なら時代がはじまったよ！',
+        title_kids: 'ならに大きな都ができた！',
         title_adult: '平城京遷都 — 奈良時代の幕開け',
-        desc_kids: 'おおきなお寺やお城がたくさんつくられた時代。おぼうさんが大かつやくしたよ。',
-        desc_adult: '元明天皇が藤原京から平城京へ遷都。律令国家体制が確立し、東大寺や正倉院など壮大な文化遺産が生まれた。',
+        desc_kids: 'ならに新しい都ができて、お寺や文化がぐんと広がったよ。日本の国づくりが進んだ時代なんだ。',
+        desc_adult: '元明天皇が藤原京から平城京へ遷都。律令国家体制の整備が進み、東大寺や正倉院に象徴される国際色豊かな天平文化が花開いた。',
     },
     {
         id: 'jp-2',
+        countryId: 'JPN',
+        year: 1192,
+        title_kids: 'さむらいの時代が本格スタート！',
+        title_adult: '鎌倉幕府成立 — 武士の政治が始動',
+        desc_kids: 'みなもとのよりともが新しい政治を始めて、さむらいたちが活やくする時代になったよ。',
+        desc_adult: '源頼朝が征夷大将軍に任じられ、武家政権が本格化。朝廷と幕府が並び立つ新しい統治構造が日本史に定着した。',
+    },
+    {
+        id: 'jp-3',
         countryId: 'JPN',
         year: 1603,
         title_kids: 'とくがわさんが将軍になった！',
@@ -21,7 +31,7 @@ export const historyEvents: HistoryEvent[] = [
         desc_adult: '徳川家康が征夷大将軍に就任し江戸幕府を開いた。参勤交代や鎖国政策で中央集権体制を維持し、約260年にわたる平和と文化の成熟期を実現。',
     },
     {
-        id: 'jp-3',
+        id: 'jp-4',
         countryId: 'JPN',
         year: 1868,
         title_kids: 'めいじ時代スタート！',
@@ -29,12 +39,156 @@ export const historyEvents: HistoryEvent[] = [
         desc_kids: 'サムライの時代がおわって、あたらしい日本がはじまったよ。でんしゃや学校ができたんだ！',
         desc_adult: '王政復古の大号令を経て明治政府が樹立。廃藩置県・殖産興業・文明開化を推進し、急速な近代化で西洋列強に伍する国力を構築した。',
     },
+    {
+        id: 'jp-5',
+        countryId: 'JPN',
+        year: 1964,
+        title_kids: '東京オリンピックで世界とつながった！',
+        title_adult: '東京オリンピック開催 — 高度経済成長の象徴',
+        desc_kids: '新しいしんかんせんも走って、日本が世界に元気なすがたを見せた年だよ。',
+        desc_adult: '1964年東京オリンピックは戦後復興の到達点を国内外に示した。新幹線や高速道路などインフラ整備も進み、日本の高度経済成長を象徴する出来事となった。',
+    },
+    {
+        id: 'us-1',
+        countryId: 'USA',
+        year: 1776,
+        title_kids: 'アメリカが独立したよ！',
+        title_adult: 'アメリカ独立宣言 — 新国家の誕生',
+        desc_kids: '13この州が集まって、イギリスから独立することを決めた大事な年だよ。',
+        desc_adult: '1776年の独立宣言は、植民地がイギリス本国から離れ近代的共和国へ向かう転機となった。自由や権利の理念は後世に大きな影響を与えた。',
+    },
+    {
+        id: 'us-2',
+        countryId: 'USA',
+        year: 1865,
+        title_kids: '南北戦争がおわった',
+        title_adult: '南北戦争終結 — 奴隷制廃止へ',
+        desc_kids: '長い戦争が終わって、アメリカの国の形が大きく変わったよ。',
+        desc_adult: '南北戦争の終結により連邦の維持が確定し、奴隷制廃止が進んだ。産業化と国民国家化を加速させる契機でもあった。',
+    },
+    {
+        id: 'us-3',
+        countryId: 'USA',
+        year: 1969,
+        title_kids: '月に人が立った！',
+        title_adult: 'アポロ11号月面着陸 — 宇宙開発の頂点',
+        desc_kids: 'アメリカの宇宙船が月につき、人が月を歩いた歴史的なできごとだよ。',
+        desc_adult: 'アポロ11号の成功は冷戦期の科学技術競争を象徴し、人類の宇宙進出を現実のものにした。アメリカの国際的威信も大きく高まった。',
+    },
+    {
+        id: 'cn-1',
+        countryId: 'CHN',
+        year: 221,
+        title_kids: '中国がひとつにまとまった！',
+        title_adult: '秦の始皇帝 — 中国統一の達成',
+        desc_kids: 'バラバラだった国々をまとめて、中国を大きく一つにしたよ。',
+        desc_adult: '秦王政が戦国時代を終わらせて中国を統一し、中央集権国家の基盤を築いた。度量衡や文字の統一も長期的な影響を与えた。',
+    },
+    {
+        id: 'cn-2',
+        countryId: 'CHN',
+        year: 1912,
+        title_kids: '王さまの時代がおわった',
+        title_adult: '中華民国成立 — 清朝の終焉',
+        desc_kids: 'とても長く続いた皇帝の時代が終わって、新しい国の形が始まったよ。',
+        desc_adult: '辛亥革命を経て中華民国が成立し、清朝は滅亡した。近代中国の国家再編が本格化する重要な転換点となった。',
+    },
+    {
+        id: 'cn-3',
+        countryId: 'CHN',
+        year: 1949,
+        title_kids: '新しい中国ができた',
+        title_adult: '中華人民共和国成立',
+        desc_kids: 'ながい戦いのあと、新しい政府ができて今の中国の出発点になったよ。',
+        desc_adult: '国共内戦の帰趨が定まり、中華人民共和国が成立した。東アジアの国際秩序と冷戦構造にも大きな影響を及ぼした。',
+    },
+    {
+        id: 'in-1',
+        countryId: 'IND',
+        year: 1526,
+        title_kids: 'ムガル帝国が始まった',
+        title_adult: 'ムガル帝国成立 — インド亜大陸の再編',
+        desc_kids: '大きな帝国ができて、文化や建物がたくさん生まれた時代の始まりだよ。',
+        desc_adult: 'バーブルの勝利によりムガル帝国が成立し、インド亜大陸の政治秩序が大きく再編された。後のタージ・マハルなど文化的遺産にもつながる。',
+    },
+    {
+        id: 'in-2',
+        countryId: 'IND',
+        year: 1947,
+        title_kids: 'インドが独立した！',
+        title_adult: 'インド独立 — イギリス支配からの脱却',
+        desc_kids: 'ガンディーたちの活動が実って、インドが自分たちの国になったよ。',
+        desc_adult: '長い民族運動の末にインドは独立を達成した。一方で分離独立に伴う大規模な移動と衝突も生じ、現代史の大きな課題を残した。',
+    },
+    {
+        id: 'in-3',
+        countryId: 'IND',
+        year: 1950,
+        title_kids: 'みんなで国のルールを決めた',
+        title_adult: 'インド共和国成立 — 憲法施行',
+        desc_kids: '新しいけんぽうが始まって、インドは共和国としてスタートしたよ。',
+        desc_adult: '1950年に憲法が施行され、インドは共和国となった。多民族・多宗教国家を民主主義で運営する枠組みがここで確立された。',
+    },
+    {
+        id: 'gb-1',
+        countryId: 'GBR',
+        year: 1215,
+        title_kids: '王さまにもルールができた',
+        title_adult: 'マグナ・カルタ — 王権制限の起点',
+        desc_kids: '王さまでも何でも自由にできない、という約束ができた大事なできごとだよ。',
+        desc_adult: 'マグナ・カルタは王権に一定の制約を課し、法の支配や議会政治の発展につながる象徴的文書となった。',
+    },
+    {
+        id: 'gb-2',
+        countryId: 'GBR',
+        year: 1688,
+        title_kids: '名誉革命で国の仕組みが変わった',
+        title_adult: '名誉革命 — 立憲君主制の確立',
+        desc_kids: '大きな流れの中で、王さまと議会の関係が変わり、今の政治の形に近づいたよ。',
+        desc_adult: '名誉革命により議会主権が強まり、近代的な立憲君主制が確立した。のちの民主政治発展に与えた影響は大きい。',
+    },
+    {
+        id: 'gb-3',
+        countryId: 'GBR',
+        year: 1760,
+        title_kids: '工場と機械の時代が始まった',
+        title_adult: '産業革命の始動',
+        desc_kids: 'イギリスで機械や工場が広がって、世界のくらし方が大きく変わったよ。',
+        desc_adult: '18世紀後半の産業革命は生産・交通・都市生活を一変させ、資本主義と近代工業社会の拡大を牽引した。',
+    },
+    {
+        id: 'br-1',
+        countryId: 'BRA',
+        year: 1500,
+        title_kids: 'ポルトガルの船がやってきた',
+        title_adult: 'カブラル到達 — 植民地化の始まり',
+        desc_kids: 'ヨーロッパの船がブラジルに来て、その後の歴史が大きく動き始めたよ。',
+        desc_adult: '1500年にカブラルが到達し、ブラジルはポルトガル植民地支配のもとへ組み込まれていく。大西洋世界の形成と深く結びつく出来事だった。',
+    },
+    {
+        id: 'br-2',
+        countryId: 'BRA',
+        year: 1822,
+        title_kids: 'ブラジルが独立した！',
+        title_adult: 'ブラジル独立',
+        desc_kids: 'ブラジルがポルトガルから独立して、自分たちの国として歩き始めたよ。',
+        desc_adult: 'ドン・ペドロが独立を宣言し、ブラジル帝国が成立した。ラテンアメリカ独立の波の中で独自の道を歩み始めた。',
+    },
+    {
+        id: 'br-3',
+        countryId: 'BRA',
+        year: 1889,
+        title_kids: '共和国になった',
+        title_adult: '共和政移行 — ブラジル共和国成立',
+        desc_kids: '王さまの国から、みんなの代表で進む共和国へ変わったよ。',
+        desc_adult: '1889年のクーデターにより帝政が終わり、ブラジル共和国が成立した。近代国家形成と政軍関係の新段階が始まった。',
+    },
 ]
 
-export const countryNames: Record<string, string> = {
-    JPN: '日本',
-}
+export const countryNames: Record<string, string> = Object.fromEntries(
+    countries.map((country) => [country.id, country.name])
+)
 
-export const countryColors: Record<string, string> = {
-    JPN: '#00ff78',
-}
+export const countryColors: Record<string, string> = Object.fromEntries(
+    countries.map((country) => [country.id, country.color])
+)

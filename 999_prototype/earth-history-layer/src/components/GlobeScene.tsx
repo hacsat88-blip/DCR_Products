@@ -6,6 +6,7 @@ import type { Euler } from 'three'
 interface GlobeSceneProps {
     hoveredCountry: string | null
     isDragging: boolean
+    globeRotation: { x: number; y: number }
     onPointerMoveGeo: (clientX: number, clientY: number, rect: DOMRect) => void
     onPointerDown: (e: React.PointerEvent) => void
     onPointerMove: (e: React.PointerEvent) => void
@@ -20,6 +21,7 @@ interface GlobeSceneProps {
 export function GlobeScene({
     hoveredCountry,
     isDragging,
+    globeRotation,
     onPointerMoveGeo,
     onPointerDown,
     onPointerMove,
@@ -64,16 +66,19 @@ export function GlobeScene({
             onPointerDown={onPointerDown}
             onPointerMove={handlePointerMove}
             onPointerUp={onPointerUp}
-            style={{ cursor: hoveredCountry ? 'pointer' : 'grab' }}
+            onPointerLeave={onPointerUp}
+            onPointerCancel={onPointerUp}
+            style={{ cursor: hoveredCountry ? 'pointer' : 'grab', touchAction: 'none' }}
         >
             <Canvas
                 camera={{ position: [0, 0, 5], fov: 45 }}
                 gl={{ antialias: true, alpha: false }}
-                style={{ background: '#000' }}
+                style={{ background: '#000', touchAction: 'none' }}
             >
                 <Suspense fallback={null}>
                     <Globe
                         hoveredCountry={hoveredCountry}
+                        globeRotation={globeRotation}
                         onRotationChange={onRotationChange}
                     />
                 </Suspense>

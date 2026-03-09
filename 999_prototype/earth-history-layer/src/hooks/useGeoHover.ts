@@ -1,39 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { geoOrthographic, geoContains, type GeoProjection } from 'd3-geo'
 import type { Euler } from 'three'
-
-// 日本の簡易バウンディングポリゴン（Step 1用 — 後でGeoJSONに差し替え）
-const JAPAN_FEATURE: GeoJSON.Feature = {
-    type: 'Feature',
-    properties: { id: 'JPN', name: '日本' },
-    geometry: {
-        type: 'Polygon',
-        coordinates: [[
-            [129.5, 31.0],
-            [131.0, 31.0],
-            [132.0, 33.0],
-            [134.0, 33.5],
-            [135.5, 34.5],
-            [137.0, 35.0],
-            [140.0, 36.0],
-            [141.0, 38.0],
-            [141.5, 41.0],
-            [141.0, 43.0],
-            [140.0, 43.5],
-            [139.5, 43.0],
-            [140.0, 41.5],
-            [139.5, 38.5],
-            [137.0, 36.5],
-            [136.0, 36.0],
-            [134.5, 35.5],
-            [132.5, 34.0],
-            [131.5, 33.5],
-            [130.5, 33.0],
-            [130.0, 32.5],
-            [129.5, 31.0],
-        ]],
-    },
-}
+import { countries } from '../data/countries'
 
 interface UseGeoHoverOptions {
     canvasWidth: number
@@ -101,16 +69,16 @@ export function useGeoHover({ canvasWidth, canvasHeight, enabled }: UseGeoHoverO
                 return
             }
 
-            // 日本のポリゴンに含まれるか判定
-            if (geoContains(JAPAN_FEATURE, lonLat)) {
-                if (hoveredCountry !== 'JPN') {
-                    console.log('[GeoHover] ホバー国: 日本 (JPN)')
-                    setHoveredCountry('JPN')
+            const nextHoveredCountry =
+                countries.find((country) => geoContains(country.geometry, lonLat))?.id ?? null
+
+            if (nextHoveredCountry !== hoveredCountry) {
+                if (nextHoveredCountry) {
+                    const country = countries.find((item) => item.id === nextHoveredCountry)
+                    console.log(`[GeoHover] ホバー国: ${country?.name ?? nextHoveredCountry} (${nextHoveredCountry})`)
                 }
-            } else {
-                if (hoveredCountry !== null) {
-                    setHoveredCountry(null)
-                }
+
+                setHoveredCountry(nextHoveredCountry)
             }
         },
         [enabled, hoveredCountry]

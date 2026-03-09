@@ -12,4 +12,5 @@ export interface CountryInfo {
     id: string
     name: string
     color: string
+    geometry: GeoJSON.Feature<GeoJSON.Polygon | GeoJSON.MultiPolygon>
 }

@@ -5,6 +5,8 @@ import { useGeoHover } from './hooks/useGeoHover'
 import { usePointerIntent } from './hooks/usePointerIntent'
 import type { Euler } from 'three'
 
+const MAX_POLAR_ROTATION = Math.PI / 2.2
+
 /**
  * 地球史層儀 — メインアプリケーション
  * 
@@ -14,6 +16,7 @@ import type { Euler } from 'three'
 function App() {
     const [isKidsMode, setIsKidsMode] = useState(true)
     const [canvasSize, setCanvasSize] = useState({ width: window.innerWidth, height: window.innerHeight })
+    const [globeRotation, setGlobeRotation] = useState({ x: -0.18, y: -0.55 })
 
     // ウィンドウリサイズ追跡
     useEffect(() => {
@@ -25,7 +28,16 @@ function App() {
     }, [])
 
     // ドラッグ/タップ判定
-    const { isDragging, onPointerDown, onPointerMove, onPointerUp } = usePointerIntent()
+    const handleGlobeDrag = useCallback((deltaX: number, deltaY: number) => {
+        setGlobeRotation((prev) => ({
+            x: Math.max(-MAX_POLAR_ROTATION, Math.min(MAX_POLAR_ROTATION, prev.x + deltaY)),
+            y: prev.y + deltaX,
+        }))
+    }, [])
+
+    const { isDragging, onPointerDown, onPointerMove, onPointerUp } = usePointerIntent({
+        onDrag: handleGlobeDrag,
+    })
 
     // d3-geoホバー判定
     const { hoveredCountry, handlePointerMove: handleGeoPointerMove, updateRotation } =
@@ -53,6 +65,7 @@ function App() {
             <GlobeScene
                 hoveredCountry={hoveredCountry}
                 isDragging={isDragging}
+                globeRotation={globeRotation}
                 onPointerMoveGeo={handleGeoPointerMove}
                 onPointerDown={onPointerDown}
                 onPointerMove={onPointerMove}
@@ -86,6 +99,24 @@ function App() {
                 >
                     Earth History Layer — 触って掘る歴史
                 </p>
+
+                <div
+                    className="mt-4 rounded-2xl px-4 py-3 animate-fade-in"
+                    style={{
+                        background: 'rgba(6, 16, 30, 0.62)',
+                        border: '1px solid rgba(105, 170, 255, 0.14)',
+                        backdropFilter: 'blur(14px)',
+                        maxWidth: '420px',
+                        animationDelay: '450ms',
+                    }}
+                >
+                    <p className="text-[11px] tracking-[0.24em] uppercase" style={{ color: 'rgba(200, 220, 230, 0.42)' }}>
+                        hover targets
+                    </p>
+                    <p className="text-sm mt-1 leading-relaxed" style={{ color: 'rgba(232, 244, 236, 0.88)' }}>
+                        日本 / アメリカ合衆国 / 中国 / インド / イギリス / ブラジル
+                    </p>
+                </div>
             </div>
 
             {/* WebGL非対応時のフォールバック */}
