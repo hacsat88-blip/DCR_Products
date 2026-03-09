@@ -187,8 +187,13 @@
   },
   "active": "821e9a30f9b94a9b",
   "lastOpenFiles": [
-    "01_AI_Prompt/🟡Idea Spark/🟡Idea Spark.md",
+    "05_vscode(gethub copilot)/docs.instructions.md",
+    "05_vscode(gethub copilot)/test.instructions.md",
+    "05_vscode(gethub copilot)/typescript-react.instructions.md",
+    "05_vscode(gethub copilot)/copilot-instructions.md",
     "01_AI_Prompt/🟡Idea Spark/Idea Spark 付録.md",
+    "05_vscode(gethub copilot)",
+    "01_AI_Prompt/🟡Idea Spark/🟡Idea Spark.md",
     "02_notebookLM/テスト.md",
     "01_AI_Prompt/🟢FORGE/🟢FORGE.md",
     "01_AI_Prompt - ショートカット.lnk",
@@ -214,14 +219,9 @@
     "00_DCR_obsidian/01_AI_Prompt/🟢FORGE/Technique Library v1.0 1.md",
     "00_DCR_obsidian/01_AI_Prompt/🟢FORGE/Production Safe Checklist v1.0.md",
     "00_DCR_obsidian/01_AI_Prompt/🟢FORGE/Preset Pattern Library v1.0.md",
-    "00_DCR_obsidian/01_AI_Prompt/🟢FORGE/Decision Trace Template v1.0.md",
-    "00_DCR_obsidian/01_AI_Prompt/🟢FORGE/Character Design Sheet v1.0.md",
-    "00_DCR_obsidian/01_AI_Prompt/🟢FORGE/🟢02_SYNAPSE_Operations_v1.2.md",
-    "00_DCR_obsidian/01_AI_Prompt/🟢FORGE/🟢01_SYNAPSE_Engines_v1.2.md",
     "00_DCR_obsidian/01_AI_Prompt/🟢FORGE",
     "00_DCR_obsidian/01_AI_Prompt/退避/🟢PRISM v4.4",
     "generate_prompts.js",
-    "ai-prompt-manager/ai-service.js",
-    "ai-prompt-manager/options.js"
+    "ai-prompt-manager/ai-service.js"
   ]
 }
