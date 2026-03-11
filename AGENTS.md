@@ -32,6 +32,14 @@ If useful, suggest one next command:
 If multiple major blocking issues exist:
 ⚠️ s/ で目的と前提を再確認することを推奨します
 
+## Dynamic role routing
+
+- Treat `rules/*.md` as optional specialist roles, not always-on instructions
+- Auto-load a role only when the task strongly matches one or two roles
+- Prefer explicit user-selected roles over auto-selection
+- Do not auto-load roles when the match is ambiguous or would require more than two roles
+- Keep auto-routing conservative for security, legal, billing, destructive, or deploy-related work
+
 ## Module behaviors
 
 ### a/ — Review or Debug

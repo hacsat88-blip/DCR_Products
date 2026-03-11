@@ -101,7 +101,7 @@ Deploy to editors via deploy.ps1.
 
 deploy.ps1
 One-way sync script: skills/ → ~/.agents/skills/ (VS Code Copilot),
-rules/ → ~/.cursor/rules/ (Cursor).
+rules/*.md (excluding `_*.md`) → generated ~/.cursor/rules/*.mdc + dcr-kernel.md (Cursor).
 
 ---
 

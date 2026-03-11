@@ -6,7 +6,7 @@
 .DESCRIPTION
   対象エディタと同期先:
     VS Code Copilot : ~/.agents/skills/
-    Cursor          : ~/.cursor/rules/  (rules/ を同期)
+    Cursor          : ~/.cursor/rules/  (rules/ から .mdc を生成して同期)
     Claude Code     : プロジェクト単位 (CLAUDE.md を生成する場合は別途)
 
 .PARAMETER Target
@@ -40,9 +40,78 @@ $UserHome = $env:USERPROFILE
 # ── Paths ──
 $SourceSkills = Join-Path $RepoRoot "skills"
 $SourceRules  = Join-Path $RepoRoot "rules"
+$SourceCursorKernel = Join-Path $RepoRoot ".cursor\rules\dcr-kernel.md"
 
 $DestVSCodeSkills = Join-Path $UserHome ".agents\skills"
 $DestCursorRules  = Join-Path $UserHome ".cursor\rules"
+
+function Get-TempDirectory {
+    $tempDir = Join-Path ([System.IO.Path]::GetTempPath()) ("dcr-cursor-rules-" + [System.Guid]::NewGuid().ToString("N"))
+    New-Item -ItemType Directory -Path $tempDir -Force | Out-Null
+    return $tempDir
+}
+
+function Get-RuleDescription {
+    param(
+        [string]$Path
+    )
+
+    $lines = Get-Content -Path $Path -Encoding utf8
+    foreach ($line in $lines) {
+        $trimmed = $line.Trim()
+        if (-not $trimmed) {
+            continue
+        }
+        if ($trimmed.StartsWith("#")) {
+            continue
+        }
+        if ($trimmed.StartsWith('```')) {
+            continue
+        }
+        return $trimmed.Replace([char]34, [char]39)
+    }
+
+    return [System.IO.Path]::GetFileNameWithoutExtension($Path)
+}
+
+function New-CursorRulePackage {
+    param(
+        [string]$RulesSource,
+        [string]$KernelSource,
+        [string]$OutputDir
+    )
+
+    if (-not (Test-Path $RulesSource)) {
+        throw "Source rules not found: $RulesSource"
+    }
+
+    if (-not (Test-Path $KernelSource)) {
+        throw "Cursor kernel not found: $KernelSource"
+    }
+
+    $ruleFiles = Get-ChildItem -Path $RulesSource -File -Filter *.md |
+        Where-Object { $_.BaseName -notlike "_*" } |
+        Sort-Object Name
+    foreach ($ruleFile in $ruleFiles) {
+        $description = Get-RuleDescription -Path $ruleFile.FullName
+        $body = Get-Content -Path $ruleFile.FullName -Raw -Encoding utf8
+        $cursorContent = @(
+            "---"
+            "description: $description"
+            'globs: ""'
+            "alwaysApply: false"
+            "---"
+            ""
+            $body.TrimEnd()
+            ""
+        ) -join "`r`n"
+
+        $destination = Join-Path $OutputDir ($ruleFile.BaseName + ".mdc")
+        Set-Content -Path $destination -Value $cursorContent -Encoding utf8
+    }
+
+    Copy-Item -Path $KernelSource -Destination (Join-Path $OutputDir "dcr-kernel.md") -Force
+}
 
 function Sync-Directory {
     param(
@@ -164,7 +233,15 @@ if ($Check) {
         Compare-Directories -Source $SourceSkills -Destination $DestVSCodeSkills -Label "VS Code Copilot skills"
     }
     if ($Target -eq "all" -or $Target -eq "cursor") {
-        Compare-Directories -Source $SourceRules -Destination $DestCursorRules -Label "Cursor rules"
+        $cursorTempDir = Get-TempDirectory
+        try {
+            New-CursorRulePackage -RulesSource $SourceRules -KernelSource $SourceCursorKernel -OutputDir $cursorTempDir
+            Compare-Directories -Source $cursorTempDir -Destination $DestCursorRules -Label "Cursor rules"
+        } finally {
+            if (Test-Path $cursorTempDir) {
+                Remove-Item -Path $cursorTempDir -Recurse -Force
+            }
+        }
     }
     Write-Host ""
     Write-Host "Drift check complete." -ForegroundColor Cyan
@@ -176,7 +253,15 @@ if ($Target -eq "all" -or $Target -eq "vscode") {
 }
 
 if ($Target -eq "all" -or $Target -eq "cursor") {
-    Sync-Files -Source $SourceRules -Destination $DestCursorRules -Label "Cursor rules"
+    $cursorTempDir = Get-TempDirectory
+    try {
+        New-CursorRulePackage -RulesSource $SourceRules -KernelSource $SourceCursorKernel -OutputDir $cursorTempDir
+        Sync-Files -Source $cursorTempDir -Destination $DestCursorRules -Label "Cursor rules"
+    } finally {
+        if (Test-Path $cursorTempDir) {
+            Remove-Item -Path $cursorTempDir -Recurse -Force
+        }
+    }
 }
 
 Write-Host ""
