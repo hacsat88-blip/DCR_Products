@@ -46,13 +46,13 @@ AI system entry:
 
 # Main Directories
 
-## Execution layer (auto-loaded by Copilot)
+## Execution layer (auto-loaded by each editor)
 
-.github/
-Copilot entry point (copilot-instructions.md).
+.github/copilot-instructions.md
+VS Code Copilot entry point. DCR Kernel inlined.
 
 .ai/
-AI system kernel, repo map, and behavior modules.
+AI system kernel, repo map, and behavior modules (VS Code Copilot).
 
 .ai/module/
 Specialized modules (architecture, debugging, review, prompting).
@@ -62,6 +62,18 @@ Trigger-activated command definitions (a/, i/, r/, s/, d/).
 
 .vscode/
 VS Code workspace settings (useInstructionFiles: true).
+
+.cursor/rules/dcr-kernel.md
+Cursor entry point. DCR Kernel + all module behaviors inlined.
+
+CLAUDE.md
+Claude Code entry point. DCR Kernel + safety/permission model.
+
+.gemini/settings.json
+Antigravity (Gemini) entry point. DCR Kernel via systemInstruction.
+
+AGENTS.md
+Codex (OpenAI) entry point. DCR Kernel + all module behaviors inlined.
 
 ## Asset layer (not auto-loaded)
 
