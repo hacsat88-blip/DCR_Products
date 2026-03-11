@@ -4,21 +4,17 @@
     "type": "split",
     "children": [
       {
-        "id": "04b5ade5c8b405ac",
+        "id": "524150127f0ea667",
         "type": "tabs",
         "children": [
           {
-            "id": "821e9a30f9b94a9b",
+            "id": "3495ea441d16cfbb",
             "type": "leaf",
             "state": {
-              "type": "markdown",
-              "state": {
-                "file": "01_AI_Prompt/🟡Idea Spark/Idea Spark 付録.md",
-                "mode": "source",
-                "source": false
-              },
+              "type": "empty",
+              "state": {},
               "icon": "lucide-file",
-              "title": "Idea Spark 付録"
+              "title": "新規タブ"
             }
           }
         ]
@@ -185,13 +181,13 @@
       "obsidian-memos:Thino": false
     }
   },
-  "active": "821e9a30f9b94a9b",
+  "active": "3495ea441d16cfbb",
   "lastOpenFiles": [
+    "01_AI_Prompt/🟡Idea Spark/Idea Spark 付録.md",
     "05_vscode(gethub copilot)/docs.instructions.md",
     "05_vscode(gethub copilot)/test.instructions.md",
     "05_vscode(gethub copilot)/typescript-react.instructions.md",
     "05_vscode(gethub copilot)/copilot-instructions.md",
-    "01_AI_Prompt/🟡Idea Spark/Idea Spark 付録.md",
     "05_vscode(gethub copilot)",
     "01_AI_Prompt/🟡Idea Spark/🟡Idea Spark.md",
     "02_notebookLM/テスト.md",
