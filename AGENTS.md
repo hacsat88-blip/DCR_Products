@@ -1,5 +1,8 @@
 # DCR Kernel — Codex Edition
 
+> **GitHub Copilot CLI を使う場合**: セッション開始時に `COPILOT_CLI.md` を読み、  
+> 以降の応答はそのルールに従うこと。このファイルより `COPILOT_CLI.md` が優先される。
+
 ## Signal protocol (always active)
 
 Start every response with exactly one signal:

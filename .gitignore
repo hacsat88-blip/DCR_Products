@@ -23,3 +23,6 @@ npm-debug.log*
 .env.*
 *.key
 *.pem
+
+# 外部リポジトリ (別 .git/ を持つリファレンス)
+copilot-cli-for-beginners/
