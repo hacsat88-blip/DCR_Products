@@ -1,8 +1,11 @@
-# Obsidian
-.obsidian/workspace.json
-.obsidian/workspace-mobile.json
-.obsidian/plugins/
-.obsidian/themes/
+# Obsidian (root)
+.obsidian/
+
+# Obsidian (templates)
+templates/obsidian/.obsidian/plugins/
+templates/obsidian/.obsidian/themes/
+templates/obsidian/.obsidian/workspace.json
+templates/obsidian/.obsidian/workspace-mobile.json
 
 # OS
 .DS_Store
