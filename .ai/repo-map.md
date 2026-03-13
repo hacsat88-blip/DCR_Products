@@ -111,10 +111,19 @@ VS Code workspace settings (useInstructionFiles: true).
 rules/
 Agent-specific behavior rules (84 agents). 正本。
 deploy.ps1 で Cursor (.mdc) / VS Code (skills) へ配布。
+`_` プレフィクスファイルは deploy 対象外の参照ドキュメント:
+- _METADATA.md: メタデータポリシー定義
+- _coding-standards.md: コードスタイル & セキュリティベースライン (ECC 由来)
+- _testing-standards.md: テスト基準 & TDD 原則 (ECC 由来)
+- _git-conventions.md: コミット & ブランチ規約 (ECC 由来)
 
 skills/
-Skill definitions (51 skills). Git-managed source of truth.
+Skill definitions (54 skills). Git-managed source of truth.
 deploy.ps1 で ~/.agents/skills/ (VS Code Copilot) へ配布。
+ECC 部分採用スキル (3):
+- search-first/: 実装前調査ワークフロー
+- strategic-compact/: 論理的コンテキスト整理
+- tdd-workflow/: テスト駆動開発サイクル
 
 templates/
 Model-specific configuration templates (archive/source).
