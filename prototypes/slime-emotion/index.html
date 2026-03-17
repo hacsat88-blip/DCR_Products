@@ -1,0 +1,105 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>感情粘菌 / Emotion Slime</title>
+  <style>
+    *{box-sizing:border-box} body{margin:0;overflow:hidden;background:#0a0a0f;color:#fff;font-family:system-ui}
+    canvas{position:fixed;inset:0;width:100vw;height:100vh}
+    .ui{position:fixed;inset:0;pointer-events:none}
+    .top{position:absolute;top:14px;left:14px;right:14px;display:flex;justify-content:space-between;align-items:center}
+    .title{font-weight:300;letter-spacing:.08em;opacity:.9}
+    .ctrl{pointer-events:auto;display:flex;gap:8px}
+    input{background:#ffffff12;border:1px solid #ffffff33;color:#fff;padding:10px 14px;border-radius:20px;min-width:220px}
+    button{background:#00ffcc22;color:#00ffcc;border:1px solid #00ffcc66;padding:10px 14px;border-radius:20px;cursor:pointer}
+    .status{position:absolute;left:16px;bottom:12px;font-size:12px;opacity:.75}
+    .legend{position:absolute;right:16px;bottom:12px;font-size:12px;display:grid;gap:4px}
+    .dot{display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:6px}
+  </style>
+</head>
+<body>
+  <canvas id="cv"></canvas>
+  <div class="ui">
+    <div class="top">
+      <div class="title">感情粘菌 / Emotion Slime</div>
+      <div class="ctrl">
+        <input id="w" placeholder="例: AI, 選挙, 戦争, 経済" />
+        <button id="go">観察する</button>
+      </div>
+    </div>
+    <div class="status" id="status">待機中</div>
+    <div class="legend">
+      <div><span class="dot" style="background:#ff4040"></span>怒り</div>
+      <div><span class="dot" style="background:#ffdd00"></span>喜び</div>
+      <div><span class="dot" style="background:#4499ff"></span>悲しみ</div>
+      <div><span class="dot" style="background:#bb44ff"></span>恐怖</div>
+      <div><span class="dot" style="background:#00ffcc"></span>驚き</div>
+      <div><span class="dot" style="background:#44ff88"></span>嫌悪</div>
+    </div>
+  </div>
+  <script>
+    const C={anger:'#ff4040',joy:'#ffdd00',sadness:'#4499ff',fear:'#bb44ff',surprise:'#00ffcc',disgust:'#44ff88'};
+    const S=(id)=>document.getElementById(id);
+    const words={
+      'AI':[['革新への驚き','surprise',.9,.5,.15],['雇用不安','fear',.8,.22,.35],['利便性の喜び','joy',.75,.78,.3],['規制議論の怒り','anger',.68,.2,.62],['倫理の嫌悪','disgust',.6,.8,.62],['格差の悲しみ','sadness',.66,.5,.8]],
+      '選挙':[['政治不信','anger',.9,.2,.2],['不正不安','fear',.8,.8,.2],['期待','joy',.6,.5,.4],['汚職嫌悪','disgust',.82,.2,.62],['結果の驚き','surprise',.76,.8,.62],['分断の悲しみ','sadness',.78,.5,.8]],
+      '戦争':[['危機','fear',.96,.5,.14],['憤り','anger',.88,.2,.3],['悲劇','sadness',.92,.8,.3],['速報','surprise',.75,.35,.52],['嫌悪','disgust',.82,.78,.62],['祈り','joy',.4,.5,.78]],
+      '経済':[['物価高怒り','anger',.9,.2,.22],['不況恐怖','fear',.86,.8,.22],['格差悲しみ','sadness',.8,.2,.55],['株価驚き','surprise',.84,.8,.55],['好景気喜び','joy',.6,.5,.42],['税負担嫌悪','disgust',.75,.5,.78]],
+      '災害':[['命の危機','fear',.98,.5,.14],['被害悲しみ','sadness',.94,.2,.32],['速報衝撃','surprise',.88,.8,.32],['対応怒り','anger',.85,.2,.62],['連帯喜び','joy',.52,.8,.62],['不信嫌悪','disgust',.7,.5,.8]]
+    };
+    const fallback=[['未知への驚き','surprise',.8,.5,.15],['不安','fear',.7,.2,.35],['喜び','joy',.6,.8,.35],['怒り','anger',.65,.2,.62],['悲しみ','sadness',.68,.8,.62],['嫌悪','disgust',.55,.5,.8]];
+    function map(word){
+      if(words[word]) return words[word];
+      for(const k of Object.keys(words)){ if(word.includes(k)||k.includes(word)) return words[k];}
+      return fallback;
+    }
+    function build(raw){
+      const nodes=raw.map((r,i)=>({id:'n'+i,label:r[0],emotion:r[1],intensity:r[2],x:r[3],y:r[4],p:0}));
+      const edges=[]; const add=new Set();
+      for(let i=0;i<nodes.length;i++){
+        const d=[]; for(let j=0;j<nodes.length;j++){if(i===j) continue; const dx=nodes[i].x-nodes[j].x,dy=nodes[i].y-nodes[j].y; d.push([j,Math.hypot(dx,dy)]);}
+        d.sort((a,b)=>a[1]-b[1]); for(let k=0;k<3;k++){const j=d[k][0], key=[Math.min(i,j),Math.max(i,j)].join('-'); if(add.has(key)) continue; add.add(key); edges.push({a:i,b:j,D:.1,Q:0});}
+      }
+      return {nodes,edges,t:0,done:false};
+    }
+    function solve(A,b){ // Gauss-Jordan
+      const n=b.length,M=A.map((r,i)=>r.concat([b[i]]));
+      for(let p=0;p<n;p++){let m=p; for(let r=p+1;r<n;r++) if(Math.abs(M[r][p])>Math.abs(M[m][p])) m=r; [M[p],M[m]]=[M[m],M[p]];
+        const pv=M[p][p]||1e-12; for(let c=p;c<=n;c++) M[p][c]/=pv;
+        for(let r=0;r<n;r++){if(r===p) continue; const f=M[r][p]; if(Math.abs(f)<1e-12) continue; for(let c=p;c<=n;c++) M[r][c]-=f*M[p][c];}}
+      return M.map(r=>isFinite(r[n])?r[n]:0);
+    }
+    function step(g){
+      const N=g.nodes.length,L=Array.from({length:N},()=>Array(N).fill(0));
+      for(const e of g.edges){const na=g.nodes[e.a],nb=g.nodes[e.b],len=Math.hypot(na.x-nb.x,na.y-nb.y)+1e-4,c=e.D/len; L[e.a][e.a]+=c; L[e.b][e.b]+=c; L[e.a][e.b]-=c; L[e.b][e.a]-=c; e.len=len;}
+      const mean=g.nodes.reduce((s,n)=>s+n.intensity,0)/N, I=g.nodes.map(n=>n.intensity-mean);
+      const A=[],b=[]; for(let i=1;i<N;i++){A.push([]); for(let j=1;j<N;j++)A[i-1].push(L[i][j]); b.push(I[i]);}
+      const p=[0].concat(solve(A,b)); g.nodes.forEach((n,i)=>n.p=p[i]||0);
+      let maxD=0; const mu=1.8,decay=1.5,dt=.012;
+      for(const e of g.edges){const q=Math.abs((e.D/e.len)*(p[e.a]-p[e.b])); e.Q=q; const nd=Math.max(.002,Math.min(5,e.D+dt*(Math.pow(q+1e-9,mu)-decay*e.D))); maxD=Math.max(maxD,Math.abs(nd-e.D)); e.D=nd;}
+      g.t++; g.done=maxD<8e-5 || g.t>800; return maxD;
+    }
+    const cv=S('cv'),ctx=cv.getContext('2d'); let W=0,H=0,DPR=1;
+    function rs(){DPR=window.devicePixelRatio||1; W=innerWidth; H=innerHeight; cv.width=W*DPR; cv.height=H*DPR; ctx.setTransform(DPR,0,0,DPR,0,0);}
+    addEventListener('resize',rs); rs();
+    function toS(n){const p=.1; return {x:(p+n.x*(1-2*p))*W,y:(p+n.y*(1-2*p))*H};}
+    let G=build(map('AI')), tick=0;
+    function draw(){
+      tick++; ctx.fillStyle='rgba(10,10,15,.16)'; ctx.fillRect(0,0,W,H);
+      if(!G.done){for(let i=0;i<5;i++) step(G); S('status').textContent=`探索中… step ${G.t}`;} else S('status').textContent=`収束完了 step ${G.t}`;
+      for(let i=0;i<G.edges.length;i++){const e=G.edges[i],a=toS(G.nodes[e.a]),b=toS(G.nodes[e.b]); const da=G.nodes[e.a],db=G.nodes[e.b],n=da.intensity>db.intensity?da:db; const col=C[n.emotion]||'#fff';
+        const pulse=Math.sin(tick*.06+i*.3)*.2+.8, w=e.D*14, al=Math.min(1,e.D*2.4)*pulse; if(w<.06) continue;
+        for(const k of [[5,.04],[2.2,.14],[.85,.84]]){ctx.beginPath();ctx.moveTo(a.x,a.y);ctx.lineTo(b.x,b.y);ctx.lineCap='round';ctx.lineWidth=w*k[0];ctx.strokeStyle=col+Math.round(al*k[1]*255).toString(16).padStart(2,'0');ctx.stroke();}
+      }
+      for(const n of G.nodes){const p=toS(n),col=C[n.emotion]||'#fff',r=4+n.intensity*12; const g=ctx.createRadialGradient(p.x,p.y,0,p.x,p.y,r*5); g.addColorStop(0,col+'55'); g.addColorStop(1,col+'00'); ctx.beginPath();ctx.arc(p.x,p.y,r*5,0,Math.PI*2);ctx.fillStyle=g;ctx.fill();
+        ctx.beginPath();ctx.arc(p.x,p.y,r,0,Math.PI*2);ctx.fillStyle=col;ctx.shadowColor=col;ctx.shadowBlur=18;ctx.fill();ctx.shadowBlur=0;
+      }
+      requestAnimationFrame(draw);
+    }
+    S('go').onclick=()=>{const w=S('w').value.trim()||'AI'; G=build(map(w)); S('status').textContent='初期化…';};
+    S('w').addEventListener('keydown',e=>{if(e.key==='Enter')S('go').click();});
+    requestAnimationFrame(draw);
+  </script>
+</body>
+</html>
