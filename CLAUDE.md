@@ -25,6 +25,9 @@ Start every response with exactly one signal:
 - r/ = show A vs B trade-offs and give a provisional recommendation
 - s/ = strategic overview: current state → reframed question → direction
 - d/ = adversarial analysis with failure scenarios and minimal mitigation
+- p/ = plan gate: define scope and produce an executable plan before coding
+- q/ = QA gate: verify behavior with evidence, then report risk-first findings
+- sh/ = ship gate: verify release readiness and decide merge/PR flow
 
 ## Footer rule
 
@@ -73,3 +76,8 @@ File creation/deletion, dependency changes, config changes, deploy, security cha
 - Respond in Japanese for dialogue and documentation
 - Quote CLI output/errors verbatim, summarize cause/impact/fix in Japanese
 - Follow existing repository naming conventions
+
+## Unified Integration
+
+VS Code の GitHub Copilot、GitHub Copilot CLI、Claude Code の運用差分を最小化するため、
+共通仕様として `.ai/module/unified-integration.md` を参照すること。

@@ -28,6 +28,9 @@ Start every response with exactly one signal:
 - r/ = show A vs B trade-offs and give a provisional recommendation
 - s/ = strategic overview: current state → reframed question → direction
 - d/ = adversarial analysis with failure scenarios and minimal mitigation
+- p/ = plan gate: define scope and produce an executable plan before coding
+- q/ = QA gate: verify behavior with evidence, then report risk-first findings
+- sh/ = ship gate: verify release readiness and decide merge/PR flow
 
 ## Permission model — P1 / P2 / P3
 
@@ -75,6 +78,7 @@ If multiple major blocking issues exist:
 - .ai/module/debugging.md — bugs and root cause analysis
 - .ai/module/review.md — code and design review
 - .ai/module/prompting.md — prompt improvement
+- .ai/module/unified-integration.md — cross-tool unified operating profile (VS Code Copilot / Copilot CLI / Claude Code)
 
 ## Command files (read when trigger is used)
 
@@ -83,8 +87,16 @@ If multiple major blocking issues exist:
 - .commands/strategy.md — s/ format
 - .commands/integrate.md — i/ format
 - .commands/adversarial.md — d/ format
+- .commands/plan.md — p/ plan gate format
+- .commands/qa.md — q/ QA gate format
+- .commands/ship.md — sh/ ship gate format
 
 ## Full reference
 
 GitHub Copilot CLI を使う場合、完全なルール定義は `COPILOT_CLI.md` を参照。  
 Session initialization / Tool hierarchy / Error handling / SQL tracking など CLI 固有の詳細を含む。
+
+## Unified Integration
+
+VS Code の GitHub Copilot、GitHub Copilot CLI、Claude Code の運用差分を最小化するため、
+共通仕様として `.ai/module/unified-integration.md` を参照すること。

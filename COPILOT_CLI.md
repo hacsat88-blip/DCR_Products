@@ -31,9 +31,10 @@
 
 ```
 1. .ai/repo-map.md を読む（プロジェクト構造と命名規則の確認）
-2. タスクに一致する rules/*.md を最大2つロード（後述のルーティング基準に従う）
-3. 対応する skills/* があれば確認
-4. 3ステップ以上のタスク → plan.md を session-state に作成し SQL に登録
+2. .ai/module/unified-integration.md を読む（共通統合プロファイルの確認）
+3. タスクに一致する rules/*.md を最大2つロード（後述のルーティング基準に従う）
+4. 対応する skills/* があれば確認
+5. 3ステップ以上のタスク → plan.md を session-state に作成し SQL に登録
 ```
 
 ---
@@ -47,6 +48,9 @@
 | `r/` | A vs B トレードオフを示し暫定推奨を出す |
 | `s/` | 戦略概観：現状 → 問いのリフレーム → 方向性評価 |
 | `d/` | 悪手分析：失敗シナリオと最小限の緩和策 |
+| `p/` | Plan Gate：実装前にスコープと実行計画を確定 |
+| `q/` | QA Gate：証跡ベースで検証し、リスク順で報告 |
+| `sh/` | Ship Gate：検証結果を満たした上で出荷判断 |
 
 ### `s/` の構造
 1. **現状**: 何が起きているか（事実のみ）
@@ -295,6 +299,14 @@ UPDATE todos SET status = 'done' WHERE id = 'add-auth-middleware';
 ```
 ⚠️ s/ で目的と前提を再確認することを推奨します
 ```
+
+---
+
+## Unified Integration Bridge
+
+VS Code の GitHub Copilot・GitHub Copilot CLI・Claude Code で
+同一運用を行うため、共通仕様 `.ai/module/unified-integration.md` を参照する。
+このファイルが CLI 固有仕様と衝突する場合は、CLI 安全制約を優先する。
 
 ---
 
