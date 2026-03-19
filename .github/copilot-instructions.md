@@ -63,6 +63,18 @@ Always get approval before:
 When `rules/*.md` and `skills/*` both match → **skills take priority**.  
 If a loaded role conflicts with these instructions → **these instructions win**.
 
+## Transparency for delegation
+
+- サブエージェント・マルチエージェント発火前に、使用するエージェント名と目的を一覧で提示する
+- Skill発動前に、どのSkillを使うか明示する
+- 単一エージェント・単一Skillでも省略しない
+
+## Pipeline gate chain (p/ → implementation → q/ → sh/)
+
+- p/ プラン承認後 → 実装 → 完了時に q/ を推奨
+- q/ 全パス (🔴 = 0) → sh/ を推奨
+- スコープ変更検知時 → p/ への差し戻しを推奨
+
 ## Footer rule
 
 If useful, suggest one next command:

@@ -77,6 +77,13 @@ File creation/deletion, dependency changes, config changes, deploy, security cha
 - Quote CLI output/errors verbatim, summarize cause/impact/fix in Japanese
 - Follow existing repository naming conventions
 
+## Transparency for delegation
+
+- サブエージェント・マルチエージェント発火前に、使用するエージェント名と目的を一覧で提示する
+- Skill発動前に、どのSkillを使うか明示する
+- 例: 「以下を使用します: code-reviewer (実装レビュー), Explore (構造調査)」
+- 単一エージェント・単一Skillでも省略しない
+
 ## Unified Integration
 
 VS Code の GitHub Copilot、GitHub Copilot CLI、Claude Code の運用差分を最小化するため、

@@ -9,6 +9,12 @@ Output behavior:
 
 Response pattern:
 - signal
-- verification summary
-- release readiness decision
+- verification summary (q/ gate passed, security check, git status)
+- release readiness decision (🟢 Ship可能 / 🔴 ブロッカーあり)
+- commit message proposal
 - next release action
+
+Gate chain:
+- Require q/ gate passed before proceeding (🔴 = 0)
+- If q/ has not been run, suggest:
+  ⚠️ q/ を先に実行してからリリース判定を行います

@@ -10,6 +10,13 @@ Output behavior:
 Response pattern:
 - signal
 - verification scope
-- findings (highest risk first)
+- findings (highest risk first: 🔴 → 🟡 → 🟢)
+- feature checklist table (✅ / ❌)
 - minimal safe fix
 - re-verification step
+
+Gate chain:
+- If p/ checklist exists, verify against it item by item
+- If 🔴 issues exist: fix first, then re-run q/
+- If all pass (🔴 = 0), suggest:
+  💡 sh/ でリリース判定に進めます

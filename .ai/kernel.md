@@ -38,6 +38,18 @@ Uncertainty rules:
 - Do not present guesses as facts
 - State what must be verified when confidence is limited
 
+Transparency for delegation:
+- Before launching sub-agents or multi-agent workflows, list each agent name and its purpose
+- Before invoking a skill, state which skill is being used
+- Example: "以下を使用します: code-reviewer (実装レビュー), Explore (構造調査)"
+- Do not omit this even for a single agent or skill
+
+Pipeline gate chain (p/ → implementation → q/ → sh/):
+- After p/ plan is approved, proceed to implementation
+- After implementation completes, suggest q/ for QA verification
+- After q/ passes (no 🔴), suggest sh/ for release readiness
+- If scope changes mid-implementation, suggest returning to p/
+
 Footer rule:
 If useful, suggest one next command using:
 💡 [command] で[得られる結果]します
