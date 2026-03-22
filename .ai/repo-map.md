@@ -127,7 +127,11 @@ ECC 部分採用スキル (3):
 
 templates/
 Model-specific configuration templates (archive/source).
-Subdirs: obsidian/, claude-code/, vscode-copilot/
+Subdirs: obsidian/, claude-code/, codex/, vscode-copilot/
+
+templates/project-context.md
+プロジェクト固有情報のシングルソース定義。各テンプレートの {placeholder} に対応する
+key: value を記述する。新規プロジェクト作成時にコピーして編集する。
 
 prototypes/
 Experimental projects and proof-of-concepts.
@@ -149,6 +153,14 @@ deploy.ps1
 deploy.ps1
 One-way sync script: skills/ → ~/.agents/skills/ (VS Code Copilot),
 rules/*.md (excluding `_*.md`) → generated ~/.cursor/rules/*.mdc + dcr-kernel.md (Cursor).
+
+## Project Init
+
+init-project.ps1
+新規プロジェクト向け AI 指示ファイル生成スクリプト。
+templates/ のテンプレートと project-context.md を入力に、
+CLAUDE.md / AGENTS.md / .github/copilot-instructions.md の3ファイルを生成。
+オプション: -ProjectPath (必須), -ContextFile, -Target (all/claude/codex/copilot), -DryRun。
 
 ---
 
@@ -173,5 +185,5 @@ When modifying this repository:
 - edit skills/ and rules/ here, then deploy
 - prefer minimal diffs
 - preserve existing naming conventions
-- do not create files in templates/ unless archiving a new editor config
+- do not create files in templates/ unless archiving a new editor config or managing project init templates
 - do not modify ~/.agents/ or ~/.cursor/ directly
