@@ -2,27 +2,26 @@
 name: copilot
 description: |
   GitHub Copilot CLI を使用してコードレビュー・分析・設計相談を行う。
-  複雑さに応じて /fleet（並列エージェント）を自動選択する。
+  複雑さに応じて並列エージェントモードを自動選択する。
   トリガー: "copilot", "copilotで", "copilotに聞いて", "並列レビュー", "fleetで"
   使用場面: (1) コードレビュー、(2) 設計相談、(3) バグ調査、(4) 複数ファイル並列分析、(5) リファクタリング計画
 ---
 
 # Copilot CLI スキル
 
-GitHub Copilot CLI（`copilot` コマンド）を使用してコードレビュー・分析を実行するスキル。
-モデルはデフォルトで **GPT-5.3-Codex**（Pro+ 加入済みのため自動選択）。
-タスクの複雑さに応じて `/fleet` 並列エージェントを自動発火する。
+GitHub Copilot CLI（`gh copilot` コマンド）を使用してコードレビュー・分析を実行するスキル。
+タスクの複雑さに応じて並列エージェントモードを自動選択する。
 
 ## 事前チェック（必須）
 
 スキル実行前に以下を確認すること。一つでも失敗したら実行を中止し、ユーザーに理由を伝える。
 
 ```bash
-# 1. Copilot CLI インストール確認
-which copilot || gh copilot --version 2>/dev/null || {
-  echo "❌ Copilot CLI が見つかりません。"
-  echo "  - 新CLI: gh extension install github/gh-copilot のあと gh copilot init"
-  echo "  - または: https://github.com/github/copilot-cli を参照"
+# 1. Copilot CLI インストール確認（gh extension として確認）
+gh copilot --version 2>/dev/null || {
+  echo "❌ GitHub Copilot CLI が見つかりません。"
+  echo "  インストール: gh extension install github/gh-copilot"
+  echo "  初期化: gh copilot init"
   exit 1
 }
 
@@ -42,41 +41,40 @@ TARGET_DIR="${1:-$(pwd)}"
 
 ## 複雑さ判定ルール（自動選択）
 
-以下のいずれかに該当する場合は `/fleet`（並列エージェント）を使用する。
+以下のいずれかに該当する場合は並列エージェントモードを使用する。
 
 | 条件 | 判定 |
 |------|------|
-| 変更ファイル数 ≥ 3 | 🚀 `/fleet` |
-| 複数モジュール・パッケージを跨ぐ | 🚀 `/fleet` |
-| テスト + 実装を同時に分析する | 🚀 `/fleet` |
-| 「全体を」「横断して」「一気に」等の指示 | 🚀 `/fleet` |
+| 変更ファイル数 ≥ 3 | 🚀 並列実行 |
+| 複数モジュール・パッケージを跨ぐ | 🚀 並列実行 |
+| テスト + 実装を同時に分析する | 🚀 並列実行 |
+| 「全体を」「横断して」「一気に」等の指示 | 🚀 並列実行 |
 | 上記に該当しない単一ファイル・単純タスク | ✅ 通常実行 |
 
 ## 実行パターン
+
+> **注記**: `gh copilot suggest` / `gh copilot explain` が実際のコマンドです。
+> 「計画」「並列実行」はワークフローの概念であり、複数の `gh copilot` 呼び出しに分解して実現します。
 
 ### A. 通常実行（シンプルなタスク）
 
 ```bash
 cd <project_directory>
-copilot -p "<リクエスト>"
+gh copilot suggest "<リクエスト>"
+# または説明・解析の場合:
+gh copilot explain "<対象コードや質問>"
 ```
 
-### B. 並列実行（複雑なタスク） `/fleet` 使用
+### B. 並列実行（複雑なタスク）
 
-```bash
-# Step 1: 計画を立てる
-cd <project_directory>
-copilot /plan "<リクエスト>"
-
-# Step 2: 計画を確認・承認後に並列実行
-copilot /fleet
-```
-
-または一発で実行する場合:
+複数の対象を独立したリクエストに分割して順次・並行して実行する:
 
 ```bash
 cd <project_directory>
-copilot /fleet "<リクエスト>"
+# 対象ごとに分割して実行
+gh copilot suggest "src/api/ のレビュー: <リクエスト>"
+gh copilot suggest "src/auth/ のレビュー: <リクエスト>"
+gh copilot suggest "tests/ のレビュー: <リクエスト>"
 ```
 
 ## プロンプトのルール
@@ -100,17 +98,20 @@ Copilot に渡すリクエストには以下を必ず含めること:
 
 | エラー | 対処 |
 |--------|------|
-| `command not found: copilot` | `gh extension install github/gh-copilot` を案内 |
+| `command not found: gh` | `gh` CLI をインストール後、`gh extension install github/gh-copilot` を案内 |
+| `gh copilot` が見つからない | `gh extension install github/gh-copilot` を促す |
 | GitHub 認証エラー | `gh auth login` を促す |
-| `/fleet` でタイムアウト | タスクを分割して個別に再実行 |
-| モデル応答なし | `/model` で利用可能なモデルを確認し再試行 |
+| タイムアウト | タスクを分割して個別に再実行 |
 | 空の出力 | プロンプトを具体化して再試行 |
 
-## モデルについて
+## 利用可能なモデルの確認
 
-- Pro+ 加入済みのため **GPT-5.3-Codex がデフォルト**で自動選択される
-- モデルを明示的に変更する場合: `--model <model-name>` または `/model` コマンドで一覧確認
-- LTS 期間: 2026/02/05 〜 2027/02/04
+使用できるモデルは環境・プラン・時期によって異なります。実行時に以下で確認してください:
+
+```bash
+gh copilot --help
+# または公式ドキュメントを参照: https://docs.github.com/copilot/using-github-copilot/using-github-copilot-in-the-command-line
+```
 
 ## Claude と Copilot の使い分け
 
@@ -129,37 +130,30 @@ Copilot に渡すリクエストには以下を必ず含めること:
 
 ```bash
 cd /path/to/project
-copilot -p "auth.ts の認証処理をレビューしてください。.envは除外。確認不要、具体的な修正案まで出力してください。"
+gh copilot suggest "auth.ts の認証処理をレビューしてください。.envは除外。確認不要、具体的な修正案まで出力してください。"
 ```
 
-### 複数モジュール横断レビュー（`/fleet`）
+### 複数モジュール横断レビュー（並列実行）
 
 ```bash
 cd /path/to/project
-copilot /fleet "src/api/ と src/auth/ と tests/ を横断的にレビューして、一貫性の問題・セキュリティリスクを洗い出してください。確認不要、具体的な修正案まで出力してください。"
-```
-
-### 計画 → 並列実行フロー
-
-```bash
-cd /path/to/project
-copilot /plan "全コンポーネントのTypeScript型安全性を改善する計画を立ててください。"
-# → 計画内容を確認・承認
-copilot /fleet
+gh copilot suggest "src/api/ をレビューして一貫性の問題・セキュリティリスクを洗い出してください。確認不要、修正案まで出力してください。"
+gh copilot suggest "src/auth/ をレビューして一貫性の問題・セキュリティリスクを洗い出してください。確認不要、修正案まで出力してください。"
+gh copilot suggest "tests/ をレビューしてカバレッジの抜けを指摘してください。確認不要、修正案まで出力してください。"
 ```
 
 ### バグ調査（通常実行）
 
 ```bash
 cd /path/to/project
-copilot -p "ログイン処理で 401 が返る原因を調査してください。確認不要、原因特定と修正案まで出力してください。"
+gh copilot suggest "ログイン処理で 401 が返る原因を調査してください。確認不要、原因特定と修正案まで出力してください。"
 ```
 
 ## 実行手順
 
 1. 事前チェックを実行（CLI 存在・GitHub 認証・ディレクトリ）
 2. ユーザーから依頼内容を受け取る
-3. 複雑さ判定ルールに従い通常実行 or `/fleet` を選択
+3. 複雑さ判定ルールに従い通常実行 or 並列実行を選択
 4. 機密ファイルが存在する場合は除外指示をプロンプトに追記する
 5. プロンプト末尾に「確認や質問は不要です。具体的な提案まで自主的に出力してください。」を追加
 6. コマンドを実行し、終了コードを確認する
