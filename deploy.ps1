@@ -7,10 +7,10 @@
   対象エディタと同期先:
     VS Code Copilot : ~/.agents/skills/
     Cursor          : ~/.cursor/rules/  (rules/ から .mdc を生成して同期)
-    Claude Code     : プロジェクト単位 (CLAUDE.md を生成する場合は別途)
+    Agents          : .ai/agents-source/ → .codex/agents/ (toml) + .claude/agents/ (md)
 
 .PARAMETER Target
-  同期先を指定: all | vscode | cursor
+  同期先を指定: all | vscode | cursor | agents
   デフォルト: all
 
 .PARAMETER DryRun
@@ -23,11 +23,12 @@
   .\deploy.ps1
   .\deploy.ps1 -Target vscode
   .\deploy.ps1 -Target cursor -DryRun
+  .\deploy.ps1 -Target agents
   .\deploy.ps1 -Check
 #>
 
 param(
-    [ValidateSet("all", "vscode", "cursor")]
+    [ValidateSet("all", "vscode", "cursor", "agents")]
     [string]$Target = "all",
     [switch]$DryRun,
     [switch]$Check
@@ -41,9 +42,12 @@ $UserHome = $env:USERPROFILE
 $SourceSkills = Join-Path $RepoRoot "skills"
 $SourceRules  = Join-Path $RepoRoot "rules"
 $SourceCursorKernel = Join-Path $RepoRoot ".cursor\rules\dcr-kernel.md"
+$SourceAgents = Join-Path $RepoRoot ".ai\agents-source"
 
 $DestVSCodeSkills = Join-Path $UserHome ".agents\skills"
 $DestCursorRules  = Join-Path $UserHome ".cursor\rules"
+$DestCodexAgents  = Join-Path $RepoRoot ".codex\agents"
+$DestClaudeAgents = Join-Path $RepoRoot ".claude\agents"
 
 function Get-TempDirectory {
     $tempDir = Join-Path ([System.IO.Path]::GetTempPath()) ("dcr-cursor-rules-" + [System.Guid]::NewGuid().ToString("N"))
@@ -77,6 +81,7 @@ function Get-RuleDescription {
 function New-CursorRulePackage {
     param(
         [string]$RulesSource,
+        [string]$SkillsSource,
         [string]$KernelSource,
         [string]$OutputDir
     )
@@ -89,6 +94,7 @@ function New-CursorRulePackage {
         throw "Cursor kernel not found: $KernelSource"
     }
 
+    # Rules → .mdc
     $ruleFiles = Get-ChildItem -Path $RulesSource -File -Filter *.md |
         Where-Object { $_.BaseName -notlike "_*" } |
         Sort-Object Name
@@ -110,7 +116,67 @@ function New-CursorRulePackage {
         Set-Content -Path $destination -Value $cursorContent -Encoding utf8
     }
 
+    # Skills → .mdc (prefixed with "skill-")
+    if (Test-Path $SkillsSource) {
+        $skillDirs = Get-ChildItem -Path $SkillsSource -Directory | Sort-Object Name
+        foreach ($skillDir in $skillDirs) {
+            $skillFile = Join-Path $skillDir.FullName "SKILL.md"
+            if (Test-Path $skillFile) {
+                $description = Get-RuleDescription -Path $skillFile
+                $body = Get-Content -Path $skillFile -Raw -Encoding utf8
+                if (-not $body) { continue }
+                $cursorContent = @(
+                    "---"
+                    "description: $description"
+                    'globs: ""'
+                    "alwaysApply: false"
+                    "---"
+                    ""
+                    $body.TrimEnd()
+                    ""
+                ) -join "`r`n"
+
+                $destination = Join-Path $OutputDir ("skill-" + $skillDir.Name + ".mdc")
+                Set-Content -Path $destination -Value $cursorContent -Encoding utf8
+            }
+        }
+    }
+
     Copy-Item -Path $KernelSource -Destination (Join-Path $OutputDir "dcr-kernel.md") -Force
+}
+
+function Sync-Agents {
+    param(
+        [string]$Source,
+        [string]$CodexDest,
+        [string]$ClaudeDest
+    )
+
+    if (-not (Test-Path $Source)) {
+        Write-Warning "Agents source not found: $Source"
+        return
+    }
+
+    $tomlFiles = Get-ChildItem -Path $Source -File -Filter '*.toml'
+    $mdFiles = Get-ChildItem -Path $Source -File -Filter '*.md' | Where-Object { $_.Name -ne 'README.md' }
+
+    if ($DryRun) {
+        Write-Host "[DRY RUN] Codex agents : $($tomlFiles.Count) toml files → $CodexDest" -ForegroundColor Yellow
+        Write-Host "[DRY RUN] Claude agents : $($mdFiles.Count) md files → $ClaudeDest" -ForegroundColor Yellow
+        return
+    }
+
+    New-Item -ItemType Directory -Force -Path $CodexDest, $ClaudeDest | Out-Null
+
+    foreach ($file in $tomlFiles) {
+        Copy-Item -Path $file.FullName -Destination (Join-Path $CodexDest $file.Name) -Force
+    }
+    foreach ($file in $mdFiles) {
+        Copy-Item -Path $file.FullName -Destination (Join-Path $ClaudeDest $file.Name) -Force
+    }
+
+    Write-Host "[OK] Codex agents : $($tomlFiles.Count) files → $CodexDest" -ForegroundColor Green
+    Write-Host "[OK] Claude agents : $($mdFiles.Count) files → $ClaudeDest" -ForegroundColor Green
 }
 
 function Sync-Directory {
@@ -235,11 +301,51 @@ if ($Check) {
     if ($Target -eq "all" -or $Target -eq "cursor") {
         $cursorTempDir = Get-TempDirectory
         try {
-            New-CursorRulePackage -RulesSource $SourceRules -KernelSource $SourceCursorKernel -OutputDir $cursorTempDir
+            New-CursorRulePackage -RulesSource $SourceRules -SkillsSource $SourceSkills -KernelSource $SourceCursorKernel -OutputDir $cursorTempDir
             Compare-Directories -Source $cursorTempDir -Destination $DestCursorRules -Label "Cursor rules"
         } finally {
             if (Test-Path $cursorTempDir) {
                 Remove-Item -Path $cursorTempDir -Recurse -Force
+            }
+        }
+    }
+    if ($Target -eq "all" -or $Target -eq "agents") {
+        # Codex agents: compare .toml files
+        if ((Test-Path $SourceAgents) -and (Test-Path $DestCodexAgents)) {
+            $codexDiffs = @()
+            $srcToml = Get-ChildItem $SourceAgents -File -Filter '*.toml'
+            foreach ($sf in $srcToml) {
+                $destFile = Join-Path $DestCodexAgents $sf.Name
+                if (-not (Test-Path $destFile)) {
+                    $codexDiffs += "[MISSING] $($sf.Name)"
+                } elseif ((Get-FileHash $sf.FullName -Algorithm MD5).Hash -ne (Get-FileHash $destFile -Algorithm MD5).Hash) {
+                    $codexDiffs += "[MODIFIED] $($sf.Name)"
+                }
+            }
+            if ($codexDiffs.Count -eq 0) {
+                Write-Host "[OK] Codex agents : in sync" -ForegroundColor Green
+            } else {
+                Write-Host "[DRIFT] Codex agents : $($codexDiffs.Count) differences" -ForegroundColor Red
+                $codexDiffs | ForEach-Object { Write-Host "  $_" -ForegroundColor Yellow }
+            }
+        }
+        # Claude agents: compare .md files
+        if ((Test-Path $SourceAgents) -and (Test-Path $DestClaudeAgents)) {
+            $claudeDiffs = @()
+            $srcMd = Get-ChildItem $SourceAgents -File -Filter '*.md' | Where-Object { $_.Name -ne 'README.md' }
+            foreach ($sf in $srcMd) {
+                $destFile = Join-Path $DestClaudeAgents $sf.Name
+                if (-not (Test-Path $destFile)) {
+                    $claudeDiffs += "[MISSING] $($sf.Name)"
+                } elseif ((Get-FileHash $sf.FullName -Algorithm MD5).Hash -ne (Get-FileHash $destFile -Algorithm MD5).Hash) {
+                    $claudeDiffs += "[MODIFIED] $($sf.Name)"
+                }
+            }
+            if ($claudeDiffs.Count -eq 0) {
+                Write-Host "[OK] Claude agents : in sync" -ForegroundColor Green
+            } else {
+                Write-Host "[DRIFT] Claude agents : $($claudeDiffs.Count) differences" -ForegroundColor Red
+                $claudeDiffs | ForEach-Object { Write-Host "  $_" -ForegroundColor Yellow }
             }
         }
     }
@@ -255,13 +361,17 @@ if ($Target -eq "all" -or $Target -eq "vscode") {
 if ($Target -eq "all" -or $Target -eq "cursor") {
     $cursorTempDir = Get-TempDirectory
     try {
-        New-CursorRulePackage -RulesSource $SourceRules -KernelSource $SourceCursorKernel -OutputDir $cursorTempDir
+        New-CursorRulePackage -RulesSource $SourceRules -SkillsSource $SourceSkills -KernelSource $SourceCursorKernel -OutputDir $cursorTempDir
         Sync-Files -Source $cursorTempDir -Destination $DestCursorRules -Label "Cursor rules"
     } finally {
         if (Test-Path $cursorTempDir) {
             Remove-Item -Path $cursorTempDir -Recurse -Force
         }
     }
+}
+
+if ($Target -eq "all" -or $Target -eq "agents") {
+    Sync-Agents -Source $SourceAgents -CodexDest $DestCodexAgents -ClaudeDest $DestClaudeAgents
 }
 
 Write-Host ""

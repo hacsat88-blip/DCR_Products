@@ -121,8 +121,49 @@ YOU MUST: Bash で変更コマンドを実行する前に、Read/Glob/Grep で�
 
 ## 10. プロジェクト固有情報
 
-<!-- /init 実行後、以下にプロジェクト固有の情報を追記する -->
-<!-- 例: スタック、ビルドコマンド、テストコマンド、ディレクトリ構成 -->
+<!-- init-project.ps1 実行時に project-context.md から自動注入される -->
+
+### プロジェクト概要
+
+- プロジェクト名: {project_name}
+- 説明: {project_description}
 
 See @README.md for project overview
-See @package.json for available commands
+
+### 技術スタック
+
+- 言語: {language}
+- フレームワーク: {framework}
+- パッケージマネージャ: {package_manager}
+- ランタイム: {runtime}
+
+### コマンド
+
+| 操作 | コマンド |
+|------|----------|
+| インストール | `{cmd_install}` |
+| 開発サーバー | `{cmd_dev}` |
+| ビルド | `{cmd_build}` |
+| テスト | `{cmd_test}` |
+| Lint | `{cmd_lint}` |
+
+### ディレクトリ構成
+
+```
+{directory_structure}
+```
+
+### NEVER — 絶対にやってはいけないこと
+
+<!-- プロジェクト運用中に発見したアンチパターンを追記していく -->
+
+- {never_item_1}
+- {never_item_2}
+
+### コード例・パターン
+
+<!-- このプロジェクトで推奨するコードパターンを記載する -->
+
+```{code_lang}
+{code_example_1}
+```

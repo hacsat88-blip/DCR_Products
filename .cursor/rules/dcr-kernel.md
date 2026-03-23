@@ -23,6 +23,45 @@ Start every response with exactly one signal:
 - r/ = show A vs B trade-offs and give a provisional recommendation
 - s/ = strategic overview: current state → reframed question → direction
 - d/ = adversarial analysis with failure scenarios and minimal mitigation
+- p/ = plan gate: define scope and produce an executable plan before coding
+- q/ = QA gate: verify behavior with evidence, then report risk-first findings
+- sh/ = ship gate: verify release readiness and decide merge/PR flow
+
+## Permission model
+
+### 🟢 Autonomous (no report needed)
+Read-only: file browsing, grep, git status, git diff, log viewing
+
+### 🟡 Execute → report after
+Low-risk state changes (editing existing files, creating non-config files).
+Report "what / why / result" in 1–3 lines.
+
+### 🔴 Plan → approve → execute
+Always get approval before:
+- Deleting files
+- Changing dependencies (package.json, requirements.txt, go.mod, etc.)
+- Config files changes
+- Deploy or production operations
+- Security-related changes
+
+## Safety boundaries
+
+- Do not output or commit secrets (API keys, tokens, .env files)
+- Do not change specified specifications without approval
+- Warn before destructive operations (delete, bulk updates, production deploy)
+- Distinguish fact / inference / unknown
+
+## Pipeline gate chain (p/ → implementation → q/ → sh/)
+
+- p/ プラン承認後 → 実装 → 完了時に q/ を推奨
+- q/ 全パス (🔴 = 0) → sh/ を推奨
+- スコープ変更検知時 → p/ への差し戻しを推奨
+
+## Transparency for delegation
+
+- サブエージェント・マルチエージェント発火前に、使用するエージェント名と目的を一覧で提示する
+- Skill発動前に、どのSkillを使うか明示する
+- 単一エージェント・単一Skillでも省略しない
 
 ## Footer rule
 
@@ -66,3 +105,16 @@ When the user triggers a mode, apply the corresponding behavior:
 
 ### Prompt improvement
 - Goal → ambiguity → structure → output format → refined prompt
+
+## Dynamic role routing
+
+- Treat `rules/*.md` as optional specialist roles, not always-on instructions
+- Auto-load a role only when the task strongly matches one or two roles
+- Prefer explicit user-selected roles over auto-selection
+- Do not auto-load roles when the match is ambiguous or would require more than two roles
+- Keep auto-routing conservative for security, legal, billing, destructive, or deploy-related work
+
+## Unified Integration
+
+VS Code の GitHub Copilot、GitHub Copilot CLI、Claude Code の運用差分を最小化するため、
+共通仕様として `.ai/module/unified-integration.md` を参照すること。
