@@ -9,6 +9,11 @@
     AGENTS.md                       (Codex)
     .github/copilot-instructions.md (VS Code Copilot)
 
+  共有リソース（-SkipShared で省略可）:
+    .ai/kernel.md                   (DCR Kernel)
+    .ai/module/*                    (モジュールファイル)
+    .commands/*                     (コマンドファイル)
+
   project-context.md の key: value を読み取り、テンプレート内の
   {key} プレースホルダーを置換して出力先に書き出す。
 
@@ -21,6 +26,9 @@
 .PARAMETER Target
   生成対象: all | claude | codex | copilot
 
+.PARAMETER SkipShared
+  共有リソース（.ai/kernel.md, .ai/module/, .commands/）のコピーをスキップ
+
 .PARAMETER DryRun
   実際にはファイルを書き出さず、生成内容をコンソールに表示する
 
@@ -28,6 +36,7 @@
   .\init-project.ps1 -ProjectPath .\prototypes\my-app
   .\init-project.ps1 -ProjectPath .\prototypes\my-app -DryRun
   .\init-project.ps1 -ProjectPath .\prototypes\my-app -Target claude
+  .\init-project.ps1 -ProjectPath .\prototypes\my-app -SkipShared
   .\init-project.ps1 -ProjectPath .\prototypes\my-app -ContextFile .\custom-context.md
 #>
 
@@ -37,6 +46,7 @@ param(
     [string]$ContextFile,
     [ValidateSet("all", "claude", "codex", "copilot")]
     [string]$Target = "all",
+    [switch]$SkipShared,
     [switch]$DryRun
 )
 
@@ -181,6 +191,60 @@ foreach ($t in $targets) {
         [System.IO.File]::WriteAllText($tmpl.Dest, $output, [System.Text.UTF8Encoding]::new($false))
         Write-Host "[OK] $($tmpl.Dest)" -ForegroundColor Green
         $generated++
+    }
+}
+
+# ── Copy shared resources ──
+
+if (-not $SkipShared) {
+    Write-Host "--- Shared resources ---" -ForegroundColor Cyan
+
+    $sharedItems = @(
+        @{ Source = Join-Path $RepoRoot ".ai\kernel.md";  Dest = Join-Path $ProjectPath ".ai\kernel.md"; Label = ".ai/kernel.md" }
+    )
+
+    # .ai/module/* files
+    $moduleDir = Join-Path $RepoRoot ".ai\module"
+    if (Test-Path $moduleDir) {
+        Get-ChildItem -Path $moduleDir -File | ForEach-Object {
+            $sharedItems += @{
+                Source = $_.FullName
+                Dest   = Join-Path $ProjectPath ".ai\module\$($_.Name)"
+                Label  = ".ai/module/$($_.Name)"
+            }
+        }
+    }
+
+    # .commands/* files
+    $commandsDir = Join-Path $RepoRoot ".commands"
+    if (Test-Path $commandsDir) {
+        Get-ChildItem -Path $commandsDir -File | ForEach-Object {
+            $sharedItems += @{
+                Source = $_.FullName
+                Dest   = Join-Path $ProjectPath ".commands\$($_.Name)"
+                Label  = ".commands/$($_.Name)"
+            }
+        }
+    }
+
+    foreach ($item in $sharedItems) {
+        if (-not (Test-Path $item.Source)) {
+            Write-Warning "ソースが見つかりません: $($item.Source)"
+            continue
+        }
+
+        if ($DryRun) {
+            Write-Host "[DryRun] $($item.Label)" -ForegroundColor Yellow
+        }
+        else {
+            $destDir = Split-Path $item.Dest -Parent
+            if (-not (Test-Path $destDir)) {
+                New-Item -ItemType Directory -Path $destDir -Force | Out-Null
+            }
+            Copy-Item -Path $item.Source -Destination $item.Dest -Force
+            Write-Host "[OK] $($item.Label)" -ForegroundColor Green
+            $generated++
+        }
     }
 }
 

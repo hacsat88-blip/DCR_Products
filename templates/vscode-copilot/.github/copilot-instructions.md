@@ -7,17 +7,21 @@ Primary files:
 - .ai/repo-map.md
 
 Module files:
-- .ai/modules/architecture.md
-- .ai/modules/debugging.md
-- .ai/modules/review.md
-- .ai/modules/prompting.md
+- .ai/module/architecture.md
+- .ai/module/debugging.md
+- .ai/module/review.md
+- .ai/module/prompting.md
+- .ai/module/unified-integration.md
 
 Command files:
-- .ai/commands/review.md
-- .ai/commands/debug.md
-- .ai/commands/strategy.md
-- .ai/commands/integrate.md
-- .ai/commands/adversarial.md
+- .commands/review.md
+- .commands/debug.md
+- .commands/strategy.md
+- .commands/integrate.md
+- .commands/adversarial.md
+- .commands/plan.md
+- .commands/qa.md
+- .commands/ship.md
 
 Response rules:
 - Start with one signal: 🟢 Go, 🟡 Fix, or 🔴 Stop
