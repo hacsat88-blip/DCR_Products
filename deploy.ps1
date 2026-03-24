@@ -322,6 +322,13 @@ if ($Check) {
                     $codexDiffs += "[MODIFIED] $($sf.Name)"
                 }
             }
+            $srcTomlNames = $srcToml | Select-Object -ExpandProperty BaseName
+            $destToml = Get-ChildItem $DestCodexAgents -File -Filter '*.toml' -ErrorAction SilentlyContinue
+            foreach ($df in $destToml) {
+                if ($df.BaseName -notin $srcTomlNames) {
+                    $codexDiffs += "[EXTRA] $($df.Name)"
+                }
+            }
             if ($codexDiffs.Count -eq 0) {
                 Write-Host "[OK] Codex agents : in sync" -ForegroundColor Green
             } else {
@@ -339,6 +346,13 @@ if ($Check) {
                     $claudeDiffs += "[MISSING] $($sf.Name)"
                 } elseif ((Get-FileHash $sf.FullName -Algorithm MD5).Hash -ne (Get-FileHash $destFile -Algorithm MD5).Hash) {
                     $claudeDiffs += "[MODIFIED] $($sf.Name)"
+                }
+            }
+            $srcMdNames = $srcMd | Select-Object -ExpandProperty BaseName
+            $destMd = Get-ChildItem $DestClaudeAgents -File -Filter '*.md' -ErrorAction SilentlyContinue
+            foreach ($df in $destMd) {
+                if ($df.BaseName -notin $srcMdNames) {
+                    $claudeDiffs += "[EXTRA] $($df.Name)"
                 }
             }
             if ($claudeDiffs.Count -eq 0) {

@@ -29,3 +29,8 @@ npm-debug.log*
 
 # 外部リポジトリ (別 .git/ を持つリファレンス)
 copilot-cli-for-beginners/
+
+# Runtime artifacts (not source of truth)
+**/.superpowers/
+codex_Product/httpserver.out
+codex_Product/httpserver.err

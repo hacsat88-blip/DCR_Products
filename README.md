@@ -34,3 +34,21 @@ deploy.ps1     エディタへの一方向同期
 .\deploy.ps1 -DryRun            # 確認のみ
 .\deploy.ps1 -Check             # ドリフト検出
 ```
+
+## 迷わない運用境界 (推奨)
+
+- 正本として編集する: `rules/`, `skills/`, `.ai/agents-source/`
+- 生成物として扱う: `.claude/agents/`, `.codex/agents/`, `.cursor/rules/*.mdc` (直接編集しない)
+- 外部/検証系リポジトリは DCR 本体と分離する
+
+安全フロー:
+
+1. 正本を編集する
+2. `deploy.ps1 -Target ...` で反映する
+3. `deploy.ps1 -Check` で整合性を確認する
+4. 問題なければコミットする
+
+注意:
+
+- `prototypes/` や外部クローンを同じルートに置く場合、検索・コミット対象を毎回明示して誤操作を防ぐ
+- `.superpowers/` などの実行時生成物は Git 管理対象にしない

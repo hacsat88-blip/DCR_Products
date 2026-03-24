@@ -118,6 +118,11 @@ deploy.ps1 で Cursor (.mdc) へ配布。
 skills/
 Skill definitions (69 skills). Git-managed source of truth.
 deploy.ps1 で ~/.agents/skills/ (VS Code Copilot) + ~/.cursor/rules/skill-*.mdc (Cursor) へ配布。
+
+### ローカル例外 (リポジトリ管理外)
+~/.agents/skills/superpowers/ — 外部由来のスキルパック (brainstorming, dispatching-parallel-agents 等 14 スキル含む)。
+リポジトリには含めない。deploy.ps1 の EXTRA 検出に表示されるが、正常な例外として無視してよい。
+
 ECC 部分採用スキル (3):
 - search-first/: 実装前調査ワークフロー
 - strategic-compact/: 論理的コンテキスト整理
