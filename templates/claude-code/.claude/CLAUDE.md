@@ -121,6 +121,13 @@ YOU MUST: Bash で変更コマンドを実行する前に、Read/Glob/Grep で�
 
 ## 10. プロジェクト固有情報
 
+## 10.5 Claude Hooks 運用
+
+- `.claude/settings.local.json` の `hooks` は任意機能として扱う
+- 既定テンプレートでは `PreToolUse` / `PostToolUse` を空配列で初期化する
+- 実運用でフックを追加する場合は、必ず dry run 相当の検証手順を先に定義する
+- 破壊的なコマンドをフックに紐づける場合は、事前承認（🔴）を維持する
+
 <!-- init-project.ps1 実行時に project-context.md から自動注入される -->
 
 ### プロジェクト概要

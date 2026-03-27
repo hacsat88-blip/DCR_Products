@@ -191,6 +191,24 @@ foreach ($t in $targets) {
         [System.IO.File]::WriteAllText($tmpl.Dest, $output, [System.Text.UTF8Encoding]::new($false))
         Write-Host "[OK] $($tmpl.Dest)" -ForegroundColor Green
         $generated++
+
+        # Claude settings template copy
+        if ($t -eq "claude") {
+            $claudeSettingsSource = Join-Path $RepoRoot "templates\claude-code\.claude\settings.local.json"
+            $claudeSettingsDest   = Join-Path $ProjectPath ".claude\settings.local.json"
+            if (Test-Path $claudeSettingsSource) {
+                Copy-Item -Path $claudeSettingsSource -Destination $claudeSettingsDest -Force
+                Write-Host "[OK] $claudeSettingsDest" -ForegroundColor Green
+                $generated++
+            }
+        }
+    }
+
+    if ($DryRun -and $t -eq "claude") {
+        $claudeSettingsSource = Join-Path $RepoRoot "templates\claude-code\.claude\settings.local.json"
+        if (Test-Path $claudeSettingsSource) {
+            Write-Host "[DryRun] .claude/settings.local.json" -ForegroundColor Yellow
+        }
     }
 }
 
