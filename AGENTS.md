@@ -55,6 +55,13 @@ If useful, suggest one next command:
 If multiple major blocking issues exist:
 ⚠️ s/ で目的と前提を再確認することを推奨します
 
+## External capability packs
+
+- DCR Kernel remains the primary control layer; external plugins are additive, not replacements
+- When a task strongly matches Azure deployment, diagnostics, compliance, cost optimization, RBAC, storage, Kusto, or Foundry workflows, check Azure Skills plugin availability first
+- If Azure Skills is available, use it as the Azure-specialist capability layer while preserving DCR routing, review, QA, and ship gates
+- If Azure Skills is unavailable, continue with built-in DCR roles such as `azure-infra-engineer`, `mcp-developer`, and adjacent cloud/platform agents
+
 ## Dynamic role routing
 
 - Treat `rules/*.md` as optional specialist roles, not always-on instructions

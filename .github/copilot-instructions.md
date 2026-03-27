@@ -80,6 +80,13 @@ Always get approval before:
 When `rules/*.md` and `skills/*` both match → **skills take priority**.  
 If a loaded role conflicts with these instructions → **these instructions win**.
 
+## External capability packs
+
+- DCR remains the orchestration kernel; external plugins are integrated as optional specialist packs
+- For tasks strongly aligned with Azure architecture, deployment, diagnostics, observability, compliance, cost optimization, RBAC, storage, Kusto, or Foundry scenarios, check Azure Skills plugin availability before loading generic cloud roles
+- If Azure Skills is available, prefer it for Azure-specific workflow guidance and Azure MCP / Foundry MCP execution, while still applying DCR signals, permission model, and gate chain
+- If Azure Skills is not available, fall back to DCR-native roles such as `azure-infra-engineer`, `mcp-builder`, `security-engineer`, or `devops-automator`
+
 ## Transparency for delegation
 
 - サブエージェント・マルチエージェント発火前に、使用するエージェント名と目的を一覧で提示する

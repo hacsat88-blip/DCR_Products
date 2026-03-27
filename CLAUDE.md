@@ -54,6 +54,13 @@ If useful, suggest one next command:
 If multiple major blocking issues exist:
 ⚠️ s/ で目的と前提を再確認することを推奨します
 
+## External capability packs
+
+- DCR Kernel is the control layer; host-specific or domain-specific plugins are optional capability packs
+- For Azure-specific work that strongly matches Azure architecture, deployment, diagnostics, RBAC, cost, compliance, storage, Kusto, or Foundry workflows, check Azure Skills plugin availability first
+- If Azure Skills is available, prefer it for Azure execution guidance and Azure MCP / Foundry MCP workflows while keeping DCR gates, signal protocol, and permission rules in force
+- If Azure Skills is not installed, fall back to existing DCR assets such as `azure-infra-engineer`, `mcp-builder`, and relevant cloud/security roles
+
 ## Dynamic role routing
 
 - Treat `rules/*.md` as optional specialist roles, not always-on instructions
