@@ -63,6 +63,36 @@ team-plan → team-prd → team-exec → team-verify → team-fix (loop)
 3. rules
 4. 直接処理
 
+## External Capability Packs
+
+外部 plugin / skill pack は DCR の置換ではなく、ドメイン特化の拡張として扱う。
+
+### Azure Skills plugin
+
+- 位置づけ: Azure 専用 capability pack
+- 役割: Azure workflows, Azure MCP Server, Foundry MCP を提供する実行専門層
+- DCR との関係: DCR が制御層、Azure Skills が Azure 専門層
+
+### Routing Rule
+
+以下に強く一致する場合、Azure Skills plugin の利用可否を先に確認する:
+
+- Azure architecture / service selection
+- Azure prepare / validate / deploy workflows
+- Azure diagnostics / observability / compliance
+- Azure cost optimization
+- Azure RBAC / storage / Kusto
+- Microsoft Foundry / model deployment / agent workflows
+
+利用可能な場合:
+
+- Azure 専用 guidance と MCP 実行は Azure Skills を優先
+- ただし signal protocol, permission model, p/ → q/ → sh/ は DCR を維持する
+
+利用不可の場合:
+
+- `azure-infra-engineer`, `mcp-builder`, `security-engineer`, `devops-automator` など既存 DCR 資産へフォールバックする
+
 ## Notes
 
 - Copilot CLI は `COPILOT_CLI.md` を優先
