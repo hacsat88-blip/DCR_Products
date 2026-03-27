@@ -1,7 +1,8 @@
 ---
 name: tdd-workflow
 description: Test-driven development workflow. Write tests first, then implement, with 80%+ coverage target.
-origin: ECC (adapted for DCR)
+metadata:
+  origin: ECC (adapted for DCR)
 ---
 
 # TDD Workflow — テスト駆動開発

@@ -1,7 +1,8 @@
 ---
 name: search-first
 description: Research-before-coding workflow. Search for existing tools, libraries, and patterns before writing custom code.
-origin: ECC (adapted for DCR)
+metadata:
+   origin: ECC (adapted for DCR)
 ---
 
 # Search First — 実装前に調査する
