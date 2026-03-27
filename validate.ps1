@@ -25,6 +25,7 @@ $RepoRoot  = $PSScriptRoot
 $SourceRules  = Join-Path $RepoRoot "rules"
 $SourceSkills = Join-Path $RepoRoot "skills"
 $DeployScript = Join-Path $RepoRoot "deploy.ps1"
+$PowerShellExe = (Get-Process -Id $PID).Path
 
 $passed = 0
 $failed = 0
@@ -102,7 +103,7 @@ Write-Host "  skills processed: $($skillDirs.Count)" -ForegroundColor DarkGray
 Write-Host ""
 Write-Host "── 3. deploy.ps1 -DryRun check ─────────────────"
 foreach ($target in @("vscode", "cursor", "agents")) {
-    $result = & powershell -ExecutionPolicy Bypass -File $DeployScript -DryRun -Target $target 2>&1
+    $result = & $PowerShellExe -ExecutionPolicy Bypass -File $DeployScript -DryRun -Target $target 2>&1
     if ($LASTEXITCODE -eq 0) {
         if ($Verbose) { Write-Ok "deploy -Target $target — exit 0" }
         else { $script:passed++ }
