@@ -1,7 +1,8 @@
 ---
 name: strategic-compact
 description: Suggests manual context compaction at logical intervals to preserve context through task phases rather than arbitrary auto-compaction.
-origin: ECC (adapted for DCR)
+metadata:
+  origin: ECC (adapted for DCR)
 ---
 
 # Strategic Compact — 論理的な区切りでコンテキストを整理する

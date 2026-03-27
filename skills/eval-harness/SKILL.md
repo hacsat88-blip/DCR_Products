@@ -1,7 +1,8 @@
 ---
 name: eval-harness
 description: "DCR リポジトリの構造品質を validate.ps1 で機械的に検証する Eval Harness スキル。q/ ゲートで validate.ps1 を実行し、rules/skills の frontmatter・H1・body・deploy整合を確認する。Use during q/ QA gate, before ship gate, or to verify structural integrity of rules and skills."
-origin: ECC eval-harness (adapted for DCR)
+metadata:
+  origin: ECC eval-harness (adapted for DCR)
 ---
 
 # Eval Harness — 構造品質の継続検証

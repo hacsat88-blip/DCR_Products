@@ -1,7 +1,8 @@
 ---
 name: continuous-learning
 description: "セッション中の学びを構造化して記録し、リポジトリ固有の知見を蓄積する継続学習スキル。エラー解決、ユーザー修正、回避策、プロジェクト固有パターンを /memories/repo/ に instinct として記録する。Use when completing tasks, resolving errors, discovering project-specific patterns, or at session end for retrospective."
-origin: ECC continuous-learning-v2 (adapted for DCR)
+metadata:
+  origin: ECC continuous-learning-v2 (adapted for DCR)
 ---
 
 # Continuous Learning — セッションの学びを蓄積する
