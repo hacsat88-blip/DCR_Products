@@ -5,7 +5,7 @@ AI エージェント設定・ルール・スキルの一元管理リポジト�
 ## 対応エディタ / CLI
 
 | ツール | エントリポイント |
-|--------|---------|
+| -------- | --------- |
 | VS Code Copilot | `.github/copilot-instructions.md` |
 | GitHub Copilot CLI | `AGENTS.md` → `COPILOT_CLI.md` |
 | Codex | `AGENTS.md` |
@@ -13,9 +13,18 @@ AI エージェント設定・ルール・スキルの一元管理リポジト�
 | Cursor | `.cursor/rules/` |
 | Gemini / Antigravity | `.gemini/settings.json` |
 
+## 運用クイックガイド
+
+- Execution Modes を全環境で共通運用: タスク先頭に `autopilot:`, `ralph:`, `ulw`, `ralplan:`, `deep-interview:`, `ultrathink:`, `deepsearch:`, `team:` を付けて実行戦略を宣言する
+- Azure Skills は DCR の置換ではなく、Azure 専用タスクのための external capability pack として扱う
+- Azure architecture / deploy / diagnostics / compliance / cost / RBAC / Kusto / Foundry は、まず Azure Skills plugin の利用可否を確認する
+- Azure Skills を使えない場合は、DCR の `azure-infra-engineer`, `mcp-builder`, `security-engineer`, `devops-automator` などへフォールバックする
+
+詳細な共通仕様は `.ai/module/unified-integration.md` を参照。
+
 ## 構造
 
-```
+```text
 .ai/           共通カーネル・モジュール・構造マップ
 .commands/     トリガーコマンド (a/ i/ r/ s/ d/)
 rules/         エージェントルール (84件) — 正本
