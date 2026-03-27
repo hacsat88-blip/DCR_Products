@@ -14,8 +14,9 @@ origin: ECC continuous-learning-v2 (adapted for DCR)
 ## パス解釈の注意
 
 - `/memories/...` は Copilot のメモリ名前空間であり、OS のルート絶対パスではない
-- リポジトリ固有の学習内容は `/memories/repo/` に保存する
-- 長期的に共有すべき知見は `skills/` または `rules/` へ昇格する
+- リポジトリ固有の学習内容は `/memories/repo/` に保存する（Copilot 管理領域）
+- `/memories/` は Git 管理対象ではないため、チーム共有したい知見は `skills/` または `rules/` へ昇格する
+- 迷った場合は「まず `/memories/repo/` に記録し、繰り返し有効ならコードベースへ昇格」の順序を使う
 
 ## いつ使うか
 
@@ -65,9 +66,15 @@ origin: ECC continuous-learning-v2 (adapted for DCR)
 
 | 性質 | 記録先 | 理由 |
 |------|-------|------|
-| リポジトリ固有の知見 | `/memories/repo/<topic>.md` | リポジトリに紐づく |
-| ユーザーの一般的な好み | `/memories/<topic>.md` | 全ワークスペース共通 |
+| リポジトリ固有の知見 | `/memories/repo/<topic>.md` | Copilot の repo scope（非Git管理） |
+| ユーザーの一般的な好み | `/memories/<topic>.md` | ユーザー共通メモリ（非Git管理） |
 | 今のタスクだけの一時メモ | `/memories/session/<topic>.md` | セッション終了で消える |
+
+## Git 共有との関係
+
+- `/memories/*` は学習メモ用途であり、リポジトリのコミット履歴には含まれない
+- チームで再利用する運用ルールは `skills/` か `rules/` へ反映して PR で共有する
+- 1回限りの観察はメモリ、再利用ルールはコードベースという責務分離を守る
 
 ## セッション終了時の振り返り
 

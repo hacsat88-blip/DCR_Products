@@ -142,13 +142,6 @@ key: value を記述する。新規プロジェクト作成時にコピーして
 prototypes/
 Experimental projects and proof-of-concepts.
 
-## External references (.gitignore 対象)
-
-copilot-cli-for-beginners/
-GitHub Copilot CLI 学習用リファレンスリポジトリ (github/copilot-cli-for-beginners)。
-独自の .git/ を持つ外部クローン。DCR 設定とは無関係。
-教育用 AGENTS.md、サンプル agents/skills を含む。
-
 ## Deploy
 
 deploy.ps1
