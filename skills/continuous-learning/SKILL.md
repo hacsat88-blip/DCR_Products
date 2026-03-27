@@ -11,6 +11,12 @@ origin: ECC continuous-learning-v2 (adapted for DCR)
 セッション中に得た知見を `/memories/repo/` に構造化して記録し、
 次回以降のセッションで同じ失敗を繰り返さない。
 
+## パス解釈の注意
+
+- `/memories/...` は Copilot のメモリ名前空間であり、OS のルート絶対パスではない
+- リポジトリ固有の学習内容は `/memories/repo/` に保存する
+- 長期的に共有すべき知見は `skills/` または `rules/` へ昇格する
+
 ## いつ使うか
 
 - エラーを解決したとき（根本原因 + 修正手順を記録）
