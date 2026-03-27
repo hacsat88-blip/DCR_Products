@@ -1,0 +1,18 @@
+name: Validate DCR Structure
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Run validate script
+        shell: pwsh
+        run: pwsh -ExecutionPolicy Bypass -File ./validate.ps1
