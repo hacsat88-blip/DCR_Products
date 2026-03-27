@@ -13,7 +13,7 @@ AI エージェント設定・ルール・スキルの一元管理リポジト�
 | Cursor | `.cursor/rules/` |
 | Gemini / Antigravity | `.gemini/settings.json` |
 
-## 最近の統合ポイント
+## 運用クイックガイド
 
 - Execution Modes を全環境で共通運用: タスク先頭に `autopilot:`, `ralph:`, `ulw`, `ralplan:`, `deep-interview:`, `ultrathink:`, `deepsearch:`, `team:` を付けて実行戦略を宣言する
 - Azure Skills は DCR の置換ではなく、Azure 専用タスクのための external capability pack として扱う
