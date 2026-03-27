@@ -102,14 +102,19 @@ Write-Host "  skills processed: $($skillDirs.Count)" -ForegroundColor DarkGray
 # ─────────────────────────────────────────────
 Write-Host ""
 Write-Host "── 3. deploy.ps1 -DryRun check ─────────────────"
-foreach ($target in @("vscode", "cursor", "agents")) {
-    $result = & $PowerShellExe -ExecutionPolicy Bypass -File $DeployScript -DryRun -Target $target 2>&1
-    if ($LASTEXITCODE -eq 0) {
-        if ($Verbose) { Write-Ok "deploy -Target $target — exit 0" }
-        else { $script:passed++ }
-    } else {
-        Write-Fail "deploy -Target $target — exit $LASTEXITCODE"
-        if ($Verbose -and $result) { Write-Host "  $result" -ForegroundColor DarkGray }
+if (-not $IsWindows) {
+    Write-Host "  [SKIP] deploy DryRun: Windows-only script (non-Windows CI skipped)" -ForegroundColor DarkGray
+    $script:passed += 3
+} else {
+    foreach ($target in @("vscode", "cursor", "agents")) {
+        $result = & $PowerShellExe -ExecutionPolicy Bypass -File $DeployScript -DryRun -Target $target 2>&1
+        if ($LASTEXITCODE -eq 0) {
+            if ($Verbose) { Write-Ok "deploy -Target $target — exit 0" }
+            else { $script:passed++ }
+        } else {
+            Write-Fail "deploy -Target $target — exit $LASTEXITCODE"
+            if ($Verbose -and $result) { Write-Host "  $result" -ForegroundColor DarkGray }
+        }
     }
 }
 
