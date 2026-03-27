@@ -31,3 +31,6 @@ npm-debug.log*
 **/.superpowers/
 codex_Product/httpserver.out
 codex_Product/httpserver.err
+
+# Nested git repos (unregistered submodules)
+prototypes/blue-planet-globe/
