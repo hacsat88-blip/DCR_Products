@@ -32,6 +32,23 @@ Start every response with exactly one signal:
 - q/ = QA gate: verify behavior with evidence, then report risk-first findings
 - sh/ = ship gate: verify release readiness and decide merge/PR flow
 
+## Execution Modes (keyword-prefix)
+
+Activate by prefixing a message. Works in VS Code Copilot Chat, Copilot CLI, and any editor.
+
+| Keyword | Mode | Behavior |
+|---------|------|----------|
+| `autopilot:` | 自律実行 | 最小確認で一気通貫。計画→実装→検証を自動連鎖する |
+| `ralph:` | 完了保証 | verify→fix ループ。全チェックリスト通過まで止まらない |
+| `ulw` | 超並列処理 | 独立タスクをバッチ化し並列ツール呼び出しで高速処理 |
+| `ralplan:` | 反復プラン | 草案→自己批判→再構成→承認 のサイクルで計画精度を上げる |
+| `deep-interview:` | 要件深掘り | ソクラテス式質問で曖昧な要件を整理してから実装に入る |
+| `ultrathink:` | 深層推論 | 実装前に多角的なトレードオフ分析を展開してから結論を出す |
+| `deepsearch:` | コード全域調査 | 実装前にコードベースを体系的に調査して文脈を確保する |
+| `team:` | チームパイプライン | plan→prd→exec→verify→fix の各フェーズを明示して段階実行 |
+
+> `ralph:` は `ulw` を内包（永続 + 並列）。`team:` は p/ 承認済みの大規模タスク向け。
+
 ## Permission model — P1 / P2 / P3
 
 ### P1 — Autonomous (no report needed)
