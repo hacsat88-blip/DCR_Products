@@ -15,10 +15,10 @@ AI エージェント設定・ルール・スキルの一元管理リポジト�
 
 ## 最近の統合ポイント
 
-- Execution Modes を全環境に共通導入: `autopilot:`, `ralph:`, `ulw`, `ralplan:`, `deep-interview:`, `ultrathink:`, `deepsearch:`, `team:`
-- Azure Skills は DCR の置換ではなく、Azure 専用の external capability pack として統合
-- Azure architecture / deploy / diagnostics / compliance / cost / RBAC / Kusto / Foundry は Azure Skills を優先確認
-- Azure Skills 未導入時は DCR の `azure-infra-engineer`, `mcp-builder`, `security-engineer`, `devops-automator` などへフォールバック
+- Execution Modes を全環境で共通運用: タスク先頭に `autopilot:`, `ralph:`, `ulw`, `ralplan:`, `deep-interview:`, `ultrathink:`, `deepsearch:`, `team:` を付けて実行戦略を宣言する
+- Azure Skills は DCR の置換ではなく、Azure 専用タスクのための external capability pack として扱う
+- Azure architecture / deploy / diagnostics / compliance / cost / RBAC / Kusto / Foundry は、まず Azure Skills plugin の利用可否を確認する
+- Azure Skills を使えない場合は、DCR の `azure-infra-engineer`, `mcp-builder`, `security-engineer`, `devops-automator` などへフォールバックする
 
 詳細な共通仕様は `.ai/module/unified-integration.md` を参照。
 
