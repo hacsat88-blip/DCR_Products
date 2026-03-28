@@ -1,11 +1,29 @@
 ---
 name: find-skills
-description: Helps users discover and install agent skills when they ask questions like "how do I do X", "find a skill for X", "is there a skill that can...", or express interest in extending capabilities. This skill should be used when the user is looking for functionality that might exist as an installable skill.
+description: Helps users discover and install agent skills when they ask questions like "how do I do X", "find a skill for X", "is there a skill that can...", or express interest in extending capabilities. Also enforces skill invocation discipline - if a skill might apply, check it before proceeding.
 ---
 
 # Find Skills
 
-This skill helps you discover and install skills from the open agent skills ecosystem.
+This skill helps you discover and install skills from the open agent skills ecosystem, and enforces skill invocation discipline.
+
+## Skill Invocation Discipline
+
+Before responding to any task, check whether an existing skill applies:
+
+1. **Process skills first** (brainstorming, debugging) — these determine HOW to approach the task
+2. **Implementation skills second** (frontend-design, mcp-builder) — these guide execution
+
+| Rationalization | Reality |
+|-----------------|---------|
+| "This is just a simple question" | Questions are tasks. Check for skills. |
+| "I need more context first" | Skill check comes BEFORE clarifying questions. |
+| "The skill is overkill" | Simple things become complex. Use it. |
+| "I remember this skill" | Skills evolve. Read current version. |
+
+**Skill types:**
+- **Rigid** (TDD, debugging): Follow exactly. Don't adapt away discipline.
+- **Flexible** (patterns): Adapt principles to context.
 
 ## When to Use This Skill
 

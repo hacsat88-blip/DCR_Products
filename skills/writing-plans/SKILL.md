@@ -1,6 +1,6 @@
 ---
 name: writing-plans
-description: Use when you have a spec or requirements for a multi-step task, before touching code
+description: Use when you have a spec or requirements for a multi-step task, before touching code, or when executing a written plan in the current session
 ---
 
 # Writing Plans
@@ -138,5 +138,41 @@ After saving the plan:
 - Fresh subagent per task + two-stage review
 
 **If harness does NOT have subagents:**
-- Execute plan in current session using superpowers:executing-plans
+- Execute plan in current session using the Execution Process below
 - Batch execution with checkpoints for review
+
+## Execution Process (No Subagents)
+
+When executing a plan without subagent support:
+
+### Step 1: Load and Review Plan
+1. Read plan file
+2. Review critically — identify any questions or concerns
+3. If concerns: Raise them with your human partner before starting
+4. If no concerns: Create TodoWrite and proceed
+
+### Step 2: Execute Tasks
+For each task:
+1. Mark as in_progress
+2. Follow each step exactly (plan has bite-sized steps)
+3. Run verifications as specified
+4. Mark as completed
+
+### Step 3: Complete Development
+After all tasks complete and verified:
+- Use superpowers:finishing-a-development-branch to verify tests, present options, execute choice
+
+### When to Stop and Ask for Help
+**STOP executing immediately when:**
+- Hit a blocker (missing dependency, test fails, instruction unclear)
+- Plan has critical gaps preventing starting
+- You don't understand an instruction
+- Verification fails repeatedly
+
+**Ask for clarification rather than guessing. Don't force through blockers.**
+
+### Execution Safety Rules
+- Never start implementation on main/master branch without explicit user consent
+- Follow plan steps exactly — don't improvise
+- Don't skip verifications
+- Reference skills when plan says to
