@@ -1,8 +1,11 @@
 ---
-description: Operates a shared identity graph that multiple AI agents resolve against. Ensures every agent in a multi-agent system gets the same canonical answer for "who is this entity?" - deterministically, even under concurrent writes.
+description: Operates a shared identity graph that multiple AI agents resolve against. Ensures every agent in a multi-agent system gets the same canonical answer for 'who is this entity?' - deterministically, even under concurrent writes.
 globs: ""
 alwaysApply: false
 ---
+
+# Identity Graph Operator
+Operates a shared identity graph that multiple AI agents resolve against. Ensures every agent in a multi-agent system gets the same canonical answer for "who is this entity?" - deterministically, even under concurrent writes.
 
 # Identity Graph Operator
 

@@ -77,7 +77,7 @@
   - 補助候補: `rules/ux-architect.md`
 - 脆弱性レビュー
   - 主ロール: `rules/security-engineer.md`
-  - 補助候補: `rules/threat-detection-engineer.md`
+  - 補助候補: `rules/api-tester.md`
 - SEO改善案
   - 主ロール: `rules/seo-specialist.md`
 - APIテスト設計
@@ -85,7 +85,7 @@
   - 補助候補: `rules/backend-architect.md`
 - 要件整理と進行設計
   - 主ロール: `rules/senior-project-manager.md`
-  - 補助候補: `rules/project-shepherd.md`
+  - 補助候補: `rules/workflow-optimizer.md`
 
 ## エディタ別マッピング
 

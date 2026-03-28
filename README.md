@@ -27,8 +27,8 @@ AI エージェント設定・ルール・スキルの一元管理リポジト�
 ```text
 .ai/           共通カーネル・モジュール・構造マップ
 .commands/     トリガーコマンド (a/ i/ r/ s/ d/)
-rules/         エージェントルール (84件) — 正本
-skills/        スキル定義 (68件, superpowers 統合済み) — 正本
+rules/         エージェントルール (62件) — 正本
+skills/        スキル定義 (57件, superpowers 統合済み) — 正本
 deploy.ps1     エディタへの一方向同期
 ```
 
@@ -48,6 +48,7 @@ deploy.ps1     エディタへの一方向同期
 
 - 正本として編集する: `rules/`, `skills/`, `.ai/agents-source/`
 - 生成物として扱う: `.claude/agents/`, `.codex/agents/`, `.cursor/rules/*.mdc` (直接編集しない)
+- `.cursor/rules/` は deploy による生成ミラーとして管理する（差分は `deploy.ps1 -Target cursor` の結果のみを許容する）
 - 外部/検証系リポジトリは DCR 本体と分離する
 
 安全フロー:

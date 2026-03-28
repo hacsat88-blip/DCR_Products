@@ -46,6 +46,8 @@ $SourceAgents = Join-Path $RepoRoot ".ai\agents-source"
 
 $DestVSCodeSkills = Join-Path $UserHome ".agents\skills"
 $DestCursorRules  = Join-Path $UserHome ".cursor\rules"
+$DestCursorManifest = Join-Path $DestCursorRules ".dcr-managed-files.json"
+$DestProjectCursorRules = Join-Path $RepoRoot ".cursor\rules"
 $DestCodexAgents  = Join-Path $RepoRoot ".codex\agents"
 $DestClaudeAgents = Join-Path $RepoRoot ".claude\agents"
 
@@ -61,8 +63,47 @@ function Get-RuleDescription {
     )
 
     $lines = Get-Content -Path $Path -Encoding utf8
-    foreach ($line in $lines) {
+    $inFrontmatter = $false
+    $frontmatterStarted = $false
+
+    for ($index = 0; $index -lt $lines.Count; $index++) {
+        $line = $lines[$index]
         $trimmed = $line.Trim()
+        if (-not $frontmatterStarted -and $trimmed -eq '---') {
+            $frontmatterStarted = $true
+            $inFrontmatter = $true
+            continue
+        }
+        if ($inFrontmatter) {
+            if ($trimmed -eq '---') {
+                $inFrontmatter = $false
+                continue
+            }
+
+            if ($trimmed -match '^description:\s*(.*)$') {
+                $description = $Matches[1].Trim()
+                if ($description) {
+                    return $description.Trim([char]34, [char]39)
+                }
+
+                $descriptionLines = @()
+                for ($nextIndex = $index + 1; $nextIndex -lt $lines.Count; $nextIndex++) {
+                    $nextLine = $lines[$nextIndex]
+                    if ($nextLine -notmatch '^\s+') {
+                        break
+                    }
+
+                    $descriptionLines += $nextLine.Trim()
+                    $index = $nextIndex
+                }
+
+                if ($descriptionLines.Count -gt 0) {
+                    return (($descriptionLines -join ' ') -replace '\s+', ' ').Trim([char]34, [char]39)
+                }
+            }
+
+            continue
+        }
         if (-not $trimmed) {
             continue
         }
@@ -76,6 +117,16 @@ function Get-RuleDescription {
     }
 
     return [System.IO.Path]::GetFileNameWithoutExtension($Path)
+}
+
+function Write-Utf8NoBom {
+    param(
+        [string]$Path,
+        [string]$Content
+    )
+
+    $utf8NoBom = New-Object System.Text.UTF8Encoding($false)
+    [System.IO.File]::WriteAllText($Path, $Content, $utf8NoBom)
 }
 
 function New-CursorRulePackage {
@@ -113,7 +164,7 @@ function New-CursorRulePackage {
         ) -join "`r`n"
 
         $destination = Join-Path $OutputDir ($ruleFile.BaseName + ".mdc")
-        Set-Content -Path $destination -Value $cursorContent -Encoding utf8
+        Write-Utf8NoBom -Path $destination -Content $cursorContent
     }
 
     # Skills → .mdc (prefixed with "skill-")
@@ -139,7 +190,7 @@ function New-CursorRulePackage {
                 ) -join "`r`n"
 
                 $destination = Join-Path $OutputDir ("skill-" + $skillDir.Name + ".mdc")
-                Set-Content -Path $destination -Value $cursorContent -Encoding utf8
+                Write-Utf8NoBom -Path $destination -Content $cursorContent
             }
         }
     }
@@ -217,7 +268,9 @@ function Sync-Files {
     param(
         [string]$Source,
         [string]$Destination,
-        [string]$Label
+        [string]$Label,
+        [switch]$Prune,
+        [string]$PruneManifestPath
     )
 
     if (-not (Test-Path $Source)) {
@@ -227,9 +280,31 @@ function Sync-Files {
 
     $sourceItems = Get-ChildItem $Source -File
     $count = $sourceItems.Count
+    $sourceNames = $sourceItems | Select-Object -ExpandProperty Name
+    $managedNames = @()
+    if ($PruneManifestPath -and (Test-Path $PruneManifestPath)) {
+        $managedNames = Get-Content -Path $PruneManifestPath -Raw -Encoding utf8 | ConvertFrom-Json
+    }
+
+    $staleItems = @()
+    if (Test-Path $Destination) {
+        $destItems = Get-ChildItem $Destination -File | Where-Object {
+            -not $PruneManifestPath -or $_.FullName -ne $PruneManifestPath
+        }
+        if ($PruneManifestPath) {
+            $staleItems = $destItems | Where-Object {
+                $_.Name -in $managedNames -and $_.Name -notin $sourceNames
+            }
+        } else {
+            $staleItems = $destItems | Where-Object { $_.Name -notin $sourceNames }
+        }
+    }
 
     if ($DryRun) {
         Write-Host "[DRY RUN] $Label : $count files → $Destination" -ForegroundColor Yellow
+        if ($Prune -and $staleItems.Count -gt 0) {
+            Write-Host "  stale files to remove: $($staleItems.Count)" -ForegroundColor Yellow
+        }
         $sourceItems | ForEach-Object { Write-Host "  $_" }
         return
     }
@@ -238,7 +313,20 @@ function Sync-Files {
         New-Item -ItemType Directory -Path $Destination -Force | Out-Null
     }
 
-    Copy-Item -Path "$Source\*" -Destination $Destination -Force
+    if ($Prune) {
+        foreach ($stale in $staleItems) {
+            Remove-Item -Path $stale.FullName -Force
+        }
+    }
+
+    foreach ($item in $sourceItems) {
+        Copy-Item -Path $item.FullName -Destination $Destination -Force
+    }
+
+    if ($PruneManifestPath) {
+        Write-Utf8NoBom -Path $PruneManifestPath -Content (($sourceNames | ConvertTo-Json) + "`r`n")
+    }
+
     Write-Host "[OK] $Label : $count files → $Destination" -ForegroundColor Green
 }
 
@@ -307,7 +395,8 @@ if ($Check) {
         $cursorTempDir = Get-TempDirectory
         try {
             New-CursorRulePackage -RulesSource $SourceRules -SkillsSource $SourceSkills -KernelSource $SourceCursorKernel -OutputDir $cursorTempDir
-            Compare-Directories -Source $cursorTempDir -Destination $DestCursorRules -Label "Cursor rules"
+            Compare-Directories -Source $cursorTempDir -Destination $DestCursorRules -Label "Cursor rules (user)"
+            Compare-Directories -Source $cursorTempDir -Destination $DestProjectCursorRules -Label "Cursor rules (project)"
         } finally {
             if (Test-Path $cursorTempDir) {
                 Remove-Item -Path $cursorTempDir -Recurse -Force
@@ -381,7 +470,8 @@ if ($Target -eq "all" -or $Target -eq "cursor") {
     $cursorTempDir = Get-TempDirectory
     try {
         New-CursorRulePackage -RulesSource $SourceRules -SkillsSource $SourceSkills -KernelSource $SourceCursorKernel -OutputDir $cursorTempDir
-        Sync-Files -Source $cursorTempDir -Destination $DestCursorRules -Label "Cursor rules"
+        Sync-Files -Source $cursorTempDir -Destination $DestCursorRules -Label "Cursor rules (user)" -Prune -PruneManifestPath $DestCursorManifest
+        Sync-Files -Source $cursorTempDir -Destination $DestProjectCursorRules -Label "Cursor rules (project)" -Prune
     } finally {
         if (Test-Path $cursorTempDir) {
             Remove-Item -Path $cursorTempDir -Recurse -Force
