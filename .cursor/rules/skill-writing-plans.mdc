@@ -182,3 +182,26 @@ After all tasks complete and verified:
 - Follow plan steps exactly — don't improvise
 - Don't skip verifications
 - Reference skills when plan says to
+
+## Manus Pattern Integration (Phase 1+)
+
+If working in a Git worktree (created by `using-git-worktrees` skill), `writing-plans` automatically initializes the Manus 3-file pattern:
+
+**Automatic Initialization:**
+- `task_plan.md` — Goal, Scope, Phases, Success Criteria, Blockers
+- `findings.md` — Decisions, Research, Error Patterns
+- `progress.md` — Checklist, Session Timeline, Verification Status
+
+**Location:** `~/.config/dcr/worktrees/<project>/<task-name>/`
+
+**Control:** `.dcr/config.json` — Set `commit_session_files: true/false` per project
+
+**Workflow:**
+1. writing-plans creates worktree + initializes 3 files
+2. Dispatch to subagent-driven-development (or executing-plans)
+3. Agents read + update 3 files throughout session
+4. verification-before-completion validates progress.md checklist
+5. On completion, optionally commit task_plan.md for history
+
+**See:** `.dcr/templates/` for file templates  
+**See:** `.dcr/config.json` for configuration options
