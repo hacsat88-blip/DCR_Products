@@ -1,7 +1,7 @@
 # Unified Integration Module
 
-このモジュールは、VS Code の GitHub Copilot、GitHub Copilot CLI、Claude Code の
-3環境で同じ運用を再現するための共通仕様です。
+このモジュールは、VS Code の GitHub Copilot、GitHub Copilot CLI、Codex、Cursor、Claude Code の
+5環境で同じ運用を再現するための共通仕様です。
 
 ## 目的
 
@@ -97,5 +97,7 @@ team-plan → team-prd → team-exec → team-verify → team-fix (loop)
 
 - Copilot CLI は `COPILOT_CLI.md` を優先
 - VS Code Copilot は `.github/copilot-instructions.md` を優先
+- Codex は `AGENTS.md` を優先
+- Cursor は `.cursor/rules/`（`deploy.ps1` 生成）を優先
 - Claude Code は `CLAUDE.md` を優先
-- ただし、上記3つはこのモジュールを共通参照し、差分を最小化する
+- ただし、上記5つはこのモジュールを共通参照し、差分を最小化する

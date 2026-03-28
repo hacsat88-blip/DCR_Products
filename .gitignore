@@ -29,6 +29,7 @@ npm-debug.log*
 
 # Runtime artifacts (not source of truth)
 **/.superpowers/
+**/.dcr/
 codex_Product/httpserver.out
 codex_Product/httpserver.err
 

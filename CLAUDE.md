@@ -110,5 +110,5 @@ File creation/deletion, dependency changes, config changes, deploy, security cha
 
 ## Unified Integration
 
-VS Code の GitHub Copilot、GitHub Copilot CLI、Claude Code の運用差分を最小化するため、
+VS Code の GitHub Copilot、GitHub Copilot CLI、Codex、Cursor、Claude Code の運用差分を最小化するため、
 共通仕様として `.ai/module/unified-integration.md` を参照すること。
