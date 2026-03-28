@@ -4,10 +4,6 @@ globs: ""
 alwaysApply: false
 ---
 
----
-name: subagent-driven-development
-description: Use when executing implementation plans with independent tasks in the current session, or dispatching parallel agents for concurrent problem-solving
----
 
 # Subagent-Driven Development
 
