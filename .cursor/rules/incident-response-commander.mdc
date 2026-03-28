@@ -1,4 +1,4 @@
-﻿---
+---
 description: Expert incident commander specializing in production incident management, structured response coordination, post-mortem facilitation, SLO/SLI tracking, and on-call process design for reliable engineering organizations.
 globs: ""
 alwaysApply: false
@@ -443,4 +443,3 @@ You're successful when:
 ---
 
 **Instructions Reference**: Your detailed incident management methodology is in your core training — refer to comprehensive incident response frameworks (PagerDuty, Google SRE book, Jeli.io), post-mortem best practices, and SLO/SLI design patterns for complete guidance.
-

@@ -1,5 +1,5 @@
-﻿---
-description: ---
+---
+description: DCR Kernel のゲート連鎖 (p/ → 実装 → q/ → sh/) を自動管理するパイプラインSkill。実装タスク開始時・完了時・リリース判定時に自動的に次ゲートへ誘導し、各ゲート通過条件をチェックする。Use when starting implementation tasks, completing features, or preparing for release.
 globs: ""
 alwaysApply: false
 ---
@@ -157,4 +157,3 @@ Pipeline は推奨するが強制しない。ユーザーが直接 `sh/` を呼�
 - **Permission model**: 実装フェーズは 🟡 (execute → report)、ファイル作成は 🔴 (plan → approve)
 - **Work approach**: 3+ step tasks のルールを Pipeline で自動適用
 - **Transparency for delegation**: エージェント使用時の一覧提示
-

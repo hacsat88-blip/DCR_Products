@@ -1,5 +1,5 @@
-﻿---
-description: ---
+---
+description: Use when requesting code reviews, dispatching reviewer subagents, or receiving and responding to code review feedback. Covers both sides of the review process with technical rigor.
 globs: ""
 alwaysApply: false
 ---
@@ -188,4 +188,3 @@ If you pushed back and were wrong:
 ✅ "You were right - I checked [X] and it does [Y]. Implementing now."
 ```
 State the correction factually and move on.
-

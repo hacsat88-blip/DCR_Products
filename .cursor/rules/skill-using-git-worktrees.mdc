@@ -1,5 +1,5 @@
-﻿---
-description: ---
+---
+description: Use when starting feature work that needs isolation from current workspace or before executing implementation plans - creates isolated git worktrees with smart directory selection and safety verification
 globs: ""
 alwaysApply: false
 ---
@@ -222,4 +222,3 @@ Ready to implement auth feature
 
 **Pairs with:**
 - **finishing-a-development-branch** - REQUIRED for cleanup after work complete
-

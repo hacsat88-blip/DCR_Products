@@ -1,5 +1,5 @@
-﻿---
-description: ---
+---
+description: Use when you have a spec or requirements for a multi-step task, before touching code, or when executing a written plan in the current session
 globs: ""
 alwaysApply: false
 ---
@@ -182,4 +182,3 @@ After all tasks complete and verified:
 - Follow plan steps exactly — don't improvise
 - Don't skip verifications
 - Reference skills when plan says to
-

@@ -62,8 +62,31 @@ function Get-RuleDescription {
     )
 
     $lines = Get-Content -Path $Path -Encoding utf8
+    $inFrontmatter = $false
+    $frontmatterStarted = $false
+
     foreach ($line in $lines) {
         $trimmed = $line.Trim()
+        if (-not $frontmatterStarted -and $trimmed -eq '---') {
+            $frontmatterStarted = $true
+            $inFrontmatter = $true
+            continue
+        }
+        if ($inFrontmatter) {
+            if ($trimmed -eq '---') {
+                $inFrontmatter = $false
+                continue
+            }
+
+            if ($trimmed -match '^description:\s*(.+)$') {
+                $description = $Matches[1].Trim()
+                if ($description) {
+                    return $description.Trim([char]34, [char]39)
+                }
+            }
+
+            continue
+        }
         if (-not $trimmed) {
             continue
         }
@@ -77,6 +100,16 @@ function Get-RuleDescription {
     }
 
     return [System.IO.Path]::GetFileNameWithoutExtension($Path)
+}
+
+function Write-Utf8NoBom {
+    param(
+        [string]$Path,
+        [string]$Content
+    )
+
+    $utf8NoBom = New-Object System.Text.UTF8Encoding($false)
+    [System.IO.File]::WriteAllText($Path, $Content, $utf8NoBom)
 }
 
 function New-CursorRulePackage {
@@ -114,7 +147,7 @@ function New-CursorRulePackage {
         ) -join "`r`n"
 
         $destination = Join-Path $OutputDir ($ruleFile.BaseName + ".mdc")
-        Set-Content -Path $destination -Value $cursorContent -Encoding utf8
+        Write-Utf8NoBom -Path $destination -Content $cursorContent
     }
 
     # Skills → .mdc (prefixed with "skill-")
@@ -140,7 +173,7 @@ function New-CursorRulePackage {
                 ) -join "`r`n"
 
                 $destination = Join-Path $OutputDir ("skill-" + $skillDir.Name + ".mdc")
-                Set-Content -Path $destination -Value $cursorContent -Encoding utf8
+                Write-Utf8NoBom -Path $destination -Content $cursorContent
             }
         }
     }

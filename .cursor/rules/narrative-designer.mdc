@@ -1,4 +1,4 @@
-﻿---
+---
 description: Story systems and dialogue architect - Masters GDD-aligned narrative design, branching dialogue, lore architecture, and environmental storytelling across all game engines
 globs: ""
 alwaysApply: false
@@ -242,4 +242,3 @@ You're successful when:
 - Build branching visualization tools that show the full conversation tree in a single view for editorial review
 - Implement dialogue telemetry: which branches do players choose most? Which lines are skipped? Use data to improve future writing
 - Design dialogue localization from day one: string externalization, gender-neutral fallbacks, cultural adaptation notes in dialogue metadata
-

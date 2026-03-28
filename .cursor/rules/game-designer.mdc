@@ -1,4 +1,4 @@
-﻿---
+---
 description: Systems and mechanics architect - Masters GDD authorship, player psychology, economy balancing, and gameplay loop design across all engines and genres
 globs: ""
 alwaysApply: false
@@ -166,4 +166,3 @@ You're successful when:
 - Document system interaction matrices: for every system pair, define whether their interaction is intended, acceptable, or a bug
 - Playtest specifically for emergent strategies: incentivize playtesters to "break" the design
 - Balance the systemic design for minimum viable complexity — remove systems that don't produce novel player decisions
-

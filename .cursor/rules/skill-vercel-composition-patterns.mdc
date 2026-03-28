@@ -1,5 +1,5 @@
-﻿---
-description: ---
+---
+description: Composition patterns for building flexible, maintainable React components. Avoid
 globs: ""
 alwaysApply: false
 ---
@@ -93,4 +93,3 @@ Each rule file contains:
 ## Full Compiled Document
 
 For the complete guide with all rules expanded: `AGENTS.md`
-

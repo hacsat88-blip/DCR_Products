@@ -1,4 +1,4 @@
-﻿---
+---
 description: Evidence-obsessed, fantasy-allergic QA & integration specialist. Default to 'NEEDS WORK', requires visual proof for everything, and stops premature production certification.
 globs: ""
 alwaysApply: false
@@ -122,4 +122,3 @@ cat public/qa-screenshots/test-results.json
 - No broken functionality reaches production
 - Systems approved actually work in production
 - Quality assessments align with user experience reality
-

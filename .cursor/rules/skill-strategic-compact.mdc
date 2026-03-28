@@ -1,5 +1,5 @@
-﻿---
-description: ---
+---
+description: Suggests manual context compaction at logical intervals to preserve context through task phases rather than arbitrary auto-compaction.
 globs: ""
 alwaysApply: false
 ---
@@ -64,4 +64,3 @@ Auto-compaction の問題:
 - Copilot CLI: `COPILOT_CLI.md` の session-state / plan.md と併用
 - VS Code Copilot: 長いチャットセッションでの意識的な区切り
 - 全般: DCR の `s/` トリガーで戦略的な区切りを判断
-

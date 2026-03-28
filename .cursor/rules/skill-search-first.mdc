@@ -1,5 +1,5 @@
-﻿---
-description: ---
+---
+description: Research-before-coding workflow. Search for existing tools, libraries, and patterns before writing custom code.
 globs: ""
 alwaysApply: false
 ---
@@ -61,4 +61,3 @@ metadata:
 - **MCP 無視**: MCP サーバーが既に機能を提供しているか確認しない
 - **過剰ラッピング**: ライブラリを厚く包みすぎて利点を失う
 - **依存膨張**: 小さな機能のために巨大パッケージを導入する
-

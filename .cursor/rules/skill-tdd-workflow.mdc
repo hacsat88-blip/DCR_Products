@@ -1,5 +1,5 @@
-﻿---
-description: ---
+---
+description: Test-driven development workflow. Write tests first, then implement, with 80%+ coverage target. Use when implementing any feature or bugfix, before writing implementation code.
 globs: ""
 alwaysApply: false
 ---
@@ -142,4 +142,3 @@ As a [役割], I want to [操作], so that [利益]
 ```
 
 テストなしでバグを修正しない。テストが修正を証明し、再発を防ぐ。
-

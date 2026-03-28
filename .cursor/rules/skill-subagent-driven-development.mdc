@@ -1,5 +1,5 @@
-﻿---
-description: ---
+---
+description: Use when executing implementation plans with independent tasks in the current session, or dispatching parallel agents for concurrent problem-solving
 globs: ""
 alwaysApply: false
 ---
@@ -333,4 +333,3 @@ When all agents return:
 
 **Alternative workflow:**
 - **superpowers:executing-plans** - Use for parallel session instead of same-session execution
-
