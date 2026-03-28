@@ -46,6 +46,7 @@ $SourceAgents = Join-Path $RepoRoot ".ai\agents-source"
 
 $DestVSCodeSkills = Join-Path $UserHome ".agents\skills"
 $DestCursorRules  = Join-Path $UserHome ".cursor\rules"
+$DestCursorManifest = Join-Path $DestCursorRules ".dcr-managed-files.json"
 $DestProjectCursorRules = Join-Path $RepoRoot ".cursor\rules"
 $DestCodexAgents  = Join-Path $RepoRoot ".codex\agents"
 $DestClaudeAgents = Join-Path $RepoRoot ".claude\agents"
@@ -252,7 +253,8 @@ function Sync-Files {
         [string]$Source,
         [string]$Destination,
         [string]$Label,
-        [switch]$Prune
+        [switch]$Prune,
+        [string]$PruneManifestPath
     )
 
     if (-not (Test-Path $Source)) {
@@ -263,11 +265,23 @@ function Sync-Files {
     $sourceItems = Get-ChildItem $Source -File
     $count = $sourceItems.Count
     $sourceNames = $sourceItems | Select-Object -ExpandProperty Name
+    $managedNames = @()
+    if ($PruneManifestPath -and (Test-Path $PruneManifestPath)) {
+        $managedNames = Get-Content -Path $PruneManifestPath -Raw -Encoding utf8 | ConvertFrom-Json
+    }
 
     $staleItems = @()
     if (Test-Path $Destination) {
-        $destItems = Get-ChildItem $Destination -File
-        $staleItems = $destItems | Where-Object { $_.Name -notin $sourceNames }
+        $destItems = Get-ChildItem $Destination -File | Where-Object {
+            -not $PruneManifestPath -or $_.FullName -ne $PruneManifestPath
+        }
+        if ($PruneManifestPath) {
+            $staleItems = $destItems | Where-Object {
+                $_.Name -in $managedNames -and $_.Name -notin $sourceNames
+            }
+        } else {
+            $staleItems = $destItems | Where-Object { $_.Name -notin $sourceNames }
+        }
     }
 
     if ($DryRun) {
@@ -291,6 +305,10 @@ function Sync-Files {
 
     foreach ($item in $sourceItems) {
         Copy-Item -Path $item.FullName -Destination $Destination -Force
+    }
+
+    if ($PruneManifestPath) {
+        Write-Utf8NoBom -Path $PruneManifestPath -Content (($sourceNames | ConvertTo-Json) + "`r`n")
     }
 
     Write-Host "[OK] $Label : $count files → $Destination" -ForegroundColor Green
@@ -436,7 +454,7 @@ if ($Target -eq "all" -or $Target -eq "cursor") {
     $cursorTempDir = Get-TempDirectory
     try {
         New-CursorRulePackage -RulesSource $SourceRules -SkillsSource $SourceSkills -KernelSource $SourceCursorKernel -OutputDir $cursorTempDir
-        Sync-Files -Source $cursorTempDir -Destination $DestCursorRules -Label "Cursor rules (user)" -Prune
+        Sync-Files -Source $cursorTempDir -Destination $DestCursorRules -Label "Cursor rules (user)" -Prune -PruneManifestPath $DestCursorManifest
         Sync-Files -Source $cursorTempDir -Destination $DestProjectCursorRules -Label "Cursor rules (project)" -Prune
     } finally {
         if (Test-Path $cursorTempDir) {
