@@ -1,0 +1,21 @@
+{
+  "version": "1.0",
+  "manus_pattern": {
+    "enabled": true,
+    "commit_session_files": true,
+    "worktree_location": "${HOME}/.config/dcr/worktrees",
+    "auto_update_progress": true,
+    "metadata": {
+      "created": "2026-03-29",
+      "description": "Manus-style persistent planning configuration"
+    }
+  },
+  "hooks": {
+    "pre_tool_use": "re-read task_plan.md for context retention",
+    "post_tool_use": "append to findings.md and update progress.md",
+    "enabled_in_phase": 2
+  },
+  "project_overrides": {
+    "comment": "Projects can set commit_session_files: false for local-only sessions"
+  }
+}
