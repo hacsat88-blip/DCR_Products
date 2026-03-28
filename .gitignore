@@ -29,7 +29,16 @@ npm-debug.log*
 
 # Runtime artifacts (not source of truth)
 **/.superpowers/
+
+# Ignore all .dcr directories by default (runtime/session files)
 **/.dcr/
+
+# Track only the repository-level Manus Pattern source files
+!/.dcr/
+/.dcr/*
+!/.dcr/config.json
+!/.dcr/templates/
+!/.dcr/templates/*.md
 codex_Product/httpserver.out
 codex_Product/httpserver.err
 

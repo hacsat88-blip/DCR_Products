@@ -10,7 +10,7 @@
     Agents          : .ai/agents-source/ → .codex/agents/ (toml) + .claude/agents/ (md)
 
 .PARAMETER Target
-  同期先を指定: all | vscode | cursor | agents
+  同期先を指定: all | vscode | cursor | agents | dcr
   デフォルト: all
 
 .PARAMETER DryRun
@@ -28,7 +28,7 @@
 #>
 
 param(
-    [ValidateSet("all", "vscode", "cursor", "agents")]
+    [ValidateSet("all", "vscode", "cursor", "agents", "dcr")]
     [string]$Target = "all",
     [switch]$DryRun,
     [switch]$Check
@@ -248,6 +248,34 @@ function Sync-Agents {
 
     Write-Host "[OK] Codex agents : $($tomlFiles.Count) files → $CodexDest" -ForegroundColor Green
     Write-Host "[OK] Claude agents : $($mdFiles.Count) files → $ClaudeDest" -ForegroundColor Green
+}
+
+function Sync-DCRConfig {
+    param(
+        [string]$Source,
+        [string]$ConfigPath
+    )
+
+    # .dcr/config.json をホーム ~/.config/dcr/ へレプリケート
+    # Phase 1 MVP: .dcr/config.json のみ（テンプレートは同期不要、動的に init される）
+    if (-not (Test-Path $ConfigPath)) {
+        Write-Warning ".dcr config not found: $ConfigPath"
+        return
+    }
+
+    $dcrConfigDest = Join-Path $HOME ".config/dcr"
+    try {
+        if ($DryRun) {
+            Write-Host "[DRY RUN] .dcr config : $ConfigPath → $dcrConfigDest" -ForegroundColor Yellow
+            return
+        }
+
+        New-Item -ItemType Directory -Force -Path $dcrConfigDest | Out-Null
+        Copy-Item -Path $ConfigPath -Destination (Join-Path $dcrConfigDest "config.json") -Force
+        Write-Host "[OK] .dcr config : config.json → $dcrConfigDest" -ForegroundColor Green
+    } catch {
+        Write-Warning "Failed to sync .dcr config: $_"
+    }
 }
 
 function Sync-Directory {
@@ -476,6 +504,22 @@ if ($Check) {
             }
         }
     }
+    if ($Target -eq "all" -or $Target -eq "dcr") {
+        # .dcr config check
+        $dcrConfigPath = Join-Path $RepoRoot ".dcr\config.json"
+        $dcrConfigDest = Join-Path $HOME ".config\dcr\config.json"
+        if (Test-Path $dcrConfigPath) {
+            if (-not (Test-Path $dcrConfigDest)) {
+                Write-Host "[MISSING] .dcr config : $dcrConfigDest" -ForegroundColor Red
+            } elseif ((Get-FileHash $dcrConfigPath -Algorithm MD5).Hash -ne (Get-FileHash $dcrConfigDest -Algorithm MD5).Hash) {
+                Write-Host "[DRIFT] .dcr config : config.json out of sync" -ForegroundColor Red
+            } else {
+                Write-Host "[OK] .dcr config : in sync" -ForegroundColor Green
+            }
+        } else {
+            Write-Host "[SKIP] .dcr config : not found" -ForegroundColor Yellow
+        }
+    }
     Write-Host ""
     Write-Host "Drift check complete." -ForegroundColor Cyan
     return
@@ -500,6 +544,11 @@ if ($Target -eq "all" -or $Target -eq "cursor") {
 
 if ($Target -eq "all" -or $Target -eq "agents") {
     Sync-Agents -Source $SourceAgents -CodexDest $DestCodexAgents -ClaudeDest $DestClaudeAgents
+}
+
+if ($Target -eq "all" -or $Target -eq "dcr") {
+    $dcrConfigPath = Join-Path $RepoRoot ".dcr/config.json"
+    Sync-DCRConfig -Source $SourceRules -ConfigPath $dcrConfigPath
 }
 
 Write-Host ""
