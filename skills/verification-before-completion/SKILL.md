@@ -137,3 +137,19 @@ From 24 failure memories:
 Run the command. Read the output. THEN claim the result.
 
 This is non-negotiable.
+
+## Manus Pattern Validation (Phase 1+)
+
+If a `progress.md` file exists in the current session directory, verification-before-completion MUST validate the Manus checklist before allowing completion.
+
+**Validation Steps:**
+1. Check if progress.md exists in session directory (e.g., ~/.config/dcr/worktrees/<project>/<task>/)
+2. Parse "## Completion Checklist" section
+3. Count completed items (marked `- [x]`)
+4. If any items are incomplete (`- [ ]`): BLOCK completion, list incomplete items
+5. If all items complete: ALLOW completion, proceed with git commit (if .dcr/config.json: commit_session_files=true)
+
+**User Error Prevention:**
+- Incomplete items show red ❌ with item name
+- Completed items show green ✅
+- Clear next steps: "Complete [item X] in task_plan.md"
