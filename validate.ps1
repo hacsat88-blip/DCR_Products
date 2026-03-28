@@ -63,7 +63,9 @@ Write-Host "  rules processed: $($ruleFiles.Count)" -ForegroundColor DarkGray
 # ─────────────────────────────────────────────
 Write-Host ""
 Write-Host "── 2. skills/*/SKILL.md frontmatter + body check ──"
-$skillDirs = Get-ChildItem -Path $SourceSkills -Directory | Sort-Object Name
+$skillDirs = Get-ChildItem -Path $SourceSkills -Directory |
+    Where-Object { $_.Name -notlike "_*" } |
+    Sort-Object Name
 
 foreach ($dir in $skillDirs) {
     $skillFile = Join-Path $dir.FullName "SKILL.md"

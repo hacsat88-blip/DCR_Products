@@ -144,6 +144,34 @@ Output: feat(auth): implement JWT-based authentication
 
 Try to explain to the model why things are important in lieu of heavy-handed musty MUSTs. Use theory of mind and try to make the skill general and not super-narrow to specific examples. Start by writing a draft and then look at it with fresh eyes and improve it.
 
+### Claude Search Optimization (CSO)
+
+Discovery depends on the description field. Future Claude reads it to decide whether to load the skill.
+
+**Description = When to Use, NOT What the Skill Does**
+
+Testing revealed that when a description summarizes the skill's workflow, Claude may follow the description instead of reading the full skill content. Keep descriptions focused on triggering conditions only.
+
+```yaml
+# BAD: Summarizes workflow - Claude may shortcut to this
+description: Use for TDD - write test first, watch it fail, write minimal code, refactor
+
+# GOOD: Just triggering conditions
+description: Use when implementing any feature or bugfix, before writing implementation code
+```
+
+**Keyword Coverage:** Include error messages, symptoms, synonyms, and tool names that Claude would search for.
+
+**Token Efficiency:** Keep SKILL.md under 500 lines. Move heavy reference to separate files. Use cross-references instead of repeating content.
+
+### Skill Types
+
+| Type | Purpose | Example |
+|------|---------|---------|
+| **Technique** | Concrete method with steps | condition-based-waiting |
+| **Pattern** | Way of thinking about problems | flatten-with-flags |
+| **Reference** | API docs, syntax guides | office-docs |
+
 ### Test Cases
 
 After writing the skill draft, come up with 2-3 realistic test prompts — the kind of thing a real user would actually say. Share them with the user: [you don't have to use this exact language] "Here are a few test cases I'd like to try. Do these look right, or do you want to add more?" Then run them.

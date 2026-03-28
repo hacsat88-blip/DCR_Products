@@ -1,6 +1,6 @@
 ---
 name: subagent-driven-development
-description: Use when executing implementation plans with independent tasks in the current session
+description: Use when executing implementation plans with independent tasks in the current session, or dispatching parallel agents for concurrent problem-solving
 ---
 
 # Subagent-Driven Development
@@ -198,6 +198,58 @@ Final reviewer: All requirements met, ready to merge
 
 Done!
 ```
+
+## Parallel Dispatch Pattern
+
+When multiple independent problems exist simultaneously, dispatch agents in parallel instead of sequentially.
+
+### When to Parallelize
+- 3+ test files failing with different root causes
+- Multiple subsystems broken independently
+- Each problem can be understood without context from others
+- No shared state between investigations
+
+### When NOT to Parallelize
+- Failures are related (fixing one might fix others)
+- Need full system state understanding
+- Agents would modify overlapping files
+- Exploratory debugging (don't know what's broken yet)
+
+### Parallel Dispatch Process
+
+**1. Identify Independent Domains**
+
+Group failures by what's broken — each domain is independent:
+```
+Domain A: Tool approval flow (file-a.test.ts)
+Domain B: Batch completion (file-b.test.ts)
+Domain C: Abort functionality (file-c.test.ts)
+```
+
+**2. Create Focused Agent Tasks**
+
+Each agent gets:
+- **Specific scope**: One test file or subsystem
+- **Clear goal**: Make these tests pass
+- **Constraints**: Don't change other code
+- **Expected output**: Summary of findings and fixes
+
+**3. Agent Prompt Best Practices**
+
+| Pattern | Bad | Good |
+|---------|-----|------|
+| Scope | "Fix all the tests" | "Fix agent-tool-abort.test.ts" |
+| Context | "Fix the race condition" | Paste error messages + test names |
+| Constraints | (none) | "Do NOT change production code" |
+| Output | "Fix it" | "Return summary of root cause and changes" |
+
+**4. Review and Integrate**
+
+When all agents return:
+- Read each summary
+- Verify fixes don't conflict (check overlapping files)
+- Run full test suite
+- Integrate all changes
 
 ## Advantages
 

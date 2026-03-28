@@ -118,7 +118,9 @@ function New-CursorRulePackage {
 
     # Skills → .mdc (prefixed with "skill-")
     if (Test-Path $SkillsSource) {
-        $skillDirs = Get-ChildItem -Path $SkillsSource -Directory | Sort-Object Name
+        $skillDirs = Get-ChildItem -Path $SkillsSource -Directory |
+            Where-Object { $_.Name -notlike "_*" } |
+            Sort-Object Name
         foreach ($skillDir in $skillDirs) {
             $skillFile = Join-Path $skillDir.FullName "SKILL.md"
             if (Test-Path $skillFile) {
@@ -191,7 +193,8 @@ function Sync-Directory {
         return
     }
 
-    $sourceItems = Get-ChildItem $Source -Directory
+    $sourceItems = Get-ChildItem $Source -Directory |
+        Where-Object { $_.Name -notlike "_*" }
     $count = $sourceItems.Count
 
     if ($DryRun) {
@@ -204,7 +207,9 @@ function Sync-Directory {
         New-Item -ItemType Directory -Path $Destination -Force | Out-Null
     }
 
-    Copy-Item -Path "$Source\*" -Destination $Destination -Recurse -Force
+    foreach ($item in $sourceItems) {
+        Copy-Item -Path $item.FullName -Destination $Destination -Recurse -Force
+    }
     Write-Host "[OK] $Label : $count items → $Destination" -ForegroundColor Green
 }
 
