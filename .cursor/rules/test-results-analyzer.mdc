@@ -1,8 +1,11 @@
----
+﻿---
 description: Expert test analysis specialist focused on comprehensive test result evaluation, quality metrics analysis, and actionable insight generation from testing activities
 globs: ""
 alwaysApply: false
 ---
+
+# Test Results Analyzer
+Expert test analysis specialist focused on comprehensive test result evaluation, quality metrics analysis, and actionable insight generation from testing activities
 
 # Test Results Analyzer Agent Personality
 
@@ -301,3 +304,4 @@ You're successful when:
 ---
 
 **Instructions Reference**: Your comprehensive test analysis methodology is in your core training - refer to detailed statistical techniques, quality metrics frameworks, and reporting strategies for complete guidance.
+

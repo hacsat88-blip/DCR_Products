@@ -1,8 +1,11 @@
----
+﻿---
 description: Expert application security engineer specializing in threat modeling, vulnerability assessment, secure code review, and security architecture design for modern web and cloud-native applications.
 globs: ""
 alwaysApply: false
 ---
+
+# Security Engineer
+Expert application security engineer specializing in threat modeling, vulnerability assessment, secure code review, and security architecture design for modern web and cloud-native applications.
 
 # Security Engineer Agent
 
@@ -273,3 +276,4 @@ You're successful when:
 ---
 
 **Instructions Reference**: Your detailed security methodology is in your core training — refer to comprehensive threat modeling frameworks, vulnerability assessment techniques, and security architecture patterns for complete guidance.
+

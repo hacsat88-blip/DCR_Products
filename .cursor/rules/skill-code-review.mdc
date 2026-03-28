@@ -1,0 +1,191 @@
+﻿---
+description: ---
+globs: ""
+alwaysApply: false
+---
+
+---
+name: code-review
+description: Use when requesting code reviews, dispatching reviewer subagents, or receiving and responding to code review feedback. Covers both sides of the review process with technical rigor.
+---
+
+# Code Review
+
+Unified code review workflow covering both requesting reviews and handling feedback.
+
+**Core principles:**
+- Review early, review often
+- Verify before implementing feedback
+- Technical correctness over social comfort
+
+---
+
+## Part 1: Requesting Reviews
+
+### When to Request
+
+**Mandatory:**
+- After each task in subagent-driven development
+- After completing major feature
+- Before merge to main
+
+**Optional but valuable:**
+- When stuck (fresh perspective)
+- Before refactoring (baseline check)
+- After fixing complex bug
+
+### How to Request
+
+**1. Get git SHAs:**
+```bash
+BASE_SHA=$(git rev-parse HEAD~1)  # or origin/main
+HEAD_SHA=$(git rev-parse HEAD)
+```
+
+**2. Dispatch code-reviewer subagent** with this context:
+- What was implemented
+- Plan or requirements reference
+- Base and head SHAs
+- Brief description
+
+**3. Act on feedback:**
+
+| Severity | Action |
+|----------|--------|
+| Critical | Fix immediately |
+| Important | Fix before proceeding |
+| Minor | Note for later |
+| Wrong | Push back with reasoning |
+
+### Reviewer Prompt Template
+
+```markdown
+# Code Review Agent
+
+You are reviewing code changes for production readiness.
+
+**Your task:**
+1. Review {WHAT_WAS_IMPLEMENTED}
+2. Compare against {PLAN_OR_REQUIREMENTS}
+3. Check code quality, architecture, testing
+4. Categorize issues by severity
+5. Assess production readiness
+
+## Git Range to Review
+
+Base: {BASE_SHA} | Head: {HEAD_SHA}
+
+## Review Checklist
+
+**Code Quality:** Separation of concerns, error handling, type safety, DRY, edge cases
+**Architecture:** Design decisions, scalability, performance, security
+**Testing:** Real logic tests (not mocks), edge cases, integration tests, all passing
+**Requirements:** All plan requirements met, no scope creep, breaking changes documented
+
+## Output Format
+
+**Strengths:** [What works well]
+**Issues:**
+- Critical: [Blocks deployment]
+- Important: [Should fix before proceeding]
+- Minor: [Can fix later]
+**Assessment:** [Ready / Needs Work / Blocked]
+```
+
+---
+
+## Part 2: Receiving Feedback
+
+### The Response Pattern
+
+```
+1. READ:       Complete feedback without reacting
+2. UNDERSTAND: Restate requirement in own words (or ask)
+3. VERIFY:     Check against codebase reality
+4. EVALUATE:   Technically sound for THIS codebase?
+5. RESPOND:    Technical acknowledgment or reasoned pushback
+6. IMPLEMENT:  One item at a time, test each
+```
+
+### Forbidden Responses
+
+| Never Say | Instead |
+|-----------|---------|
+| "You're absolutely right!" | Restate the technical requirement |
+| "Great point!" | Ask clarifying questions |
+| "Let me implement that now" | Verify against codebase first |
+| "Thanks for catching that!" | "Fixed. [Brief description]" |
+
+### Handling Unclear Feedback
+
+If ANY item is unclear, STOP. Do not implement anything yet.
+
+```
+human: "Fix 1-6"
+You understand 1,2,3,6. Unclear on 4,5.
+
+❌ Implement 1,2,3,6 now, ask about 4,5 later
+✅ "Understand 1,2,3,6. Need clarification on 4 and 5 before implementing."
+```
+
+### Implementation Order
+
+For multi-item feedback:
+1. Clarify anything unclear FIRST
+2. Blocking issues (breaks, security)
+3. Simple fixes (typos, imports)
+4. Complex fixes (refactoring, logic)
+5. Test each fix individually
+6. Verify no regressions
+
+### Source-Specific Handling
+
+**From human partner:**
+- Trusted — implement after understanding
+- Still ask if scope unclear
+- Skip to action or technical acknowledgment
+
+**From external reviewers:**
+1. Check: Technically correct for THIS codebase?
+2. Check: Breaks existing functionality?
+3. Check: Reason for current implementation?
+4. Check: Works on all platforms/versions?
+5. Check: Does reviewer understand full context?
+
+### When To Push Back
+
+Push back when:
+- Suggestion breaks existing functionality
+- Reviewer lacks full context
+- Violates YAGNI (unused feature)
+- Technically incorrect for this stack
+- Conflicts with human partner's architectural decisions
+
+**How:** Use technical reasoning, reference working tests/code, involve human partner if architectural.
+
+### YAGNI Check
+
+```
+IF reviewer suggests "implementing properly":
+  grep codebase for actual usage
+
+  IF unused: "This endpoint isn't called. Remove it (YAGNI)?"
+  IF used:   Then implement properly
+```
+
+### Acknowledging Correct Feedback
+
+```
+✅ "Fixed. [Brief description of what changed]"
+✅ "Good catch - [specific issue]. Fixed in [location]."
+✅ [Just fix it and show in the code]
+```
+
+### Correcting Wrong Pushback
+
+If you pushed back and were wrong:
+```
+✅ "You were right - I checked [X] and it does [Y]. Implementing now."
+```
+State the correction factually and move on.
+

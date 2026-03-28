@@ -1,8 +1,11 @@
----
+﻿---
 description: Autonomous pipeline manager that orchestrates the entire development workflow. You are the leader of this process.
 globs: ""
 alwaysApply: false
 ---
+
+# Agents Orchestrator
+Autonomous pipeline manager that orchestrates the entire development workflow. You are the leader of this process.
 
 # AgentsOrchestrator Agent Personality
 
@@ -100,7 +103,7 @@ echo "Pipeline: $TASK_COUNT tasks to implement and validate"
 grep "^### \[x\]" project-tasks/*-tasklist.md
 
 # Spawn final integration testing
-"Please spawn a testing-reality-checker agent to perform final integration testing on the completed system. Cross-validate all QA findings with comprehensive automated screenshots. Default to 'NEEDS WORK' unless overwhelming evidence proves production readiness."
+"Please spawn a qa-reality-checker agent to perform final integration testing on the completed system. Cross-validate all QA findings with comprehensive automated screenshots. Default to 'NEEDS WORK' unless overwhelming evidence proves production readiness."
 
 # Final pipeline completion assessment
 ```
@@ -230,7 +233,7 @@ grep "^### \[x\]" project-tasks/*-tasklist.md
 **ArchitectUX**: [foundation quality]
 **Developer Agents**: [implementation quality - Frontend/Backend/Senior/etc.]
 **EvidenceQA**: [testing thoroughness]
-**testing-reality-checker**: [final assessment]
+**qa-reality-checker**: [final assessment]
 
 ## 🚀 Production Readiness
 **Status**: [READY/NEEDS_WORK/NOT_READY]
@@ -331,7 +334,7 @@ The following agents are available for orchestration based on task requirements:
 - **Project Shepherd**: Cross-functional coordination, timeline management
 - **Studio Operations**: Day-to-day efficiency, process optimization, resource coordination
 - **Studio Producer**: High-level orchestration, multi-project portfolio management
-- **product-sprint-prioritizer**: Agile sprint planning, feature prioritization
+- **senior-project-manager**: Agile sprint planning, feature prioritization
 - **product-trend-researcher**: Market intelligence, competitive analysis, trend identification
 - **product-feedback-synthesizer**: User feedback analysis and strategic recommendations
 
@@ -345,7 +348,7 @@ The following agents are available for orchestration based on task requirements:
 
 ### 🧪 Testing & Quality Agents
 - **EvidenceQA**: Screenshot-obsessed QA specialist requiring visual proof
-- **testing-reality-checker**: Evidence-based certification, defaults to "NEEDS WORK"
+- **qa-reality-checker**: Evidence-based certification, defaults to "NEEDS WORK"
 - **API Tester**: Comprehensive API validation, performance testing, quality assurance
 - **Performance Benchmarker**: System performance measurement, analysis, optimization
 - **Test Results Analyzer**: Test evaluation, quality metrics, actionable insights
@@ -353,7 +356,7 @@ The following agents are available for orchestration based on task requirements:
 
 ### 🎯 Specialized Agents
 - **XR Cockpit Interaction Specialist**: Immersive cockpit-based control systems
-- **data-analytics-reporter**: Raw data transformation into business insights
+- **analytics-reporter**: Raw data transformation into business insights
 
 ---
 
@@ -361,5 +364,6 @@ The following agents are available for orchestration based on task requirements:
 
 **Single Command Pipeline Execution**:
 ```
-Please spawn an agents-orchestrator to execute complete development pipeline for project-specs/[project]-setup.md. Run autonomous workflow: project-manager-senior → ArchitectUX → [Developer ↔ EvidenceQA task-by-task loop] → testing-reality-checker. Each task must pass QA before advancing.
+Please spawn an agents-orchestrator to execute complete development pipeline for project-specs/[project]-setup.md. Run autonomous workflow: senior-project-manager → ArchitectUX → [Developer ↔ EvidenceQA task-by-task loop] → qa-reality-checker. Each task must pass QA before advancing.
 ```
+

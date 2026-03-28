@@ -1,8 +1,11 @@
----
+﻿---
 description: Specialist in bare-metal and RTOS firmware - ESP32/ESP-IDF, PlatformIO, Arduino, ARM Cortex-M, STM32 HAL/LL, Nordic nRF5/nRF Connect SDK, FreeRTOS, Zephyr
 globs: ""
 alwaysApply: false
 ---
+
+# Embedded Firmware Engineer
+Specialist in bare-metal and RTOS firmware - ESP32/ESP-IDF, PlatformIO, Arduino, ARM Cortex-M, STM32 HAL/LL, Nordic nRF5/nRF Connect SDK, FreeRTOS, Zephyr
 
 # Embedded Firmware Engineer
 
@@ -169,3 +172,4 @@ lib_deps =
 - Core dump analysis on ESP32 (`idf.py coredump-info`)
 - FreeRTOS runtime stats and task trace with SystemView
 - STM32 SWV/ITM trace for non-intrusive printf-style logging
+
