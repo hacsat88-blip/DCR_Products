@@ -107,7 +107,7 @@ VS Code workspace settings (useInstructionFiles: true).
 ## Asset layer (not auto-loaded — referenced on demand)
 
 rules/
-Agent-specific behavior rules (85 agents). 正本。
+Agent-specific behavior rules (62 agents). 正本。
 deploy.ps1 で Cursor (.mdc) へ配布。
 `_` プレフィクスファイルは deploy 対象外の参照ドキュメント:
 - _METADATA.md: メタデータポリシー定義
@@ -116,12 +116,8 @@ deploy.ps1 で Cursor (.mdc) へ配布。
 - _git-conventions.md: コミット & ブランチ規約 (ECC 由来)
 
 skills/
-Skill definitions (69 skills). Git-managed source of truth.
+Skill definitions (57 skills). Git-managed source of truth.
 deploy.ps1 で ~/.agents/skills/ (VS Code Copilot) + ~/.cursor/rules/skill-*.mdc (Cursor) へ配布。
-
-### ローカル例外 (リポジトリ管理外)
-~/.agents/skills/superpowers/ — 外部由来のスキルパック (brainstorming, dispatching-parallel-agents 等 14 スキル含む)。
-リポジトリには含めない。deploy.ps1 の EXTRA 検出に表示されるが、正常な例外として無視してよい。
 
 ECC 部分採用スキル (3):
 - search-first/: 実装前調査ワークフロー

@@ -46,6 +46,7 @@ $SourceAgents = Join-Path $RepoRoot ".ai\agents-source"
 
 $DestVSCodeSkills = Join-Path $UserHome ".agents\skills"
 $DestCursorRules  = Join-Path $UserHome ".cursor\rules"
+$DestProjectCursorRules = Join-Path $RepoRoot ".cursor\rules"
 $DestCodexAgents  = Join-Path $RepoRoot ".codex\agents"
 $DestClaudeAgents = Join-Path $RepoRoot ".claude\agents"
 
@@ -217,7 +218,8 @@ function Sync-Files {
     param(
         [string]$Source,
         [string]$Destination,
-        [string]$Label
+        [string]$Label,
+        [switch]$Prune
     )
 
     if (-not (Test-Path $Source)) {
@@ -227,9 +229,19 @@ function Sync-Files {
 
     $sourceItems = Get-ChildItem $Source -File
     $count = $sourceItems.Count
+    $sourceNames = $sourceItems | Select-Object -ExpandProperty Name
+
+    $staleItems = @()
+    if (Test-Path $Destination) {
+        $destItems = Get-ChildItem $Destination -File
+        $staleItems = $destItems | Where-Object { $_.Name -notin $sourceNames }
+    }
 
     if ($DryRun) {
         Write-Host "[DRY RUN] $Label : $count files → $Destination" -ForegroundColor Yellow
+        if ($Prune -and $staleItems.Count -gt 0) {
+            Write-Host "  stale files to remove: $($staleItems.Count)" -ForegroundColor Yellow
+        }
         $sourceItems | ForEach-Object { Write-Host "  $_" }
         return
     }
@@ -238,7 +250,16 @@ function Sync-Files {
         New-Item -ItemType Directory -Path $Destination -Force | Out-Null
     }
 
-    Copy-Item -Path "$Source\*" -Destination $Destination -Force
+    if ($Prune) {
+        foreach ($stale in $staleItems) {
+            Remove-Item -Path $stale.FullName -Force
+        }
+    }
+
+    foreach ($item in $sourceItems) {
+        Copy-Item -Path $item.FullName -Destination $Destination -Force
+    }
+
     Write-Host "[OK] $Label : $count files → $Destination" -ForegroundColor Green
 }
 
@@ -307,7 +328,8 @@ if ($Check) {
         $cursorTempDir = Get-TempDirectory
         try {
             New-CursorRulePackage -RulesSource $SourceRules -SkillsSource $SourceSkills -KernelSource $SourceCursorKernel -OutputDir $cursorTempDir
-            Compare-Directories -Source $cursorTempDir -Destination $DestCursorRules -Label "Cursor rules"
+            Compare-Directories -Source $cursorTempDir -Destination $DestCursorRules -Label "Cursor rules (user)"
+            Compare-Directories -Source $cursorTempDir -Destination $DestProjectCursorRules -Label "Cursor rules (project)"
         } finally {
             if (Test-Path $cursorTempDir) {
                 Remove-Item -Path $cursorTempDir -Recurse -Force
@@ -381,7 +403,8 @@ if ($Target -eq "all" -or $Target -eq "cursor") {
     $cursorTempDir = Get-TempDirectory
     try {
         New-CursorRulePackage -RulesSource $SourceRules -SkillsSource $SourceSkills -KernelSource $SourceCursorKernel -OutputDir $cursorTempDir
-        Sync-Files -Source $cursorTempDir -Destination $DestCursorRules -Label "Cursor rules"
+        Sync-Files -Source $cursorTempDir -Destination $DestCursorRules -Label "Cursor rules (user)" -Prune
+        Sync-Files -Source $cursorTempDir -Destination $DestProjectCursorRules -Label "Cursor rules (project)" -Prune
     } finally {
         if (Test-Path $cursorTempDir) {
             Remove-Item -Path $cursorTempDir -Recurse -Force
