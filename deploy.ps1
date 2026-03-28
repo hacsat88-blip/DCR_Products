@@ -66,7 +66,8 @@ function Get-RuleDescription {
     $inFrontmatter = $false
     $frontmatterStarted = $false
 
-    foreach ($line in $lines) {
+    for ($index = 0; $index -lt $lines.Count; $index++) {
+        $line = $lines[$index]
         $trimmed = $line.Trim()
         if (-not $frontmatterStarted -and $trimmed -eq '---') {
             $frontmatterStarted = $true
@@ -79,10 +80,25 @@ function Get-RuleDescription {
                 continue
             }
 
-            if ($trimmed -match '^description:\s*(.+)$') {
+            if ($trimmed -match '^description:\s*(.*)$') {
                 $description = $Matches[1].Trim()
                 if ($description) {
                     return $description.Trim([char]34, [char]39)
+                }
+
+                $descriptionLines = @()
+                for ($nextIndex = $index + 1; $nextIndex -lt $lines.Count; $nextIndex++) {
+                    $nextLine = $lines[$nextIndex]
+                    if ($nextLine -notmatch '^\s+') {
+                        break
+                    }
+
+                    $descriptionLines += $nextLine.Trim()
+                    $index = $nextIndex
+                }
+
+                if ($descriptionLines.Count -gt 0) {
+                    return (($descriptionLines -join ' ') -replace '\s+', ' ').Trim([char]34, [char]39)
                 }
             }
 
