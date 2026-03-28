@@ -104,7 +104,8 @@ Write-Host "  skills processed: $($skillDirs.Count)" -ForegroundColor DarkGray
 # ─────────────────────────────────────────────
 Write-Host ""
 Write-Host "── 3. deploy.ps1 -DryRun check ─────────────────"
-if (-not $IsWindows) {
+$isWindowsPlatform = ($env:OS -eq "Windows_NT")
+if (-not $isWindowsPlatform) {
     Write-Host "  [SKIP] deploy DryRun: Windows-only script (non-Windows CI skipped)" -ForegroundColor DarkGray
     $script:passed += 3
 } else {
