@@ -325,9 +325,6 @@ The following agents are available for orchestration based on task requirements:
 ### 📋 Product & Project Management Agents
 - **senior-project-manager**: Spec-to-task conversion, stakeholder alignment, agile sprint planning, feature prioritization
 - **Experiment Tracker**: A/B testing, feature experiments, hypothesis validation
-- **Project Shepherd**: Cross-functional coordination, timeline management
-- **Studio Operations**: Day-to-day efficiency, process optimization, resource coordination
-- **Studio Producer**: High-level orchestration, multi-project portfolio management
 - **trend-researcher**: Market intelligence, competitive analysis, trend identification
 - **feedback-synthesizer**: User feedback analysis and strategic recommendations
 

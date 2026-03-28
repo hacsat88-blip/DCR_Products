@@ -129,6 +129,24 @@ function Write-Utf8NoBom {
     [System.IO.File]::WriteAllText($Path, $Content, $utf8NoBom)
 }
 
+function Get-ManagedFileNames {
+    param(
+        [string]$ManifestPath
+    )
+
+    if (-not $ManifestPath -or -not (Test-Path $ManifestPath)) {
+        return @()
+    }
+
+    try {
+        $manifestContent = Get-Content -Path $ManifestPath -Raw -Encoding utf8 | ConvertFrom-Json
+        return @($manifestContent) | ForEach-Object { "$($_)" } | Sort-Object -Unique
+    } catch {
+        Write-Warning "Managed file manifest is invalid and will be rebuilt: $ManifestPath"
+        return @()
+    }
+}
+
 function New-CursorRulePackage {
     param(
         [string]$RulesSource,
@@ -280,16 +298,16 @@ function Sync-Files {
 
     $sourceItems = Get-ChildItem $Source -File
     $count = $sourceItems.Count
-    $sourceNames = $sourceItems | Select-Object -ExpandProperty Name
-    $managedNames = @()
-    if ($PruneManifestPath -and (Test-Path $PruneManifestPath)) {
-        $managedNames = Get-Content -Path $PruneManifestPath -Raw -Encoding utf8 | ConvertFrom-Json
-    }
+    $sourceNames = $sourceItems | Select-Object -ExpandProperty Name | Sort-Object -Unique
+    $managedNames = Get-ManagedFileNames -ManifestPath $PruneManifestPath
 
     $staleItems = @()
     if (Test-Path $Destination) {
         $destItems = Get-ChildItem $Destination -File | Where-Object {
             -not $PruneManifestPath -or $_.FullName -ne $PruneManifestPath
+        }
+        if ($PruneManifestPath -and -not (Test-Path $PruneManifestPath) -and $destItems.Count -gt 0) {
+            Write-Warning "Managed file manifest not found. Pre-manifest stale files in $Destination will not be pruned until the next deploy writes $PruneManifestPath."
         }
         if ($PruneManifestPath) {
             $staleItems = $destItems | Where-Object {
@@ -324,7 +342,7 @@ function Sync-Files {
     }
 
     if ($PruneManifestPath) {
-        Write-Utf8NoBom -Path $PruneManifestPath -Content (($sourceNames | ConvertTo-Json) + "`r`n")
+        Write-Utf8NoBom -Path $PruneManifestPath -Content (($sourceNames | ConvertTo-Json -Compress) + "`r`n")
     }
 
     Write-Host "[OK] $Label : $count files → $Destination" -ForegroundColor Green
@@ -335,7 +353,8 @@ function Compare-Directories {
     param(
         [string]$Source,
         [string]$Destination,
-        [string]$Label
+        [string]$Label,
+        [string[]]$IgnoreNames = @()
     )
 
     if (-not (Test-Path $Source) -or -not (Test-Path $Destination)) {
@@ -346,7 +365,7 @@ function Compare-Directories {
     $diffs = @()
 
     # Files only in destination (edited outside repo)
-    $destFiles = Get-ChildItem $Destination -Recurse -File
+    $destFiles = Get-ChildItem $Destination -Recurse -File | Where-Object { $_.Name -notin $IgnoreNames }
     foreach ($df in $destFiles) {
         $relativePath = $df.FullName.Substring($Destination.Length + 1)
         $sourceFile = Join-Path $Source $relativePath
@@ -362,7 +381,7 @@ function Compare-Directories {
     }
 
     # Files only in source (not yet deployed)
-    $sourceFiles = Get-ChildItem $Source -Recurse -File
+    $sourceFiles = Get-ChildItem $Source -Recurse -File | Where-Object { $_.Name -notin $IgnoreNames }
     foreach ($sf in $sourceFiles) {
         $relativePath = $sf.FullName.Substring($Source.Length + 1)
         $destFile = Join-Path $Destination $relativePath
@@ -395,7 +414,7 @@ if ($Check) {
         $cursorTempDir = Get-TempDirectory
         try {
             New-CursorRulePackage -RulesSource $SourceRules -SkillsSource $SourceSkills -KernelSource $SourceCursorKernel -OutputDir $cursorTempDir
-            Compare-Directories -Source $cursorTempDir -Destination $DestCursorRules -Label "Cursor rules (user)"
+            Compare-Directories -Source $cursorTempDir -Destination $DestCursorRules -Label "Cursor rules (user)" -IgnoreNames @('.dcr-managed-files.json')
             Compare-Directories -Source $cursorTempDir -Destination $DestProjectCursorRules -Label "Cursor rules (project)"
         } finally {
             if (Test-Path $cursorTempDir) {
