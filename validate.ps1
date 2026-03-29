@@ -42,7 +42,7 @@ Write-Host ""
 # ─────────────────────────────────────────────
 # 1. rules/*.md — H1 見出し検証
 # ─────────────────────────────────────────────
-Write-Host "── 1. rules/*.md H1 check ──────────────────────"
+Write-Host "== 1. rules/*.md H1 check ======================"
 $ruleFiles = Get-ChildItem -Path $SourceRules -File -Filter *.md |
     Where-Object { $_.BaseName -notlike "_*" } |
     Sort-Object Name
@@ -62,7 +62,7 @@ Write-Host "  rules processed: $($ruleFiles.Count)" -ForegroundColor DarkGray
 # 2 & 3. skills/*/SKILL.md — frontmatter + body 検証
 # ─────────────────────────────────────────────
 Write-Host ""
-Write-Host "── 2. skills/*/SKILL.md frontmatter + body check ──"
+Write-Host "== 2. skills/*/SKILL.md frontmatter + body check =="
 $skillDirs = Get-ChildItem -Path $SourceSkills -Directory |
     Where-Object { $_.Name -notlike "_*" } |
     Sort-Object Name
@@ -103,7 +103,7 @@ Write-Host "  skills processed: $($skillDirs.Count)" -ForegroundColor DarkGray
 # 4. deploy.ps1 -DryRun 全ターゲット
 # ─────────────────────────────────────────────
 Write-Host ""
-Write-Host "── 3. deploy.ps1 -DryRun check ─────────────────"
+Write-Host "== 3. deploy.ps1 -DryRun check =================="
 $isWindowsPlatform = ($env:OS -eq "Windows_NT")
 if (-not $isWindowsPlatform) {
     Write-Host "  [SKIP] deploy DryRun: Windows-only script (non-Windows CI skipped)" -ForegroundColor DarkGray
@@ -125,14 +125,14 @@ if (-not $isWindowsPlatform) {
 # 結果サマリー
 # ─────────────────────────────────────────────
 Write-Host ""
-Write-Host "══════════════════════════════════════════════════"
+Write-Host "=================================================="
 Write-Host "RESULT: $passed passed, $failed failed" -ForegroundColor $(if ($failed -eq 0) { 'Green' } else { 'Red' })
 if ($errors.Count -gt 0) {
     Write-Host ""
     Write-Host "FAILURES:" -ForegroundColor Red
     foreach ($e in $errors) { Write-Host "  - $e" -ForegroundColor Red }
 }
-Write-Host "══════════════════════════════════════════════════"
+Write-Host "=================================================="
 Write-Host ""
 
 if ($failed -gt 0) { exit 1 } else { exit 0 }
