@@ -114,3 +114,17 @@ instinct (low) → instinct (high) → skill 候補として提案
 ```
 💡 p/ で「[トピック]」を独立Skillとして設計します
 ```
+
+## v2 運用への接続
+
+この Skill は日次運用の入口として維持し、より高度な運用は `continuous-learning-v2` に接続する。
+
+- project/global のスコープ分離が必要な場合
+- confidence を用いた昇格判定をしたい場合
+- instinct の `evolve/promote` で再利用資産化したい場合
+
+推奨フロー:
+
+1. `continuous-learning` で知見を記録
+2. `continuous-learning-v2` でクラスタ化と昇格判定
+3. `rules-distill` で rule 化候補を抽出
