@@ -129,6 +129,23 @@ function Write-Utf8NoBom {
     [System.IO.File]::WriteAllText($Path, $Content, $utf8NoBom)
 }
 
+function Remove-LeadingFrontmatter {
+    param(
+        [string]$Content
+    )
+
+    if (-not $Content) {
+        return $Content
+    }
+
+    # Strip only the first YAML frontmatter block at file start.
+    if ($Content -match '(?s)^---\r?\n.*?\r?\n---\r?\n?') {
+        return $Content.Substring($Matches[0].Length)
+    }
+
+    return $Content
+}
+
 function Get-ManagedFileNames {
     param(
         [string]$ManifestPath
@@ -170,6 +187,7 @@ function New-CursorRulePackage {
     foreach ($ruleFile in $ruleFiles) {
         $description = Get-RuleDescription -Path $ruleFile.FullName
         $body = Get-Content -Path $ruleFile.FullName -Raw -Encoding utf8
+        $body = Remove-LeadingFrontmatter -Content $body
         $cursorContent = @(
             "---"
             "description: $description"
@@ -195,6 +213,7 @@ function New-CursorRulePackage {
             if (Test-Path $skillFile) {
                 $description = Get-RuleDescription -Path $skillFile
                 $body = Get-Content -Path $skillFile -Raw -Encoding utf8
+                $body = Remove-LeadingFrontmatter -Content $body
                 if (-not $body) { continue }
                 $cursorContent = @(
                     "---"
