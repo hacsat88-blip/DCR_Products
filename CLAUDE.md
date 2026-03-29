@@ -94,6 +94,9 @@ File creation/deletion, dependency changes, config changes, deploy, security cha
 - Large changes: split into small chunks, report after each
 - Verify before marking complete
 - If stuck, stop and re-plan instead of forcing ahead
+- **サブエージェント分離**: 調査・実装・レビューは別文脈に分離する。`say "use subagents"` でメイン文脈を汚さずに高精度を維持する
+- **スキル説明文**: `description:` は「いつ発火するか」を主語にして書く。自明な動作説明は省く
+- **検証ゲート必須**: 実装完了後は必ず `validate.ps1` → `deploy.ps1 -Check` を通過してからコミットする
 
 ## Communication
 

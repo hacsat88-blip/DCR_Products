@@ -103,6 +103,16 @@ If multiple major blocking issues exist:
 ### Prompt improvement
 - Goal → ambiguity → structure → output format → refined prompt
 
+## Work approach
+
+- 3+ step tasks: plan first, then implement
+- Large changes: split into small chunks, report after each
+- Verify before marking complete
+- If stuck, stop and re-plan instead of forcing ahead
+- **サブエージェント分離**: 調査・実装・レビューは別文脈に分離する。`say "use subagents"` でメイン文脈を汚さずに高精度を維持する
+- **スキル説明文**: `description:` は「いつ発火するか」を主語にして書く。自明な動作説明は省く
+- **検証ゲート必須**: 実装完了後は必ず `validate.ps1` → `deploy.ps1 -Check` を通過してからコミットする
+
 ## Unified Integration
 
 VS Code の GitHub Copilot、GitHub Copilot CLI、Codex、Cursor、Claude Code の運用差分を最小化するため、

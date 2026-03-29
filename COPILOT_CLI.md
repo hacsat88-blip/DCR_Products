@@ -300,6 +300,9 @@ UPDATE todos SET status = 'done' WHERE id = 'add-auth-middleware';
 - **大規模変更**: 小さなチャンクに分割、各完了後に報告
 - **完了判断**: Completion verification セクションで検証してから「完了」
 - **行き詰まり**: 強行突破せず、立ち止まって再計画（Error handling 参照）
+- **サブエージェント分離**: 調査・実装・レビューは別文脈に分離する。`say "use subagents"` でメイン文脈を汚さずに高精度を維持する
+- **スキル説明文**: `description:` は「いつ発火するか」を主語にして書く。自明な動作説明は省く
+- **検証ゲート必須**: 実装完了後は必ず `validate.ps1` → `deploy.ps1 -Check` を通過してからコミットする
 
 ---
 
