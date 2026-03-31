@@ -27,11 +27,27 @@ AI エージェント設定・ルール・スキルの一元管理リポジト�
 ## 構造
 
 ```text
-.ai/           共通カーネル・モジュール・構造マップ
-.commands/     トリガーコマンド (a/ i/ r/ s/ d/)
-rules/         エージェントルール (62件) — 正本
-skills/        スキル定義 (57件, DCR 統合済み) — 正本
-deploy.ps1     エディタへの一方向同期
+Source layer
+	.ai/           共通カーネル・モジュール・構造マップ
+	.commands/     トリガーコマンド (a/ i/ r/ s/ d/)
+	rules/         エージェントルール (62件) — 正本
+	skills/        スキル定義 (57件, DCR 統合済み) — 正本
+	templates/     init-project.ps1 用テンプレート入力
+
+Runtime / generated layer
+	.github/       VS Code Copilot 実行エントリポイント
+	.cursor/rules/ Cursor 用生成ミラー (.mdc)
+	.claude/agents/ Claude 用生成ミラー
+	.codex/agents/ Codex 用生成ミラー
+	AGENTS.md      Codex / Copilot CLI 実行エントリポイント
+	CLAUDE.md      Claude Code 実行エントリポイント
+
+Workspace / operations layer
+	.vscode/       ワークスペース設定
+	docs/          設計・仕様・計画書
+	deploy.ps1     エディタへの一方向同期
+	validate.ps1   source assets の構造検証
+	init-project.ps1 新規プロジェクト初期化
 ```
 
 詳細は [.ai/repo-map.md](.ai/repo-map.md) を参照。
@@ -48,10 +64,21 @@ deploy.ps1     エディタへの一方向同期
 
 ## 迷わない運用境界 (推奨)
 
-- 正本として編集する: `rules/`, `skills/`, `.ai/agents-source/`
+- 正本として編集する: `rules/`, `skills/`, `templates/`, `.ai/agents-source/`
 - 生成物として扱う: `.claude/agents/`, `.codex/agents/`, `.cursor/rules/*.mdc` (直接編集しない)
 - `.cursor/rules/` は deploy による生成ミラーとして管理する（差分は `deploy.ps1 -Target cursor` の結果のみを許容する）
+- `.github/` は VS Code Copilot の runtime entrypoint であり、`rules/` や `skills/` の置き換え先ではない
+- `templates/` は `init-project.ps1` の入力契約であり、スクリプト更新なしに削除しない
 - 外部/検証系リポジトリは DCR 本体と分離する
+
+unsafe migration と見なすもの:
+
+- `rules/` を `.cursor/` 配下へ移す
+- `skills/` を `.cursor/` 配下へ移す
+- `templates/` を削除する
+- `templates/vscode-copilot/.github/copilot-instructions.md` で `.github/copilot-instructions.md` を上書きする
+
+上記は `deploy.ps1`, `validate.ps1`, `init-project.ps1` の参照先を同時に更新しない限り実施しない。
 
 安全フロー:
 
@@ -64,3 +91,15 @@ deploy.ps1     エディタへの一方向同期
 
 - `prototypes/` や外部クローンを同じルートに置く場合、検索・コミット対象を毎回明示して誤操作を防ぐ
 - `.dcr/`（互換で `.superpowers/`）などの実行時生成物は Git 管理対象にしない
+
+将来 `.github/instructions/` を追加することは可能だが、これは VS Code Copilot 専用の補助レイヤーであり、このリポジトリでは `rules/` や `skills/` の正本を置き換えない。
+
+構成移行が必要になった場合の安全な順序:
+
+1. 新パスへ copy する
+2. `deploy.ps1`, `validate.ps1`, `init-project.ps1` を両対応にする
+3. `deploy.ps1 -Check` と `validate.ps1` を通す
+4. ドキュメントを切り替える
+5. 後続変更で旧パスを削除する
+
+move と overwrite と delete を一発で行うコマンドによる構成移行は、このリポジトリでは許容しない。
