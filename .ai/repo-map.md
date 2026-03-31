@@ -56,6 +56,18 @@ for each tool's reading conventions.
 
 # Main Directories
 
+Repository governance model:
+- Source layer: editable canonical assets (`rules/`, `skills/`, `templates/`, `.ai/agents-source/`)
+- Runtime layer: tool entrypoints read directly by each editor (`.github/`, `AGENTS.md`, `CLAUDE.md`, `COPILOT_CLI.md`)
+- Generated layer: deploy outputs and mirrors (`.cursor/rules/*.mdc`, `.claude/agents/`, `.codex/agents/`)
+- Workspace layer: editor settings, docs, and operations scripts (`.vscode/`, `docs/`, `deploy.ps1`, `validate.ps1`, `init-project.ps1`)
+
+Unsafe migration rule:
+- Do not move `rules/` or `skills/` into `.cursor/`
+- Do not delete `templates/` while `init-project.ps1` reads from it
+- Do not overwrite runtime entrypoints from templates without an explicit migration plan
+- Any future path migration must support old and new paths in parallel before deletion
+
 ## Execution layer (auto-loaded by each editor)
 
 .github/copilot-instructions.md
@@ -100,9 +112,11 @@ Safety boundaries + Pipeline gate chain + module behaviors inlined.
 .cursor/rules/*.mdc
 Cursor agent rules + skills. deploy.ps1 が rules/*.md と skills/*/SKILL.md から自動生成。
 rules は元ファイル名.mdc、skills は skill-<name>.mdc として出力。
+生成物であり、source of truth ではない。手編集しない。
 
 .vscode/
 VS Code workspace settings (useInstructionFiles: true).
+Workspace config layer。`rules/` や `templates/` の代替ではない。
 
 ## Asset layer (not auto-loaded — referenced on demand)
 
@@ -127,6 +141,7 @@ ECC 部分採用スキル (3):
 templates/
 Model-specific configuration templates for init-project.ps1.
 Subdirs: claude-code/, codex/, vscode-copilot/
+Source layer。runtime ではなく project-init 用の入力契約。
 
 templates/README.md
 テンプレートの配置ルールと使い方。
@@ -180,8 +195,10 @@ One-way only: repository → editor. Never reverse.
 
 When modifying this repository:
 
-- edit skills/ and rules/ here, then deploy
+- edit `rules/`, `skills/`, `templates/`, and `.ai/agents-source/` here, then deploy if needed
 - prefer minimal diffs
 - preserve existing naming conventions
 - do not create files in templates/ unless archiving a new editor config or managing project init templates
 - do not modify ~/.agents/ or ~/.cursor/ directly
+- do not treat `.cursor/rules/`, `.claude/agents/`, or `.codex/agents/` as editable source paths
+- do not perform one-shot move + overwrite + delete migrations for folder restructuring

@@ -2,6 +2,8 @@
 
 `init-project.ps1` が使用するテンプレートディレクトリ。
 
+これは legacy 退避場所ではなく、`init-project.ps1` の入力契約です。`templates/` の削除や runtime 配下への吸収は、`init-project.ps1` の参照先変更と互換期間を伴う移行が完了するまで行いません。
+
 ## 構成
 
 | ディレクトリ | 内容 | 生成先 |
@@ -17,6 +19,8 @@
 - **プレースホルダーは `{key}` 形式** — `project-context.md` のキーと対応
 - **共有リソース（.ai/, .commands/）はここに置かない** — `init-project.ps1` がルートからコピーする
 - **.vscode/ はここに不要** — プロジェクト固有設定は `init-project.ps1` のスコープ外
+- **runtime entrypoint をここから直接上書きしない** — `.github/copilot-instructions.md` などの実運用ファイルはテンプレートと別管理
+- **`templates/` を単独で削除しない** — `init-project.ps1` が `templates/claude-code/`, `templates/codex/`, `templates/vscode-copilot/` を読むため
 
 ## 使い方
 
