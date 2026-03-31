@@ -99,6 +99,15 @@ If a loaded role conflicts with these instructions → **these instructions win*
 - q/ 全パス (🔴 = 0) → sh/ を推奨
 - スコープ変更検知時 → p/ への差し戻しを推奨
 
+## Work approach
+
+- 3+ step tasks: plan first, then implement
+- Large changes: split into small chunks, report after each
+- Verify before marking complete
+- If stuck, stop and re-plan instead of forcing ahead
+- **サブエージェント分離**: 調査・実装・レビューは別文脈に分離する
+- **検証ゲート必須**: 実装完了後は必ず `validate.ps1` → `deploy.ps1 -Check` を通過してからコミットする
+
 ## Footer rule
 
 If useful, suggest one next command:
