@@ -24,6 +24,7 @@ $ErrorActionPreference = "Stop"
 $RepoRoot  = $PSScriptRoot
 $SourceRules  = Join-Path $RepoRoot "rules"
 $SourceSkills = Join-Path $RepoRoot "skills"
+$KernelRoot = Join-Path $RepoRoot ".ai\kernel"
 $DeployScript = Join-Path $RepoRoot "deploy.ps1"
 $PowerShellExe = (Get-Process -Id $PID).Path
 
@@ -100,10 +101,31 @@ foreach ($dir in $skillDirs) {
 Write-Host "  skills processed: $($skillDirs.Count)" -ForegroundColor DarkGray
 
 # ─────────────────────────────────────────────
+# 4. .ai/kernel/**/*.md — H1 検証
+# ─────────────────────────────────────────────
+Write-Host ""
+Write-Host "== 3. .ai/kernel/**/*.md H1 check ==============="
+$kernelFiles = @()
+if (Test-Path $KernelRoot) {
+    $kernelFiles = Get-ChildItem -Path $KernelRoot -File -Filter *.md -Recurse | Sort-Object FullName
+}
+
+foreach ($file in $kernelFiles) {
+    $content = Get-Content -Path $file.FullName -Raw -Encoding utf8
+    if ($content -match '(?m)^# .+') {
+        if ($Verbose) { Write-Ok "$($file.FullName.Replace($RepoRoot + '\\', '')) — H1 found" }
+        else { $script:passed++ }
+    } else {
+        Write-Fail "$($file.FullName.Replace($RepoRoot + '\\', '')) — H1 missing"
+    }
+}
+Write-Host "  kernel docs processed: $($kernelFiles.Count)" -ForegroundColor DarkGray
+
+# ─────────────────────────────────────────────
 # 4. deploy.ps1 -DryRun 全ターゲット
 # ─────────────────────────────────────────────
 Write-Host ""
-Write-Host "== 3. deploy.ps1 -DryRun check =================="
+Write-Host "== 4. deploy.ps1 -DryRun check =================="
 $isWindowsPlatform = ($env:OS -eq "Windows_NT")
 if (-not $isWindowsPlatform) {
     Write-Host "  [SKIP] deploy DryRun: Windows-only script (non-Windows CI skipped)" -ForegroundColor DarkGray

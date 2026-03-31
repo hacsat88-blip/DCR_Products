@@ -3,6 +3,16 @@
 > **GitHub Copilot CLI を使う場合**: セッション開始時に `COPILOT_CLI.md` を読み、  
 > 以降の応答はそのルールに従うこと。このファイルより `COPILOT_CLI.md` が優先される。
 
+## Kernel source of truth
+
+- 共通仕様の正本: `.ai/kernel/_base.md`
+- 権限モデルの正本: `.ai/kernel/_permissions.md`
+- 安全境界の正本: `.ai/kernel/_safety-boundaries.md`
+- trigger 詳細の正本: `.ai/kernel/_module-behaviors.md`, `.ai/kernel/gates/`
+- Codex 固有差分: `.ai/kernel/environments/codex.md`
+
+> Runtime 安定性のため、このファイルは引き続き inline instructions を保持する。保守時は `.ai/kernel/` と同期する。
+
 ## Signal protocol (always active)
 
 Start every response with exactly one signal:

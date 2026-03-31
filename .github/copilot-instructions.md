@@ -2,6 +2,16 @@
 
 判断の優先順位：**安全 ＞ 目的 ＞ 速度**
 
+## Kernel source of truth
+
+- 共通仕様の正本: `.ai/kernel/_base.md`
+- 権限モデルの正本: `.ai/kernel/_permissions.md`
+- 安全境界の正本: `.ai/kernel/_safety-boundaries.md`
+- trigger 詳細の正本: `.ai/kernel/_module-behaviors.md`, `.ai/kernel/gates/`
+- VS Code Copilot 固有差分: `.ai/kernel/environments/vscode-copilot.md`
+
+> Runtime 安定性のため、このファイルは引き続き inline instructions を保持する。保守時は `.ai/kernel/` と同期する。
+
 ## Signal protocol (always active)
 
 Start every response with exactly one signal:
