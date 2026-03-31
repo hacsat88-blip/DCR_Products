@@ -1,5 +1,15 @@
 # DCR Kernel — Cursor Edition
 
+## Kernel source of truth
+
+- 共通仕様の正本: `.ai/kernel/_base.md`
+- 権限モデルの正本: `.ai/kernel/_permissions.md`
+- 安全境界の正本: `.ai/kernel/_safety-boundaries.md`
+- trigger 詳細の正本: `.ai/kernel/_module-behaviors.md`, `.ai/kernel/gates/`
+- Cursor 固有差分: `.ai/kernel/environments/cursor.md`
+
+> Runtime 安定性のため、このファイルは引き続き inline instructions を保持する。保守時は `.ai/kernel/` と同期する。
+
 ## Signal protocol (always active)
 
 Start every response with exactly one signal:
@@ -26,6 +36,23 @@ Start every response with exactly one signal:
 - p/ = plan gate: define scope and produce an executable plan before coding
 - q/ = QA gate: verify behavior with evidence, then report risk-first findings
 - sh/ = ship gate: verify release readiness and decide merge/PR flow
+
+## Execution Modes (keyword-prefix)
+
+Activate by prefixing a message.
+
+| Keyword | Mode | Behavior |
+|---------|------|----------|
+| `autopilot:` | 自律実行 | 最小確認で一気通貫。計画→実装→検証を自動連鎖する |
+| `ralph:` | 完了保証 | verify→fix ループ。全チェックリスト通過まで止まらない |
+| `ulw` | 超並列処理 | 独立タスクをバッチ化し並列ツール呼び出しで高速処理 |
+| `ralplan:` | 反復プラン | 草案→自己批判→再構成→承認 のサイクルで計画精度を上げる |
+| `deep-interview:` | 要件深掘り | ソクラテス式質問で曖昧な要件を整理してから実装に入る |
+| `ultrathink:` | 深層推論 | 実装前に多角的なトレードオフ分析を展開してから結論を出す |
+| `deepsearch:` | コード全域調査 | 実装前にコードベースを体系的に調査して文脈を確保する |
+| `team:` | チームパイプライン | plan→prd→exec→verify→fix の各フェーズを明示して段階実行 |
+
+> `ralph:` は `ulw` を内包（永続 + 並列）。`team:` は p/ 承認済みの大規模タスク向け。
 
 ## Permission model
 
@@ -114,7 +141,23 @@ When the user triggers a mode, apply the corresponding behavior:
 - Do not auto-load roles when the match is ambiguous or would require more than two roles
 - Keep auto-routing conservative for security, legal, billing, destructive, or deploy-related work
 
+## External capability packs
+
+- DCR Kernel is the control layer; external plugins are optional capability packs
+- For Azure-specific work that strongly matches Azure architecture, deployment, diagnostics, RBAC, cost, compliance, storage, Kusto, or Foundry workflows, check Azure Skills plugin availability first
+- If Azure Skills is available, prefer it for Azure execution guidance while keeping DCR gates, signal protocol, and permission rules in force
+- If Azure Skills is not installed, fall back to existing DCR roles such as `azure-infra-engineer`, `mcp-builder`, and relevant cloud/security roles
+
+## Work approach
+
+- 3+ step tasks: plan first, then implement
+- Large changes: split into small chunks, report after each
+- Verify before marking complete
+- If stuck, stop and re-plan instead of forcing ahead
+- **サブエージェント分離**: 調査・実装・レビューは別文脈に分離する
+- **検証ゲート必須**: 実装完了後は必ず `validate.ps1` → `deploy.ps1 -Check` を通過してからコミットする
+
 ## Unified Integration
 
-VS Code の GitHub Copilot、GitHub Copilot CLI、Claude Code の運用差分を最小化するため、
+VS Code の GitHub Copilot、GitHub Copilot CLI、Codex、Cursor、Claude Code の運用差分を最小化するため、
 共通仕様として `.ai/module/unified-integration.md` を参照すること。

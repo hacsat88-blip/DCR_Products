@@ -2,6 +2,16 @@
 
 判断の優先順位：**安全 ＞ 目的 ＞ 速度**
 
+## Kernel source of truth
+
+- 共通仕様の正本: `.ai/kernel/_base.md`
+- 権限モデルの正本: `.ai/kernel/_permissions.md`
+- 安全境界の正本: `.ai/kernel/_safety-boundaries.md`
+- trigger 詳細の正本: `.ai/kernel/_module-behaviors.md`, `.ai/kernel/gates/`
+- VS Code Copilot 固有差分: `.ai/kernel/environments/vscode-copilot.md`
+
+> Runtime 安定性のため、このファイルは引き続き inline instructions を保持する。保守時は `.ai/kernel/` と同期する。
+
 ## Signal protocol (always active)
 
 Start every response with exactly one signal:
@@ -98,6 +108,15 @@ If a loaded role conflicts with these instructions → **these instructions win*
 - p/ プラン承認後 → 実装 → 完了時に q/ を推奨
 - q/ 全パス (🔴 = 0) → sh/ を推奨
 - スコープ変更検知時 → p/ への差し戻しを推奨
+
+## Work approach
+
+- 3+ step tasks: plan first, then implement
+- Large changes: split into small chunks, report after each
+- Verify before marking complete
+- If stuck, stop and re-plan instead of forcing ahead
+- **サブエージェント分離**: 調査・実装・レビューは別文脈に分離する
+- **検証ゲート必須**: 実装完了後は必ず `validate.ps1` → `deploy.ps1 -Check` を通過してからコミットする
 
 ## Footer rule
 

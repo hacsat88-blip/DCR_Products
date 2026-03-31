@@ -2,6 +2,16 @@
 
 判断の優先順位：**安全 ＞ 目的 ＞ 速度**
 
+## Kernel source of truth
+
+- 共通仕様の正本: `.ai/kernel/_base.md`
+- 権限モデルの正本: `.ai/kernel/_permissions.md`
+- 安全境界の正本: `.ai/kernel/_safety-boundaries.md`
+- trigger 詳細の正本: `.ai/kernel/_module-behaviors.md`, `.ai/kernel/gates/`
+- Claude Code 固有差分: `.ai/kernel/environments/claude-code.md`
+
+> Runtime 安定性のため、このファイルは引き続き inline instructions を保持する。保守時は `.ai/kernel/` と同期する。
+
 ## Signal protocol (always active)
 
 Start every response with exactly one signal:
@@ -104,12 +114,51 @@ File creation/deletion, dependency changes, config changes, deploy, security cha
 - Quote CLI output/errors verbatim, summarize cause/impact/fix in Japanese
 - Follow existing repository naming conventions
 
+## Module behaviors
+
+> Triggers are applied silently. Do not meta-comment on which trigger is active — produce the output directly.
+
+### a/ — Review or Debug
+- Surface flaws, risks, contradictions, and missing constraints
+- Prefer 🔴 Stop and 🟡 Fix over reassurance
+- Debugging: symptom → root cause → minimal fix → verification step
+
+### s/ — Strategy
+1. Current state
+2. Reframed question
+3. Direction evaluation
+
+### i/ — Integrate
+- One coherent recommendation
+- Keep only the trade-offs needed to justify the final choice
+
+### d/ — Adversarial
+- How the plan could fail
+- Fatal weaknesses + minimum viable mitigation
+
+## Pipeline gate chain (p/ → 実装 → q/ → sh/)
+
+- p/ プラン承認後 → 実装 → 完了時に q/ を推奨
+- q/ 全パス (🔴 = 0) → sh/ を推奨
+- スコープ変更検知時 → p/ への差し戻しを推奨
+
 ## Transparency for delegation
 
 - サブエージェント・マルチエージェント発火前に、使用するエージェント名と目的を一覧で提示する
 - Skill発動前に、どのSkillを使うか明示する
 - 例: 「以下を使用します: code-reviewer (実装レビュー), Explore (構造調査)」
 - 単一エージェント・単一Skillでも省略しない
+
+## Command files (read when trigger is used)
+
+- .commands/review.md — a/ review format
+- .commands/debug.md — a/ debug format
+- .commands/strategy.md — s/ format
+- .commands/integrate.md — i/ format
+- .commands/adversarial.md — d/ format
+- .commands/plan.md — p/ plan gate format
+- .commands/qa.md — q/ QA gate format
+- .commands/ship.md — sh/ ship gate format
 
 ## Unified Integration
 

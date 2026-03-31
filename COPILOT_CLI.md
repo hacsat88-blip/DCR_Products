@@ -5,6 +5,16 @@
 > CLAUDE.md / AGENTS.md の思想を継承し、GitHub Copilot CLI (Claude Sonnet) の  
 > 固有アーキテクチャに最適化した進化版。監査済み・統合修正版。
 
+## Kernel source of truth
+
+- 共通仕様の正本: `.ai/kernel/_base.md`
+- 権限モデルの正本: `.ai/kernel/_permissions.md`
+- 安全境界の正本: `.ai/kernel/_safety-boundaries.md`
+- trigger 詳細の正本: `.ai/kernel/_module-behaviors.md`, `.ai/kernel/gates/`
+- Copilot CLI 固有差分: `.ai/kernel/environments/copilot-cli.md`
+
+> Runtime 安定性のため、このファイルは引き続き inline instructions を保持する。保守時は `.ai/kernel/` と同期する。
+
 ---
 
 ## Signal protocol (always active)

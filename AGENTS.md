@@ -3,6 +3,16 @@
 > **GitHub Copilot CLI を使う場合**: セッション開始時に `COPILOT_CLI.md` を読み、  
 > 以降の応答はそのルールに従うこと。このファイルより `COPILOT_CLI.md` が優先される。
 
+## Kernel source of truth
+
+- 共通仕様の正本: `.ai/kernel/_base.md`
+- 権限モデルの正本: `.ai/kernel/_permissions.md`
+- 安全境界の正本: `.ai/kernel/_safety-boundaries.md`
+- trigger 詳細の正本: `.ai/kernel/_module-behaviors.md`, `.ai/kernel/gates/`
+- Codex 固有差分: `.ai/kernel/environments/codex.md`
+
+> Runtime 安定性のため、このファイルは引き続き inline instructions を保持する。保守時は `.ai/kernel/` と同期する。
+
 ## Signal protocol (always active)
 
 Start every response with exactly one signal:
@@ -70,6 +80,24 @@ If multiple major blocking issues exist:
 - Do not auto-load roles when the match is ambiguous or would require more than two roles
 - Keep auto-routing conservative for security, legal, billing, destructive, or deploy-related work
 
+## Permission model
+
+### 🟢 Autonomous (no report needed)
+Read-only: ls, cat, grep, git status, git diff, log viewing
+
+### 🟡 Execute → report after
+Low-risk state changes. Report “what / why / result” in 1-3 lines.
+
+### 🔴 Plan → approve → execute
+File creation/deletion, dependency changes, config changes, deploy, security changes.
+
+## Safety boundaries
+
+- Do not output or commit secrets (API keys, tokens, .env files)
+- Do not change specified specifications without approval
+- Warn before destructive operations (delete, bulk updates, production deploy)
+- Distinguish fact / inference / unknown
+
 ## Module behaviors
 
 ### a/ — Review or Debug
@@ -112,6 +140,18 @@ If multiple major blocking issues exist:
 - **サブエージェント分離**: 調査・実装・レビューは別文脈に分離する。`say "use subagents"` でメイン文脈を汚さずに高精度を維持する
 - **スキル説明文**: `description:` は「いつ発火するか」を主語にして書く。自明な動作説明は省く
 - **検証ゲート必須**: 実装完了後は必ず `validate.ps1` → `deploy.ps1 -Check` を通過してからコミットする
+
+## Transparency for delegation
+
+- サブエージェント・マルチエージェント発火前に、使用するエージェント名と目的を一覧で提示する
+- Skill発動前に、どのSkillを使うか明示する
+- 単一エージェント・単一Skillでも省略しない
+
+## Pipeline gate chain (p/ → 実装 → q/ → sh/)
+
+- p/ プラン承認後 → 実装 → 完了時に q/ を推奨
+- q/ 全パス (🔴 = 0) → sh/ を推奨
+- スコープ変更検知時 → p/ への差し戻しを推奨
 
 ## Unified Integration
 
