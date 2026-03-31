@@ -39,8 +39,7 @@ npm-debug.log*
 !/.dcr/config.json
 !/.dcr/templates/
 !/.dcr/templates/*.md
-codex_Product/httpserver.out
-codex_Product/httpserver.err
+codex_Product/
 
 # Nested git repos (unregistered submodules)
 prototypes/blue-planet-globe/
