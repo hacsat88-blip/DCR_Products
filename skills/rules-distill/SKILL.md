@@ -1,6 +1,7 @@
 ---
 name: rules-distill
 description: "複数 skill に分散した実践知を抽出し、rule に昇格すべき原則を特定する。what と how の境界を維持する。"
+disable-model-invocation: true
 ---
 
 # Rules Distill

@@ -1,6 +1,7 @@
 ---
 name: harness-audit
 description: "repo の harness 健全性を監査し、Tool Coverage / Quality Gates / Security / Cost の不足を優先順位付きで可視化する。"
+disable-model-invocation: true
 ---
 
 # Harness Audit
