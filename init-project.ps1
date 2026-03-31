@@ -12,7 +12,7 @@
   共有リソース（-SkipShared で省略可）:
     .ai/kernel.md                   (DCR Kernel)
     .ai/module/*                    (モジュールファイル)
-    .commands/*                     (コマンドファイル)
+    .ai/kernel/gates/*              (トリガーゲートファイル)
 
   project-context.md の key: value を読み取り、テンプレート内の
   {key} プレースホルダーを置換して出力先に書き出す。
@@ -27,7 +27,7 @@
   生成対象: all | claude | codex | copilot
 
 .PARAMETER SkipShared
-  共有リソース（.ai/kernel.md, .ai/module/, .commands/）のコピーをスキップ
+  共有リソース（.ai/kernel.md, .ai/module/, .ai/kernel/gates/）のコピーをスキップ
 
 .PARAMETER DryRun
   実際にはファイルを書き出さず、生成内容をコンソールに表示する
@@ -233,14 +233,14 @@ if (-not $SkipShared) {
         }
     }
 
-    # .commands/* files
-    $commandsDir = Join-Path $RepoRoot ".commands"
-    if (Test-Path $commandsDir) {
-        Get-ChildItem -Path $commandsDir -File | ForEach-Object {
+    # .ai/kernel/gates/* files
+    $gatesDir = Join-Path $RepoRoot ".ai\kernel\gates"
+    if (Test-Path $gatesDir) {
+        Get-ChildItem -Path $gatesDir -File | ForEach-Object {
             $sharedItems += @{
                 Source = $_.FullName
-                Dest   = Join-Path $ProjectPath ".commands\$($_.Name)"
-                Label  = ".commands/$($_.Name)"
+                Dest   = Join-Path $ProjectPath ".ai\kernel\gates\$($_.Name)"
+                Label  = ".ai/kernel/gates/$($_.Name)"
             }
         }
     }

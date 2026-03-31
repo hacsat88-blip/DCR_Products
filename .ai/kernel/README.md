@@ -299,7 +299,7 @@ gate/*.md（12個）   ～300 行（統一）
 
 ### Phase 3: トリガーハンドラの統一化
 ```
-□ gates/trigger-*.md を生成（.commands/ の内容を移行）
+✅ gates/trigger-*.md を生成（.commands/ から移行完了、.commands/ 削除済み）
 ```
 
 ### Phase 4: エントリポイント参照化

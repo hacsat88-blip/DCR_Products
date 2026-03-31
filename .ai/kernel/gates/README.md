@@ -21,4 +21,4 @@
 ## Rule
 
 - entrypoint には trigger 名の一覧だけを置き、詳細はここへ寄せる
-- 行動指針の変更は `.commands/` と整合するように行う
+- `.commands/` は廃止済み。gates/ が trigger 定義の唯一の正本

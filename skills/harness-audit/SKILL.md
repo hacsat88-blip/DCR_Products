@@ -18,7 +18,7 @@ description: "repo の harness 健全性を監査し、Tool Coverage / Quality G
 
 ## 実行手順
 
-1. `skills/`, `rules/`, `.commands/` を棚卸し
+1. `skills/`, `rules/`, `.ai/kernel/gates/` を棚卸し
 2. 監査結果を PASS/FAIL で記録
 3. Top 3 改善アクションを提示
 

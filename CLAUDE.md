@@ -149,16 +149,16 @@ File creation/deletion, dependency changes, config changes, deploy, security cha
 - 例: 「以下を使用します: code-reviewer (実装レビュー), Explore (構造調査)」
 - 単一エージェント・単一Skillでも省略しない
 
-## Command files (read when trigger is used)
+## Gate files (read when trigger is used)
 
-- .commands/review.md — a/ review format
-- .commands/debug.md — a/ debug format
-- .commands/strategy.md — s/ format
-- .commands/integrate.md — i/ format
-- .commands/adversarial.md — d/ format
-- .commands/plan.md — p/ plan gate format
-- .commands/qa.md — q/ QA gate format
-- .commands/ship.md — sh/ ship gate format
+- .ai/kernel/gates/trigger-a-review.md — a/ review format
+- .ai/kernel/gates/trigger-a-debug.md — a/ debug format
+- .ai/kernel/gates/trigger-s.md — s/ format
+- .ai/kernel/gates/trigger-i.md — i/ format
+- .ai/kernel/gates/trigger-d.md — d/ format
+- .ai/kernel/gates/trigger-p.md — p/ plan gate format
+- .ai/kernel/gates/trigger-q.md — q/ QA gate format
+- .ai/kernel/gates/trigger-sh.md — sh/ ship gate format
 
 ## Unified Integration
 

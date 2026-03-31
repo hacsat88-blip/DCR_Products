@@ -46,7 +46,7 @@ for each tool's reading conventions.
 
 | Editor/CLI          | Entry Point                        | Reads                                    |
 |---------------------|------------------------------------|------------------------------------------|
-| VS Code Copilot     | .github/copilot-instructions.md    | .ai/, .commands/, rules/, skills/        |
+| VS Code Copilot     | .github/copilot-instructions.md    | .ai/, .ai/kernel/gates/, rules/, skills/ |
 | Copilot CLI         | AGENTS.md → COPILOT_CLI.md         | .ai/repo-map.md, rules/, skills/         |
 | Codex               | AGENTS.md                          | rules/ (by reference)                    |
 | Claude Code         | CLAUDE.md                          | rules/ (by reference)                    |
@@ -102,8 +102,9 @@ AI system kernel, repo map, routing design, and behavior modules.
 .ai/module/
 Specialized behavior modules (architecture, debugging, review, prompting).
 
-.commands/
-Trigger-activated command definitions (a/, i/, r/, s/, d/).
+.ai/kernel/gates/
+Trigger-activated gate definitions (a/, i/, r/, s/, d/, p/, q/, sh/).
+旧 `.commands/` は `.ai/kernel/gates/` に統合済み。
 
 .cursor/rules/dcr-kernel.md
 Cursor entry point. DCR Kernel + triggers (a/i/r/s/d/p/q/sh/) + Permission model +
@@ -172,7 +173,7 @@ init-project.ps1
 新規プロジェクト向け AI 指示ファイル生成スクリプト。
 templates/ のテンプレートと project-context.md を入力に、
 CLAUDE.md / AGENTS.md / .github/copilot-instructions.md の3ファイルを生成。
-共有リソース (.ai/kernel.md, .ai/module/, .commands/) もコピーする。
+共有リソース (.ai/kernel.md, .ai/module/, .ai/kernel/gates/) もコピーする。
 オプション: -ProjectPath (必須), -ContextFile, -Target (all/claude/codex/copilot), -SkipShared, -DryRun。
 
 ---
@@ -180,7 +181,7 @@ CLAUDE.md / AGENTS.md / .github/copilot-instructions.md の3ファイルを生�
 # Architecture Notes
 
 Preferred layering:
-copilot-instructions.md → kernel.md → module/*.md + .commands/*.md
+copilot-instructions.md → kernel.md → module/*.md + .ai/kernel/gates/*.md
 
 Configuration pattern:
 Markdown-based instruction files, no code dependencies.

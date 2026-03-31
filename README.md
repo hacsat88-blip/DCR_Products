@@ -29,7 +29,7 @@ AI エージェント設定・ルール・スキルの一元管理リポジト�
 ```text
 Source layer
 	.ai/           共通カーネル・モジュール・構造マップ
-	.commands/     トリガーコマンド (a/ i/ r/ s/ d/)
+	.ai/kernel/gates/ トリガーゲート (a/ i/ r/ s/ d/ p/ q/ sh/)
 	rules/         エージェントルール (62件) — 正本
 	skills/        スキル定義 (57件, DCR 統合済み) — 正本
 	templates/     init-project.ps1 用テンプレート入力
