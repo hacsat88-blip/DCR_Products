@@ -17,7 +17,7 @@
 
 - **テンプレートのみ配置する** — 実動作する設定ファイルはルートに置く
 - **プレースホルダーは `{key}` 形式** — `project-context.md` のキーと対応
-- **共有リソース（.ai/, .commands/）はここに置かない** — `init-project.ps1` がルートからコピーする
+- **共有リソース（.ai/, .ai/kernel/gates/）はここに置かない** — `init-project.ps1` がルートからコピーする
 - **.vscode/ はここに不要** — プロジェクト固有設定は `init-project.ps1` のスコープ外
 - **runtime entrypoint をここから直接上書きしない** — `.github/copilot-instructions.md` などの実運用ファイルはテンプレートと別管理
 - **`templates/` を単独で削除しない** — `init-project.ps1` が `templates/claude-code/`, `templates/codex/`, `templates/vscode-copilot/` を読むため

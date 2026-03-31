@@ -13,15 +13,15 @@ Module files:
 - .ai/module/prompting.md
 - .ai/module/unified-integration.md
 
-Command files:
-- .commands/review.md
-- .commands/debug.md
-- .commands/strategy.md
-- .commands/integrate.md
-- .commands/adversarial.md
-- .commands/plan.md
-- .commands/qa.md
-- .commands/ship.md
+Gate files:
+- .ai/kernel/gates/trigger-a-review.md
+- .ai/kernel/gates/trigger-a-debug.md
+- .ai/kernel/gates/trigger-s.md
+- .ai/kernel/gates/trigger-i.md
+- .ai/kernel/gates/trigger-d.md
+- .ai/kernel/gates/trigger-p.md
+- .ai/kernel/gates/trigger-q.md
+- .ai/kernel/gates/trigger-sh.md
 
 Response rules:
 - Start with one signal: 🟢 Go, 🟡 Fix, or 🔴 Stop

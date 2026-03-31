@@ -15,7 +15,7 @@
 ### Source Layer (authoritative)
 ```text
 .ai/                  Shared kernel and architecture docs
-.commands/            Trigger command docs
+.ai/kernel/gates/     Trigger gate definitions (consolidated from .commands/)
 rules/                Agent rule source of truth
 skills/               Skill source of truth
 templates/            init-project input templates
@@ -125,7 +125,7 @@ State that the default supported structure is:
 
 ```text
 .ai/
-.commands/
+.ai/kernel/gates/
 rules/
 skills/
 templates/
