@@ -1,6 +1,7 @@
 ---
 name: security-scan
 description: "agent 設定、rules/skills、hook 相当設定を対象に、シークレット露出・危険な権限・注入リスクを監査する。"
+disable-model-invocation: true
 ---
 
 # Security Scan

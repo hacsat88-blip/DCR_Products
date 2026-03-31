@@ -1,0 +1,144 @@
+---
+name: skill-router
+description: "タスクに最適なスキルを選定し、Transparency for delegation に則り報告するルーター。Layer 1でカバーできないとき、または「何を使えばいい？」と聞かれたときに自動発火する。"
+---
+
+# Skill Router
+
+タスクに最適なスキル/エージェントを選定し、Transparency for delegation に則って報告してから発火するルーター。
+
+## 動作フロー
+
+1. ユーザーのタスクを分析する
+2. 下記インデックスからマッチするスキル/エージェントを特定する
+3. **発火前に以下のフォーマットで報告する**（DCR Transparency for delegation 準拠）:
+
+```
+以下を使用します:
+- [skill/agent名] ([目的の1行説明])
+```
+
+4. ユーザーの承認後（または明示的な質問でなければ自動で）、`/skill-name` で発火する
+
+## 報告ルール
+
+- 単一スキルでも省略しない
+- サブエージェントを併用する場合はエージェント名も列挙する
+- Layer 1 (常時ロード) スキルも報告対象とする
+- 複数スキルが候補の場合は優先順位を付けて最大3つ提案する
+
+## Layer 1: Always-On スキル（常時ロード済み — 自動発火可能）
+
+以下は description がコンテキストに常駐し、モデルが自動で発火できる:
+
+| スキル | 用途 |
+|---|---|
+| code-review | コードレビュー、レビューフィードバック対応 |
+| systematic-debugging | バグ、テスト失敗、予期しない挙動の調査 |
+| verification-before-completion | 完了・修正・パス主張前の検証 |
+| writing-plans | マルチステップタスクの計画作成 |
+| search-first | 実装前の既存ツール・ライブラリ調査 |
+| continuous-learning | セッション中の学びの記録 |
+| continuous-learning-v2 | instinct の管理・昇格 |
+| dcr-pipeline | DCR ゲート連鎖の自動管理 |
+| eval-harness | validate.ps1 での構造品質検証 |
+| brainstorming | 機能設計・創造的作業の前段階 |
+| subagent-driven-development | 独立タスクの並列実行 |
+| api-design | REST API 設計チェックリスト |
+| prompt-master | プロンプトの作成・改善・最適化 |
+| model-route | タスク難易度に応じたモデル選択 |
+| strategic-compact | コンテキスト圧縮タイミングの提案 |
+| tdd-workflow | テスト駆動開発ワークフロー |
+
+## Layer 3: Manual-Only スキル（手動発火のみ — インデックス）
+
+以下は `disable-model-invocation: true` が設定されており、`/skill-name` での明示的な呼び出し、またはこの skill-router 経由でのみ発火する。
+
+### マーケティング・グロース
+
+| スキル | いつ使う |
+|---|---|
+| ad-creative | 広告コピー・ヘッドライン・バリエーション生成 |
+| ai-seo | AI検索エンジン向けコンテンツ最適化 |
+| analytics-tracking | GA4・GTM・コンバージョン追跡の設定 |
+| churn-prevention | 解約防止・リテンション施策 |
+| cold-email | B2B コールドメール・フォローアップ |
+| competitor-alternatives | 競合比較ページ・代替ページ作成 |
+| content-strategy | コンテンツ戦略・トピッククラスタ計画 |
+| copy-editing | 既存マーケティングコピーの編集・改善 |
+| copywriting | LP・HP・機能ページのコピーライティング |
+| email-sequence | メールシーケンス・ドリップキャンペーン |
+| form-cro | フォーム最適化（サインアップ以外） |
+| free-tool-strategy | マーケティング用フリーツールの企画・構築 |
+| launch-strategy | プロダクトローンチ・リリース戦略 |
+| marketing-ideas | SaaS/ソフトウェアのマーケティングアイデア |
+| marketing-psychology | 行動心理学のマーケティング応用 |
+| onboarding-cro | サインアップ後のオンボーディング最適化 |
+| page-cro | マーケティングページのCRO |
+| paid-ads | PPC・有料広告キャンペーン戦略 |
+| paywall-upgrade-cro | アプリ内アップグレード・ペイウォール最適化 |
+| popup-cro | ポップアップ・モーダル・オーバーレイ最適化 |
+| pricing-strategy | 価格設定・パッケージング・マネタイズ戦略 |
+| product-marketing-context | プロダクトマーケティングコンテキスト文書 |
+| programmatic-seo | テンプレート×データの大量SEOページ生成 |
+| referral-program | 紹介プログラム・アフィリエイト設計 |
+| signup-flow-cro | サインアップ・登録フロー最適化 |
+| social-content | SNSコンテンツ作成・スケジュール最適化 |
+
+### ドキュメント・ファイル
+
+| スキル | いつ使う |
+|---|---|
+| doc-coauthoring | ドキュメント・提案書の共同執筆 |
+| docx | Word文書の作成・編集・操作 |
+| pdf | PDFの読み取り・結合・分割・作成 |
+| pptx | PowerPointの作成・編集 |
+| xlsx | スプレッドシートの作成・編集・変換 |
+| schema-markup | 構造化データ・JSON-LD の追加・修正 |
+| seo-audit | 技術的SEO・オンページSEO監査 |
+
+### UI・デザイン
+
+| スキル | いつ使う |
+|---|---|
+| canvas-design | ポスター・アートなどの静的ビジュアル作成 |
+| theme-factory | 成果物へのテーマ・スタイル適用 |
+| ui-ux-pro-max | UI/UX設計・レビュー・アクセシビリティ |
+| web-artifacts-builder | 複雑なHTML/React/Tailwindアーティファクト |
+| remotion-best-practices | Remotionでのビデオ生成 |
+
+### 特化ワークフロー
+
+| スキル | いつ使う |
+|---|---|
+| deployment-patterns | CI/CD・ロールバック・段階リリースパターン |
+| finishing-a-development-branch | 実装完了後のマージ・PR・クリーンアップ判断 |
+| using-git-worktrees | feature用のgit worktree分離 |
+| webapp-testing | Playwrightでのローカルウェブアプリテスト |
+| vercel-composition-patterns | Reactコンポーネント設計パターン |
+
+### メタ・監査
+
+| スキル | いつ使う |
+|---|---|
+| find-skills | スキルの検索・インストール (npx skills) |
+| harness-audit | harness 健全性の監査 |
+| rules-distill | 実践知の抽出・rule 昇格判定 |
+| security-scan | agent設定のセキュリティ監査 |
+| skill-creator | スキルの新規作成・改善・評価 |
+| mcp-builder | MCPサーバーの構築ガイド |
+
+## マッチングガイドライン
+
+タスクの内容から以下の優先度で判定する:
+
+1. **キーワード完全一致**: 「広告コピー」→ `ad-creative`
+2. **ドメイン一致**: 「マーケティング」系の話 → マーケティング・グロースから候補提示
+3. **ファイル形式**: `.docx` → `docx`, `.pdf` → `pdf`, `.pptx` → `pptx`, `.xlsx` → `xlsx`
+4. **複合タスク**: 複数ドメインにまたがる場合は最大3つを優先順位付きで提案
+
+## 候補なしの場合
+
+インデックスに該当スキルがない場合は:
+- 「該当するスキルはありません。直接対応します。」と報告
+- 必要に応じて `find-skills` でマーケットプレイスを検索する提案をする
