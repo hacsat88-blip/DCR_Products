@@ -17,7 +17,7 @@ AI エージェント設定・ルール・スキルの一元管理リポジト�
 
 - Execution Modes を全環境で共通運用: タスク先頭に `autopilot:`, `ralph:`, `ulw`, `ralplan:`, `deep-interview:`, `ultrathink:`, `deepsearch:`, `team:` を付けて実行戦略を宣言する
 - **日次更新**: 毎朝 `deploy.ps1 -Check` でドリフト確認 → 変更があれば `deploy.ps1` で同期 → `validate.ps1` で全通過を確認してからコミットする
-- **検証ゲート**: 実装後は `validate.ps1`（195 passed, 0 failed）と `deploy.ps1 -Check`（全 in sync）を通過してからコミット・PR を作成する
+- **検証ゲート**: 実装後は `validate.ps1`（222 passed, 0 failed）と `deploy.ps1 -Check`（全 in sync）を通過してからコミット・PR を作成する
 - Azure Skills は DCR の置換ではなく、Azure 専用タスクのための external capability pack として扱う
 - Azure architecture / deploy / diagnostics / compliance / cost / RBAC / Kusto / Foundry は、まず Azure Skills plugin の利用可否を確認する
 - Azure Skills を使えない場合は、DCR の `azure-infra-engineer`, `mcp-builder`, `security-engineer`, `devops-automator` などへフォールバックする

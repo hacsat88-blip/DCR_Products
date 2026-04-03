@@ -57,7 +57,7 @@
 
 - 個人専用の上書きは `CLAUDE.local.md` を使用する。
 - `CLAUDE.local.md` は Git 管理対象にしない。
-- ローカル専用の `.claude/settings.json` も Git 管理対象にしない。
+- ローカル専用の `.claude/settings.local.json` は Git 管理対象にしない。
 - 共有したい内容は `CLAUDE.local.md` ではなく共通正本へ移す。
 
 ## 検証フロー
