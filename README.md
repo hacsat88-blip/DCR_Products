@@ -41,6 +41,8 @@ AI エージェント設定・ルール・スキルの一元管理リポジト�
 
 `git fetch` で警告が再発した場合の手順は `docs/dcr/instruction-governance.md` を参照。
 
+Step 7（運用観測）の記録テンプレートは `docs/dcr/operation-metrics-weekly.md` を参照。
+
 ## 構造
 
 ```text
