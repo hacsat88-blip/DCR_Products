@@ -33,11 +33,13 @@ AI エージェント設定・ルール・スキルの一元管理リポジト�
 - 再利用ワークフロー: `.claude/commands/review.md`, `.claude/commands/fix.md`
 - 外部連携（最小）: `.mcp.json`（GitHub MCP）
 
-日次の推奨実行順:
+最短運用手順（毎日これだけ）:
 
 1. `powershell -ExecutionPolicy Bypass -File .\deploy.ps1 -Check`
 2. `powershell -ExecutionPolicy Bypass -File .\validate.ps1`
 3. 変更がある場合のみ `deploy.ps1` 実行 → 再検証
+
+`git fetch` で警告が再発した場合の手順は `docs/dcr/instruction-governance.md` を参照。
 
 ## 構造
 
