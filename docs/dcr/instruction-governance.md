@@ -48,6 +48,10 @@
 - Step 5（環境設定層）: 導入済み（共有最小）
 	- `.claude/settings.json` を追加（language / permissions の最小構成）
 	- 個人差分は `.claude/settings.local.json` に維持する
+- Step 6（運用入口層）: 導入済み
+	- `README.md` に個人運用の入口と最短運用手順を記載
+- Step 7（観測層）: 導入済み
+	- `docs/dcr/operation-metrics-weekly.md` に1週間の観測テンプレートを追加
 
 ## 個人運用での扱い
 
@@ -78,3 +82,10 @@
 3. `git status -sb` で `main...origin/main` を確認
 
 解消しない場合は、無理に reset せず、現状ログを保持して原因を切り分ける。
+
+## Step 7 運用観測ルール
+
+- 期間: 1週間（平日5日）
+- 記録先: `docs/dcr/operation-metrics-weekly.md`
+- 観測項目: 検証ゲート通過率、手戻り回数、fetch警告再発有無、1タスク完了までの所要時間
+- 判定: 再発が多い箇所のみルールを追加し、問題がない箇所は現状維持
