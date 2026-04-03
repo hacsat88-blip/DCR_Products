@@ -46,5 +46,4 @@ prototypes/blue-planet-globe/
 
 # Personal local overrides (not shared)
 CLAUDE.local.md
-.claude/settings.json
 .claude/settings.local.json

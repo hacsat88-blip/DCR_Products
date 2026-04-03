@@ -45,6 +45,9 @@
 - Step 4（外部連携層）: 導入済み（最小）
 	- `.mcp.json` に GitHub MCP の最小構成を設定
 	- 認証情報はローカル環境変数で管理する（ファイルに秘密情報を保存しない）
+- Step 5（環境設定層）: 導入済み（共有最小）
+	- `.claude/settings.json` を追加（language / permissions の最小構成）
+	- 個人差分は `.claude/settings.local.json` に維持する
 
 ## 個人運用での扱い
 
