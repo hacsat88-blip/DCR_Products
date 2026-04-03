@@ -68,3 +68,13 @@
 - 参照切れがないか。
 - 重複記述が再発していないか。
 - 環境固有差分と共通規則が混在していないか。
+
+## Git fetch 警告の再発時手順
+
+`git fetch` 実行時に `incorrect old value provided` が再発した場合は、以下の順で対処する。
+
+1. `git remote prune origin`
+2. `git fetch origin`
+3. `git status -sb` で `main...origin/main` を確認
+
+解消しない場合は、無理に reset せず、現状ログを保持して原因を切り分ける。
