@@ -24,6 +24,21 @@ AI エージェント設定・ルール・スキルの一元管理リポジト�
 
 詳細な共通仕様は `.ai/module/unified-integration.md` を参照。
 
+## 個人運用の入口 (Step 6)
+
+- 運用方針の正本: `docs/dcr/instruction-governance.md`
+- 個人上書き: `CLAUDE.local.md`（Git 管理外）
+- 共有最小設定: `.claude/settings.json`
+- 個人ローカル設定: `.claude/settings.local.json`（Git 管理外）
+- 再利用ワークフロー: `.claude/commands/review.md`, `.claude/commands/fix.md`
+- 外部連携（最小）: `.mcp.json`（GitHub MCP）
+
+日次の推奨実行順:
+
+1. `powershell -ExecutionPolicy Bypass -File .\deploy.ps1 -Check`
+2. `powershell -ExecutionPolicy Bypass -File .\validate.ps1`
+3. 変更がある場合のみ `deploy.ps1` 実行 → 再検証
+
 ## 構造
 
 ```text
