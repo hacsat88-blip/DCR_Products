@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>設定 - AI Prompt Manager</title>
+    <link rel="stylesheet" href="sidepanel.css">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet">
+    <style>
+        body {
+            padding: 24px;
+            max-width: 600px;
+            margin: 0 auto;
+            height: auto;
+            overflow-y: visible;
+        }
+
+        .settings-container {
+            background-color: var(--surface-color);
+            border-radius: var(--radius-lg);
+            padding: 24px;
+            box-shadow: var(--shadow-md);
+            border: 1px solid var(--border-color);
+        }
+
+        .settings-header {
+            margin-bottom: 24px;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 16px;
+        }
+
+        .settings-header h1 {
+            color: var(--primary-color);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .help-text {
+            font-size: 12px;
+            color: var(--text-muted);
+            margin-top: 4px;
+        }
+
+        .btn-group {
+            display: flex;
+            justify-content: flex-end;
+            gap: 12px;
+            margin-top: 32px;
+        }
+
+        #save-status {
+            display: none;
+            color: var(--success-color);
+            font-weight: 500;
+            align-items: center;
+            gap: 4px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="settings-container">
+        <div class="settings-header">
+            <h1><span class="material-icons-round">settings</span> AI設定</h1>
+            <p class="help-text">AI機能（自動タイトル付け、あいまい検索など）を利用するための設定です。</p>
+        </div>
+
+        <div class="form-group">
+            <label for="gemini-api-key">Gemini API キー</label>
+            <input type="password" id="gemini-api-key" placeholder="AIzaSy..." style="width: 100%;">
+            <p class="help-text">
+                <a href="https://aistudio.google.com/app/apikey" target="_blank" rel="noopener noreferrer">Google AI
+                    Studio</a> から取得したAPIキーを入力してください。<br>
+                ※ キーはお使いのブラウザ内部にのみ安全に保存されます。
+            </p>
+        </div>
+
+        <div class="form-group">
+            <label for="ai-model">使用するモデル</label>
+            <select id="ai-model" style="width: 100%;">
+                <option value="gemini-3-flash-preview">Gemini 3 Flash (推奨・高速)</option>
+                <option value="gemini-3.1-pro-preview">Gemini 3.1 Pro (最新・高精度)</option>
+            </select>
+        </div>
+
+        <!-- ここにインポート/エクスポートの設定を後で追加 -->
+
+        <div class="btn-group">
+            <span id="save-status"><span class="material-icons-round" style="font-size:16px">check_circle</span>
+                保存しました</span>
+            <button id="save-btn" class="btn btn-primary">設定を保存</button>
+        </div>
+    </div>
+    <script src="options.js"></script>
+</body>
+
+</html>
