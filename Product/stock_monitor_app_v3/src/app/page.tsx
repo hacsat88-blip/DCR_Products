@@ -6,27 +6,22 @@ import { AlertCenter } from "@/components/alerts/AlertCenter";
 import { AlertToastStack } from "@/components/alerts/AlertToastStack";
 import { RuleManager } from "@/components/alerts/RuleManager";
 import { Header } from "@/components/common/Header";
-import { BenchmarkChart } from "@/components/dashboard/BenchmarkChart";
 import { CollapseSimulatorPanel } from "@/components/dashboard/CollapseSimulatorPanel";
 import { ContrarianPanel } from "@/components/dashboard/ContrarianPanel";
 import { DataQualityRibbon } from "@/components/dashboard/DataQualityRibbon";
 import { DecisionBoard } from "@/components/dashboard/DecisionBoard";
-import { DecisionReviewPanel } from "@/components/dashboard/DecisionReviewPanel";
 import { ExportPanel } from "@/components/dashboard/ExportPanel";
 import { ImportPanel } from "@/components/dashboard/ImportPanel";
 import { KpiCards } from "@/components/dashboard/KpiCards";
 import { NikkeiCandlestickChart } from "@/components/dashboard/NikkeiCandlestickChart";
-import { PortfolioPanel } from "@/components/dashboard/PortfolioPanel";
 import { RankingBoard } from "@/components/dashboard/RankingBoard";
 import { SavedScreenPanel } from "@/components/dashboard/SavedScreenPanel";
 import { ScoreTuningPanel } from "@/components/dashboard/ScoreTuningPanel";
 import { StockOnboardingPanel } from "@/components/dashboard/StockOnboardingPanel";
 import { SummaryBar } from "@/components/dashboard/SummaryBar";
-import { NikkeiTrendChart } from "@/components/dashboard/NikkeiTrendChart";
 import { NavigatorLaunchButton, NavigatorResultsPanel, NavigatorSetupModal } from "@/components/navigator";
 import { FilterPanel } from "@/components/screener/FilterPanel";
 import { SearchBar } from "@/components/screener/SearchBar";
-import { StockDetailDrawer } from "@/components/stock/StockDetailDrawer";
 import { StockGrid } from "@/components/stock/StockGrid";
 import { SkeletonCard } from "@/components/ui/Skeleton";
 import { useDashboardDerived } from "@/hooks/useDashboardDerived";
@@ -34,7 +29,7 @@ import { useNikkei } from "@/hooks/useNikkei";
 import { useStockStore } from "@/store/useStockStore";
 import { initNavigatorStore } from "@/store/useNavigatorStore";
 
-/* ── Lazy-loaded heavy panels inside collapsible section ── */
+/* ── Lazy-loaded heavy panels (Recharts & collapsible sections) ── */
 const BacktestPanel = React.lazy(() =>
   import("@/components/dashboard/BacktestPanel").then((m) => ({ default: m.BacktestPanel }))
 );
@@ -49,6 +44,21 @@ const MorningCheckPanel = React.lazy(() =>
 );
 const SnapshotPanel = React.lazy(() =>
   import("@/components/dashboard/SnapshotPanel").then((m) => ({ default: m.SnapshotPanel }))
+);
+const BenchmarkChart = React.lazy(() =>
+  import("@/components/dashboard/BenchmarkChart").then((m) => ({ default: m.BenchmarkChart }))
+);
+const NikkeiTrendChart = React.lazy(() =>
+  import("@/components/dashboard/NikkeiTrendChart").then((m) => ({ default: m.NikkeiTrendChart }))
+);
+const DecisionReviewPanel = React.lazy(() =>
+  import("@/components/dashboard/DecisionReviewPanel").then((m) => ({ default: m.DecisionReviewPanel }))
+);
+const PortfolioPanel = React.lazy(() =>
+  import("@/components/dashboard/PortfolioPanel").then((m) => ({ default: m.PortfolioPanel }))
+);
+const StockDetailDrawer = React.lazy(() =>
+  import("@/components/stock/StockDetailDrawer").then((m) => ({ default: m.StockDetailDrawer }))
 );
 
 function LazyFallback(): JSX.Element {
@@ -78,7 +88,11 @@ const TabNav = React.memo(function TabNav({
   badges?: Partial<Record<TabId, number>>;
 }) {
   return (
-    <nav className="sticky top-0 z-30 rounded-none border border-slate-700/40 bg-canvas/90 backdrop-blur-md">{/* cyber: sharp nav + canvas bg */}
+    <nav
+      role="tablist"
+      aria-label="メインナビゲーションタブ"
+      className="sticky top-0 z-30 rounded-none border border-border-subtle bg-canvas/90 backdrop-blur-md"
+    >
       <div className="flex">
         {TAB_ITEMS.map((tab) => {
           const on = active === tab.id;
@@ -88,20 +102,29 @@ const TabNav = React.memo(function TabNav({
               key={tab.id}
               type="button"
               onClick={() => onChange(tab.id)}
+              role="tab"
+              id={`tab-${tab.id}`}
+              aria-selected={on}
+              aria-controls={`tabpanel-${tab.id}`}
+              tabIndex={on ? 0 : -1}
               className={[
                 "relative flex flex-1 items-center justify-center gap-1.5 px-3 py-3 font-orb uppercase tracking-wider text-[12px] font-medium transition-all duration-300",
-                on ? "text-mint" : "text-slate-400 hover:bg-white/5 hover:text-slate-200",
+                on
+                  ? "text-mint"
+                  : "text-text-muted hover:bg-white/5 hover:text-text-secondary",
               ].join(" ")}
             >
-              <span className="text-base">{tab.icon}</span>
-              <span className="hidden sm:inline">{tab.label}</span>
+              <span className="text-base" aria-hidden="true">
+                {tab.icon}
+              </span>
+              <span className="text-[11px] sm:text-xs">{tab.label}</span>
               {badge != null && badge > 0 && (
                 <span className="ml-0.5 inline-flex h-4 min-w-4 items-center justify-center rounded-none bg-amber px-1 text-[10px] font-bold leading-none text-slate-900">
                   {badge > 99 ? "99+" : badge}
                 </span>
               )}
               {on && (
-                <span className="absolute bottom-0 left-3 right-3 h-0.5 rounded-full bg-mint" />
+                <span className="absolute bottom-0 left-3 right-3 h-0.5 bg-mint" />
               )}
             </button>
           );
@@ -267,7 +290,12 @@ export default function HomePage(): JSX.Element {
 
       {/* ── マーケット tab ── */}
       {activeTab === "market" && (
-        <div className="flex flex-col gap-5 animate-fade-in">
+        <div
+          role="tabpanel"
+          id="tabpanel-market"
+          aria-labelledby="tab-market"
+          className="flex flex-col gap-5 animate-fade-in"
+        >
           {/* ── AI Navigator launch + results ── */}
           <div className="flex items-center gap-4">
             <NavigatorLaunchButton />
@@ -303,10 +331,10 @@ export default function HomePage(): JSX.Element {
             onExportCsv={exportRankingCsv}
           />
 
-          <section className="rounded-none border border-slate-700/60 bg-panel p-4 shadow-card">
+          <section className="rounded-none border border-border-subtle bg-panel p-4 shadow-card">
             <div className="mb-3 flex items-center justify-between gap-3">
-              <h2 className="font-orb text-lg font-semibold text-slate-100">銘柄一覧</h2>
-              <p className="text-xs text-slate-300">表示件数: <span className="font-mono-tech">{filteredStocks.length}</span></p>
+              <h2 className="font-orb text-lg font-semibold text-text-primary">銘柄一覧</h2>
+              <p className="text-xs text-text-secondary">表示件数: <span className="font-mono-tech">{filteredStocks.length}</span></p>
             </div>
 
             {isLoading ? (
@@ -342,16 +370,27 @@ export default function HomePage(): JSX.Element {
 
           <NikkeiCandlestickChart lastUpdatedAt={lastUpdatedAt} />
 
-          <NikkeiTrendChart lastUpdatedAt={lastUpdatedAt} />
+          <Suspense fallback={<SkeletonCard />}>
+            <NikkeiTrendChart lastUpdatedAt={lastUpdatedAt} />
+          </Suspense>
 
-          <BenchmarkChart stocks={stocks} />
+          <Suspense fallback={<SkeletonCard />}>
+            <BenchmarkChart stocks={stocks} />
+          </Suspense>
         </div>
       )}
 
       {/* ── ポートフォリオ tab ── */}
       {activeTab === "portfolio" && (
-        <div className="flex flex-col gap-5 animate-fade-in">
-          <PortfolioPanel />
+        <div
+          role="tabpanel"
+          id="tabpanel-portfolio"
+          aria-labelledby="tab-portfolio"
+          className="flex flex-col gap-5 animate-fade-in"
+        >
+          <Suspense fallback={<LazyFallback />}>
+            <PortfolioPanel />
+          </Suspense>
 
           <ExportPanel
             onExportJson={exportData}
@@ -373,7 +412,12 @@ export default function HomePage(): JSX.Element {
 
       {/* ── 分析 tab ── */}
       {activeTab === "analysis" && (
-        <div className="flex flex-col gap-5 animate-fade-in">
+        <div
+          role="tabpanel"
+          id="tabpanel-analysis"
+          aria-labelledby="tab-analysis"
+          className="flex flex-col gap-5 animate-fade-in"
+        >
           <Suspense fallback={<LazyFallback />}>
             <SnapshotPanel
               snapshots={snapshots}
@@ -412,11 +456,13 @@ export default function HomePage(): JSX.Element {
             />
           </Suspense>
 
-          <DecisionReviewPanel
-            stock={selectedStock}
-            alerts={alertEvents}
-            backtestResult={selectedBacktestResult}
-          />
+          <Suspense fallback={<LazyFallback />}>
+            <DecisionReviewPanel
+              stock={selectedStock}
+              alerts={alertEvents}
+              backtestResult={selectedBacktestResult}
+            />
+          </Suspense>
 
           <CollapseSimulatorPanel stock={selectedStock} scoringConfig={scoringConfig} />
 
@@ -426,7 +472,12 @@ export default function HomePage(): JSX.Element {
 
       {/* ── 設定 tab ── */}
       {activeTab === "settings" && (
-        <div className="flex flex-col gap-5 animate-fade-in">
+        <div
+          role="tabpanel"
+          id="tabpanel-settings"
+          aria-labelledby="tab-settings"
+          className="flex flex-col gap-5 animate-fade-in"
+        >
           <SummaryBar
             stocks={filteredStocks}
             dataMode={dataMode}
@@ -484,16 +535,18 @@ export default function HomePage(): JSX.Element {
         </div>
       )}
 
-      <StockDetailDrawer
-        stock={drawerStock}
-        hypothesis={selectedHypothesis}
-        open={detailOpen}
-        hiddenByFilter={detailOpen && Boolean(selectedStock) && !selectedInFiltered}
-        onClose={closeDetail}
-        onToggleWatch={toggleWatch}
-        onSaveMemo={saveMemo}
-        onSaveHypothesis={saveHypothesis}
-      />
+      <Suspense fallback={null}>
+        <StockDetailDrawer
+          stock={drawerStock}
+          hypothesis={selectedHypothesis}
+          open={detailOpen}
+          hiddenByFilter={detailOpen && Boolean(selectedStock) && !selectedInFiltered}
+          onClose={closeDetail}
+          onToggleWatch={toggleWatch}
+          onSaveMemo={saveMemo}
+          onSaveHypothesis={saveHypothesis}
+        />
+      </Suspense>
 
       <AlertToastStack events={alertEvents} onDismiss={dismissAlert} />
 

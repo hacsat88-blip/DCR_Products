@@ -7,21 +7,21 @@ const inter = Inter({
   subsets: ["latin"],
   display: "swap",
   variable: "--font-inter",
-  weight: ["400", "500", "600", "700"],
+  weight: ["400", "600"],
 });
 
 const notoSansJP = Noto_Sans_JP({
   subsets: ["latin"],
   display: "swap",
   variable: "--font-noto",
-  weight: ["400", "500", "600", "700"],
+  weight: ["400", "700"],
 });
 
 const orbitron = Orbitron({
   subsets: ["latin"],
   display: "swap",
   variable: "--font-orbitron",
-  weight: ["400", "500", "600", "700", "800", "900"],
+  weight: ["400", "700", "800"],
 });
 
 const shareTechMono = Share_Tech_Mono({
