@@ -175,7 +175,7 @@ export function ImportPanel(): JSX.Element {
 
       {/* Error message */}
       {errorMessage && (
-        <div className="mb-3 rounded-none border border-red-500/40 bg-red-500/10 px-3 py-2 text-xs text-red-300">
+        <div className="mb-3 rounded-none border border-red-500/40 bg-red-500/10 px-3 py-2 text-xs text-danger">
           {errorMessage}
         </div>
       )}
@@ -190,7 +190,7 @@ export function ImportPanel(): JSX.Element {
           className={`cursor-pointer rounded-none border-2 border-dashed p-6 text-center transition-colors ${
             dragOver
               ? "border-blue bg-blue/10"
-              : "border-border-subtle bg-white/5 hover:border-slate-500 hover:bg-white/10"
+              : "border-border-subtle bg-white/5 hover:border-border-active hover:bg-white/10"
           }`}
         >
           <p className="text-sm text-text-secondary">
@@ -213,9 +213,9 @@ export function ImportPanel(): JSX.Element {
       {phase === "preview" && validation && (
         <div className="space-y-3">
           <div className="rounded-none border border-border-subtle bg-canvas-deep/60 px-3 py-2">
-            <p className="text-xs font-medium text-slate-200">
+            <p className="text-xs font-medium text-text-primary">
               📄 {fileName}
-              <span className="ml-2 rounded-none bg-slate-700 px-1.5 py-0.5 text-[10px] uppercase text-text-secondary">
+              <span className="ml-2 rounded-none bg-glass px-1.5 py-0.5 text-[10px] uppercase text-text-secondary">
                 {fileType}
               </span>
             </p>
@@ -223,7 +223,7 @@ export function ImportPanel(): JSX.Element {
 
           {/* Validation errors */}
           {validation.errors.length > 0 && (
-            <div className="rounded-none border border-red-500/40 bg-red-500/10 px-3 py-2 text-xs text-red-300">
+            <div className="rounded-none border border-red-500/40 bg-red-500/10 px-3 py-2 text-xs text-danger">
               {validation.errors.map((err, i) => (
                 <p key={i}>⛔ {err}</p>
               ))}
@@ -310,7 +310,7 @@ export function ImportPanel(): JSX.Element {
                     .map((t) => (
                       <label
                         key={t.key}
-                        className="rounded-none border border-border-subtle bg-canvas-deep/60 px-3 py-2 text-xs text-slate-200"
+                        className="rounded-none border border-border-subtle bg-canvas-deep/60 px-3 py-2 text-xs text-text-primary"
                       >
                         <input
                           type="checkbox"
@@ -351,7 +351,7 @@ export function ImportPanel(): JSX.Element {
       {phase === "done" && (
         <div className="space-y-3">
           {resultMessage && (
-            <div className="rounded-none border border-green-500/40 bg-green-500/10 px-3 py-2 text-xs text-green-300">
+            <div className="rounded-none border border-green-500/40 bg-green-500/10 px-3 py-2 text-xs text-mint">
               ✅ {resultMessage}
             </div>
           )}

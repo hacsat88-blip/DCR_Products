@@ -167,7 +167,7 @@ function TimelinePanelInner({ stock, snapshots }: TimelinePanelProps): JSX.Eleme
               ? item.evaluatedAction !== next.evaluatedAction
               : false;
           return (
-            <article key={item.id} className="rounded-none border border-border-subtle bg-canvas-deep/50 p-3 text-xs text-slate-200">
+            <article key={item.id} className="rounded-none border border-border-subtle bg-canvas-deep/50 p-3 text-xs text-text-primary">
               <p className="font-semibold font-mono-tech">{formatDateTime(item.checkedAt)}</p>
               <p className="mt-1 font-mono-tech">
                 score {item.score ?? "-"} / action {actionLabel(item.evaluatedAction)} / price{" "}

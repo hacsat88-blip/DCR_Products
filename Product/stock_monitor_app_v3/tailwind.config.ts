@@ -77,7 +77,7 @@ const config: Config = {
         "accent-warm": "#ffd700",
         "text-primary": "#00ff41",
         "text-secondary": "#00cc33",
-        "text-muted": "#007a1f",
+        "text-muted": "#00a82b",
         "border-subtle": "rgba(0,255,65,0.18)",
         "border-active": "rgba(0,255,65,0.4)",
         "cyber-green": "#00ff41",

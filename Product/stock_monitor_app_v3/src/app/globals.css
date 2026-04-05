@@ -232,7 +232,7 @@ input[type="range"].slider-pro::-moz-range-thumb {
 
   .cyber-section-title {
     font-size: 0.625rem;
-    color: #007a1f;
+    color: #00a82b;
     letter-spacing: 0.2em;
     text-transform: uppercase;
     display: flex;
@@ -287,6 +287,20 @@ input[type="range"].slider-pro::-moz-range-thumb {
     background: #ff3355;
     box-shadow: 0 0 7px #ff3355;
   }
+}
+
+/* Cyber focus indicator — replaces outline-none gaps */
+:focus-visible {
+  outline: 2px solid #00ff41;
+  outline-offset: 2px;
+}
+
+input:focus-visible,
+textarea:focus-visible,
+select:focus-visible {
+  outline: 2px solid #00ff41;
+  outline-offset: -1px;
+  box-shadow: 0 0 8px rgba(0, 255, 65, 0.3);
 }
 
 /* Reduced motion */

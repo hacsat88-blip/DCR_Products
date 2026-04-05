@@ -67,7 +67,7 @@ export function SavedScreenPanel({
         <p className="text-xs text-text-muted">現在の絞り込み条件を保存して再利用します。</p>
       </div>
 
-      <div className="rounded-none border border-border-subtle bg-canvas-deep/60 p-3 text-xs text-slate-200">
+      <div className="rounded-none border border-border-subtle bg-canvas-deep/60 p-3 text-xs text-text-primary">
         <p className="text-text-muted">現在の条件</p>
         <p className="mt-1">{currentSummary}</p>
       </div>
@@ -109,7 +109,7 @@ export function SavedScreenPanel({
                 <button
                   type="button"
                   onClick={() => onApply(screen.id)}
-                  className="rounded-none border border-border-subtle px-2 py-1 text-[11px] text-slate-200"
+                  className="rounded-none border border-border-subtle px-2 py-1 text-[11px] text-text-primary"
                 >
                   適用
                 </button>
@@ -134,14 +134,14 @@ export function SavedScreenPanel({
                       }
                     }
                   }}
-                  className="rounded-none border border-border-subtle px-2 py-1 text-[11px] text-slate-200"
+                  className="rounded-none border border-border-subtle px-2 py-1 text-[11px] text-text-primary"
                 >
                   名前変更
                 </button>
                 <button
                   type="button"
                   onClick={() => onDelete(screen.id)}
-                  className="rounded-none border border-border-subtle px-2 py-1 text-[11px] text-slate-200"
+                  className="rounded-none border border-border-subtle px-2 py-1 text-[11px] text-text-primary"
                 >
                   削除
                 </button>

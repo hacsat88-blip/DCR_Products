@@ -61,7 +61,7 @@ async function callGemini(
   userPrompt: string,
   apiKey: string,
 ): Promise<unknown> {
-  const url = `${GEMINI_ENDPOINT}?key=${apiKey}`;
+  const url = GEMINI_ENDPOINT;
 
   const body = {
     system_instruction: {
@@ -85,16 +85,18 @@ async function callGemini(
   try {
     const response = await fetch(url, {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: {
+        "Content-Type": "application/json",
+        "x-goog-api-key": apiKey,
+      },
       body: JSON.stringify(body),
       signal: controller.signal,
     });
 
     if (!response.ok) {
       const errorBody = await response.text().catch(() => "");
-      throw new Error(
-        `Gemini API returned HTTP ${response.status}: ${errorBody.slice(0, 200)}`,
-      );
+      console.error(`[gemini] API error ${response.status}: ${errorBody.slice(0, 200)}`);
+      throw new Error(`Gemini API returned HTTP ${response.status}`);
     }
 
     const json = await response.json();
@@ -184,12 +186,8 @@ export async function runMacroResearch(
     `Analyze current global macro for ${marketLabel} equity investment.`,
   ].join(" ");
 
-  try {
-    const result = await callGemini(MACRO_SYSTEM_PROMPT, userPrompt, apiKey);
-    return result as MacroResult;
-  } catch {
-    return null;
-  }
+  const result = await callGemini(MACRO_SYSTEM_PROMPT, userPrompt, apiKey);
+  return result as MacroResult;
 }
 
 // ────────────────────────────────────────────────
@@ -226,12 +224,8 @@ export async function runStockSelection(
     "Focus on sector diversification and CF quality.",
   ].join(" ");
 
-  try {
-    const result = await callGemini(SELECTION_SYSTEM_PROMPT, userPrompt, apiKey);
-    return result as StockSelectionResult;
-  } catch {
-    return null;
-  }
+  const result = await callGemini(SELECTION_SYSTEM_PROMPT, userPrompt, apiKey);
+  return result as StockSelectionResult;
 }
 
 // ────────────────────────────────────────────────
@@ -275,12 +269,8 @@ export async function runDebate(
     `Horizon:${horizonLabel}.`,
   ].join(" ");
 
-  try {
-    const result = await callGemini(DEBATE_SYSTEM_PROMPT, userPrompt, apiKey);
-    return result as DebateResult;
-  } catch {
-    return null;
-  }
+  const result = await callGemini(DEBATE_SYSTEM_PROMPT, userPrompt, apiKey);
+  return result as DebateResult;
 }
 
 // ────────────────────────────────────────────────
@@ -326,12 +316,8 @@ export async function runFinalEvaluation(
     `Horizon:${horizonLabel}.`,
   ].join(" ");
 
-  try {
-    const result = await callGemini(FINAL_SYSTEM_PROMPT, userPrompt, apiKey);
-    return result as FinalEvaluation;
-  } catch {
-    return null;
-  }
+  const result = await callGemini(FINAL_SYSTEM_PROMPT, userPrompt, apiKey);
+  return result as FinalEvaluation;
 }
 
 // ────────────────────────────────────────────────

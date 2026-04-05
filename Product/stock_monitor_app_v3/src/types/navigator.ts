@@ -164,6 +164,7 @@ export interface FinalEvaluation {
 /** 0-indexed pipeline step (0 = macro, 1 = selection, 2 = debate, 3 = final). */
 export type PipelineStep = 0 | 1 | 2 | 3;
 export type PipelineStatus = "idle" | "running" | "done" | "error";
+export type NavigatorAnalysisMode = "live" | "mock-fallback" | null;
 
 export interface PipelineStepState {
   step: PipelineStep;
@@ -178,6 +179,10 @@ export interface NavigatorState {
   stocks: StockSelectionResult | null;
   debate: DebateResult | null;
   final: FinalEvaluation | null;
+  /** Data source mode for the latest successful run. */
+  analysisMode: NavigatorAnalysisMode;
+  /** Additional diagnostic detail from the latest failed run. */
+  diagnosticMessage: string | null;
   status: PipelineStatus;
   currentStep: PipelineStep;
   steps: PipelineStepState[];
@@ -221,6 +226,8 @@ export const INITIAL_NAVIGATOR_STATE: NavigatorState = {
   stocks: null,
   debate: null,
   final: null,
+  analysisMode: null,
+  diagnosticMessage: null,
   status: "idle",
   currentStep: 0,
   steps: DEFAULT_PIPELINE_STEPS.map((s) => ({ ...s })),

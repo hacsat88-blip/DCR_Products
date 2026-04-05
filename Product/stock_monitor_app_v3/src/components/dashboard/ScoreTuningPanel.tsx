@@ -38,7 +38,7 @@ export function ScoreTuningPanel({ config, onChange, onReset }: ScoreTuningPanel
         <button
           type="button"
           onClick={onReset}
-          className="rounded-none border border-border-subtle px-3 py-2 text-xs font-semibold text-slate-200"
+          className="rounded-none border border-border-subtle px-3 py-2 text-xs font-semibold text-text-primary"
         >
           初期値に戻す
         </button>
@@ -52,7 +52,7 @@ export function ScoreTuningPanel({ config, onChange, onReset }: ScoreTuningPanel
           return (
             <label
               key={field.key}
-              className="rounded-none border border-border-subtle bg-canvas-deep/60 p-3 text-xs text-slate-200"
+              className="rounded-none border border-border-subtle bg-canvas-deep/60 p-3 text-xs text-text-primary"
             >
               <p className="font-semibold font-orb text-text-primary">{field.label}</p>
               <p className="mt-1 text-text-muted">{field.helper}</p>

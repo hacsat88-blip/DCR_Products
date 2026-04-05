@@ -97,6 +97,9 @@ function SelectorButton<T extends string>({
     <button
       type="button"
       onClick={() => onSelect(option.value)}
+      role="radio"
+      aria-checked={selected}
+      aria-label={option.label}
       className={clsx(
         "rounded-none border px-4 py-2 font-mono-tech text-sm transition-all duration-200",
         selected
@@ -130,7 +133,7 @@ function OptionGroup<T extends string>({
       <p className="font-orb text-xs uppercase tracking-widest text-mint/60">
         ▸ {label}
       </p>
-      <div className="flex flex-wrap gap-2">
+      <div role="radiogroup" aria-label={label} className="flex flex-wrap gap-2">
         {options.map((opt) => (
           <SelectorButton
             key={opt.value}
@@ -250,9 +253,11 @@ export function NavigatorSetupModal(): JSX.Element | null {
     isModalOpen,
     settings,
     status,
+    analysisMode,
     steps,
     progress,
     error,
+    diagnosticMessage,
     closeModal,
     updateSettings,
     runPipeline,
@@ -383,6 +388,19 @@ export function NavigatorSetupModal(): JSX.Element | null {
                   <p className="font-mono-tech text-xs text-danger">
                     ✗ ERROR: {error}
                   </p>
+                  {diagnosticMessage && (
+                    <p className="mt-1 break-words font-mono-tech text-[10px] text-danger/80">
+                      DETAIL: {diagnosticMessage}
+                    </p>
+                  )}
+                </div>
+              )}
+
+              {analysisMode === "mock-fallback" && (
+                <div className="border border-yellow-500/30 bg-yellow-500/10 px-4 py-2">
+                  <p className="font-mono-tech text-xs text-yellow-300">
+                    ⚠ SOURCE: MOCK FALLBACK (要再実行)
+                  </p>
                 </div>
               )}
 
@@ -405,7 +423,7 @@ export function NavigatorSetupModal(): JSX.Element | null {
 
           {/* Pipeline running phase */}
           {isRunning && (
-            <div className="space-y-5">
+            <div className="space-y-5" aria-live="polite" aria-atomic="true">
               <ProgressBar value={progress} />
 
               <div className="space-y-2.5 border-t border-mint/10 pt-4">

@@ -84,7 +84,7 @@ function NikkeiTrendChartInner({
     diff !== null && diff >= 0 ? "text-mint" : "text-danger";
 
   return (
-    <section className="card-surface p-5">
+    <section className="card-surface card-surface-hover p-5">
       {/* Header */}
       <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
         <div>

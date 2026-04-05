@@ -124,12 +124,12 @@ function BacktestPanelInner({
       <div className="mb-3 flex flex-wrap items-center justify-between gap-3">
         <div>
           <h2 className="text-lg font-semibold text-text-primary font-orb">バックテスト</h2>
-          <p className="text-xs text-slate-400">単銘柄優先の簡易バックテスト。説明可能性を重視しています。</p>
+          <p className="text-xs text-text-muted">単銘柄優先の簡易バックテスト。説明可能性を重視しています。</p>
         </div>
         <button
           type="button"
           onClick={onClearResults}
-          className="rounded-none border border-slate-600 px-3 py-2 text-xs font-semibold text-slate-200"
+          className="rounded-none border border-border-subtle px-3 py-2 text-xs font-semibold text-text-primary"
         >
           結果クリア
         </button>
@@ -139,7 +139,7 @@ function BacktestPanelInner({
         <select
           value={stockCode}
           onChange={(event) => setStockCode(event.target.value)}
-          className="rounded-none border border-slate-600 bg-slate-950/70 px-2 py-2 text-xs text-slate-100"
+          className="rounded-none border border-border-subtle bg-canvas-deep/70 px-2 py-2 text-xs text-text-primary"
         >
           {stocks.map((stock) => (
             <option key={stock.code} value={stock.code}>
@@ -152,14 +152,14 @@ function BacktestPanelInner({
           type="date"
           value={startDate}
           onChange={(event) => setStartDate(event.target.value)}
-          className="rounded-none border border-slate-600 bg-slate-950/70 px-2 py-2 text-xs text-slate-100"
+          className="rounded-none border border-border-subtle bg-canvas-deep/70 px-2 py-2 text-xs text-text-primary"
         />
 
         <input
           type="date"
           value={endDate}
           onChange={(event) => setEndDate(event.target.value)}
-          className="rounded-none border border-slate-600 bg-slate-950/70 px-2 py-2 text-xs text-slate-100"
+          className="rounded-none border border-border-subtle bg-canvas-deep/70 px-2 py-2 text-xs text-text-primary"
         />
 
         <button

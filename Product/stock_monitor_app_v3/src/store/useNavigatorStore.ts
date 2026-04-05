@@ -2,16 +2,10 @@
 
 import { create } from "zustand";
 
-import {
-  runMacroResearch,
-  runStockSelection,
-  runDebate,
-  runFinalEvaluation,
-  runMockPipeline,
-} from "@/services/gemini";
 import type {
   NavigatorSettings,
   NavigatorState,
+  NavigatorAnalysisMode,
   NavigatorExport,
   MacroResult,
   StockSelectionResult,
@@ -44,6 +38,7 @@ interface PersistedNavigator {
   stocks: StockSelectionResult | null;
   debate: DebateResult | null;
   final: FinalEvaluation | null;
+  analysisMode?: NavigatorAnalysisMode;
   executedAt: string | null;
 }
 
@@ -68,8 +63,24 @@ function writeStorage(data: PersistedNavigator): void {
 }
 
 function persist(get: () => NavigatorStore): void {
-  const { settings, macro, stocks, debate, final: finalEval, executedAt } = get();
-  writeStorage({ settings, macro, stocks, debate, final: finalEval, executedAt });
+  const {
+    settings,
+    macro,
+    stocks,
+    debate,
+    final: finalEval,
+    analysisMode,
+    executedAt,
+  } = get();
+  writeStorage({
+    settings,
+    macro,
+    stocks,
+    debate,
+    final: finalEval,
+    analysisMode,
+    executedAt,
+  });
 }
 
 // ────────────────────────────────────────────────
@@ -88,6 +99,68 @@ function updateStepStatus(
   return steps.map((s) =>
     s.step === step ? { ...s, status } : s,
   );
+}
+
+type StepResult =
+  | MacroResult
+  | StockSelectionResult
+  | DebateResult
+  | FinalEvaluation;
+
+interface RunStepRequest {
+  step: PipelineStep;
+  settings: NavigatorSettings;
+  macro?: MacroResult;
+  stocks?: StockSelectionResult;
+  debate?: DebateResult;
+}
+
+interface RunStepResponse {
+  result: StepResult | null;
+  error: string | null;
+  mock?: boolean;
+}
+
+function truncate(text: string, max = 220): string {
+  if (text.length <= max) return text;
+  return `${text.slice(0, max)}...`;
+}
+
+async function runStep<T extends StepResult>(
+  request: RunStepRequest,
+): Promise<{ result: T; mock: boolean }> {
+  const response = await fetch("/api/navigator/run", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(request),
+  });
+
+  const raw = await response.text();
+  let payload: RunStepResponse | null = null;
+  if (raw.trim().length > 0) {
+    try {
+      payload = JSON.parse(raw) as RunStepResponse;
+    } catch {
+      payload = null;
+    }
+  }
+
+  if (!payload) {
+    if (!response.ok) {
+      throw new Error(`HTTP ${response.status} (非JSON応答)`);
+    }
+    throw new Error("API応答の形式が不正です (非JSON)");
+  }
+
+  if (!response.ok || payload.error || !payload.result) {
+    const reason = payload.error || `Step ${request.step} failed with HTTP ${response.status}`;
+    throw new Error(truncate(reason));
+  }
+
+  return {
+    result: payload.result as T,
+    mock: Boolean(payload.mock),
+  };
 }
 
 // ────────────────────────────────────────────────
@@ -153,8 +226,7 @@ export const useNavigatorStore = create<NavigatorStore>((set, get) => ({
    * Run the full analysis pipeline (4 steps).
    *
    * 1. Validates that all 3 settings fields are present.
-   * 2. Fetches API key from `/api/navigator/config`.
-   * 3. If no key → uses mock pipeline; otherwise runs each step sequentially.
+   * 2. Executes each step via `/api/navigator/run` (server-side).
    * 4. Persists results to localStorage on success.
    */
   runPipeline: async () => {
@@ -176,40 +248,13 @@ export const useNavigatorStore = create<NavigatorStore>((set, get) => ({
       stocks: null,
       debate: null,
       final: null,
+      analysisMode: null,
+      diagnosticMessage: null,
       error: null,
       executedAt: null,
     });
 
     try {
-      // — Fetch API key —
-      const configRes = await fetch("/api/navigator/config");
-      const { apiKey } = await configRes.json();
-
-      if (!apiKey) {
-        // ── Mock pipeline ──
-        const mockResult = await runMockPipeline(settings);
-
-        set({
-          macro: mockResult.macro,
-          stocks: mockResult.stocks,
-          debate: mockResult.debate,
-          final: mockResult.final,
-          status: "done",
-          progress: 100,
-          currentStep: 3 as PipelineStep,
-          steps: DEFAULT_PIPELINE_STEPS.map((s) => ({ ...s, status: "done" as const })),
-          executedAt: new Date().toISOString(),
-        });
-
-        persist(get);
-
-        setTimeout(() => {
-          get().closeModal();
-        }, MODAL_CLOSE_DELAY_MS);
-
-        return;
-      }
-
       // ── Step 0: Macro Research ──
       set((state) => ({
         currentStep: 0 as PipelineStep,
@@ -217,13 +262,20 @@ export const useNavigatorStore = create<NavigatorStore>((set, get) => ({
         progress: 10,
       }));
 
-      const macro = await runMacroResearch(settings, apiKey);
-
-      if (!macro) {
+      let macro: MacroResult;
+      try {
+        const step0 = await runStep<MacroResult>({ step: 0, settings });
+        if (step0.mock) {
+          throw new Error("mockフォールバック結果を検出したため停止しました");
+        }
+        macro = step0.result;
+      } catch (err) {
+        const detail = err instanceof Error ? err.message : "Step 0 error";
         set((state) => ({
           steps: updateStepStatus(state.steps, 0, "error"),
           status: "error",
-          error: "マクロ分析に失敗しました (Step 0)",
+          error: "マクロ分析に失敗しました (Step 0)。設定を確認して再実行してください。",
+          diagnosticMessage: detail,
         }));
         return;
       }
@@ -241,13 +293,20 @@ export const useNavigatorStore = create<NavigatorStore>((set, get) => ({
         progress: 40,
       }));
 
-      const stocks = await runStockSelection(settings, macro, apiKey);
-
-      if (!stocks) {
+      let stocks: StockSelectionResult;
+      try {
+        const step1 = await runStep<StockSelectionResult>({ step: 1, settings, macro });
+        if (step1.mock) {
+          throw new Error("mockフォールバック結果を検出したため停止しました");
+        }
+        stocks = step1.result;
+      } catch (err) {
+        const detail = err instanceof Error ? err.message : "Step 1 error";
         set((state) => ({
           steps: updateStepStatus(state.steps, 1, "error"),
           status: "error",
-          error: "銘柄選定に失敗しました (Step 1)",
+          error: "銘柄選定に失敗しました (Step 1)。時間をおいて再実行してください。",
+          diagnosticMessage: detail,
         }));
         return;
       }
@@ -265,13 +324,20 @@ export const useNavigatorStore = create<NavigatorStore>((set, get) => ({
         progress: 65,
       }));
 
-      const debate = await runDebate(settings, stocks, macro, apiKey);
-
-      if (!debate) {
+      let debate: DebateResult;
+      try {
+        const step2 = await runStep<DebateResult>({ step: 2, settings, macro, stocks });
+        if (step2.mock) {
+          throw new Error("mockフォールバック結果を検出したため停止しました");
+        }
+        debate = step2.result;
+      } catch (err) {
+        const detail = err instanceof Error ? err.message : "Step 2 error";
         set((state) => ({
           steps: updateStepStatus(state.steps, 2, "error"),
           status: "error",
-          error: "ディベート分析に失敗しました (Step 2)",
+          error: "ディベート分析に失敗しました (Step 2)。時間をおいて再実行してください。",
+          diagnosticMessage: detail,
         }));
         return;
       }
@@ -289,13 +355,20 @@ export const useNavigatorStore = create<NavigatorStore>((set, get) => ({
         progress: 88,
       }));
 
-      const finalEval = await runFinalEvaluation(settings, stocks, debate, macro, apiKey);
-
-      if (!finalEval) {
+      let finalEval: FinalEvaluation;
+      try {
+        const step3 = await runStep<FinalEvaluation>({ step: 3, settings, macro, stocks, debate });
+        if (step3.mock) {
+          throw new Error("mockフォールバック結果を検出したため停止しました");
+        }
+        finalEval = step3.result;
+      } catch (err) {
+        const detail = err instanceof Error ? err.message : "Step 3 error";
         set((state) => ({
           steps: updateStepStatus(state.steps, 3, "error"),
           status: "error",
-          error: "最終評価に失敗しました (Step 3)",
+          error: "最終評価に失敗しました (Step 3)。時間をおいて再実行してください。",
+          diagnosticMessage: detail,
         }));
         return;
       }
@@ -309,6 +382,8 @@ export const useNavigatorStore = create<NavigatorStore>((set, get) => ({
       // ── Success ──
       set({
         status: "done",
+        analysisMode: "live",
+        diagnosticMessage: null,
         executedAt: new Date().toISOString(),
       });
 
@@ -319,7 +394,12 @@ export const useNavigatorStore = create<NavigatorStore>((set, get) => ({
       }, MODAL_CLOSE_DELAY_MS);
     } catch (err) {
       const message = err instanceof Error ? err.message : "パイプラインの実行中にエラーが発生しました";
-      set({ status: "error", error: message });
+      set((state) => ({
+        status: "error",
+        steps: updateStepStatus(state.steps, state.currentStep, "error"),
+        error: "パイプラインの実行中にエラーが発生しました。時間をおいて再実行してください。",
+        diagnosticMessage: truncate(message),
+      }));
     }
   },
 
@@ -358,6 +438,8 @@ export const useNavigatorStore = create<NavigatorStore>((set, get) => ({
       stocks: data.data.stocks,
       debate: data.data.debate,
       final: data.data.final,
+      analysisMode: null,
+      diagnosticMessage: null,
       status: "done",
       progress: 100,
       currentStep: 3 as PipelineStep,
@@ -391,6 +473,8 @@ export function initNavigatorStore(): void {
     stocks: saved.stocks,
     debate: saved.debate,
     final: saved.final,
+    analysisMode: saved.analysisMode ?? null,
+    diagnosticMessage: null,
     executedAt: saved.executedAt,
     ...(hasResults
       ? {

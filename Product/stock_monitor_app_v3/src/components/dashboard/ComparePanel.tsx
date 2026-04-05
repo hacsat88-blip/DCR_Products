@@ -33,7 +33,7 @@ function metricCellTone(
     return "border border-mint/40 bg-mint/10 text-mint";
   }
   if (adjustedCurrent === min) {
-    return "border border-rose-300/40 bg-rose-500/10 text-rose-200";
+    return "border border-rose-300/40 bg-rose-500/10 text-danger";
   }
   return "";
 }
@@ -67,43 +67,43 @@ function ComparePanelInner({
       <div className="mb-3 flex flex-wrap items-center justify-between gap-3">
         <div>
           <h2 className="text-lg font-semibold text-text-primary font-orb">比較ビュー</h2>
-          <p className="text-xs text-slate-400">最大4銘柄を横並びで比較します。</p>
-          <p className="mt-1 text-[11px] text-slate-500">緑=相対優位 / 赤=要注意（価格は優劣色を付けません）</p>
+          <p className="text-xs text-text-muted">最大4銘柄を横並びで比較します。</p>
+          <p className="mt-1 text-[11px] text-text-muted">緑=相対優位 / 赤=要注意（価格は優劣色を付けません）</p>
         </div>
         <button
           type="button"
           onClick={onClear}
-          className="rounded-none border border-slate-600 px-3 py-2 text-xs font-semibold text-slate-200"
+          className="rounded-none border border-border-subtle px-3 py-2 text-xs font-semibold text-text-primary"
         >
           比較をクリア
         </button>
       </div>
 
       {compared.length === 0 ? (
-        <p className="text-sm text-slate-300">比較対象がありません。ランキングから比較に追加してください。</p>
+        <p className="text-sm text-text-secondary">比較対象がありません。ランキングから比較に追加してください。</p>
       ) : (
         <div className="overflow-x-auto">
-          <table className="w-full min-w-[760px] border-collapse text-xs text-slate-200">
+          <table className="w-full min-w-[760px] border-collapse text-xs text-text-secondary">
             <thead>
               <tr>
-                <th className="border-b border-slate-700 px-2 py-2 text-left text-slate-400">項目</th>
+                <th className="border-b border-border-subtle px-2 py-2 text-left text-text-muted">項目</th>
                 {compared.map((stock) => (
-                  <th key={stock.code} className="border-b border-slate-700 px-2 py-2 text-left">
-                    <p className="font-semibold text-slate-100">
+                  <th key={stock.code} className="border-b border-border-subtle px-2 py-2 text-left">
+                    <p className="font-semibold text-text-primary">
                       {stock.code} {stock.name}
                     </p>
                     <div className="mt-1 flex gap-1">
                       <button
                         type="button"
                         onClick={() => onOpenDetail(stock.id)}
-                        className="rounded-none border border-slate-600 px-1.5 py-0.5 text-[11px]"
+                        className="rounded-none border border-border-subtle px-1.5 py-0.5 text-[11px]"
                       >
                         詳細
                       </button>
                       <button
                         type="button"
                         onClick={() => onRemove(stock.code)}
-                        className="rounded-none border border-slate-600 px-1.5 py-0.5 text-[11px]"
+                        className="rounded-none border border-border-subtle px-1.5 py-0.5 text-[11px]"
                       >
                         削除
                       </button>
@@ -114,28 +114,28 @@ function ComparePanelInner({
             </thead>
             <tbody>
               <tr>
-                <td className="border-b border-slate-800 px-2 py-2 text-slate-400">株価</td>
+                <td className="border-b border-border-subtle/50 px-2 py-2 text-text-muted">株価</td>
                 {compared.map((stock) => (
-                  <td key={`${stock.code}-price`} className="border-b border-slate-800 px-2 py-2">
+                  <td key={`${stock.code}-price`} className="border-b border-border-subtle/50 px-2 py-2">
                     {formatYen(stock.price)}
                   </td>
                 ))}
               </tr>
               <tr>
-                <td className="border-b border-slate-800 px-2 py-2 text-slate-400">前日比</td>
+                <td className="border-b border-border-subtle/50 px-2 py-2 text-text-muted">前日比</td>
                 {compared.map((stock) => (
-                  <td key={`${stock.code}-change`} className="border-b border-slate-800 px-2 py-2">
+                  <td key={`${stock.code}-change`} className="border-b border-border-subtle/50 px-2 py-2">
                     {formatPercent(stock.changePercent)}
                   </td>
                 ))}
               </tr>
               <tr>
-                <td className="border-b border-slate-800 px-2 py-2 text-slate-400">本命度</td>
+                <td className="border-b border-border-subtle/50 px-2 py-2 text-text-muted">本命度</td>
                 {compared.map((stock) => (
                   <td
                     key={`${stock.code}-score`}
                     className={clsx(
-                      "border-b border-slate-800 px-2 py-2",
+                      "border-b border-border-subtle/50 px-2 py-2",
                       metricCellTone(scoreValues, stock.score)
                     )}
                   >
@@ -144,20 +144,20 @@ function ComparePanelInner({
                 ))}
               </tr>
               <tr>
-                <td className="border-b border-slate-800 px-2 py-2 text-slate-400">判定</td>
+                <td className="border-b border-border-subtle/50 px-2 py-2 text-text-muted">判定</td>
                 {compared.map((stock) => (
-                  <td key={`${stock.code}-action`} className="border-b border-slate-800 px-2 py-2">
+                  <td key={`${stock.code}-action`} className="border-b border-border-subtle/50 px-2 py-2">
                     {formatActionLabel(stock.evaluatedAction)}
                   </td>
                 ))}
               </tr>
               <tr>
-                <td className="border-b border-slate-800 px-2 py-2 text-slate-400">売上成長</td>
+                <td className="border-b border-border-subtle/50 px-2 py-2 text-text-muted">売上成長</td>
                 {compared.map((stock) => (
                   <td
                     key={`${stock.code}-rev`}
                     className={clsx(
-                      "border-b border-slate-800 px-2 py-2",
+                      "border-b border-border-subtle/50 px-2 py-2",
                       metricCellTone(revenueValues, stock.revenueGrowth ?? null)
                     )}
                   >
@@ -166,12 +166,12 @@ function ComparePanelInner({
                 ))}
               </tr>
               <tr>
-                <td className="border-b border-slate-800 px-2 py-2 text-slate-400">営業利益成長</td>
+                <td className="border-b border-border-subtle/50 px-2 py-2 text-text-muted">営業利益成長</td>
                 {compared.map((stock) => (
                   <td
                     key={`${stock.code}-op`}
                     className={clsx(
-                      "border-b border-slate-800 px-2 py-2",
+                      "border-b border-border-subtle/50 px-2 py-2",
                       metricCellTone(opValues, stock.opGrowth ?? null)
                     )}
                   >
@@ -180,12 +180,12 @@ function ComparePanelInner({
                 ))}
               </tr>
               <tr>
-                <td className="border-b border-slate-800 px-2 py-2 text-slate-400">営業CF</td>
+                <td className="border-b border-border-subtle/50 px-2 py-2 text-text-muted">営業CF</td>
                 {compared.map((stock) => (
                   <td
                     key={`${stock.code}-cf`}
                     className={clsx(
-                      "border-b border-slate-800 px-2 py-2",
+                      "border-b border-border-subtle/50 px-2 py-2",
                       metricCellTone(cfValues, stock.operatingCF ?? null)
                     )}
                   >
@@ -194,12 +194,12 @@ function ComparePanelInner({
                 ))}
               </tr>
               <tr>
-                <td className="border-b border-slate-800 px-2 py-2 text-slate-400">PER</td>
+                <td className="border-b border-border-subtle/50 px-2 py-2 text-text-muted">PER</td>
                 {compared.map((stock) => (
                   <td
                     key={`${stock.code}-per`}
                     className={clsx(
-                      "border-b border-slate-800 px-2 py-2",
+                      "border-b border-border-subtle/50 px-2 py-2",
                       metricCellTone(perValues, stock.per ?? null, { higherBetter: false })
                     )}
                   >
@@ -208,12 +208,12 @@ function ComparePanelInner({
                 ))}
               </tr>
               <tr>
-                <td className="border-b border-slate-800 px-2 py-2 text-slate-400">PBR</td>
+                <td className="border-b border-border-subtle/50 px-2 py-2 text-text-muted">PBR</td>
                 {compared.map((stock) => (
                   <td
                     key={`${stock.code}-pbr`}
                     className={clsx(
-                      "border-b border-slate-800 px-2 py-2",
+                      "border-b border-border-subtle/50 px-2 py-2",
                       metricCellTone(pbrValues, stock.pbr ?? null, { higherBetter: false })
                     )}
                   >
@@ -222,12 +222,12 @@ function ComparePanelInner({
                 ))}
               </tr>
               <tr>
-                <td className="border-b border-slate-800 px-2 py-2 text-slate-400">配当利回り</td>
+                <td className="border-b border-border-subtle/50 px-2 py-2 text-text-muted">配当利回り</td>
                 {compared.map((stock) => (
                   <td
                     key={`${stock.code}-div`}
                     className={clsx(
-                      "border-b border-slate-800 px-2 py-2",
+                      "border-b border-border-subtle/50 px-2 py-2",
                       metricCellTone(dividendValues, stock.dividendYield ?? null)
                     )}
                   >
@@ -236,47 +236,47 @@ function ComparePanelInner({
                 ))}
               </tr>
               <tr>
-                <td className="border-b border-slate-800 px-2 py-2 text-slate-400">核心KPI</td>
+                <td className="border-b border-border-subtle/50 px-2 py-2 text-text-muted">核心KPI</td>
                 {compared.map((stock) => (
-                  <td key={`${stock.code}-kpi`} className="border-b border-slate-800 px-2 py-2">
+                  <td key={`${stock.code}-kpi`} className="border-b border-border-subtle/50 px-2 py-2">
                     {stock.coreKpiLabel}: {stock.coreKpiValue}
                   </td>
                 ))}
               </tr>
               <tr>
-                <td className="border-b border-slate-800 px-2 py-2 text-slate-400">危険信号</td>
+                <td className="border-b border-border-subtle/50 px-2 py-2 text-text-muted">危険信号</td>
                 {compared.map((stock) => (
-                  <td key={`${stock.code}-risk`} className="border-b border-slate-800 px-2 py-2">
+                  <td key={`${stock.code}-risk`} className="border-b border-border-subtle/50 px-2 py-2">
                     {stock.riskSignal}
                   </td>
                 ))}
               </tr>
               <tr>
-                <td className="border-b border-slate-800 px-2 py-2 text-slate-400">次に見る数字</td>
+                <td className="border-b border-border-subtle/50 px-2 py-2 text-text-muted">次に見る数字</td>
                 {compared.map((stock) => (
-                  <td key={`${stock.code}-watch`} className="border-b border-slate-800 px-2 py-2">
+                  <td key={`${stock.code}-watch`} className="border-b border-border-subtle/50 px-2 py-2">
                     {stock.coreKpiLabel}: {stock.coreKpiValue}
                   </td>
                 ))}
               </tr>
               <tr>
-                <td className="border-b border-slate-800 px-2 py-2 text-slate-400">崩れる条件</td>
+                <td className="border-b border-border-subtle/50 px-2 py-2 text-text-muted">崩れる条件</td>
                 {compared.map((stock) => (
-                  <td key={`${stock.code}-collapse`} className="border-b border-slate-800 px-2 py-2">
+                  <td key={`${stock.code}-collapse`} className="border-b border-border-subtle/50 px-2 py-2">
                     {stock.collapseCondition}
                   </td>
                 ))}
               </tr>
               <tr>
-                <td className="border-b border-slate-800 px-2 py-2 text-slate-400">企業説明</td>
+                <td className="border-b border-border-subtle/50 px-2 py-2 text-text-muted">企業説明</td>
                 {compared.map((stock) => (
-                  <td key={`${stock.code}-narrative`} className="border-b border-slate-800 px-2 py-2">
+                  <td key={`${stock.code}-narrative`} className="border-b border-border-subtle/50 px-2 py-2">
                     {stock.summary}
                   </td>
                 ))}
               </tr>
               <tr>
-                <td className="px-2 py-2 text-slate-400">判定要約</td>
+                <td className="px-2 py-2 text-text-muted">判定要約</td>
                 {compared.map((stock) => (
                   <td key={`${stock.code}-score-summary`} className="px-2 py-2">
                     {stock.scoreSummary}

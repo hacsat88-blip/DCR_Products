@@ -55,6 +55,25 @@ const INITIAL: NikkeiOhlcState = {
   diffPercent: null,
 };
 
+function computeAdjacentChange(points: OhlcPoint[]): {
+  latestClose: number | null;
+  diff: number | null;
+  diffPercent: number | null;
+} {
+  const last = points.length > 0 ? points[points.length - 1] : null;
+  const previous = points.length > 1 ? points[points.length - 2] : null;
+  const latestClose = last?.close ?? null;
+  const prevClose = previous?.close ?? null;
+  const diff =
+    latestClose !== null && prevClose !== null ? latestClose - prevClose : null;
+  const diffPercent =
+    diff !== null && prevClose !== null && prevClose !== 0
+      ? (diff / prevClose) * 100
+      : null;
+
+  return { latestClose, diff, diffPercent };
+}
+
 // ── Hook ─────────────────────────────────────────────────────────────────────
 
 export function useNikkeiOhlc(timeframe: CandleTimeframe = "1d") {
@@ -100,19 +119,7 @@ export function useNikkeiOhlc(timeframe: CandleTimeframe = "1d") {
           return;
         }
 
-        // Compute latestClose / diff / diffPercent from candle data
-        const first = ohlc.length > 0 ? ohlc[0] : null;
-        const last = ohlc.length > 0 ? ohlc[ohlc.length - 1] : null;
-        const latestClose = last?.close ?? null;
-        const firstClose = first?.close ?? null;
-        const diff =
-          latestClose !== null && firstClose !== null
-            ? latestClose - firstClose
-            : null;
-        const diffPercent =
-          diff !== null && firstClose !== null && firstClose !== 0
-            ? (diff / firstClose) * 100
-            : null;
+        const { latestClose, diff, diffPercent } = computeAdjacentChange(ohlc);
 
         setState({
           ohlc,
@@ -125,23 +132,28 @@ export function useNikkeiOhlc(timeframe: CandleTimeframe = "1d") {
         });
       } else {
         // Yahoo Finance payload: { latestClose, diff, diffPercent, source, ohlc, ... }
+        const adjacent = computeAdjacentChange(ohlc);
+        const latestClose =
+          typeof json.latestClose === "number" && Number.isFinite(json.latestClose)
+            ? json.latestClose
+            : adjacent.latestClose;
+        const diff =
+          typeof json.diff === "number" && Number.isFinite(json.diff)
+            ? json.diff
+            : adjacent.diff;
+        const diffPercent =
+          typeof json.diffPercent === "number" && Number.isFinite(json.diffPercent)
+            ? json.diffPercent
+            : adjacent.diffPercent;
+
         setState({
           ohlc,
           loading: false,
           error: null,
           source: "yahoo_finance",
-          latestClose:
-            typeof json.latestClose === "number" && Number.isFinite(json.latestClose)
-              ? json.latestClose
-              : null,
-          diff:
-            typeof json.diff === "number" && Number.isFinite(json.diff)
-              ? json.diff
-              : null,
-          diffPercent:
-            typeof json.diffPercent === "number" && Number.isFinite(json.diffPercent)
-              ? json.diffPercent
-              : null,
+          latestClose,
+          diff,
+          diffPercent,
         });
       }
     } catch (e) {

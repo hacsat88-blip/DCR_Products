@@ -119,6 +119,10 @@ export function StocksTable({ stocks, debate }: StocksTableProps): JSX.Element {
                     key && "cursor-pointer select-none hover:text-mint",
                   )}
                   onClick={key ? () => toggleSort(key) : undefined}
+                  role={key ? "button" : undefined}
+                  tabIndex={key ? 0 : undefined}
+                  onKeyDown={key ? (e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); toggleSort(key); } } : undefined}
+                  aria-sort={key ? (sortKey === key ? (sortDir === "asc" ? "ascending" : "descending") : "none") : undefined}
                 >
                   {label}
                   {key && sortIcon(key)}

@@ -64,7 +64,7 @@ export function ExportPanel({
       </div>
 
       <div className="grid gap-2 md:grid-cols-2">
-        <label className="rounded-none border border-border-subtle bg-canvas-deep/60 px-3 py-2 text-xs text-slate-200">
+        <label className="rounded-none border border-border-subtle bg-canvas-deep/60 px-3 py-2 text-xs text-text-primary">
           <input
             type="checkbox"
             checked={selection.snapshots}
@@ -73,7 +73,7 @@ export function ExportPanel({
           />
           スナップショット
         </label>
-        <label className="rounded-none border border-border-subtle bg-canvas-deep/60 px-3 py-2 text-xs text-slate-200">
+        <label className="rounded-none border border-border-subtle bg-canvas-deep/60 px-3 py-2 text-xs text-text-primary">
           <input
             type="checkbox"
             checked={selection.alertEvents}
@@ -82,7 +82,7 @@ export function ExportPanel({
           />
           アラート履歴
         </label>
-        <label className="rounded-none border border-border-subtle bg-canvas-deep/60 px-3 py-2 text-xs text-slate-200">
+        <label className="rounded-none border border-border-subtle bg-canvas-deep/60 px-3 py-2 text-xs text-text-primary">
           <input
             type="checkbox"
             checked={selection.savedScreens}
@@ -91,7 +91,7 @@ export function ExportPanel({
           />
           保存スクリーン
         </label>
-        <label className="rounded-none border border-border-subtle bg-canvas-deep/60 px-3 py-2 text-xs text-slate-200">
+        <label className="rounded-none border border-border-subtle bg-canvas-deep/60 px-3 py-2 text-xs text-text-primary">
           <input
             type="checkbox"
             checked={selection.backtestResults}
@@ -100,7 +100,7 @@ export function ExportPanel({
           />
           バックテスト結果
         </label>
-        <label className="rounded-none border border-border-subtle bg-canvas-deep/60 px-3 py-2 text-xs text-slate-200">
+        <label className="rounded-none border border-border-subtle bg-canvas-deep/60 px-3 py-2 text-xs text-text-primary">
           <input
             type="checkbox"
             checked={selection.holdings}
@@ -130,21 +130,21 @@ export function ExportPanel({
         <button
           type="button"
           onClick={onExportSnapshotsCsv}
-          className="rounded-none border border-border-subtle px-3 py-2 text-xs font-semibold text-slate-200"
+          className="rounded-none border border-border-subtle px-3 py-2 text-xs font-semibold text-text-primary"
         >
           スナップショットCSV出力
         </button>
         <button
           type="button"
           onClick={onExportRankingCsv}
-          className="rounded-none border border-border-subtle px-3 py-2 text-xs font-semibold text-slate-200"
+          className="rounded-none border border-border-subtle px-3 py-2 text-xs font-semibold text-text-primary"
         >
           ランキングCSV出力
         </button>
         <button
           type="button"
           onClick={onExportPortfolioCsv}
-          className="rounded-none border border-border-subtle px-3 py-2 text-xs font-semibold text-slate-200"
+          className="rounded-none border border-border-subtle px-3 py-2 text-xs font-semibold text-text-primary"
         >
           ポートフォリオCSV出力
         </button>

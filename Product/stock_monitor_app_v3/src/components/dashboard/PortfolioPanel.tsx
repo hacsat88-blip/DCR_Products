@@ -17,6 +17,7 @@ import {
 import { formatActionLabel, formatPercent, formatYen, actionTone } from "@/lib/format";
 import { useStockStore } from "@/store/useStockStore";
 import type { EvaluatedStock, StockAction } from "@/types/stock";
+import { CHART_COLORS, CHART_TOOLTIP_STYLE } from "@/components/ui/ChartTheme";
 import { Badge } from "@/components/ui/Badge";
 
 /* ───────── palette ───────── */
@@ -57,11 +58,9 @@ type SortField = "value" | "score" | "shares" | "weight";
 
 /* ───────── tooltip style ───────── */
 const tooltipStyle: React.CSSProperties = {
-  background: "rgba(18, 38, 70, 0.95)",
-  border: "1px solid rgba(255,255,255,0.08)",
-  borderRadius: "12px",
+  ...CHART_TOOLTIP_STYLE,
   backdropFilter: "blur(8px)",
-  color: "#e8edf5",
+  color: "#e0ffe0",
 };
 
 /* ───────── custom tooltip renderers ───────── */
@@ -389,16 +388,16 @@ function PortfolioPanelInner(): JSX.Element {
               >
                 <XAxis
                   type="number"
-                  stroke="#64748b"
-                  tick={{ fontSize: 11, fill: "#8fa3c4" }}
+                  stroke={CHART_COLORS.axis}
+                  tick={{ fontSize: 11, fill: CHART_COLORS.axis }}
                   tickFormatter={(v: number) => formatYen(Math.round(v))}
                 />
                 <YAxis
                   type="category"
                   dataKey="name"
                   width={100}
-                  stroke="#64748b"
-                  tick={{ fontSize: 11, fill: "#8fa3c4" }}
+                  stroke={CHART_COLORS.axis}
+                  tick={{ fontSize: 11, fill: CHART_COLORS.axis }}
                 />
                 <Tooltip content={<BarTooltipContent />} />
                 <Bar dataKey="value" radius={[0, 6, 6, 0]}>

@@ -83,7 +83,7 @@ function SnapshotPanelInner({
           <button
             type="button"
             onClick={onClear}
-            className="rounded-none border border-border-subtle px-3 py-2 text-xs font-semibold text-slate-200"
+            className="rounded-none border border-border-subtle px-3 py-2 text-xs font-semibold text-text-primary"
           >
             全削除
           </button>
@@ -91,15 +91,15 @@ function SnapshotPanelInner({
       </div>
 
       <div className="grid gap-2 md:grid-cols-3">
-        <div className="rounded-none border border-border-subtle bg-canvas-deep/60 p-3 text-xs text-slate-200">
+        <div className="rounded-none border border-border-subtle bg-canvas-deep/60 p-3 text-xs text-text-primary">
           <p className="text-text-muted">保存件数 (capture)</p>
           <p className="mt-1 text-base font-semibold font-mono-tech">{captures.length}</p>
         </div>
-        <div className="rounded-none border border-border-subtle bg-canvas-deep/60 p-3 text-xs text-slate-200">
+        <div className="rounded-none border border-border-subtle bg-canvas-deep/60 p-3 text-xs text-text-primary">
           <p className="text-text-muted">最新保存</p>
           <p className="mt-1 font-semibold font-mono-tech">{formatDateTime(latest)}</p>
         </div>
-        <label className="rounded-none border border-border-subtle bg-canvas-deep/60 p-3 text-xs text-slate-200">
+        <label className="rounded-none border border-border-subtle bg-canvas-deep/60 p-3 text-xs text-text-primary">
           <p className="text-text-muted">自動保存</p>
           <div className="mt-2 flex items-center gap-2">
             <input
@@ -123,7 +123,7 @@ function SnapshotPanelInner({
                 key={snapshot.captureId}
                 className="flex flex-wrap items-center justify-between gap-2 rounded-none border border-border-subtle bg-canvas/90 px-3 py-2 text-xs"
               >
-                <div className="text-slate-200">
+                <div className="text-text-primary">
                   <p className="font-semibold">保存ID {snapshot.captureId.slice(0, 12)}</p>
                   <p className="text-text-muted">
                     {formatDateTime(snapshot.checkedAt)} / 種別 {snapshot.source === "manual" ? "手動" : "自動"} / 銘柄 {snapshot.count} 件
@@ -132,7 +132,7 @@ function SnapshotPanelInner({
                 <button
                   type="button"
                   onClick={() => onDeleteCapture(snapshot.captureId)}
-                  className="rounded-none border border-border-subtle px-2 py-1 text-[11px] text-slate-200"
+                  className="rounded-none border border-border-subtle px-2 py-1 text-[11px] text-text-primary"
                 >
                   削除
                 </button>
@@ -144,7 +144,7 @@ function SnapshotPanelInner({
           <button
             type="button"
             onClick={() => setVisibleCount((c) => c + SNAPSHOT_PAGE_SIZE)}
-            className="mt-2 w-full rounded-none border border-border-subtle py-2 text-xs font-semibold text-slate-200 transition-colors hover:border-slate-400"
+            className="mt-2 w-full rounded-none border border-border-subtle py-2 text-xs font-semibold text-text-primary transition-colors hover:border-border-active"
           >
             もっと見る（残り {captures.length - visibleCount} 件）
           </button>

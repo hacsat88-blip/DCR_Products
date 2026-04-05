@@ -75,7 +75,7 @@ export function StockOnboardingPanel(): JSX.Element {
       />
 
       <div className="mt-3 rounded-none border border-border-subtle bg-canvas-deep/60 p-3 text-xs">
-        {validation.error ? <p className="text-rose-300">チェック結果: {validation.error}</p> : null}
+        {validation.error ? <p className="text-danger">チェック結果: {validation.error}</p> : null}
         {!validation.error && validation.valid ? (
           <p className="text-mint">チェック結果: OK（必須項目が揃っています）</p>
         ) : null}

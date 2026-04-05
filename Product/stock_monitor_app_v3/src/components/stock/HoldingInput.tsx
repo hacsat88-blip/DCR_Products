@@ -108,7 +108,7 @@ export function HoldingInput({ stockId, price, compact = false }: HoldingInputPr
   if (compact) {
     return (
       <div className="flex items-center gap-1" onClick={(e) => e.stopPropagation()}>
-        <button type="button" data-dir="dec" onClick={handleAdjust} className={btnClass}>
+        <button type="button" data-dir="dec" onClick={handleAdjust} className={btnClass} aria-label="保有株数を減らす">
           −
         </button>
         {editing ? (
@@ -136,11 +136,11 @@ export function HoldingInput({ stockId, price, compact = false }: HoldingInputPr
             {shares > 0 ? shares.toLocaleString("ja-JP") : "未保有"}
           </button>
         )}
-        <button type="button" data-dir="inc" onClick={handleAdjust} className={btnClass}>
+        <button type="button" data-dir="inc" onClick={handleAdjust} className={btnClass} aria-label="保有株数を増やす">
           +
         </button>
         {saved && (
-          <span className="ml-1 text-[10px] text-blue animate-fade-up">保存済み</span>
+          <span className="ml-1 text-[10px] text-blue animate-fade-up" role="status" aria-live="polite">保存済み</span>
         )}
       </div>
     );
@@ -150,7 +150,7 @@ export function HoldingInput({ stockId, price, compact = false }: HoldingInputPr
     <div onClick={(e) => e.stopPropagation()}>
       <div className="flex items-center gap-2">
         <span className="text-xs text-text-muted">保有株数:</span>
-        <button type="button" data-dir="dec" onClick={handleAdjust} className={btnClass}>
+        <button type="button" data-dir="dec" onClick={handleAdjust} className={btnClass} aria-label="保有株数を減らす">
           −
         </button>
         {editing ? (
@@ -178,11 +178,11 @@ export function HoldingInput({ stockId, price, compact = false }: HoldingInputPr
             {shares > 0 ? shares.toLocaleString("ja-JP") : "0"}
           </button>
         )}
-        <button type="button" data-dir="inc" onClick={handleAdjust} className={btnClass}>
+        <button type="button" data-dir="inc" onClick={handleAdjust} className={btnClass} aria-label="保有株数を増やす">
           +
         </button>
         {saved && (
-          <span className="ml-1 text-xs text-blue animate-fade-up">保存済み</span>
+          <span className="ml-1 text-xs text-blue animate-fade-up" role="status" aria-live="polite">保存済み</span>
         )}
       </div>
       {evalValue !== null && (

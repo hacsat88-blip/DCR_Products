@@ -90,9 +90,9 @@ function MorningCheckPanelInner({ stocks, snapshots }: MorningCheckPanelProps): 
       <div className="mb-3 flex flex-wrap items-center justify-between gap-3">
         <div>
           <h2 className="text-lg font-semibold text-text-primary font-orb">朝チェックモード</h2>
-          <p className="text-xs text-slate-400">前回スナップショットとの差分だけ先に確認できます。</p>
+          <p className="text-xs text-text-secondary">前回スナップショットとの差分だけ先に確認できます。</p>
         </div>
-        <label className="flex items-center gap-2 text-xs text-slate-300">
+        <label className="flex items-center gap-2 text-xs text-text-secondary">
           <input
             type="checkbox"
             checked={changesOnly}
@@ -103,27 +103,27 @@ function MorningCheckPanelInner({ stocks, snapshots }: MorningCheckPanelProps): 
       </div>
 
       {visibleRows.length === 0 ? (
-        <p className="text-sm text-slate-300">差分はありません。スナップショット保存後に変化を追跡できます。</p>
+        <p className="text-sm text-text-secondary">差分はありません。スナップショット保存後に変化を追跡できます。</p>
       ) : (
         <div className="grid gap-2 md:grid-cols-2 xl:grid-cols-4">
           {visibleRows.map((row) => (
             <article key={row.code} className="rounded-none border border-border-subtle bg-canvas-deep/60 p-3">
-              <p className="text-xs tracking-[0.12em] text-slate-400">{row.code}</p>
-              <p className="text-sm font-semibold text-slate-100">{row.name}</p>
-              <p className="mt-2 text-xs text-slate-300">
+              <p className="text-xs tracking-[0.12em] text-text-muted">{row.code}</p>
+              <p className="text-sm font-semibold text-text-primary">{row.name}</p>
+              <p className="mt-2 text-xs text-text-secondary">
                 判定: {toActionLabel(row.currentAction)}
                 {row.actionChanged ? ` (前回: ${toActionLabel(row.previousAction)})` : ""}
               </p>
               <p
                 className={clsx(
                   "mt-1 text-xs",
-                  row.scoreDelta === null ? "text-slate-400" : row.scoreDelta > 0 ? "text-mint" : "text-rose-300"
+                  row.scoreDelta === null ? "text-text-muted" : row.scoreDelta > 0 ? "text-mint" : "text-danger"
                 )}
               >
                 スコア差分:{" "}
                 <span className="font-mono-tech">{row.scoreDelta === null ? "-" : `${row.scoreDelta > 0 ? "+" : ""}${row.scoreDelta.toFixed(1)}`}</span>
               </p>
-              <p className="mt-1 text-xs text-slate-400">
+              <p className="mt-1 text-xs text-text-secondary">
                 価格差分:{" "}
                 <span className="font-mono-tech">{row.priceDeltaPct === null
                   ? "-"

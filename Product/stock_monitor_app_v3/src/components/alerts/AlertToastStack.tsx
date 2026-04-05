@@ -97,7 +97,7 @@ export function AlertToastStack({ events, onDismiss }: AlertToastStackProps): JS
   }
 
   return (
-    <div className="fixed right-3 top-3 z-50 grid w-[min(360px,calc(100vw-24px))] gap-2 md:right-6 md:top-6">
+    <div role="log" aria-live="polite" aria-label="アラート通知" className="fixed right-3 top-3 z-50 grid w-[min(360px,calc(100vw-24px))] gap-2 md:right-6 md:top-6">
       {visible.map((event) => (
         <article
           key={event.id}

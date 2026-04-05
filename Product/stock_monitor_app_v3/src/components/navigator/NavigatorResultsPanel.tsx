@@ -46,6 +46,7 @@ export function NavigatorResultsPanel(): JSX.Element | null {
     debate,
     final: finalEval,
     settings,
+    analysisMode,
     executedAt,
   } = useNavigatorStore();
 
@@ -64,6 +65,17 @@ export function NavigatorResultsPanel(): JSX.Element | null {
         <span>
           {marketLabel} {"//"} RISK:{riskLabel} {"//"} HORIZON:{horizonLabel}
         </span>
+        {analysisMode && (
+          <span
+            className={
+              analysisMode === "live"
+                ? "rounded border border-mint/30 bg-mint/10 px-1.5 py-0.5 text-mint"
+                : "rounded border border-yellow-500/40 bg-yellow-500/10 px-1.5 py-0.5 text-yellow-300"
+            }
+          >
+            SOURCE: {analysisMode === "live" ? "LIVE AI" : "MOCK FALLBACK"}
+          </span>
+        )}
         {executedAt && (
           <span>
             {"//"} {new Date(executedAt).toLocaleDateString("ja-JP")}

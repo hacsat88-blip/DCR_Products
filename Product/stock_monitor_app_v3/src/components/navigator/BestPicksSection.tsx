@@ -229,6 +229,7 @@ function PickCard({ pick }: { pick: BestPick }): JSX.Element {
       <button
         type="button"
         onClick={() => setExpanded((p) => !p)}
+        aria-expanded={expanded}
         className="font-mono-tech text-[10px] text-text-muted transition-colors hover:text-mint"
       >
         [{expanded ? "−" : "+"}] {expanded ? "閉じる" : "リスク詳細"}

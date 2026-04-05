@@ -46,12 +46,12 @@ function ActionLaneBoardInner({ stocks, onOpenDetail }: ActionLaneBoardProps): J
             <article key={action} className={clsx("rounded-none border p-3", laneTone(action))}>
               <div className="mb-2 flex items-center justify-between">
                 <p className="text-sm font-semibold text-text-primary font-orb uppercase">{formatActionLabel(action)}</p>
-                <span className="rounded-none border border-border-subtle px-2 py-0.5 text-[11px] text-slate-200">
+                <span className="rounded-none border border-border-subtle px-2 py-0.5 text-[11px] text-text-primary">
                   {rows.length}件
                 </span>
               </div>
               {rows.length === 0 ? (
-                <p className="text-xs text-slate-500">対象なし</p>
+                <p className="text-xs text-text-muted">対象なし</p>
               ) : (
                 <ul className="space-y-2">
                   {rows.map((stock) => (
@@ -59,12 +59,12 @@ function ActionLaneBoardInner({ stocks, onOpenDetail }: ActionLaneBoardProps): J
                       <button
                         type="button"
                         onClick={() => onOpenDetail(stock.id)}
-                        className="w-full rounded-none border border-border-subtle bg-canvas-deep/60 px-2 py-2 text-left text-xs text-slate-200 transition hover:border-slate-500"
+                        className="w-full rounded-none border border-border-subtle bg-canvas-deep/60 px-2 py-2 text-left text-xs text-text-primary transition hover:border-border-active"
                       >
                         <p className="font-semibold">
                           {stock.code} {stock.name}
                         </p>
-                        <p className="mt-1 text-slate-400">本命度 <span className="font-mono-tech">{stock.score}</span></p>
+                        <p className="mt-1 text-text-muted">本命度 <span className="font-mono-tech">{stock.score}</span></p>
                       </button>
                     </li>
                   ))}

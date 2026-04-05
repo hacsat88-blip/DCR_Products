@@ -289,7 +289,7 @@ function KpiCardsInner({
       </div>
 
       {/* Card 4: Watch / Holdings */}
-      <div className="card-surface group relative overflow-hidden p-5 transition-all duration-300 hover:shadow-glow-amber">
+      <div className="card-surface card-surface-hover group relative overflow-hidden p-5 transition-all duration-300 hover:shadow-glow-amber">
         <div className="absolute inset-y-0 left-0 w-[2px] bg-amber/50" />
         <p className="font-orb text-[10px] uppercase tracking-widest text-text-muted">銘柄サマリー</p>
         <p className="mt-1.5 font-mono-tech text-3xl md:text-4xl tabular-nums font-semibold tracking-kpi text-text-primary">{totalCount}</p>
@@ -314,7 +314,7 @@ function KpiCardsInner({
         <p
           className={clsx(
             "mt-1 text-xs",
-            diff != null && diff > 0 ? "text-red-300" : diff != null && diff < 0 ? "text-emerald-300" : "text-text-muted"
+            diff != null && diff > 0 ? "text-danger" : diff != null && diff < 0 ? "text-mint" : "text-text-muted"
           )}
         >
           {formatSigned(diff, 0, "円")} ({formatSigned(diffPercent, 2, "%")})

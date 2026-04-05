@@ -34,7 +34,7 @@ function DecisionBoardInner({ stocks, alertEvents }: DecisionBoardProps): JSX.El
     <section className="rounded-none border border-border-subtle bg-panel p-5 shadow-card">
       <div className="mb-3 flex items-center justify-between gap-3">
         <h2 className="text-lg font-semibold text-text-primary font-orb">判断ボード</h2>
-        <p className="text-xs text-slate-400">監視中銘柄を優先して表示</p>
+        <p className="text-xs text-text-muted">監視中銘柄を優先して表示</p>
       </div>
 
       <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-4">
@@ -46,8 +46,8 @@ function DecisionBoardInner({ stocks, alertEvents }: DecisionBoardProps): JSX.El
             <article key={stock.id} className="rounded-none border border-border-subtle bg-canvas-deep/60 p-3">
               <div className="flex items-start justify-between gap-2">
                 <div>
-                  <p className="text-xs tracking-[0.12em] text-slate-400 font-mono-tech">{stock.code}</p>
-                  <h3 className="text-base font-semibold text-slate-100">
+                  <p className="text-xs tracking-[0.12em] text-text-muted font-mono-tech">{stock.code}</p>
+                  <h3 className="text-base font-semibold text-text-primary">
                     {stock.name}
                     {holding > 0 && (
                       <span className="ml-1 text-xs font-normal text-mint">({holding.toLocaleString("ja-JP")}株)</span>
@@ -66,16 +66,16 @@ function DecisionBoardInner({ stocks, alertEvents }: DecisionBoardProps): JSX.El
                 </span>
               </div>
 
-              <div className="mt-2 flex items-center justify-between text-xs text-slate-300">
+              <div className="mt-2 flex items-center justify-between text-xs text-text-secondary">
                 <span>本命度: <span className="font-mono-tech">{stock.score}</span></span>
                 <span>アラート: {stockAlertCount}</span>
               </div>
 
-              <p className="mt-3 line-clamp-2 text-sm leading-6 text-slate-200">{stock.oneLiner}</p>
-              <p className="mt-3 text-xs text-slate-400">
+              <p className="mt-3 line-clamp-2 text-sm leading-6 text-text-primary">{stock.oneLiner}</p>
+              <p className="mt-3 text-xs text-text-muted">
                 注目点: {stock.coreKpiLabel} ({stock.coreKpiValue})
               </p>
-              <p className="mt-2 line-clamp-2 text-xs leading-5 text-slate-400">
+              <p className="mt-2 line-clamp-2 text-xs leading-5 text-text-muted">
                 崩れる条件: {stock.collapseCondition}
               </p>
             </article>

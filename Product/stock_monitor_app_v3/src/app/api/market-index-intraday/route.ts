@@ -78,7 +78,7 @@ async function fetchIntraday(
   url.searchParams.set("function", "TIME_SERIES_INTRADAY");
   url.searchParams.set("symbol", symbol);
   url.searchParams.set("interval", interval);
-  url.searchParams.set("outputsize", "full");
+  url.searchParams.set("outputsize", "compact");
   url.searchParams.set("apikey", apiKey);
 
   const response = await fetch(url.toString(), { cache: "no-store" });

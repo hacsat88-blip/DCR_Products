@@ -6,7 +6,6 @@ import { NextResponse } from "next/server";
 export async function GET(): Promise<NextResponse> {
   const apiKey = process.env.GEMINI_API_KEY || "";
   return NextResponse.json({
-    apiKey: apiKey || null,
     hasKey: !!apiKey,
   });
 }
