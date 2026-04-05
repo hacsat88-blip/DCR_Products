@@ -31,9 +31,9 @@ function DecisionBoardInner({ stocks, alertEvents }: DecisionBoardProps): JSX.El
   );
 
   return (
-    <section className="rounded-2xl border border-slate-700/60 bg-panel p-5 shadow-card">
+    <section className="rounded-none border border-border-subtle bg-panel p-5 shadow-card">
       <div className="mb-3 flex items-center justify-between gap-3">
-        <h2 className="text-lg font-semibold text-slate-100">判断ボード</h2>
+        <h2 className="text-lg font-semibold text-text-primary font-orb">判断ボード</h2>
         <p className="text-xs text-slate-400">監視中銘柄を優先して表示</p>
       </div>
 
@@ -43,10 +43,10 @@ function DecisionBoardInner({ stocks, alertEvents }: DecisionBoardProps): JSX.El
           const stockAlertCount = activeAlerts.filter((event) => event.stockCode === stock.code).length;
           const holding = holdingsMap[stock.id] ?? 0;
           return (
-            <article key={stock.id} className="rounded-xl border border-slate-700 bg-slate-900/60 p-3">
+            <article key={stock.id} className="rounded-none border border-border-subtle bg-canvas-deep/60 p-3">
               <div className="flex items-start justify-between gap-2">
                 <div>
-                  <p className="text-xs tracking-[0.12em] text-slate-400">{stock.code}</p>
+                  <p className="text-xs tracking-[0.12em] text-slate-400 font-mono-tech">{stock.code}</p>
                   <h3 className="text-base font-semibold text-slate-100">
                     {stock.name}
                     {holding > 0 && (
@@ -56,7 +56,7 @@ function DecisionBoardInner({ stocks, alertEvents }: DecisionBoardProps): JSX.El
                 </div>
                 <span
                   className={clsx(
-                    "rounded-full border px-2 py-1 text-[11px] font-semibold",
+                    "rounded-none border px-2 py-1 text-[11px] font-semibold",
                     tone === "buy" && "border-mint/50 bg-mint/10 text-mint",
                     tone === "wait" && "border-blue/50 bg-blue/10 text-blue",
                     tone === "exclude" && "border-danger/50 bg-danger/10 text-danger"
@@ -67,7 +67,7 @@ function DecisionBoardInner({ stocks, alertEvents }: DecisionBoardProps): JSX.El
               </div>
 
               <div className="mt-2 flex items-center justify-between text-xs text-slate-300">
-                <span>本命度: {stock.score}</span>
+                <span>本命度: <span className="font-mono-tech">{stock.score}</span></span>
                 <span>アラート: {stockAlertCount}</span>
               </div>
 

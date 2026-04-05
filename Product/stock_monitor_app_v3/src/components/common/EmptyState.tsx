@@ -5,9 +5,9 @@ interface EmptyStateProps {
 
 export function EmptyState({ title, body }: EmptyStateProps): JSX.Element {
   return (
-    <div className="rounded-2xl border border-dashed border-slate-600 bg-slate-900/50 p-6">
-      <p className="text-base font-semibold text-slate-100">{title}</p>
-      <p className="mt-2 text-sm leading-6 text-slate-300">{body}</p>
+    <div className="rounded-none border border-dashed border-mint/20 bg-canvas-deep/50 p-6">{/* cyber: sharp border + mint accent */}
+      <p className="font-orb text-base font-semibold text-mint">{title}</p>
+      <p className="mt-2 text-sm leading-6 text-text-secondary">{body}</p>
     </div>
   );
 }

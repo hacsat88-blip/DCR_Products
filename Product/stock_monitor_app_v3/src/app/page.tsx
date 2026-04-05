@@ -15,6 +15,7 @@ import { DecisionReviewPanel } from "@/components/dashboard/DecisionReviewPanel"
 import { ExportPanel } from "@/components/dashboard/ExportPanel";
 import { ImportPanel } from "@/components/dashboard/ImportPanel";
 import { KpiCards } from "@/components/dashboard/KpiCards";
+import { NikkeiCandlestickChart } from "@/components/dashboard/NikkeiCandlestickChart";
 import { PortfolioPanel } from "@/components/dashboard/PortfolioPanel";
 import { RankingBoard } from "@/components/dashboard/RankingBoard";
 import { SavedScreenPanel } from "@/components/dashboard/SavedScreenPanel";
@@ -22,6 +23,7 @@ import { ScoreTuningPanel } from "@/components/dashboard/ScoreTuningPanel";
 import { StockOnboardingPanel } from "@/components/dashboard/StockOnboardingPanel";
 import { SummaryBar } from "@/components/dashboard/SummaryBar";
 import { NikkeiTrendChart } from "@/components/dashboard/NikkeiTrendChart";
+import { NavigatorLaunchButton, NavigatorResultsPanel, NavigatorSetupModal } from "@/components/navigator";
 import { FilterPanel } from "@/components/screener/FilterPanel";
 import { SearchBar } from "@/components/screener/SearchBar";
 import { StockDetailDrawer } from "@/components/stock/StockDetailDrawer";
@@ -30,6 +32,7 @@ import { SkeletonCard } from "@/components/ui/Skeleton";
 import { useDashboardDerived } from "@/hooks/useDashboardDerived";
 import { useNikkei } from "@/hooks/useNikkei";
 import { useStockStore } from "@/store/useStockStore";
+import { initNavigatorStore } from "@/store/useNavigatorStore";
 
 /* ── Lazy-loaded heavy panels inside collapsible section ── */
 const BacktestPanel = React.lazy(() =>
@@ -50,7 +53,7 @@ const SnapshotPanel = React.lazy(() =>
 
 function LazyFallback(): JSX.Element {
   return (
-    <div className="flex items-center justify-center rounded-2xl border border-slate-700/60 bg-panel p-8">
+    <div className="flex items-center justify-center rounded-none border border-slate-700/60 bg-panel p-8">
       <div className="h-6 w-6 animate-spin rounded-full border-2 border-slate-600 border-t-mint" />
     </div>
   );
@@ -75,7 +78,7 @@ const TabNav = React.memo(function TabNav({
   badges?: Partial<Record<TabId, number>>;
 }) {
   return (
-    <nav className="sticky top-0 z-30 rounded-2xl border border-slate-700/40 bg-slate-900/80 backdrop-blur-md">
+    <nav className="sticky top-0 z-30 rounded-none border border-slate-700/40 bg-canvas/90 backdrop-blur-md">{/* cyber: sharp nav + canvas bg */}
       <div className="flex">
         {TAB_ITEMS.map((tab) => {
           const on = active === tab.id;
@@ -86,14 +89,14 @@ const TabNav = React.memo(function TabNav({
               type="button"
               onClick={() => onChange(tab.id)}
               className={[
-                "relative flex flex-1 items-center justify-center gap-1.5 px-3 py-3 text-sm font-medium transition-all duration-300",
+                "relative flex flex-1 items-center justify-center gap-1.5 px-3 py-3 font-orb uppercase tracking-wider text-[12px] font-medium transition-all duration-300",
                 on ? "text-mint" : "text-slate-400 hover:bg-white/5 hover:text-slate-200",
               ].join(" ")}
             >
               <span className="text-base">{tab.icon}</span>
               <span className="hidden sm:inline">{tab.label}</span>
               {badge != null && badge > 0 && (
-                <span className="ml-0.5 inline-flex h-4 min-w-4 items-center justify-center rounded-full bg-amber px-1 text-[10px] font-bold leading-none text-slate-900">
+                <span className="ml-0.5 inline-flex h-4 min-w-4 items-center justify-center rounded-none bg-amber px-1 text-[10px] font-bold leading-none text-slate-900">
                   {badge > 99 ? "99+" : badge}
                 </span>
               )}
@@ -181,6 +184,7 @@ export default function HomePage(): JSX.Element {
 
   useEffect(() => {
     void initialize();
+    initNavigatorStore();
   }, [initialize]);
 
   /* ── Tab state ── */
@@ -264,6 +268,13 @@ export default function HomePage(): JSX.Element {
       {/* ── マーケット tab ── */}
       {activeTab === "market" && (
         <div className="flex flex-col gap-5 animate-fade-in">
+          {/* ── AI Navigator launch + results ── */}
+          <div className="flex items-center gap-4">
+            <NavigatorLaunchButton />
+          </div>
+
+          <NavigatorResultsPanel />
+
           <SearchBar
             value={filters.query}
             registeredStocks={stocks}
@@ -292,10 +303,10 @@ export default function HomePage(): JSX.Element {
             onExportCsv={exportRankingCsv}
           />
 
-          <section className="rounded-2xl border border-slate-700/60 bg-panel p-4 shadow-card">
+          <section className="rounded-none border border-slate-700/60 bg-panel p-4 shadow-card">
             <div className="mb-3 flex items-center justify-between gap-3">
-              <h2 className="text-lg font-semibold text-slate-100">銘柄一覧</h2>
-              <p className="text-xs text-slate-300">表示件数: {filteredStocks.length}</p>
+              <h2 className="font-orb text-lg font-semibold text-slate-100">銘柄一覧</h2>
+              <p className="text-xs text-slate-300">表示件数: <span className="font-mono-tech">{filteredStocks.length}</span></p>
             </div>
 
             {isLoading ? (
@@ -328,6 +339,8 @@ export default function HomePage(): JSX.Element {
             benchmarkSeries={benchmarkSeries}
             nikkei={nikkei}
           />
+
+          <NikkeiCandlestickChart lastUpdatedAt={lastUpdatedAt} />
 
           <NikkeiTrendChart lastUpdatedAt={lastUpdatedAt} />
 
@@ -483,6 +496,9 @@ export default function HomePage(): JSX.Element {
       />
 
       <AlertToastStack events={alertEvents} onDismiss={dismissAlert} />
+
+      {/* ── AI Navigator modal (portal-style, renders at page level) ── */}
+      <NavigatorSetupModal />
     </main>
   );
 }

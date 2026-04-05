@@ -60,10 +60,10 @@ export function StockOnboardingPanel(): JSX.Element {
   }, [draft]);
 
   return (
-    <section className="rounded-2xl border border-slate-700/60 bg-panel p-5 shadow-card">
+    <section className="rounded-none border border-border-subtle bg-panel p-5 shadow-card">
       <div className="mb-3">
-        <h2 className="text-lg font-semibold text-slate-100">銘柄追加オンボーディング</h2>
-        <p className="text-xs text-slate-400">
+        <h2 className="text-lg font-semibold font-orb text-text-primary">銘柄追加オンボーディング</h2>
+        <p className="text-xs text-text-muted">
           mock銘柄を追加する前に、必須項目と narrative/score 要約の分離をチェックできます。
         </p>
       </div>
@@ -71,10 +71,10 @@ export function StockOnboardingPanel(): JSX.Element {
       <textarea
         value={draft}
         onChange={(event) => setDraft(event.target.value)}
-        className="h-52 w-full rounded-xl border border-slate-600 bg-slate-950/70 px-3 py-3 font-mono text-xs text-slate-100 outline-none"
+        className="h-52 w-full rounded-none border border-border-subtle bg-canvas/90 px-3 py-3 font-mono text-xs text-text-primary outline-none"
       />
 
-      <div className="mt-3 rounded-xl border border-slate-700 bg-slate-900/60 p-3 text-xs">
+      <div className="mt-3 rounded-none border border-border-subtle bg-canvas-deep/60 p-3 text-xs">
         {validation.error ? <p className="text-rose-300">チェック結果: {validation.error}</p> : null}
         {!validation.error && validation.valid ? (
           <p className="text-mint">チェック結果: OK（必須項目が揃っています）</p>
@@ -82,7 +82,7 @@ export function StockOnboardingPanel(): JSX.Element {
         {!validation.error && !validation.valid ? (
           <p className="text-amber">不足項目: {validation.missing.join(", ")}</p>
         ) : null}
-        <p className="mt-2 text-slate-400">
+        <p className="mt-2 text-text-muted">
           追加先: <code>src/data/mockStocks.ts</code> / symbol resolver: <code>providers</code> 側の定数
         </p>
       </div>

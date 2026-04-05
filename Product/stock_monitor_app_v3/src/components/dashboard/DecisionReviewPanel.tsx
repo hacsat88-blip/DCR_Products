@@ -28,7 +28,7 @@ export function DecisionReviewPanel({
   if (!stock) {
     return (
       <section className="card-surface p-5">
-        <h2 className="text-lg font-semibold text-slate-100">判定レビュー</h2>
+        <h2 className="text-lg font-semibold text-text-primary font-orb">判定レビュー</h2>
         <p className="mt-3 text-sm text-slate-300">対象銘柄がありません。</p>
       </section>
     );
@@ -74,25 +74,25 @@ export function DecisionReviewPanel({
   return (
     <section className="card-surface p-5">
       <div className="mb-3 flex items-center justify-between gap-3">
-        <h2 className="text-lg font-semibold text-slate-100">判定レビュー</h2>
+        <h2 className="text-lg font-semibold text-text-primary font-orb">判定レビュー</h2>
         <p className="text-xs text-slate-400">{stock.code} {stock.name}</p>
       </div>
 
       <div className="grid gap-2 md:grid-cols-4">
-        <div className="rounded-xl border border-slate-700 bg-slate-900/60 p-3 text-xs text-slate-200">
-          <p className="text-slate-400">現在判定</p>
+        <div className="rounded-none border border-border-subtle bg-canvas-deep/60 p-3 text-xs text-slate-200">
+          <p className="text-text-muted font-orb">現在判定</p>
           <p className="mt-1 font-semibold">{formatActionLabel(stock.evaluatedAction)}</p>
         </div>
-        <div className="rounded-xl border border-slate-700 bg-slate-900/60 p-3 text-xs text-slate-200">
-          <p className="text-slate-400">本命度</p>
-          <p className="mt-1 font-semibold">{stock.score}</p>
+        <div className="rounded-none border border-border-subtle bg-canvas-deep/60 p-3 text-xs text-slate-200">
+          <p className="text-text-muted font-orb">本命度</p>
+          <p className="mt-1 font-semibold font-mono-tech">{stock.score}</p>
         </div>
-        <div className="rounded-xl border border-slate-700 bg-slate-900/60 p-3 text-xs text-slate-200">
-          <p className="text-slate-400">直近の判定変化</p>
-          <p className="mt-1 font-semibold">{latestActionChange === null ? "未実行" : latestActionChange}</p>
+        <div className="rounded-none border border-border-subtle bg-canvas-deep/60 p-3 text-xs text-slate-200">
+          <p className="text-text-muted font-orb">直近の判定変化</p>
+          <p className="mt-1 font-semibold font-mono-tech">{latestActionChange === null ? "未実行" : latestActionChange}</p>
         </div>
-        <div className="rounded-xl border border-slate-700 bg-slate-900/60 p-3 text-xs text-slate-200">
-          <p className="text-slate-400">次回決算注目</p>
+        <div className="rounded-none border border-border-subtle bg-canvas-deep/60 p-3 text-xs text-slate-200">
+          <p className="text-text-muted font-orb">次回決算注目</p>
           <p className="mt-1 font-semibold">{stock.coreKpiLabel}</p>
         </div>
       </div>
@@ -113,8 +113,8 @@ export function DecisionReviewPanel({
       )}
 
       <div className="mt-3 grid gap-2 md:grid-cols-2">
-        <div className="rounded-xl border border-slate-700 bg-slate-900/60 p-3">
-          <p className="text-xs font-semibold text-slate-100">本命度内訳（上位）</p>
+        <div className="rounded-none border border-border-subtle bg-canvas-deep/60 p-3">
+          <p className="text-xs font-semibold text-slate-100 font-orb">本命度内訳（上位）</p>
           {(() => {
             const breakdown = stock.breakdown.slice(0, 5);
             return (
@@ -122,7 +122,7 @@ export function DecisionReviewPanel({
                 <BarChart layout="vertical" data={breakdown} margin={{ top: 8, right: 12, bottom: 0, left: 0 }}>
                   <XAxis type="number" hide />
                   <YAxis type="category" dataKey="label" width={80} tick={{ fontSize: 10, fill: CHART_COLORS.axis }} axisLine={false} tickLine={false} />
-                  <Bar dataKey="value" radius={[0, 4, 4, 0]}>
+                  <Bar dataKey="value" radius={[0, 0, 0, 0]}>
                     {breakdown.map((item) => (
                       <Cell key={item.id} fill={item.value > 0 ? CHART_COLORS.mint : CHART_COLORS.danger} />
                     ))}
@@ -138,8 +138,8 @@ export function DecisionReviewPanel({
           </ul>
         </div>
 
-        <div className="rounded-xl border border-slate-700 bg-slate-900/60 p-3">
-          <p className="text-xs font-semibold text-slate-100">最近のアラート</p>
+        <div className="rounded-none border border-border-subtle bg-canvas-deep/60 p-3">
+          <p className="text-xs font-semibold text-slate-100 font-orb">最近のアラート</p>
           <ul className="mt-2 space-y-2 text-xs text-slate-200">
             {recentAlerts.length === 0 ? <li className="text-slate-500">該当なし</li> : null}
             {recentAlerts.map((alert) => (
@@ -152,7 +152,7 @@ export function DecisionReviewPanel({
         </div>
       </div>
 
-      <div className="mt-3 rounded-xl border border-slate-700 bg-slate-900/60 p-3 text-xs text-slate-200">
+      <div className="mt-3 rounded-none border border-border-subtle bg-canvas-deep/60 p-3 text-xs text-slate-200">
         <p className="font-semibold">崩れる条件</p>
         <p className="mt-1 text-slate-300">{stock.collapseCondition}</p>
       </div>

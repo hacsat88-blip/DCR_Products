@@ -1,13 +1,14 @@
+// ── Cyber-themed chart palette ──
 export const CHART_COLORS = {
-  mint: '#5bf0ba',
-  blue: '#8bb0ff',
-  amber: '#ffc772',
-  danger: '#ff8798',
-  warmAccent: '#e8a87c',
-  grid: 'rgba(255, 255, 255, 0.05)',
-  axis: 'rgba(90, 113, 148, 0.9)',
-  tooltipBg: '#132238',
-  tooltipBorder: '#1e3050',
+  mint: '#00ff41',
+  blue: '#00e5ff',
+  amber: '#ffd700',
+  danger: '#ff3355',
+  warmAccent: '#ff8800',
+  grid: 'rgba(0, 255, 65, 0.06)',
+  axis: 'rgba(0, 255, 65, 0.55)',
+  tooltipBg: '#050a05',
+  tooltipBorder: 'rgba(0, 255, 65, 0.3)',
 } as const;
 
 export const CHART_GRID_PROPS = {
@@ -19,17 +20,19 @@ export const CHART_GRID_PROPS = {
 export const CHART_AXIS_TICK = {
   fontSize: 11,
   fill: CHART_COLORS.axis,
+  fontFamily: 'var(--font-share-tech-mono), monospace',
 };
 
 export const CHART_TOOLTIP_STYLE = {
   background: CHART_COLORS.tooltipBg,
   border: `1px solid ${CHART_COLORS.tooltipBorder}`,
-  borderRadius: '12px',
-  boxShadow: '0 8px 32px rgba(0,0,0,.4), 0 2px 8px rgba(0,0,0,.2)',
+  borderRadius: '0px',
+  boxShadow: '0 0 12px rgba(0,255,65,.15), 0 4px 16px rgba(0,0,0,.6)',
 };
 
 export const ACTIVE_DOT_PROPS = {
-  r: 5,
+  r: 4,
   strokeWidth: 2,
   fill: CHART_COLORS.tooltipBg,
+  stroke: CHART_COLORS.mint,
 };

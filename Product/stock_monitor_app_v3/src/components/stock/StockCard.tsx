@@ -31,7 +31,7 @@ function Sparkline({ data, className }: { data: Array<{ price: number }>; classN
     y: h - ((p - min) / range) * h,
   }));
   const trending = prices[prices.length - 1] >= prices[0];
-  const color = trending ? "#5bf0ba" : "#ff8798";
+  const color = trending ? "#00ff41" : "#ff3355";
   const gradId = `sg${uid}`;
   const filterId = `sf${uid}`;
 
@@ -95,12 +95,12 @@ function StockCardInner({ stock, selected, onSelect, onToggleWatch }: StockCardP
       )}
     >
       {/* Left accent bar */}
-      <div className={clsx("absolute inset-y-0 left-0 w-[3px] rounded-l-2xl", actionBarColor[tone] ?? "bg-blue/50")} />
+      <div className={clsx("absolute inset-y-0 left-0 w-[3px]", actionBarColor[tone] ?? "bg-blue/50")} />
 
       <div className="flex items-start justify-between gap-3">
         <button type="button" className="min-w-0 flex-1 text-left" onClick={() => onSelect(stock.id)}>
           <div className="flex items-center gap-2">
-            <span className="font-mono text-[11px] tracking-wider text-text-muted">{stock.code}</span>
+            <span className="font-mono font-mono-tech text-[11px] tracking-wider text-mint">{stock.code}</span>
             <Badge tone={tone} glow>
               {formatActionLabel(stock.evaluatedAction)}
             </Badge>
@@ -114,10 +114,10 @@ function StockCardInner({ stock, selected, onSelect, onToggleWatch }: StockCardP
 
       <div className="mt-3 flex items-end justify-between gap-2">
         <div>
-          <p className="text-2xl font-bold tracking-tight text-text-primary">{formatYen(stock.price)}</p>
+          <p className="font-mono-tech text-2xl font-bold tracking-tight text-text-primary">{formatYen(stock.price)}</p>
           <span
             className={clsx(
-              "mt-1 inline-flex items-center rounded-md px-2 py-0.5 text-[11px] font-semibold",
+              "mt-1 inline-flex items-center rounded-none px-2 py-0.5 text-[11px] font-semibold",
               changePositive ? "bg-mint/10 text-mint" : "bg-danger/10 text-danger"
             )}
           >
@@ -131,18 +131,18 @@ function StockCardInner({ stock, selected, onSelect, onToggleWatch }: StockCardP
       <p className="mt-2 line-clamp-2 text-sm leading-relaxed text-text-secondary">{stock.oneLiner}</p>
 
       <div className={clsx("mt-3 grid gap-2", stock.per != null ? "grid-cols-3" : "grid-cols-2")}>
-        <div className="rounded-lg border border-border-subtle bg-canvas-deep/50 p-2">
-          <p className="text-[10px] font-medium uppercase tracking-widest text-text-muted">核心KPI</p>
-          <p className="mt-0.5 text-sm font-semibold text-text-primary">{stock.coreKpiValue}</p>
+        <div className="rounded-none border border-border-subtle bg-canvas-deep/50 p-2">
+          <p className="font-orb text-[10px] font-medium uppercase tracking-widest text-text-muted">核心KPI</p>
+          <p className="mt-0.5 font-mono-tech text-sm font-semibold text-text-primary">{stock.coreKpiValue}</p>
         </div>
-        <div className="rounded-lg border border-border-subtle bg-canvas-deep/50 p-2">
-          <p className="text-[10px] font-medium uppercase tracking-widest text-text-muted">本命度</p>
-          <p className="mt-0.5 text-sm font-semibold text-text-primary">{stock.score}</p>
+        <div className="rounded-none border border-border-subtle bg-canvas-deep/50 p-2">
+          <p className="font-orb text-[10px] font-medium uppercase tracking-widest text-text-muted">本命度</p>
+          <p className="mt-0.5 font-mono-tech text-sm font-semibold text-text-primary">{stock.score}</p>
         </div>
         {stock.per != null && (
-          <div className="rounded-lg border border-border-subtle bg-canvas-deep/50 p-2">
-            <p className="text-[10px] font-medium uppercase tracking-widest text-text-muted">PER</p>
-            <p className="mt-0.5 text-sm font-semibold text-text-primary">{stock.per.toFixed(1)}</p>
+          <div className="rounded-none border border-border-subtle bg-canvas-deep/50 p-2">
+            <p className="font-orb text-[10px] font-medium uppercase tracking-widest text-text-muted">PER</p>
+            <p className="mt-0.5 font-mono-tech text-sm font-semibold text-text-primary">{stock.per.toFixed(1)}</p>
           </div>
         )}
       </div>
@@ -160,7 +160,7 @@ function StockCardInner({ stock, selected, onSelect, onToggleWatch }: StockCardP
           type="button"
           onClick={() => onToggleWatch(stock.id)}
           className={clsx(
-            "flex-1 rounded-lg border px-3 py-2 text-xs font-semibold transition-colors",
+            "flex-1 rounded-none border px-3 py-2 text-xs font-semibold transition-colors",
             stock.watched
               ? "border-amber/30 bg-amber/8 text-amber hover:bg-amber/15"
               : "border-border-subtle text-text-secondary hover:border-border-active hover:text-text-primary"
@@ -171,7 +171,7 @@ function StockCardInner({ stock, selected, onSelect, onToggleWatch }: StockCardP
         <button
           type="button"
           onClick={() => onSelect(stock.id)}
-          className="flex-1 rounded-lg border border-blue/25 bg-blue/8 px-3 py-2 text-xs font-semibold text-blue transition-colors hover:bg-blue/15"
+          className="flex-1 rounded-none border border-blue/25 bg-blue/8 px-3 py-2 text-xs font-semibold text-blue transition-colors hover:bg-blue/15"
         >
           詳細を見る
         </button>

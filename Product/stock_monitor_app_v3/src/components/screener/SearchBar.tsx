@@ -96,18 +96,18 @@ export function SearchBar({ value, registeredStocks, onChange, onRegister }: Sea
   };
 
   return (
-    <section className="rounded-2xl border border-slate-700/60 bg-panel p-4 shadow-card">
+    <section className="rounded-none border border-border-subtle bg-panel p-4 shadow-card">
       <div className="mb-2 flex items-center justify-between gap-3">
-        <label htmlFor="stock-search" className="block text-xs tracking-[0.14em] text-slate-300">
+        <label htmlFor="stock-search" className="block text-xs font-orb tracking-[0.14em] text-text-secondary">
           銘柄検索
         </label>
-        <div className="flex items-center gap-1 rounded-lg border border-slate-700 bg-slate-900/60 p-1 text-xs">
+        <div className="flex items-center gap-1 rounded-none border border-border-subtle bg-canvas-deep/60 p-1 text-xs">
           <button
             type="button"
             onClick={() => setMode("registered")}
             className={clsx(
-              "rounded-md px-2 py-1",
-              mode === "registered" ? "bg-blue/20 text-blue" : "text-slate-300"
+              "rounded-none px-2 py-1",
+              mode === "registered" ? "bg-blue/20 text-blue" : "text-text-secondary"
             )}
           >
             登録銘柄
@@ -115,7 +115,7 @@ export function SearchBar({ value, registeredStocks, onChange, onRegister }: Sea
           <button
             type="button"
             onClick={() => setMode("api")}
-            className={clsx("rounded-md px-2 py-1", mode === "api" ? "bg-blue/20 text-blue" : "text-slate-300")}
+            className={clsx("rounded-none px-2 py-1", mode === "api" ? "bg-blue/20 text-blue" : "text-text-secondary")}
           >
             市場検索(API)
           </button>
@@ -130,13 +130,13 @@ export function SearchBar({ value, registeredStocks, onChange, onRegister }: Sea
             value={value}
             onChange={(event) => onChange(event.target.value)}
             placeholder="銘柄名 / コード / キーワード"
-            className="w-full rounded-xl border border-slate-600 bg-slate-950/70 px-3 py-3 text-sm text-slate-100 outline-none ring-blue focus:border-blue"
+            className="w-full rounded-none border border-mint/30 bg-canvas px-3 py-3 text-sm text-text-primary outline-none ring-blue focus:border-mint"
           />
           <div className="grid gap-2 md:grid-cols-[1fr_auto]">
             <select
               value={selectedCode}
               onChange={(event) => setSelectedCode(event.target.value)}
-              className="rounded-xl border border-slate-600 bg-slate-950/70 px-3 py-2 text-sm text-slate-100 outline-none"
+              className="rounded-none border border-border-subtle bg-canvas/90 px-3 py-2 text-sm text-text-primary outline-none"
             >
               <option value="">登録銘柄を選択して絞り込む</option>
               {sortedRegistered.map((stock) => (
@@ -149,7 +149,7 @@ export function SearchBar({ value, registeredStocks, onChange, onRegister }: Sea
               type="button"
               onClick={() => onChange(selectedCode)}
               disabled={!selectedCode}
-              className="rounded-xl border border-slate-600 px-3 py-2 text-xs font-semibold text-slate-100 disabled:opacity-50"
+              className="rounded-none border border-border-subtle px-3 py-2 text-xs font-semibold text-text-primary disabled:opacity-50"
             >
               適用
             </button>
@@ -163,44 +163,44 @@ export function SearchBar({ value, registeredStocks, onChange, onRegister }: Sea
               value={apiQuery}
               onChange={(event) => setApiQuery(event.target.value)}
               placeholder="銘柄名 / 4桁コード（例: いちご / 2337）"
-              className="w-full rounded-xl border border-slate-600 bg-slate-950/70 px-3 py-3 text-sm text-slate-100 outline-none ring-blue focus:border-blue"
+              className="w-full rounded-none border border-mint/30 bg-canvas px-3 py-3 text-sm text-text-primary outline-none ring-blue focus:border-mint"
             />
             <button
               type="button"
               onClick={() => void handleApiSearch()}
               disabled={isSearching}
-              className="rounded-xl border border-slate-600 px-3 py-2 text-xs font-semibold text-slate-100 disabled:opacity-50"
+              className="rounded-none border border-border-subtle px-3 py-2 text-xs font-semibold text-text-primary disabled:opacity-50"
             >
               {isSearching ? "検索中..." : "市場検索"}
             </button>
           </div>
 
-          <p className="text-xs text-slate-400">最終検索: {formatSearchedAt(searchedAt)} / API呼び出しはボタン実行のみ</p>
+          <p className="text-xs text-text-muted">最終検索: {formatSearchedAt(searchedAt)} / API呼び出しはボタン実行のみ</p>
 
-          {apiError ? <p className="rounded-lg border border-amber/40 bg-amber/10 px-3 py-2 text-xs text-amber">{apiError}</p> : null}
+          {apiError ? <p className="rounded-none border border-amber/40 bg-amber/10 px-3 py-2 text-xs text-amber">{apiError}</p> : null}
 
           <div className="grid gap-2">
             {apiResults.length === 0 ? (
-              <p className="rounded-lg border border-slate-700 bg-slate-900/50 px-3 py-2 text-xs text-slate-400">
+              <p className="rounded-none border border-border-subtle bg-canvas-deep/50 px-3 py-2 text-xs text-text-muted">
                 検索結果はここに表示されます。
               </p>
             ) : (
               apiResults.map((item) => (
-                <div key={`${item.code}-${item.source}`} className="rounded-lg border border-slate-700 bg-slate-900/60 px-3 py-2 text-xs">
+                <div key={`${item.code}-${item.source}`} className="rounded-none border border-border-subtle bg-canvas-deep/60 px-3 py-2 text-xs">
                   {(() => {
                     const alreadyRegistered = item.isRegistered || registeredCodeSet.has(item.code);
                     return (
                       <>
                   <div className="flex flex-wrap items-center justify-between gap-2">
-                    <p className="font-semibold text-slate-100">
+                    <p className="font-semibold text-text-primary">
                       {item.code} {item.name}
                     </p>
                     <div className="flex items-center gap-1">
-                      <span className="rounded border border-slate-600 px-2 py-0.5 text-[11px] text-slate-300">
+                      <span className="rounded-none border border-border-subtle px-2 py-0.5 text-[11px] text-text-secondary">
                         {alreadyRegistered ? "登録済み" : item.source === "registered" ? "登録済み" : "API"}
                       </span>
                       {!alreadyRegistered ? (
-                        <span className="rounded border border-amber/50 bg-amber/10 px-2 py-0.5 text-[11px] text-amber">未登録</span>
+                        <span className="rounded-none border border-amber/50 bg-amber/10 px-2 py-0.5 text-[11px] text-amber">未登録</span>
                       ) : null}
                     </div>
                   </div>
@@ -212,7 +212,7 @@ export function SearchBar({ value, registeredStocks, onChange, onRegister }: Sea
                         setMode("registered");
                         setSelectedCode(item.code);
                       }}
-                      className="rounded-lg border border-slate-600 px-2 py-1 text-[11px] text-slate-100"
+                      className="rounded-none border border-border-subtle px-2 py-1 text-[11px] text-text-primary"
                     >
                       検索欄へ反映
                     </button>
@@ -237,7 +237,7 @@ export function SearchBar({ value, registeredStocks, onChange, onRegister }: Sea
                         setSelectedCode(item.code);
                       }}
                       disabled={alreadyRegistered || isRegisteringCode === item.code}
-                      className="rounded-lg border border-blue/40 bg-blue/10 px-2 py-1 text-[11px] text-blue disabled:opacity-50"
+                      className="rounded-none border border-blue/40 bg-blue/10 px-2 py-1 text-[11px] text-blue disabled:opacity-50"
                     >
                       {alreadyRegistered
                         ? "登録済み"
@@ -254,7 +254,7 @@ export function SearchBar({ value, registeredStocks, onChange, onRegister }: Sea
             )}
           </div>
           {registerMessage ? <p className="text-[11px] text-mint">{registerMessage}</p> : null}
-          <p className="text-[11px] text-slate-500">未登録銘柄は「銘柄一覧へ登録」で登録すると、一覧・ランキング・判断系パネルに連携されます。</p>
+          <p className="text-[11px] text-text-muted">未登録銘柄は「銘柄一覧へ登録」で登録すると、一覧・ランキング・判断系パネルに連携されます。</p>
         </div>
       )}
     </section>

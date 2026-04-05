@@ -100,8 +100,8 @@ export function HoldingInput({ stockId, price, compact = false }: HoldingInputPr
   );
 
   const btnClass = compact
-    ? "flex h-[28px] w-[28px] items-center justify-center rounded bg-white/5 text-xs text-slate-300 hover:bg-white/10 transition-colors"
-    : "flex h-[36px] w-[36px] items-center justify-center rounded-lg bg-white/5 text-sm text-slate-300 hover:bg-white/10 transition-colors";
+    ? "flex h-[28px] w-[28px] items-center justify-center rounded-none bg-white/5 text-xs text-text-secondary hover:bg-white/10 transition-colors"
+    : "flex h-[36px] w-[36px] items-center justify-center rounded-none bg-white/5 text-sm text-text-secondary hover:bg-white/10 transition-colors";
 
   const evalValue = price && shares > 0 ? shares * price : null;
 
@@ -120,17 +120,17 @@ export function HoldingInput({ stockId, price, compact = false }: HoldingInputPr
             onChange={handleDraftChange}
             onBlur={commitEdit}
             onKeyDown={handleKeyDown}
-            className="h-[28px] w-[56px] rounded border border-slate-600 bg-slate-950/70 text-center font-mono text-xs text-slate-100 outline-none"
+            className="h-[28px] w-[56px] rounded-none border border-border-subtle bg-canvas/90 text-center font-mono text-xs text-text-primary outline-none"
           />
         ) : (
           <button
             type="button"
             onClick={startEdit}
             className={clsx(
-              "h-[28px] min-w-[56px] rounded border px-1 text-center font-mono text-xs transition-colors",
+              "h-[28px] min-w-[56px] rounded-none border px-1 text-center font-mono text-xs transition-colors",
               shares > 0
                 ? "border-mint/30 bg-mint/5 text-mint"
-                : "border-slate-700/40 bg-slate-900/40 text-slate-500"
+                : "border-border-subtle/40 bg-canvas-deep/40 text-text-muted"
             )}
           >
             {shares > 0 ? shares.toLocaleString("ja-JP") : "未保有"}
@@ -149,7 +149,7 @@ export function HoldingInput({ stockId, price, compact = false }: HoldingInputPr
   return (
     <div onClick={(e) => e.stopPropagation()}>
       <div className="flex items-center gap-2">
-        <span className="text-xs text-slate-400">保有株数:</span>
+        <span className="text-xs text-text-muted">保有株数:</span>
         <button type="button" data-dir="dec" onClick={handleAdjust} className={btnClass}>
           −
         </button>
@@ -162,17 +162,17 @@ export function HoldingInput({ stockId, price, compact = false }: HoldingInputPr
             onChange={handleDraftChange}
             onBlur={commitEdit}
             onKeyDown={handleKeyDown}
-            className="h-[36px] w-[80px] rounded-lg border border-slate-600 bg-slate-950/70 text-center font-mono text-sm text-slate-100 outline-none"
+            className="h-[36px] w-[80px] rounded-none border border-border-subtle bg-canvas/90 text-center font-mono text-sm text-text-primary outline-none"
           />
         ) : (
           <button
             type="button"
             onClick={startEdit}
             className={clsx(
-              "h-[36px] min-w-[80px] rounded-lg border px-2 text-center font-mono text-sm transition-colors",
+              "h-[36px] min-w-[80px] rounded-none border px-2 text-center font-mono text-sm transition-colors",
               shares > 0
                 ? "border-mint/30 bg-mint/5 text-mint"
-                : "border-slate-700/40 bg-slate-900/40 text-slate-500"
+                : "border-border-subtle/40 bg-canvas-deep/40 text-text-muted"
             )}
           >
             {shares > 0 ? shares.toLocaleString("ja-JP") : "0"}
@@ -186,7 +186,7 @@ export function HoldingInput({ stockId, price, compact = false }: HoldingInputPr
         )}
       </div>
       {evalValue !== null && (
-        <p className="mt-1 text-xs text-slate-400">
+        <p className="mt-1 text-xs text-text-muted">
           評価額: <span className="text-slate-200">¥{evalValue.toLocaleString("ja-JP")}</span>
         </p>
       )}

@@ -29,16 +29,16 @@ const FIELDS: ConfigField[] = [
 
 export function ScoreTuningPanel({ config, onChange, onReset }: ScoreTuningPanelProps): JSX.Element {
   return (
-    <section className="rounded-2xl border border-slate-700/60 bg-panel p-5 shadow-card">
+    <section className="rounded-none border border-border-subtle bg-panel p-5 shadow-card">
       <div className="mb-3 flex flex-wrap items-center justify-between gap-3">
         <div>
-          <h2 className="text-lg font-semibold text-slate-100">本命度チューニング</h2>
-          <p className="text-xs text-slate-400">閾値と重みを調整すると score / action を即時再計算します。</p>
+          <h2 className="text-lg font-semibold font-orb text-text-primary">本命度チューニング</h2>
+          <p className="text-xs text-text-muted">閾値と重みを調整すると score / action を即時再計算します。</p>
         </div>
         <button
           type="button"
           onClick={onReset}
-          className="rounded-lg border border-slate-600 px-3 py-2 text-xs font-semibold text-slate-200"
+          className="rounded-none border border-border-subtle px-3 py-2 text-xs font-semibold text-slate-200"
         >
           初期値に戻す
         </button>
@@ -52,10 +52,10 @@ export function ScoreTuningPanel({ config, onChange, onReset }: ScoreTuningPanel
           return (
             <label
               key={field.key}
-              className="rounded-xl border border-slate-700 bg-slate-900/60 p-3 text-xs text-slate-200"
+              className="rounded-none border border-border-subtle bg-canvas-deep/60 p-3 text-xs text-slate-200"
             >
-              <p className="font-semibold text-slate-100">{field.label}</p>
-              <p className="mt-1 text-slate-400">{field.helper}</p>
+              <p className="font-semibold font-orb text-text-primary">{field.label}</p>
+              <p className="mt-1 text-text-muted">{field.helper}</p>
               <input
                 type="number"
                 step="0.1"
@@ -65,9 +65,9 @@ export function ScoreTuningPanel({ config, onChange, onReset }: ScoreTuningPanel
                     [field.key]: Number(event.target.value)
                   } as Partial<ScoringConfig>)
                 }
-                className="mt-2 w-full rounded-lg border border-slate-600 bg-slate-950/70 px-2 py-2 text-xs text-slate-100 outline-none"
+                className="mt-2 w-full rounded-none border border-border-subtle bg-canvas/90 px-2 py-2 text-xs font-mono-tech text-text-primary outline-none"
               />
-              <p className="mt-1 text-slate-400">
+              <p className="mt-1 text-text-muted font-mono-tech">
                 初期値: {defaultValue}
                 {changed ? " (変更中)" : ""}
               </p>

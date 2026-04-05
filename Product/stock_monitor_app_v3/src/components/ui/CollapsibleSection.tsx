@@ -29,7 +29,7 @@ export function CollapsibleSection({
         aria-expanded={open}
       >
         <span className="flex items-center gap-2">
-          <span className="text-sm font-semibold text-text-primary">{title}</span>
+          <span className="font-orb text-sm font-semibold uppercase tracking-wider text-text-primary">{title}</span>
           {badge}
         </span>
         <svg

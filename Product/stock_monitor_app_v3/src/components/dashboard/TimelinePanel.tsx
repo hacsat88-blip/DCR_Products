@@ -59,7 +59,7 @@ function TimelineTooltip({ active, payload, label }: any): JSX.Element | null {
           <div key={entry.dataKey} className="flex items-center gap-2 text-sm">
             <span className="h-2 w-2 rounded-full" style={{ backgroundColor: entry.stroke }} />
             <span className="text-text-secondary">{entry.name}</span>
-            <span className="ml-auto font-semibold tabular-nums text-text-primary">
+            <span className="ml-auto font-semibold font-mono-tech tabular-nums text-text-primary">
               {entry.dataKey === "price" ? `¥${Number(entry.value).toLocaleString()}` : `${Number(entry.value).toFixed(0)} pt`}
             </span>
           </div>
@@ -83,18 +83,18 @@ function TimelinePanelInner({ stock, snapshots }: TimelinePanelProps): JSX.Eleme
 
   if (!stock) {
     return (
-      <section className="rounded-2xl border border-glass-border bg-panel p-5 shadow-card">
-        <h2 className="text-lg font-semibold text-slate-100">評価タイムライン</h2>
-        <p className="mt-2 text-sm text-slate-300">銘柄を選択すると履歴を表示します。</p>
+      <section className="rounded-none border border-glass-border bg-panel p-5 shadow-card">
+        <h2 className="text-lg font-semibold font-orb text-text-primary">評価タイムライン</h2>
+        <p className="mt-2 text-sm text-text-secondary">銘柄を選択すると履歴を表示します。</p>
       </section>
     );
   }
 
   if (timeline.length === 0) {
     return (
-      <section className="rounded-2xl border border-glass-border bg-panel p-5 shadow-card">
-        <h2 className="text-lg font-semibold text-slate-100">評価タイムライン</h2>
-        <p className="mt-2 text-sm text-slate-300">まだ履歴がありません。</p>
+      <section className="rounded-none border border-glass-border bg-panel p-5 shadow-card">
+        <h2 className="text-lg font-semibold font-orb text-text-primary">評価タイムライン</h2>
+        <p className="mt-2 text-sm text-text-secondary">まだ履歴がありません。</p>
       </section>
     );
   }
@@ -117,9 +117,9 @@ function TimelinePanelInner({ stock, snapshots }: TimelinePanelProps): JSX.Eleme
   const recent = [...timeline].reverse().slice(0, 8);
 
   return (
-    <section className="rounded-2xl border border-glass-border bg-panel p-5 shadow-card">
+    <section className="rounded-none border border-glass-border bg-panel p-5 shadow-card">
       <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
-        <h2 className="text-lg font-semibold text-slate-100">評価タイムライン</h2>
+        <h2 className="text-lg font-semibold font-orb text-text-primary">評価タイムライン</h2>
         <p className="text-xs text-text-muted">
           {stock.code} {stock.name}
         </p>
@@ -167,16 +167,16 @@ function TimelinePanelInner({ stock, snapshots }: TimelinePanelProps): JSX.Eleme
               ? item.evaluatedAction !== next.evaluatedAction
               : false;
           return (
-            <article key={item.id} className="rounded-xl border border-slate-700 bg-slate-900/50 p-3 text-xs text-slate-200">
-              <p className="font-semibold">{formatDateTime(item.checkedAt)}</p>
-              <p className="mt-1">
+            <article key={item.id} className="rounded-none border border-border-subtle bg-canvas-deep/50 p-3 text-xs text-slate-200">
+              <p className="font-semibold font-mono-tech">{formatDateTime(item.checkedAt)}</p>
+              <p className="mt-1 font-mono-tech">
                 score {item.score ?? "-"} / action {actionLabel(item.evaluatedAction)} / price{" "}
                 {item.price ?? "-"}
               </p>
-              <p className="mt-1 text-slate-400">
+              <p className="mt-1 text-text-muted">
                 データモード: {item.dataMode ?? "-"} / データ健全性: {item.providerHealth ?? "-"}
               </p>
-              <p className="mt-1 text-slate-400">
+              <p className="mt-1 text-text-muted">
                 本命度差分: {scoreDelta === null ? "-" : `${scoreDelta > 0 ? "+" : ""}${scoreDelta}`} / 判定変化:{" "}
                 {actionChanged ? "あり" : "なし"}
               </p>

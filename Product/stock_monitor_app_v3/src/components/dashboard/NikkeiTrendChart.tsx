@@ -88,7 +88,7 @@ function NikkeiTrendChartInner({
       {/* Header */}
       <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
         <div>
-          <h2 className="text-lg font-semibold text-text-primary">日経225</h2>
+          <h2 className="text-lg font-semibold text-text-primary font-orb">日経225</h2>
           {sourceLabel && (
             <p className="mt-0.5 text-xs text-text-muted">{sourceLabel}</p>
           )}
@@ -101,7 +101,7 @@ function NikkeiTrendChartInner({
               key={opt.value}
               type="button"
               onClick={() => setRange(opt.value)}
-              className={`rounded-full px-3 py-1 text-[11px] font-medium transition-colors ${
+              className={`rounded-none px-3 py-1 text-[11px] font-medium transition-colors ${
                 range === opt.value
                   ? "border border-amber/30 bg-amber/15 text-amber"
                   : "border border-transparent text-text-muted hover:text-text-secondary"
@@ -116,12 +116,12 @@ function NikkeiTrendChartInner({
       {/* Price display */}
       {latestClose !== null && (
         <div className="mb-4 flex flex-wrap items-baseline gap-3">
-          <span className="text-3xl font-bold tabular-nums text-text-primary md:text-4xl">
+          <span className="text-3xl font-bold tabular-nums text-text-primary font-mono-tech md:text-4xl">
             {formatYen(latestClose)}
           </span>
           {diff !== null && diffPercent !== null && (
             <span
-              className={`rounded-md bg-canvas-raised/60 px-2 py-0.5 text-sm font-medium tabular-nums ${diffColor}`}
+              className={`rounded-none bg-canvas-raised/60 px-2 py-0.5 text-sm font-medium tabular-nums font-mono-tech ${diffColor}`}
             >
               {diffSign}
               {diff.toLocaleString("ja-JP", { maximumFractionDigits: 0 })} (
@@ -134,7 +134,7 @@ function NikkeiTrendChartInner({
 
       {/* Loading skeleton */}
       {isLoading && (
-        <div className="h-[280px] animate-pulse rounded-xl bg-canvas-raised/40 md:h-[360px]" />
+        <div className="h-[280px] animate-pulse rounded-none bg-canvas-raised/40 md:h-[360px]" />
       )}
 
       {/* Chart */}

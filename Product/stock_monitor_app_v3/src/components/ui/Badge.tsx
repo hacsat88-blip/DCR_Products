@@ -20,11 +20,11 @@ const toneStyles: Record<BadgeTone, string> = {
 };
 
 const accentStyles: Record<BadgeTone, string> = {
-  buy: "border-l-2 border-l-mint/60 rounded-l-sm",
-  wait: "border-l-2 border-l-blue/60 rounded-l-sm",
-  exclude: "border-l-2 border-l-danger/60 rounded-l-sm",
-  info: "border-l-2 border-l-blue/60 rounded-l-sm",
-  warning: "border-l-2 border-l-amber/60 rounded-l-sm",
+  buy: "border-l-2 border-l-mint/60",
+  wait: "border-l-2 border-l-blue/60",
+  exclude: "border-l-2 border-l-danger/60",
+  info: "border-l-2 border-l-blue/60",
+  warning: "border-l-2 border-l-amber/60",
   neutral: ""
 };
 
@@ -42,8 +42,8 @@ export function Badge({ tone, children, size = "sm", glow = false, accent = fals
     <span
       className={clsx(
         "inline-flex items-center border font-medium tracking-wide",
-        accent ? accentStyles[tone] : "rounded-full",
-        !accent && "rounded-full",
+        accent ? accentStyles[tone] : "rounded-none",
+        !accent && "rounded-none",
         toneStyles[tone],
         glow && glowStyles[tone],
         size === "sm" && "px-2.5 py-0.5 text-[11px]",

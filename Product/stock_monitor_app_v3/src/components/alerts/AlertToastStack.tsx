@@ -101,7 +101,7 @@ export function AlertToastStack({ events, onDismiss }: AlertToastStackProps): JS
       {visible.map((event) => (
         <article
           key={event.id}
-          className={clsx("rounded-xl border px-3 py-3 shadow-2xl backdrop-blur", tone(event.severity))}
+          className={clsx("rounded-none border px-3 py-3 shadow-2xl backdrop-blur", tone(event.severity))}
         >
           <div className="flex items-start justify-between gap-2">
             <p className="text-xs font-semibold">{event.title}</p>
@@ -111,14 +111,14 @@ export function AlertToastStack({ events, onDismiss }: AlertToastStackProps): JS
                 removeToast(event.id);
                 onDismiss?.(event.id);
               }}
-              className="rounded border border-slate-400/40 px-1.5 py-0.5 text-[10px] font-semibold text-slate-100 hover:bg-slate-900/40"
+              className="rounded-none border border-slate-400/40 px-1.5 py-0.5 text-[10px] font-semibold text-text-primary hover:bg-canvas-deep/40"
               aria-label="アラートを閉じる"
               title="閉じる"
             >
               ✕
             </button>
           </div>
-          <p className="mt-1 text-xs leading-5 text-slate-100">{event.message}</p>
+          <p className="mt-1 text-xs leading-5 text-text-primary">{event.message}</p>
         </article>
       ))}
     </div>

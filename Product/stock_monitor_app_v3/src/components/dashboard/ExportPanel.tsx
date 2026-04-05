@@ -57,14 +57,14 @@ export function ExportPanel({
   }
 
   return (
-    <section className="rounded-2xl border border-slate-700/60 bg-panel p-5 shadow-card">
+    <section className="rounded-none border border-border-subtle bg-panel p-5 shadow-card">
       <div className="mb-3">
-        <h2 className="text-lg font-semibold text-slate-100">エクスポート</h2>
-        <p className="text-xs text-slate-400">保存データを JSON / CSV で出力します。</p>
+        <h2 className="text-lg font-semibold font-orb text-text-primary">エクスポート</h2>
+        <p className="text-xs text-text-muted">保存データを JSON / CSV で出力します。</p>
       </div>
 
       <div className="grid gap-2 md:grid-cols-2">
-        <label className="rounded-xl border border-slate-700 bg-slate-900/60 px-3 py-2 text-xs text-slate-200">
+        <label className="rounded-none border border-border-subtle bg-canvas-deep/60 px-3 py-2 text-xs text-slate-200">
           <input
             type="checkbox"
             checked={selection.snapshots}
@@ -73,7 +73,7 @@ export function ExportPanel({
           />
           スナップショット
         </label>
-        <label className="rounded-xl border border-slate-700 bg-slate-900/60 px-3 py-2 text-xs text-slate-200">
+        <label className="rounded-none border border-border-subtle bg-canvas-deep/60 px-3 py-2 text-xs text-slate-200">
           <input
             type="checkbox"
             checked={selection.alertEvents}
@@ -82,7 +82,7 @@ export function ExportPanel({
           />
           アラート履歴
         </label>
-        <label className="rounded-xl border border-slate-700 bg-slate-900/60 px-3 py-2 text-xs text-slate-200">
+        <label className="rounded-none border border-border-subtle bg-canvas-deep/60 px-3 py-2 text-xs text-slate-200">
           <input
             type="checkbox"
             checked={selection.savedScreens}
@@ -91,7 +91,7 @@ export function ExportPanel({
           />
           保存スクリーン
         </label>
-        <label className="rounded-xl border border-slate-700 bg-slate-900/60 px-3 py-2 text-xs text-slate-200">
+        <label className="rounded-none border border-border-subtle bg-canvas-deep/60 px-3 py-2 text-xs text-slate-200">
           <input
             type="checkbox"
             checked={selection.backtestResults}
@@ -100,7 +100,7 @@ export function ExportPanel({
           />
           バックテスト結果
         </label>
-        <label className="rounded-xl border border-slate-700 bg-slate-900/60 px-3 py-2 text-xs text-slate-200">
+        <label className="rounded-none border border-border-subtle bg-canvas-deep/60 px-3 py-2 text-xs text-slate-200">
           <input
             type="checkbox"
             checked={selection.holdings}
@@ -112,7 +112,7 @@ export function ExportPanel({
       </div>
 
       {previewParts.length > 0 && (
-        <div className="mt-3 rounded-lg bg-white/5 p-3">
+        <div className="mt-3 rounded-none bg-white/5 p-3">
           <p className="text-sm text-text-secondary">
             {previewParts.join(", ")}
           </p>
@@ -123,34 +123,34 @@ export function ExportPanel({
         <button
           type="button"
           onClick={() => onExportJson(selection)}
-          className="rounded-lg border border-blue/40 bg-blue/10 px-3 py-2 text-xs font-semibold text-blue"
+          className="rounded-none border border-blue/40 bg-blue/10 px-3 py-2 text-xs font-semibold text-blue"
         >
           JSON出力
         </button>
         <button
           type="button"
           onClick={onExportSnapshotsCsv}
-          className="rounded-lg border border-slate-600 px-3 py-2 text-xs font-semibold text-slate-200"
+          className="rounded-none border border-border-subtle px-3 py-2 text-xs font-semibold text-slate-200"
         >
           スナップショットCSV出力
         </button>
         <button
           type="button"
           onClick={onExportRankingCsv}
-          className="rounded-lg border border-slate-600 px-3 py-2 text-xs font-semibold text-slate-200"
+          className="rounded-none border border-border-subtle px-3 py-2 text-xs font-semibold text-slate-200"
         >
           ランキングCSV出力
         </button>
         <button
           type="button"
           onClick={onExportPortfolioCsv}
-          className="rounded-lg border border-slate-600 px-3 py-2 text-xs font-semibold text-slate-200"
+          className="rounded-none border border-border-subtle px-3 py-2 text-xs font-semibold text-slate-200"
         >
           ポートフォリオCSV出力
         </button>
       </div>
 
-      <p className="mt-3 text-xs text-slate-400">
+      <p className="mt-3 text-xs text-text-muted">
         エクスポートデータにはAPIキー等の秘密情報は含まれません。
       </p>
     </section>

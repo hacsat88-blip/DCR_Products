@@ -126,12 +126,12 @@ export const BenchmarkChart = memo(function BenchmarkChart({ stocks }: Benchmark
   const data = buildBenchmarkSeries(stocks);
 
   return (
-    <section className="rounded-2xl border border-glass-border bg-panel p-5 shadow-card">
+    <section className="rounded-none border border-glass-border bg-panel p-5 shadow-card">
       <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
-        <h2 className="text-lg font-semibold text-slate-100">ベンチマーク比較チャート</h2>
-        <p className="rounded-full border border-slate-600/40 px-3 py-1 text-xs text-slate-400">指数表示（初期日=100）</p>
+        <h2 className="text-lg font-semibold text-text-primary font-orb">ベンチマーク比較チャート</h2>
+        <p className="rounded-none border border-slate-600/40 px-3 py-1 text-xs text-text-muted">指数表示（初期日=100）</p>
       </div>
-      <p className="mb-3 text-xs text-slate-500">
+      <p className="mb-3 text-xs text-text-muted">
         戦略指数は表示銘柄の平均を初期日=100で指数化した値です。ベンチマークも同じ基準で表示しています。
       </p>
       <div className="h-[320px] w-full md:h-[420px]">

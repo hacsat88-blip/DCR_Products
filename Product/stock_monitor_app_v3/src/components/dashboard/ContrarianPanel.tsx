@@ -62,14 +62,14 @@ export function ContrarianPanel({ stock }: ContrarianPanelProps): JSX.Element {
   return (
     <section className="card-surface p-5">
       <div className="mb-3">
-        <h2 className="text-lg font-semibold text-slate-100">逆張り監査官</h2>
+        <h2 className="text-lg font-semibold text-text-primary font-orb">逆張り監査官</h2>
         <p className="text-xs text-slate-400">現在判断に対する反対意見を1つ提示して、思い込みを減らします。</p>
       </div>
       {!stock || !risk ? (
         <p className="text-sm text-slate-300">銘柄を選択すると反対意見を表示します。</p>
       ) : (
         <div
-          className="relative overflow-hidden rounded-xl border border-border-subtle bg-canvas-deep/50 p-4 text-sm leading-7 text-slate-200"
+          className="relative overflow-hidden rounded-none border border-border-subtle bg-canvas-deep/50 p-4 text-sm leading-7 text-slate-200"
           style={{ borderLeftWidth: 3, borderLeftColor: color }}
         >
           <div className="flex items-center gap-2">
@@ -78,7 +78,7 @@ export function ContrarianPanel({ stock }: ContrarianPanelProps): JSX.Element {
               対象: {stock.code} {stock.name}
             </p>
             <span
-              className="ml-auto rounded-full px-2.5 py-0.5 text-[10px] font-bold tracking-wider"
+              className="ml-auto rounded-none px-2.5 py-0.5 text-[10px] font-bold tracking-wider"
               style={{ backgroundColor: `${color}15`, color, border: `1px solid ${color}30` }}
             >
               {riskLabel(risk)}

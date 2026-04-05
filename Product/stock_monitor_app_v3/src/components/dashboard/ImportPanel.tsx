@@ -167,15 +167,15 @@ export function ImportPanel(): JSX.Element {
   ];
 
   return (
-    <section className="rounded-2xl border border-slate-700/60 bg-panel p-5 shadow-card">
+    <section className="rounded-none border border-border-subtle bg-panel p-5 shadow-card">
       <div className="mb-3">
-        <h2 className="text-lg font-semibold text-slate-100">インポート</h2>
-        <p className="text-xs text-slate-400">JSON / CSV ファイルからデータを取り込みます。</p>
+        <h2 className="text-lg font-semibold font-orb text-text-primary">インポート</h2>
+        <p className="text-xs text-text-muted">JSON / CSV ファイルからデータを取り込みます。</p>
       </div>
 
       {/* Error message */}
       {errorMessage && (
-        <div className="mb-3 rounded-lg border border-red-500/40 bg-red-500/10 px-3 py-2 text-xs text-red-300">
+        <div className="mb-3 rounded-none border border-red-500/40 bg-red-500/10 px-3 py-2 text-xs text-red-300">
           {errorMessage}
         </div>
       )}
@@ -187,16 +187,16 @@ export function ImportPanel(): JSX.Element {
           onDragOver={handleDragOver}
           onDragLeave={handleDragLeave}
           onClick={() => fileInputRef.current?.click()}
-          className={`cursor-pointer rounded-xl border-2 border-dashed p-6 text-center transition-colors ${
+          className={`cursor-pointer rounded-none border-2 border-dashed p-6 text-center transition-colors ${
             dragOver
               ? "border-blue bg-blue/10"
-              : "border-slate-600 bg-white/5 hover:border-slate-500 hover:bg-white/10"
+              : "border-border-subtle bg-white/5 hover:border-slate-500 hover:bg-white/10"
           }`}
         >
-          <p className="text-sm text-slate-300">
+          <p className="text-sm text-text-secondary">
             ファイルをドラッグ＆ドロップ
           </p>
-          <p className="mt-1 text-xs text-slate-500">
+          <p className="mt-1 text-xs text-text-muted">
             または クリックして選択（JSON / CSV、最大10MB）
           </p>
           <input
@@ -212,10 +212,10 @@ export function ImportPanel(): JSX.Element {
       {/* Preview */}
       {phase === "preview" && validation && (
         <div className="space-y-3">
-          <div className="rounded-xl border border-slate-700 bg-slate-900/60 px-3 py-2">
+          <div className="rounded-none border border-border-subtle bg-canvas-deep/60 px-3 py-2">
             <p className="text-xs font-medium text-slate-200">
               📄 {fileName}
-              <span className="ml-2 rounded bg-slate-700 px-1.5 py-0.5 text-[10px] uppercase text-slate-300">
+              <span className="ml-2 rounded-none bg-slate-700 px-1.5 py-0.5 text-[10px] uppercase text-text-secondary">
                 {fileType}
               </span>
             </p>
@@ -223,7 +223,7 @@ export function ImportPanel(): JSX.Element {
 
           {/* Validation errors */}
           {validation.errors.length > 0 && (
-            <div className="rounded-lg border border-red-500/40 bg-red-500/10 px-3 py-2 text-xs text-red-300">
+            <div className="rounded-none border border-red-500/40 bg-red-500/10 px-3 py-2 text-xs text-red-300">
               {validation.errors.map((err, i) => (
                 <p key={i}>⛔ {err}</p>
               ))}
@@ -232,7 +232,7 @@ export function ImportPanel(): JSX.Element {
 
           {/* Validation warnings */}
           {validation.warnings.length > 0 && (
-            <div className="rounded-lg border border-yellow-500/40 bg-yellow-500/10 px-3 py-2 text-xs text-yellow-300">
+            <div className="rounded-none border border-yellow-500/40 bg-yellow-500/10 px-3 py-2 text-xs text-yellow-300">
               {validation.warnings.map((warn, i) => (
                 <p key={i}>⚠️ {warn}</p>
               ))}
@@ -241,7 +241,7 @@ export function ImportPanel(): JSX.Element {
 
           {/* Preview counts */}
           {fileType === "json" && (
-            <div className="grid gap-1 text-xs text-slate-300">
+            <div className="grid gap-1 text-xs text-text-secondary">
               {validation.preview.snapshotCount > 0 && (
                 <p>スナップショット: {validation.preview.snapshotCount}件</p>
               )}
@@ -261,7 +261,7 @@ export function ImportPanel(): JSX.Element {
           )}
 
           {fileType === "csv" && validation.preview.compareSelectionCount > 0 && (
-            <p className="text-xs text-slate-300">
+            <p className="text-xs text-text-secondary">
               ウォッチリスト銘柄: {validation.preview.compareSelectionCount}件
             </p>
           )}
@@ -270,15 +270,15 @@ export function ImportPanel(): JSX.Element {
           {fileType === "json" && validation.valid && (
             <>
               <div>
-                <p className="mb-1 text-xs font-medium text-slate-300">マージ方法</p>
+                <p className="mb-1 text-xs font-medium text-text-secondary">マージ方法</p>
                 <div className="grid gap-1">
                   {strategies.map((s) => (
                     <label
                       key={s.value}
-                      className={`flex cursor-pointer items-center rounded-lg border px-3 py-2 text-xs transition-colors ${
+                      className={`flex cursor-pointer items-center rounded-none border px-3 py-2 text-xs transition-colors ${
                         mergeStrategy === s.value
                           ? "border-blue/60 bg-blue/10 text-blue"
-                          : "border-slate-700 bg-slate-900/60 text-slate-300 hover:border-slate-600"
+                          : "border-border-subtle bg-canvas-deep/60 text-text-secondary hover:border-border-subtle"
                       }`}
                     >
                       <input
@@ -290,14 +290,14 @@ export function ImportPanel(): JSX.Element {
                         className="mr-2"
                       />
                       <span className="font-medium">{s.label}</span>
-                      <span className="ml-2 text-slate-500">{s.desc}</span>
+                      <span className="ml-2 text-text-muted">{s.desc}</span>
                     </label>
                   ))}
                 </div>
               </div>
 
               <div>
-                <p className="mb-1 text-xs font-medium text-slate-300">インポート対象</p>
+                <p className="mb-1 text-xs font-medium text-text-secondary">インポート対象</p>
                 <div className="grid gap-1 md:grid-cols-2">
                   {[
                     { key: "snapshots" as const, label: "スナップショット", count: validation.preview.snapshotCount },
@@ -310,7 +310,7 @@ export function ImportPanel(): JSX.Element {
                     .map((t) => (
                       <label
                         key={t.key}
-                        className="rounded-xl border border-slate-700 bg-slate-900/60 px-3 py-2 text-xs text-slate-200"
+                        className="rounded-none border border-border-subtle bg-canvas-deep/60 px-3 py-2 text-xs text-slate-200"
                       >
                         <input
                           type="checkbox"
@@ -332,14 +332,14 @@ export function ImportPanel(): JSX.Element {
               type="button"
               onClick={executeImport}
               disabled={!validation.valid}
-              className="rounded-lg border border-blue/40 bg-blue/10 px-3 py-2 text-xs font-semibold text-blue disabled:cursor-not-allowed disabled:opacity-40"
+              className="rounded-none border border-blue/40 bg-blue/10 px-3 py-2 text-xs font-semibold text-blue disabled:cursor-not-allowed disabled:opacity-40"
             >
               インポート実行
             </button>
             <button
               type="button"
               onClick={reset}
-              className="rounded-lg border border-slate-600 px-3 py-2 text-xs font-semibold text-slate-300"
+              className="rounded-none border border-border-subtle px-3 py-2 text-xs font-semibold text-text-secondary"
             >
               キャンセル
             </button>
@@ -351,21 +351,21 @@ export function ImportPanel(): JSX.Element {
       {phase === "done" && (
         <div className="space-y-3">
           {resultMessage && (
-            <div className="rounded-lg border border-green-500/40 bg-green-500/10 px-3 py-2 text-xs text-green-300">
+            <div className="rounded-none border border-green-500/40 bg-green-500/10 px-3 py-2 text-xs text-green-300">
               ✅ {resultMessage}
             </div>
           )}
           <button
             type="button"
             onClick={reset}
-            className="rounded-lg border border-slate-600 px-3 py-2 text-xs font-semibold text-slate-300"
+            className="rounded-none border border-border-subtle px-3 py-2 text-xs font-semibold text-text-secondary"
           >
             別のファイルをインポート
           </button>
         </div>
       )}
 
-      <p className="mt-3 text-xs text-slate-400">
+      <p className="mt-3 text-xs text-text-muted">
         JSON はエクスポート形式に準拠。CSV は code カラム必須（ウォッチリスト追加）。
       </p>
     </section>

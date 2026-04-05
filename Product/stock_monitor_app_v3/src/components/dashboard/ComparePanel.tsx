@@ -63,17 +63,17 @@ function ComparePanelInner({
   const dividendValues = useMemo(() => compared.map((stock) => stock.dividendYield ?? null), [compared]);
 
   return (
-    <section className="rounded-2xl border border-slate-700/60 bg-panel p-5 shadow-card">
+    <section className="rounded-none border border-border-subtle bg-panel p-5 shadow-card">
       <div className="mb-3 flex flex-wrap items-center justify-between gap-3">
         <div>
-          <h2 className="text-lg font-semibold text-slate-100">比較ビュー</h2>
+          <h2 className="text-lg font-semibold text-text-primary font-orb">比較ビュー</h2>
           <p className="text-xs text-slate-400">最大4銘柄を横並びで比較します。</p>
           <p className="mt-1 text-[11px] text-slate-500">緑=相対優位 / 赤=要注意（価格は優劣色を付けません）</p>
         </div>
         <button
           type="button"
           onClick={onClear}
-          className="rounded-lg border border-slate-600 px-3 py-2 text-xs font-semibold text-slate-200"
+          className="rounded-none border border-slate-600 px-3 py-2 text-xs font-semibold text-slate-200"
         >
           比較をクリア
         </button>
@@ -96,14 +96,14 @@ function ComparePanelInner({
                       <button
                         type="button"
                         onClick={() => onOpenDetail(stock.id)}
-                        className="rounded border border-slate-600 px-1.5 py-0.5 text-[11px]"
+                        className="rounded-none border border-slate-600 px-1.5 py-0.5 text-[11px]"
                       >
                         詳細
                       </button>
                       <button
                         type="button"
                         onClick={() => onRemove(stock.code)}
-                        className="rounded border border-slate-600 px-1.5 py-0.5 text-[11px]"
+                        className="rounded-none border border-slate-600 px-1.5 py-0.5 text-[11px]"
                       >
                         削除
                       </button>

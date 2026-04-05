@@ -86,10 +86,10 @@ function MorningCheckPanelInner({ stocks, snapshots }: MorningCheckPanelProps): 
   );
 
   return (
-    <section className="rounded-2xl border border-slate-700/60 bg-panel p-5 shadow-card">
+    <section className="rounded-none border border-border-subtle bg-panel p-5 shadow-card">
       <div className="mb-3 flex flex-wrap items-center justify-between gap-3">
         <div>
-          <h2 className="text-lg font-semibold text-slate-100">朝チェックモード</h2>
+          <h2 className="text-lg font-semibold text-text-primary font-orb">朝チェックモード</h2>
           <p className="text-xs text-slate-400">前回スナップショットとの差分だけ先に確認できます。</p>
         </div>
         <label className="flex items-center gap-2 text-xs text-slate-300">
@@ -107,7 +107,7 @@ function MorningCheckPanelInner({ stocks, snapshots }: MorningCheckPanelProps): 
       ) : (
         <div className="grid gap-2 md:grid-cols-2 xl:grid-cols-4">
           {visibleRows.map((row) => (
-            <article key={row.code} className="rounded-xl border border-slate-700 bg-slate-900/60 p-3">
+            <article key={row.code} className="rounded-none border border-border-subtle bg-canvas-deep/60 p-3">
               <p className="text-xs tracking-[0.12em] text-slate-400">{row.code}</p>
               <p className="text-sm font-semibold text-slate-100">{row.name}</p>
               <p className="mt-2 text-xs text-slate-300">
@@ -121,13 +121,13 @@ function MorningCheckPanelInner({ stocks, snapshots }: MorningCheckPanelProps): 
                 )}
               >
                 スコア差分:{" "}
-                {row.scoreDelta === null ? "-" : `${row.scoreDelta > 0 ? "+" : ""}${row.scoreDelta.toFixed(1)}`}
+                <span className="font-mono-tech">{row.scoreDelta === null ? "-" : `${row.scoreDelta > 0 ? "+" : ""}${row.scoreDelta.toFixed(1)}`}</span>
               </p>
               <p className="mt-1 text-xs text-slate-400">
                 価格差分:{" "}
-                {row.priceDeltaPct === null
+                <span className="font-mono-tech">{row.priceDeltaPct === null
                   ? "-"
-                  : `${row.priceDeltaPct > 0 ? "+" : ""}${row.priceDeltaPct.toFixed(2)}%`}
+                  : `${row.priceDeltaPct > 0 ? "+" : ""}${row.priceDeltaPct.toFixed(2)}%`}</span>
               </p>
             </article>
           ))}

@@ -28,20 +28,20 @@ function ImpactZone({ current, simulated }: { current: number; simulated: number
         <span className="flex-1 text-center">注意圏</span>
         <span className="flex-1 text-right">安全圏</span>
       </div>
-      <div className="relative mt-1 h-2 overflow-hidden rounded-full">
+      <div className="relative mt-1 h-2 overflow-hidden rounded-none">
         <div className="absolute inset-0 flex">
           <div className="h-full flex-[40] bg-danger/20" />
           <div className="h-full flex-[30] bg-amber/20" />
           <div className="h-full flex-[30] bg-mint/20" />
         </div>
         <div
-          className="absolute top-0 h-full w-1 rounded-full bg-text-primary"
+          className="absolute top-0 h-full w-1 rounded-none bg-text-primary"
           style={{ left: `${clampPos(current)}%` }}
           title={`現在: ${current}`}
         />
         {simulated !== null && (
           <div
-            className="absolute top-0 h-full w-1 rounded-full bg-amber opacity-80"
+            className="absolute top-0 h-full w-1 rounded-none bg-amber opacity-80"
             style={{ left: `${clampPos(simulated)}%` }}
             title={`シミュ: ${simulated}`}
           />
@@ -76,7 +76,7 @@ export function CollapseSimulatorPanel({
   return (
     <section className="card-surface p-5">
       <div className="mb-3">
-        <h2 className="text-lg font-semibold text-slate-100">崩れシミュレーター</h2>
+        <h2 className="text-lg font-semibold text-text-primary font-orb">崩れシミュレーター</h2>
         <p className="text-xs text-slate-400">成長率やPERを仮に動かして、判定がどこで崩れるかを確認します。</p>
       </div>
 
@@ -85,7 +85,7 @@ export function CollapseSimulatorPanel({
       ) : (
         <>
           <div className="grid gap-3 md:grid-cols-3">
-            <label className="rounded-xl border border-border-subtle bg-canvas-deep/50 p-3 text-xs text-slate-200">
+            <label className="rounded-none border border-border-subtle bg-canvas-deep/50 p-3 text-xs text-slate-200">
               <span className="flex items-center justify-between">
                 <span>売上成長補正</span>
                 <span className="font-mono font-semibold text-mint">{revenueDelta > 0 ? "+" : ""}{revenueDelta}</span>
@@ -99,7 +99,7 @@ export function CollapseSimulatorPanel({
                 className="slider-pro mt-2 w-full accent-mint"
               />
             </label>
-            <label className="rounded-xl border border-border-subtle bg-canvas-deep/50 p-3 text-xs text-slate-200">
+            <label className="rounded-none border border-border-subtle bg-canvas-deep/50 p-3 text-xs text-slate-200">
               <span className="flex items-center justify-between">
                 <span>営業利益成長補正</span>
                 <span className="font-mono font-semibold text-blue">{opDelta > 0 ? "+" : ""}{opDelta}</span>
@@ -113,7 +113,7 @@ export function CollapseSimulatorPanel({
                 className="slider-pro mt-2 w-full accent-blue"
               />
             </label>
-            <label className="rounded-xl border border-border-subtle bg-canvas-deep/50 p-3 text-xs text-slate-200">
+            <label className="rounded-none border border-border-subtle bg-canvas-deep/50 p-3 text-xs text-slate-200">
               <span className="flex items-center justify-between">
                 <span>PER補正</span>
                 <span className="font-mono font-semibold text-amber">{perDelta > 0 ? "+" : ""}{perDelta}</span>
@@ -130,17 +130,17 @@ export function CollapseSimulatorPanel({
           </div>
 
           <div className="mt-3 grid gap-2 md:grid-cols-2">
-            <div className="rounded-xl border border-border-subtle bg-canvas-deep/50 p-3 text-xs text-slate-200">
+            <div className="rounded-none border border-border-subtle bg-canvas-deep/50 p-3 text-xs text-slate-200">
               <p className="text-text-muted">現在</p>
-              <p className={clsx("mt-1 text-lg font-bold tabular-nums", zoneColor(stock.score))}>{stock.score}</p>
+              <p className={clsx("mt-1 text-lg font-bold tabular-nums font-mono-tech", zoneColor(stock.score))}>{stock.score}</p>
               <p className="mt-1 text-text-secondary">{formatActionLabel(stock.evaluatedAction)}</p>
             </div>
             <div className={clsx(
-              "rounded-xl border p-3 text-xs text-slate-200 transition-all duration-300",
+              "rounded-none border p-3 text-xs text-slate-200 transition-all duration-300",
               bigChange ? "border-amber/40 shadow-glow-amber bg-canvas-deep/50" : "border-border-subtle bg-canvas-deep/50"
             )}>
               <p className="text-text-muted">シミュレーション後</p>
-              <p className={clsx("mt-1 text-lg font-bold tabular-nums", simulated ? zoneColor(simulated.score) : "text-text-muted")}>
+              <p className={clsx("mt-1 text-lg font-bold tabular-nums font-mono-tech", simulated ? zoneColor(simulated.score) : "text-text-muted")}>
                 {simulated?.score ?? "-"}
               </p>
               <p className="mt-1 text-text-secondary">{simulated ? formatActionLabel(simulated.evaluatedAction) : "-"}</p>

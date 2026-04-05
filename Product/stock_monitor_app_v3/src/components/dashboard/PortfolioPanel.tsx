@@ -245,7 +245,7 @@ function PortfolioPanelInner(): JSX.Element {
   if (holdingRows.length === 0) {
     return (
       <section className="card-surface p-8 text-center">
-        <h2 className="mb-3 text-lg font-semibold text-text-primary">ポートフォリオ</h2>
+        <h2 className="mb-3 text-lg font-semibold font-orb text-text-primary">ポートフォリオ</h2>
         <p className="text-sm text-text-muted">
           ポートフォリオが空です。銘柄カードの保有数入力から株数を設定してください。
         </p>
@@ -263,7 +263,7 @@ function PortfolioPanelInner(): JSX.Element {
           <p className="text-[11px] font-medium uppercase tracking-[0.14em] text-text-muted">
             総評価額
           </p>
-          <p className="mt-2 text-3xl font-semibold tracking-kpi text-text-primary md:text-4xl">
+          <p className="mt-2 text-3xl font-semibold font-mono-tech tracking-kpi text-text-primary md:text-4xl">
             {formatYen(Math.round(totalValue))}
           </p>
           <p className="mt-2 text-xs text-text-muted">保有全銘柄の時価合計</p>
@@ -275,7 +275,7 @@ function PortfolioPanelInner(): JSX.Element {
           <p className="text-[11px] font-medium uppercase tracking-[0.14em] text-text-muted">
             銘柄数
           </p>
-          <p className="mt-2 text-3xl font-semibold tracking-kpi text-text-primary md:text-4xl">
+          <p className="mt-2 text-3xl font-semibold font-mono-tech tracking-kpi text-text-primary md:text-4xl">
             {stockCount}
           </p>
           <p className="mt-2 text-xs text-text-muted">保有中の銘柄</p>
@@ -289,7 +289,7 @@ function PortfolioPanelInner(): JSX.Element {
           </p>
           <p
             className={clsx(
-              "mt-2 text-3xl font-semibold tracking-kpi md:text-4xl",
+              "mt-2 text-3xl font-semibold font-mono-tech tracking-kpi md:text-4xl",
               scoreColor(weightedAvgScore),
             )}
           >
@@ -311,7 +311,7 @@ function PortfolioPanelInner(): JSX.Element {
           </p>
           <p
             className={clsx(
-              "mt-2 text-3xl font-semibold tracking-kpi md:text-4xl",
+              "mt-2 text-3xl font-semibold font-mono-tech tracking-kpi md:text-4xl",
               dailyChange >= 0 ? "text-mint" : "text-danger",
             )}
           >
@@ -320,7 +320,7 @@ function PortfolioPanelInner(): JSX.Element {
           </p>
           <p
             className={clsx(
-              "mt-2 text-xs",
+              "mt-2 text-xs font-mono-tech",
               dailyChange >= 0 ? "text-mint/70" : "text-danger/70",
             )}
           >
@@ -333,7 +333,7 @@ function PortfolioPanelInner(): JSX.Element {
       <div className="grid grid-cols-1 gap-5 lg:grid-cols-2">
         {/* Sector Donut */}
         <div className="card-surface p-5">
-          <h3 className="mb-4 text-sm font-semibold text-text-primary">セクター構成</h3>
+          <h3 className="mb-4 text-sm font-semibold font-orb text-text-primary">セクター構成</h3>
           <div className="relative h-[280px] w-full">
             <ResponsiveContainer>
               <PieChart>
@@ -358,7 +358,7 @@ function PortfolioPanelInner(): JSX.Element {
             {/* Center text */}
             <div className="pointer-events-none absolute inset-0 flex flex-col items-center justify-center">
               <span className="text-[10px] text-text-muted">合計</span>
-              <span className="text-sm font-semibold text-text-primary">
+              <span className="text-sm font-semibold font-mono-tech text-text-primary">
                 {formatYen(Math.round(totalValue))}
               </span>
             </div>
@@ -379,7 +379,7 @@ function PortfolioPanelInner(): JSX.Element {
 
         {/* Holdings Bar Chart */}
         <div className="card-surface p-5">
-          <h3 className="mb-4 text-sm font-semibold text-text-primary">銘柄別評価額</h3>
+          <h3 className="mb-4 text-sm font-semibold font-orb text-text-primary">銘柄別評価額</h3>
           <div className="h-[280px] w-full" style={{ minHeight: Math.max(280, barData.length * 40) }}>
             <ResponsiveContainer>
               <BarChart
@@ -417,7 +417,7 @@ function PortfolioPanelInner(): JSX.Element {
 
       {/* ── Section 4: Holdings Table ── */}
       <div className="card-surface overflow-x-auto p-5">
-        <h3 className="mb-4 text-sm font-semibold text-text-primary">保有銘柄一覧</h3>
+        <h3 className="mb-4 text-sm font-semibold font-orb text-text-primary">保有銘柄一覧</h3>
         <table className="w-full text-left text-sm">
           <thead>
             <tr className="border-b border-border-subtle text-[11px] font-medium uppercase tracking-[0.14em] text-text-muted">
@@ -466,19 +466,19 @@ function PortfolioPanelInner(): JSX.Element {
                   <span className="ml-1.5 text-[10px] text-text-muted">{r.stock.code}</span>
                 </td>
                 <td className="py-2.5 pr-3 text-text-secondary">{r.stock.sector}</td>
-                <td className="py-2.5 pr-3 text-text-secondary tabular-nums">
+                <td className="py-2.5 pr-3 text-text-secondary font-mono-tech tabular-nums">
                   {r.shares.toLocaleString("ja-JP")}
                 </td>
-                <td className="py-2.5 pr-3 text-text-secondary tabular-nums">
+                <td className="py-2.5 pr-3 text-text-secondary font-mono-tech tabular-nums">
                   {formatYen(r.stock.price)}
                 </td>
-                <td className="py-2.5 pr-3 font-medium tabular-nums text-text-primary">
+                <td className="py-2.5 pr-3 font-medium font-mono-tech tabular-nums text-text-primary">
                   {formatYen(Math.round(r.value))}
                 </td>
-                <td className="py-2.5 pr-3 text-text-secondary tabular-nums">
+                <td className="py-2.5 pr-3 text-text-secondary font-mono-tech tabular-nums">
                   {(r.weight * 100).toFixed(1)}%
                 </td>
-                <td className={clsx("py-2.5 pr-3 font-semibold tabular-nums", scoreColor(r.stock.score))}>
+                <td className={clsx("py-2.5 pr-3 font-semibold font-mono-tech tabular-nums", scoreColor(r.stock.score))}>
                   {r.stock.score.toFixed(0)}
                 </td>
                 <td className="py-2.5">
@@ -494,7 +494,7 @@ function PortfolioPanelInner(): JSX.Element {
 
       {/* ── Section 5: Risk Summary ── */}
       <div className="card-surface p-5">
-        <h3 className="mb-4 text-sm font-semibold text-text-primary">ポートフォリオリスク概要</h3>
+        <h3 className="mb-4 text-sm font-semibold font-orb text-text-primary">ポートフォリオリスク概要</h3>
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
           {/* Action distribution */}
           <div className="flex flex-col gap-2">
@@ -522,7 +522,7 @@ function PortfolioPanelInner(): JSX.Element {
             <p className="text-[11px] font-medium uppercase tracking-[0.14em] text-text-muted">
               平均スコア
             </p>
-            <p className={clsx("text-2xl font-semibold", scoreColor(weightedAvgScore))}>
+            <p className={clsx("text-2xl font-semibold font-mono-tech", scoreColor(weightedAvgScore))}>
               {weightedAvgScore.toFixed(1)}
             </p>
           </div>
@@ -535,7 +535,7 @@ function PortfolioPanelInner(): JSX.Element {
             {lowestScoreRow ? (
               <div className="flex items-center gap-2">
                 <span className="font-medium text-text-primary">{lowestScoreRow.stock.name}</span>
-                <span className={clsx("text-sm font-semibold", scoreColor(lowestScoreRow.stock.score))}>
+                <span className={clsx("text-sm font-semibold font-mono-tech", scoreColor(lowestScoreRow.stock.score))}>
                   {lowestScoreRow.stock.score.toFixed(0)}pt
                 </span>
                 <Badge tone={actionTone(lowestScoreRow.stock.evaluatedAction)}>

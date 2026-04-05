@@ -39,14 +39,14 @@ export const RankingBoard = memo(function RankingBoard({
     <section className="card-surface p-5">
       <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
         <div>
-          <h2 className="text-base font-semibold tracking-heading text-text-primary">ランキング</h2>
+          <h2 className="text-base font-semibold tracking-heading text-text-primary font-orb">ランキング</h2>
           <p className="mt-0.5 text-xs text-text-muted">現在の絞り込み結果をランキング表示します。</p>
         </div>
         <div className="flex flex-wrap items-center gap-2">
           <select
             value={rankingSortKey}
             onChange={(event) => onRankingSortChange(event.target.value as RankingSortKey)}
-            className="rounded-lg border border-border-subtle bg-canvas-deep/80 px-2.5 py-2 text-xs text-text-primary outline-none transition-colors focus:border-border-active"
+            className="rounded-none border border-border-subtle bg-canvas-deep/80 px-2.5 py-2 text-xs text-text-primary outline-none transition-colors focus:border-border-active"
           >
             <option value="score_desc">本命度（高い順）</option>
             <option value="price_asc">株価（安い順）</option>
@@ -61,7 +61,7 @@ export const RankingBoard = memo(function RankingBoard({
           <button
             type="button"
             onClick={() => onExportCsv(rows)}
-            className="rounded-lg border border-border-subtle px-3 py-2 text-xs font-medium text-text-secondary transition-colors hover:border-border-active hover:text-text-primary"
+            className="rounded-none border border-border-subtle px-3 py-2 text-xs font-medium text-text-secondary transition-colors hover:border-border-active hover:text-text-primary"
           >
             CSV出力
           </button>
@@ -72,17 +72,17 @@ export const RankingBoard = memo(function RankingBoard({
         <table className="w-full min-w-[920px] border-collapse text-xs text-text-secondary">
           <thead>
             <tr className="bg-canvas-raised">
-              <th className="border-b border-border-subtle px-3 py-2.5 text-left text-[11px] font-medium uppercase tracking-wider text-text-muted">順位</th>
-              <th className="border-b border-border-subtle px-3 py-2.5 text-left text-[11px] font-medium uppercase tracking-wider text-text-muted">銘柄</th>
-              <th className="border-b border-border-subtle px-3 py-2.5 text-left text-[11px] font-medium uppercase tracking-wider text-text-muted">本命度</th>
-              <th className="border-b border-border-subtle px-3 py-2.5 text-left text-[11px] font-medium uppercase tracking-wider text-text-muted">判定</th>
-              <th className="border-b border-border-subtle px-3 py-2.5 text-left text-[11px] font-medium uppercase tracking-wider text-text-muted">価格/前日比</th>
-              <th className="border-b border-border-subtle px-3 py-2.5 text-left text-[11px] font-medium uppercase tracking-wider text-text-muted">核心KPI</th>
-              <th className="border-b border-border-subtle px-3 py-2.5 text-left text-[11px] font-medium uppercase tracking-wider text-text-muted">要約</th>
-              <th className="border-b border-border-subtle px-3 py-2.5 text-left text-[11px] font-medium uppercase tracking-wider text-text-muted">アラート</th>
-              <th className="border-b border-border-subtle px-3 py-2.5 text-left text-[11px] font-medium uppercase tracking-wider text-text-muted">監視</th>
-              <th className="border-b border-border-subtle px-3 py-2.5 text-left text-[11px] font-medium uppercase tracking-wider text-text-muted">保有</th>
-              <th className="border-b border-border-subtle px-3 py-2.5 text-left text-[11px] font-medium uppercase tracking-wider text-text-muted">操作</th>
+              <th className="border-b border-border-subtle px-3 py-2.5 text-left text-[11px] font-medium uppercase tracking-wider text-text-muted font-orb">順位</th>
+              <th className="border-b border-border-subtle px-3 py-2.5 text-left text-[11px] font-medium uppercase tracking-wider text-text-muted font-orb">銘柄</th>
+              <th className="border-b border-border-subtle px-3 py-2.5 text-left text-[11px] font-medium uppercase tracking-wider text-text-muted font-orb">本命度</th>
+              <th className="border-b border-border-subtle px-3 py-2.5 text-left text-[11px] font-medium uppercase tracking-wider text-text-muted font-orb">判定</th>
+              <th className="border-b border-border-subtle px-3 py-2.5 text-left text-[11px] font-medium uppercase tracking-wider text-text-muted font-orb">価格/前日比</th>
+              <th className="border-b border-border-subtle px-3 py-2.5 text-left text-[11px] font-medium uppercase tracking-wider text-text-muted font-orb">核心KPI</th>
+              <th className="border-b border-border-subtle px-3 py-2.5 text-left text-[11px] font-medium uppercase tracking-wider text-text-muted font-orb">要約</th>
+              <th className="border-b border-border-subtle px-3 py-2.5 text-left text-[11px] font-medium uppercase tracking-wider text-text-muted font-orb">アラート</th>
+              <th className="border-b border-border-subtle px-3 py-2.5 text-left text-[11px] font-medium uppercase tracking-wider text-text-muted font-orb">監視</th>
+              <th className="border-b border-border-subtle px-3 py-2.5 text-left text-[11px] font-medium uppercase tracking-wider text-text-muted font-orb">保有</th>
+              <th className="border-b border-border-subtle px-3 py-2.5 text-left text-[11px] font-medium uppercase tracking-wider text-text-muted font-orb">操作</th>
             </tr>
           </thead>
           <tbody>
@@ -92,15 +92,15 @@ export const RankingBoard = memo(function RankingBoard({
               const canAddCompare = selected || compareSelection.length < 4;
               return (
                 <tr key={stock.id} className="transition-colors hover:bg-panel-hover">
-                  <td className="border-b border-border-subtle/50 px-3 py-2.5 font-semibold text-text-primary">{index + 1}</td>
+                  <td className="border-b border-border-subtle/50 px-3 py-2.5 font-semibold text-text-primary font-mono-tech">{index + 1}</td>
                   <td className="border-b border-border-subtle/50 px-3 py-2.5">
                     <span className="font-mono text-[10px] text-text-muted">{stock.code}</span>{" "}
                     <span className="text-text-primary">{stock.name}</span>
                   </td>
-                  <td className="border-b border-border-subtle/50 px-3 py-2.5 font-semibold text-text-primary">{stock.score}</td>
+                  <td className="border-b border-border-subtle/50 px-3 py-2.5 font-semibold text-text-primary font-mono-tech">{stock.score}</td>
                   <td className="border-b border-border-subtle/50 px-3 py-2.5">{formatActionLabel(stock.evaluatedAction)}</td>
                   <td className="border-b border-border-subtle/50 px-3 py-2.5">
-                    <span className="text-text-primary">{formatYen(stock.price)}</span> / {formatPercent(stock.changePercent)}
+                    <span className="font-mono-tech text-text-primary">{formatYen(stock.price)}</span> / {formatPercent(stock.changePercent)}
                   </td>
                   <td className="border-b border-border-subtle/50 px-3 py-2.5">
                     {stock.coreKpiLabel}: <span className="text-text-primary">{stock.coreKpiValue}</span>
@@ -118,7 +118,7 @@ export const RankingBoard = memo(function RankingBoard({
                       <button
                         type="button"
                         onClick={() => onOpenDetail(stock.id)}
-                        className="rounded border border-border-subtle px-2 py-0.5 text-[11px] text-text-secondary transition-colors hover:border-border-active hover:text-text-primary"
+                        className="rounded-none border border-border-subtle px-2 py-0.5 text-[11px] text-text-secondary transition-colors hover:border-border-active hover:text-text-primary"
                       >
                         詳細
                       </button>
@@ -126,7 +126,7 @@ export const RankingBoard = memo(function RankingBoard({
                         <button
                           type="button"
                           onClick={() => onRemoveFromCompare(stock.code)}
-                          className="rounded border border-border-subtle px-2 py-0.5 text-[11px] text-text-secondary transition-colors hover:border-border-active hover:text-text-primary"
+                          className="rounded-none border border-border-subtle px-2 py-0.5 text-[11px] text-text-secondary transition-colors hover:border-border-active hover:text-text-primary"
                         >
                           比較から外す
                         </button>
@@ -135,7 +135,7 @@ export const RankingBoard = memo(function RankingBoard({
                           type="button"
                           disabled={!canAddCompare}
                           onClick={() => onAddToCompare(stock.code)}
-                          className="rounded border border-border-subtle px-2 py-0.5 text-[11px] text-text-secondary transition-colors hover:border-border-active hover:text-text-primary disabled:cursor-not-allowed disabled:opacity-50"
+                          className="rounded-none border border-border-subtle px-2 py-0.5 text-[11px] text-text-secondary transition-colors hover:border-border-active hover:text-text-primary disabled:cursor-not-allowed disabled:opacity-50"
                         >
                           比較に追加
                         </button>

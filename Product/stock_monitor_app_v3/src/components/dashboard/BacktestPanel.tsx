@@ -120,16 +120,16 @@ function BacktestPanelInner({
   );
 
   return (
-    <section className="rounded-2xl border border-glass-border bg-panel p-5 shadow-card">
+    <section className="rounded-none border border-glass-border bg-panel p-5 shadow-card">
       <div className="mb-3 flex flex-wrap items-center justify-between gap-3">
         <div>
-          <h2 className="text-lg font-semibold text-slate-100">バックテスト</h2>
+          <h2 className="text-lg font-semibold text-text-primary font-orb">バックテスト</h2>
           <p className="text-xs text-slate-400">単銘柄優先の簡易バックテスト。説明可能性を重視しています。</p>
         </div>
         <button
           type="button"
           onClick={onClearResults}
-          className="rounded-lg border border-slate-600 px-3 py-2 text-xs font-semibold text-slate-200"
+          className="rounded-none border border-slate-600 px-3 py-2 text-xs font-semibold text-slate-200"
         >
           結果クリア
         </button>
@@ -139,7 +139,7 @@ function BacktestPanelInner({
         <select
           value={stockCode}
           onChange={(event) => setStockCode(event.target.value)}
-          className="rounded-lg border border-slate-600 bg-slate-950/70 px-2 py-2 text-xs text-slate-100"
+          className="rounded-none border border-slate-600 bg-slate-950/70 px-2 py-2 text-xs text-slate-100"
         >
           {stocks.map((stock) => (
             <option key={stock.code} value={stock.code}>
@@ -152,14 +152,14 @@ function BacktestPanelInner({
           type="date"
           value={startDate}
           onChange={(event) => setStartDate(event.target.value)}
-          className="rounded-lg border border-slate-600 bg-slate-950/70 px-2 py-2 text-xs text-slate-100"
+          className="rounded-none border border-slate-600 bg-slate-950/70 px-2 py-2 text-xs text-slate-100"
         />
 
         <input
           type="date"
           value={endDate}
           onChange={(event) => setEndDate(event.target.value)}
-          className="rounded-lg border border-slate-600 bg-slate-950/70 px-2 py-2 text-xs text-slate-100"
+          className="rounded-none border border-slate-600 bg-slate-950/70 px-2 py-2 text-xs text-slate-100"
         />
 
         <button
@@ -173,40 +173,40 @@ function BacktestPanelInner({
               endDate: endDate || undefined
             })
           }
-          className="rounded-lg border border-blue/40 bg-blue/10 px-3 py-2 text-xs font-semibold text-blue disabled:cursor-not-allowed disabled:opacity-50"
+          className="rounded-none border border-blue/40 bg-blue/10 px-3 py-2 text-xs font-semibold text-blue disabled:cursor-not-allowed disabled:opacity-50"
         >
           バックテスト実行
         </button>
       </div>
 
       <div className="mt-3 grid gap-2 md:grid-cols-5">
-        <div className="rounded-xl border border-border-subtle bg-canvas-deep/50 p-3">
-          <p className="text-[10px] font-medium uppercase tracking-widest text-text-muted">戦略リターン</p>
-          <p className={clsx("mt-1 text-base font-bold tabular-nums", (current?.totalReturnPct ?? 0) >= 0 ? "text-mint" : "text-danger")}>
+        <div className="rounded-none border border-border-subtle bg-canvas-deep/50 p-3">
+          <p className="text-[10px] font-medium uppercase tracking-widest text-text-muted font-orb">戦略リターン</p>
+          <p className={clsx("mt-1 text-base font-bold tabular-nums font-mono-tech", (current?.totalReturnPct ?? 0) >= 0 ? "text-mint" : "text-danger")}>
             {formatPct(current?.totalReturnPct ?? null)}
           </p>
         </div>
-        <div className="rounded-xl border border-border-subtle bg-canvas-deep/50 p-3">
-          <p className="text-[10px] font-medium uppercase tracking-widest text-text-muted">ベンチマークリターン</p>
-          <p className={clsx("mt-1 text-base font-bold tabular-nums", (current?.benchmarkReturnPct ?? 0) >= 0 ? "text-mint" : "text-danger")}>
+        <div className="rounded-none border border-border-subtle bg-canvas-deep/50 p-3">
+          <p className="text-[10px] font-medium uppercase tracking-widest text-text-muted font-orb">ベンチマークリターン</p>
+          <p className={clsx("mt-1 text-base font-bold tabular-nums font-mono-tech", (current?.benchmarkReturnPct ?? 0) >= 0 ? "text-mint" : "text-danger")}>
             {formatPct(current?.benchmarkReturnPct ?? null)}
           </p>
         </div>
-        <div className="rounded-xl border border-border-subtle bg-canvas-deep/50 p-3">
-          <p className="text-[10px] font-medium uppercase tracking-widest text-text-muted">超過リターン</p>
-          <p className={clsx("mt-1 text-base font-bold tabular-nums", (current?.excessReturnPct ?? 0) >= 0 ? "text-mint" : "text-danger")}>
+        <div className="rounded-none border border-border-subtle bg-canvas-deep/50 p-3">
+          <p className="text-[10px] font-medium uppercase tracking-widest text-text-muted font-orb">超過リターン</p>
+          <p className={clsx("mt-1 text-base font-bold tabular-nums font-mono-tech", (current?.excessReturnPct ?? 0) >= 0 ? "text-mint" : "text-danger")}>
             {formatPct(current?.excessReturnPct ?? null)}
           </p>
         </div>
-        <div className="rounded-xl border border-border-subtle bg-canvas-deep/50 p-3">
-          <p className="text-[10px] font-medium uppercase tracking-widest text-text-muted">最大ドローダウン</p>
-          <p className="mt-1 text-base font-bold tabular-nums text-danger">
+        <div className="rounded-none border border-border-subtle bg-canvas-deep/50 p-3">
+          <p className="text-[10px] font-medium uppercase tracking-widest text-text-muted font-orb">最大ドローダウン</p>
+          <p className="mt-1 text-base font-bold tabular-nums text-danger font-mono-tech">
             {formatPct(current?.maxDrawdownPct ?? null)}
           </p>
         </div>
-        <div className="rounded-xl border border-border-subtle bg-canvas-deep/50 p-3">
-          <p className="text-[10px] font-medium uppercase tracking-widest text-text-muted">判定切替回数</p>
-          <p className="mt-1 text-base font-bold tabular-nums text-text-primary">{current?.actionChanges ?? 0}</p>
+        <div className="rounded-none border border-border-subtle bg-canvas-deep/50 p-3">
+          <p className="text-[10px] font-medium uppercase tracking-widest text-text-muted font-orb">判定切替回数</p>
+          <p className="mt-1 text-base font-bold tabular-nums text-text-primary font-mono-tech">{current?.actionChanges ?? 0}</p>
         </div>
       </div>
 

@@ -151,14 +151,14 @@ export function StockDetailDrawer({
       >
         <div className="mb-5 flex items-start justify-between gap-3">
           <div>
-            <p className="text-[11px] font-medium uppercase tracking-[0.14em] text-text-muted">{stock.code}</p>
+            <p className="font-mono-tech text-[11px] font-medium uppercase tracking-[0.14em] text-text-muted">{stock.code}</p>
             <h3 className="text-2xl font-bold tracking-heading text-text-primary">{stock.name}</h3>
             <p className="mt-1 text-sm text-text-secondary">{stock.sector}</p>
           </div>
           <button
             type="button"
             onClick={onClose}
-            className="rounded-lg border border-border-subtle px-3 py-2 text-xs font-medium text-text-secondary transition-colors hover:border-border-active hover:text-text-primary"
+            className="rounded-none border border-mint/30 px-3 py-2 text-xs font-medium text-text-secondary transition-colors hover:border-mint/60 hover:text-text-primary"
           >
             閉じる
           </button>
@@ -169,11 +169,11 @@ export function StockDetailDrawer({
             {formatActionLabel(stock.evaluatedAction)}
           </Badge>
           <ScoreRing score={stock.score} size={36} strokeWidth={2.5} className="ml-1" />
-          <span className="rounded-full border border-border-subtle px-3 py-1 text-xs text-text-secondary">{formatMarketCap(stock.marketCap)}</span>
+          <span className="rounded-none border border-border-subtle px-3 py-1 text-xs text-text-secondary">{formatMarketCap(stock.marketCap)}</span>
         </div>
 
         <div className="sticky top-0 z-10 mb-4 card-surface p-4 backdrop-blur border-blue/20">
-          <h4 className="text-sm font-semibold text-text-primary">判断クイックレビュー</h4>
+          <h4 className="font-orb text-sm font-semibold uppercase tracking-wider text-text-primary">判断クイックレビュー</h4>
           <p className="mt-2 text-sm text-text-secondary">
             今の判定: <strong className="text-text-primary">{formatActionLabel(stock.evaluatedAction)}</strong> / 本命度 <strong className="text-text-primary">{stock.score}</strong>
           </p>
@@ -186,7 +186,7 @@ export function StockDetailDrawer({
         </div>
 
         {hiddenByFilter ? (
-          <div className="mb-4 rounded-xl border border-amber/25 bg-amber/5 px-3 py-2 text-sm text-amber">
+          <div className="mb-4 rounded-none border border-amber/25 bg-amber/5 px-3 py-2 text-sm text-amber">
             現在の絞り込み条件では一覧に表示されていません
           </div>
         ) : null}
@@ -220,14 +220,14 @@ export function StockDetailDrawer({
                 <YAxis stroke="#9fb4d7" tick={{ fontSize: 11 }} width={36} />
                 <Tooltip
                   contentStyle={{
-                    background: "rgba(18, 38, 70, 0.95)",
-                    border: "1px solid rgba(255,255,255,0.08)",
-                    borderRadius: "12px",
+                    background: "rgba(0, 0, 0, 0.95)",
+                    border: "1px solid rgba(0,255,65,0.25)",
+                    borderRadius: "0px",
                     backdropFilter: "blur(8px)"
                   }}
                 />
-                <Line type="monotone" dataKey="price" name="銘柄" stroke="#5bf0ba" strokeWidth={2.5} dot={false} />
-                <Line type="monotone" dataKey="benchmark" name="ベンチマーク" stroke="#8bb0ff" strokeWidth={2.5} dot={false} />
+                <Line type="monotone" dataKey="price" name="銘柄" stroke="#00ff41" strokeWidth={2.5} dot={false} />
+                <Line type="monotone" dataKey="benchmark" name="ベンチマーク" stroke="#00e5ff" strokeWidth={2.5} dot={false} />
               </LineChart>
             </ResponsiveContainer>
           </div>
@@ -241,27 +241,27 @@ export function StockDetailDrawer({
           <dl className="mt-3 grid grid-cols-2 gap-3 text-sm">
             <div>
               <dt className="text-text-muted text-xs">株価</dt>
-              <dd className="text-text-primary font-medium">{formatYen(stock.price)}</dd>
+              <dd className="font-mono-tech text-text-primary font-medium">{formatYen(stock.price)}</dd>
             </div>
             <div>
               <dt className="text-text-muted text-xs">前日比</dt>
-              <dd className="text-text-primary font-medium">{formatPercent(stock.changePercent)}</dd>
+              <dd className="font-mono-tech text-text-primary font-medium">{formatPercent(stock.changePercent)}</dd>
             </div>
             <div>
               <dt className="text-text-muted text-xs">売上成長</dt>
-              <dd className="text-text-primary font-medium">{formatPercent(stock.revenueGrowth)}</dd>
+              <dd className="font-mono-tech text-text-primary font-medium">{formatPercent(stock.revenueGrowth)}</dd>
             </div>
             <div>
               <dt className="text-text-muted text-xs">営業利益成長</dt>
-              <dd className="text-text-primary font-medium">{formatPercent(stock.opGrowth)}</dd>
+              <dd className="font-mono-tech text-text-primary font-medium">{formatPercent(stock.opGrowth)}</dd>
             </div>
             <div>
               <dt className="text-text-muted text-xs">営業CF</dt>
-              <dd className="text-text-primary font-medium">{stock.operatingCF === null ? "-" : `${stock.operatingCF.toLocaleString("ja-JP")}`}</dd>
+              <dd className="font-mono-tech text-text-primary font-medium">{stock.operatingCF === null ? "-" : `${stock.operatingCF.toLocaleString("ja-JP")}`}</dd>
             </div>
             <div>
               <dt className="text-text-muted text-xs">PER / PBR</dt>
-              <dd className="text-text-primary font-medium">
+              <dd className="font-mono-tech text-text-primary font-medium">
                 {formatNullableNumber(stock.per)} / {formatNullableNumber(stock.pbr)}
               </dd>
             </div>
@@ -273,9 +273,9 @@ export function StockDetailDrawer({
             <span className="text-xs text-text-muted">次回決算で見る数字: </span>
             {stock.coreKpiLabel}: <strong className="text-text-primary">{stock.coreKpiValue}</strong>
           </p>
-          <h4 className="mt-3 text-xs font-semibold uppercase tracking-wider text-text-muted">崩れる条件</h4>
+          <h4 className="mt-3 font-orb text-xs font-semibold uppercase tracking-wider text-text-muted">崩れる条件</h4>
           <p className="mt-2 text-sm leading-7 text-text-secondary">{stock.collapseCondition}</p>
-          <h4 className="mt-4 text-xs font-semibold uppercase tracking-wider text-text-muted">危険信号</h4>
+          <h4 className="mt-4 font-orb text-xs font-semibold uppercase tracking-wider text-text-muted">危険信号</h4>
           <p className="mt-2 text-sm leading-7 text-text-secondary">{stock.riskSignal}</p>
         </CollapsibleSection>
 
@@ -287,7 +287,7 @@ export function StockDetailDrawer({
                 value={hypothesisDraft}
                 onChange={(event) => setHypothesisDraft(event.target.value)}
                 placeholder="例: 営業CF改善が継続するなら buy_now 維持"
-                className="mt-1 h-20 w-full rounded-xl border border-border-subtle bg-canvas-deep/80 px-3 py-2 text-sm text-text-primary outline-none transition-colors focus:border-border-active"
+                className="mt-1 h-20 w-full rounded-none border border-mint/30 bg-canvas-deep/80 px-3 py-2 text-sm text-text-primary outline-none transition-colors focus:border-mint"
               />
             </label>
             <label className="text-xs text-text-secondary">
@@ -296,7 +296,7 @@ export function StockDetailDrawer({
                 value={rationaleDraft}
                 onChange={(event) => setRationaleDraft(event.target.value)}
                 placeholder="数字と散文の根拠を短く残す"
-                className="mt-1 h-20 w-full rounded-xl border border-border-subtle bg-canvas-deep/80 px-3 py-2 text-sm text-text-primary outline-none transition-colors focus:border-border-active"
+                className="mt-1 h-20 w-full rounded-none border border-mint/30 bg-canvas-deep/80 px-3 py-2 text-sm text-text-primary outline-none transition-colors focus:border-mint"
               />
             </label>
             <label className="text-xs text-text-secondary">
@@ -305,7 +305,7 @@ export function StockDetailDrawer({
                 type="date"
                 value={reviewDateDraft}
                 onChange={(event) => setReviewDateDraft(event.target.value)}
-                className="mt-1 w-full rounded-xl border border-border-subtle bg-canvas-deep/80 px-3 py-2 text-sm text-text-primary outline-none transition-colors focus:border-border-active"
+                className="mt-1 w-full rounded-none border border-mint/30 bg-canvas-deep/80 px-3 py-2 text-sm text-text-primary outline-none transition-colors focus:border-mint"
               />
             </label>
             <label className="text-xs text-text-secondary">
@@ -314,7 +314,7 @@ export function StockDetailDrawer({
                 value={outcomeDraft}
                 onChange={(event) => setOutcomeDraft(event.target.value)}
                 placeholder="結果を簡潔に残す"
-                className="mt-1 h-20 w-full rounded-xl border border-border-subtle bg-canvas-deep/80 px-3 py-2 text-sm text-text-primary outline-none transition-colors focus:border-border-active"
+                className="mt-1 h-20 w-full rounded-none border border-mint/30 bg-canvas-deep/80 px-3 py-2 text-sm text-text-primary outline-none transition-colors focus:border-mint"
               />
             </label>
           </div>
@@ -322,7 +322,7 @@ export function StockDetailDrawer({
             <button
               type="button"
               onClick={handleSaveHypothesis}
-              className="rounded-lg border border-border-subtle px-3 py-2 text-xs font-medium text-text-secondary transition-colors hover:border-border-active hover:text-text-primary"
+              className="rounded-none border border-mint/30 px-3 py-2 text-xs font-medium text-text-secondary transition-colors hover:border-mint/60 hover:text-text-primary"
             >
               仮説ログ保存
             </button>
@@ -335,13 +335,13 @@ export function StockDetailDrawer({
             value={memoDraft}
             onChange={(event) => setMemoDraft(event.target.value)}
             placeholder="この銘柄の判断メモを保存"
-            className="mt-3 h-28 w-full rounded-xl border border-border-subtle bg-canvas-deep/80 px-3 py-3 text-sm text-text-primary outline-none transition-colors focus:border-border-active"
+            className="mt-3 h-28 w-full rounded-none border border-mint/30 bg-canvas-deep/80 px-3 py-3 text-sm text-text-primary outline-none transition-colors focus:border-mint"
           />
           <div className="mt-3 flex items-center justify-between gap-3">
             <button
               type="button"
               onClick={handleSave}
-              className="rounded-lg border border-border-subtle px-3 py-2 text-xs font-medium text-text-secondary transition-colors hover:border-border-active hover:text-text-primary"
+              className="rounded-none border border-mint/30 px-3 py-2 text-xs font-medium text-text-secondary transition-colors hover:border-mint/60 hover:text-text-primary"
             >
               メモ保存
             </button>
@@ -352,7 +352,7 @@ export function StockDetailDrawer({
         <button
           type="button"
           onClick={() => onToggleWatch(stock.id)}
-          className="mt-4 w-full rounded-xl border border-border-subtle px-4 py-3 text-sm font-medium text-text-secondary transition-colors hover:border-border-active hover:text-text-primary"
+          className="mt-4 w-full rounded-none border border-mint/30 px-4 py-3 text-sm font-medium text-text-secondary transition-colors hover:border-mint/60 hover:text-text-primary"
         >
           {stock.watched ? "監視から外す" : "監視に追加"}
         </button>

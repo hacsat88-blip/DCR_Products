@@ -108,9 +108,9 @@ function StalenessBar({ lastUpdatedAt }: { lastUpdatedAt: string | null }): JSX.
   const color = progress < 0.5 ? "bg-mint" : progress < 1 ? "bg-amber" : "bg-danger";
 
   return (
-    <div className="h-[2px] w-16 rounded-full bg-canvas-deep/80 overflow-hidden">
+    <div className="h-[2px] w-16 rounded-none bg-canvas-deep/80 overflow-hidden">
       <div
-        className={clsx("h-full rounded-full transition-all duration-500", color)}
+        className={clsx("h-full rounded-none transition-all duration-500", color)}
         style={{ width: `${progress * 100}%` }}
       />
     </div>
@@ -139,7 +139,7 @@ export function DataQualityRibbon({
         {/* Data mode badge */}
         <span
           className={clsx(
-            "inline-flex items-center gap-1.5 rounded-full border px-3 py-1 font-medium",
+            "inline-flex items-center gap-1.5 rounded-none border px-3 py-1 font-medium",
             dataMode === "live" && "border-mint/25 bg-mint/8 text-mint",
             dataMode === "fallback" && "border-amber/25 bg-amber/8 text-amber",
             dataMode === "mock" && "border-border-subtle bg-canvas-raised/60 text-text-secondary"
@@ -160,10 +160,10 @@ export function DataQualityRibbon({
         <span className="hidden h-4 w-px bg-border-subtle sm:block" />
 
         {/* Last updated with elapsed + progress bar */}
-        <span className="inline-flex items-center gap-2 rounded-full border border-border-subtle bg-canvas-deep/50 px-3 py-1 text-text-muted">
+        <span className="inline-flex items-center gap-2 rounded-none border border-border-subtle bg-canvas-deep/50 px-3 py-1 text-text-muted">
           最終更新:
-          <span className="text-text-secondary">{formatDateTime(lastUpdatedAt)}</span>
-          <span className={clsx("font-medium", isStale ? "text-danger" : "text-text-secondary")}>
+          <span className="font-mono-tech text-text-secondary">{formatDateTime(lastUpdatedAt)}</span>
+          <span className={clsx("font-medium font-mono-tech", isStale ? "text-danger" : "text-text-secondary")}>
             ({elapsed})
           </span>
           <StalenessBar lastUpdatedAt={lastUpdatedAt} />
@@ -177,7 +177,7 @@ export function DataQualityRibbon({
           <span
             key={item.provider}
             className={clsx(
-              "inline-flex items-center gap-1.5 rounded-full border px-3 py-1 font-medium",
+              "inline-flex items-center gap-1.5 rounded-none border px-3 py-1 font-medium",
               item.ok
                 ? "border-border-subtle bg-canvas-deep/50 text-text-secondary"
                 : "border-danger/25 bg-danger/8 text-danger"
@@ -187,7 +187,7 @@ export function DataQualityRibbon({
             <span className={clsx("h-1.5 w-1.5 rounded-full", item.ok ? "bg-mint" : "bg-danger")} />
             {providerLabel(item.provider)}: {item.ok ? "正常" : "失敗"}
             {item.latencyMs != null && (
-              <span className="text-text-muted">({item.latencyMs}ms)</span>
+              <span className="font-mono-tech text-text-muted">({item.latencyMs}ms)</span>
             )}
           </span>
         ))}
@@ -196,7 +196,7 @@ export function DataQualityRibbon({
         {nextRefresh && (
           <>
             <span className="hidden h-4 w-px bg-border-subtle sm:block" />
-            <span className="inline-flex items-center gap-1.5 rounded-full border border-blue/20 bg-blue/6 px-3 py-1 text-blue">
+            <span className="inline-flex items-center gap-1.5 rounded-none border border-blue/20 bg-blue/6 px-3 py-1 text-blue">
               ⏱ 次回更新: {nextRefresh}
             </span>
           </>

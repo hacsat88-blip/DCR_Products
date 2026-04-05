@@ -3,11 +3,15 @@ import { NextRequest, NextResponse } from "next/server";
 const YAHOO_CHART_ENDPOINT = "https://query1.finance.yahoo.com/v8/finance/chart/%5EN225";
 const CACHE_TTL_SECONDS = 300;
 
-const VALID_RANGES = ["5d", "1mo", "3mo", "6mo", "1y"] as const;
+const VALID_RANGES = ["1d", "5d", "1mo", "3mo", "6mo", "1y"] as const;
 type Range = (typeof VALID_RANGES)[number];
+
+const VALID_INTERVALS = ["5m", "15m", "1h", "1d", "1wk"] as const;
 
 function rangeToInterval(range: Range): string {
   switch (range) {
+    case "1d":
+      return "5m";
     case "1y":
       return "1wk";
     default:
@@ -30,7 +34,27 @@ type NikkeiPayload = {
   history: NikkeiHistoryPoint[];
 };
 
-const cache = new Map<string, { expiresAt: number; payload: NikkeiPayload }>();
+type OhlcPoint = {
+  date: string;
+  time: number;
+  open: number;
+  high: number;
+  low: number;
+  close: number;
+  volume: number;
+};
+
+type OhlcPayload = {
+  latestClose: number | null;
+  prevClose: number | null;
+  diff: number | null;
+  diffPercent: number | null;
+  asOf: string | null;
+  source: string;
+  ohlc: OhlcPoint[];
+};
+
+const cache = new Map<string, { expiresAt: number; payload: NikkeiPayload | OhlcPayload }>();
 
 function toNumber(value: unknown): number | null {
   if (value === null || value === undefined || value === "") {
@@ -67,9 +91,9 @@ function toIso(value: unknown): string | null {
   return Number.isNaN(date.getTime()) ? null : date.toISOString();
 }
 
-async function fetchNikkeiDaily(range: Range): Promise<NikkeiPayload> {
+async function fetchNikkeiDaily(range: Range, interval: string): Promise<NikkeiPayload> {
   const url = new URL(YAHOO_CHART_ENDPOINT);
-  url.searchParams.set("interval", rangeToInterval(range));
+  url.searchParams.set("interval", interval);
   url.searchParams.set("range", range);
 
   const response = await fetch(url.toString(), { cache: "no-store" });
@@ -127,6 +151,93 @@ async function fetchNikkeiDaily(range: Range): Promise<NikkeiPayload> {
   };
 }
 
+async function fetchNikkeiOhlc(range: Range, interval: string): Promise<OhlcPayload> {
+  const url = new URL(YAHOO_CHART_ENDPOINT);
+  url.searchParams.set("interval", interval);
+  url.searchParams.set("range", range);
+
+  const response = await fetch(url.toString(), { cache: "no-store" });
+  if (!response.ok) {
+    throw new Error(`Nikkei request failed: HTTP ${response.status}`);
+  }
+
+  const payload = (await response.json()) as {
+    chart?: {
+      result?: Array<{
+        meta?: Record<string, unknown>;
+        timestamp?: unknown[];
+        indicators?: {
+          quote?: Array<{
+            open?: unknown[];
+            high?: unknown[];
+            low?: unknown[];
+            close?: unknown[];
+            volume?: unknown[];
+          }>;
+        };
+      }>;
+    };
+  };
+
+  const result = payload.chart?.result?.[0];
+  if (!result) {
+    throw new Error("Nikkei payload is empty");
+  }
+
+  const meta = result.meta ?? {};
+  const quote = result.indicators?.quote?.[0];
+  const closesArray = quote?.close;
+  const closes = pickLastTwo(closesArray);
+  const latestClose = closes.latest ?? toNumber(meta.regularMarketPrice);
+  const prevClose = closes.previous ?? toNumber(meta.previousClose);
+  const diff =
+    latestClose !== null && prevClose !== null && Number.isFinite(latestClose) && Number.isFinite(prevClose)
+      ? latestClose - prevClose
+      : null;
+  const diffPercent =
+    diff !== null && prevClose !== null && prevClose !== 0 ? (diff / prevClose) * 100 : null;
+  const timestamps = Array.isArray(result.timestamp) ? result.timestamp : [];
+  const latestTs = timestamps.length > 0 ? timestamps[timestamps.length - 1] : meta.regularMarketTime;
+
+  const opens = Array.isArray(quote?.open) ? quote.open : [];
+  const highs = Array.isArray(quote?.high) ? quote.high : [];
+  const lows = Array.isArray(quote?.low) ? quote.low : [];
+  const rawCloses = Array.isArray(closesArray) ? closesArray : [];
+  const volumes = Array.isArray(quote?.volume) ? quote.volume : [];
+
+  const ohlc: OhlcPoint[] = [];
+  for (let i = 0; i < timestamps.length; i++) {
+    const ts = toNumber(timestamps[i]);
+    const o = toNumber(opens[i]);
+    const h = toNumber(highs[i]);
+    const l = toNumber(lows[i]);
+    const c = toNumber(rawCloses[i]);
+    const v = toNumber(volumes[i]);
+    if (ts !== null && o !== null && h !== null && l !== null && c !== null) {
+      const iso = toIso(timestamps[i]);
+      ohlc.push({
+        date: iso ?? "",
+        time: ts,
+        open: o,
+        high: h,
+        low: l,
+        close: c,
+        volume: v ?? 0,
+      });
+    }
+  }
+
+  return {
+    latestClose,
+    prevClose,
+    diff,
+    diffPercent,
+    asOf: toIso(latestTs),
+    source: "Yahoo Finance ^N225",
+    ohlc,
+  };
+}
+
 export async function GET(request: NextRequest): Promise<NextResponse> {
   const key = request.nextUrl.searchParams.get("index")?.trim().toLowerCase() ?? "nikkei";
   if (key !== "nikkei") {
@@ -138,7 +249,15 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
     ? (rawRange as Range)
     : "5d";
 
-  const cacheKey = `${key}-${range}`;
+  const format = request.nextUrl.searchParams.get("format")?.trim().toLowerCase() ?? "";
+  const isOhlc = format === "ohlc";
+
+  const rawInterval = request.nextUrl.searchParams.get("interval")?.trim().toLowerCase() ?? "";
+  const interval: string = (VALID_INTERVALS as readonly string[]).includes(rawInterval)
+    ? rawInterval
+    : rangeToInterval(range);
+
+  const cacheKey = `${key}-${range}-${interval}-${isOhlc ? "ohlc" : "close"}`;
 
   const now = Date.now();
   for (const [ck, entry] of cache.entries()) {
@@ -153,24 +272,26 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
   }
 
   try {
-    const payload = await fetchNikkeiDaily(range);
+    const payload = isOhlc
+      ? await fetchNikkeiOhlc(range, interval)
+      : await fetchNikkeiDaily(range, interval);
     cache.set(cacheKey, {
       expiresAt: now + CACHE_TTL_SECONDS * 1000,
       payload
     });
     return NextResponse.json(payload, { status: 200 });
   } catch (error) {
+    const base = {
+      latestClose: null,
+      prevClose: null,
+      diff: null,
+      diffPercent: null,
+      asOf: null,
+      source: "Nikkei fetch failed",
+      error: error instanceof Error ? error.message : "Unknown error"
+    };
     return NextResponse.json(
-      {
-        latestClose: null,
-        prevClose: null,
-        diff: null,
-        diffPercent: null,
-        asOf: null,
-        source: "Nikkei fetch failed",
-        history: [],
-        error: error instanceof Error ? error.message : "Unknown error"
-      },
+      isOhlc ? { ...base, ohlc: [] } : { ...base, history: [] },
       { status: 200 }
     );
   }

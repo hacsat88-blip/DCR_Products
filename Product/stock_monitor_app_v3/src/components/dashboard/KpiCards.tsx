@@ -123,7 +123,7 @@ function ExcessBars({
             {data.map((entry, i) => (
               <Cell
                 key={i}
-                fill={entry.d >= 0 ? "rgba(91,240,186,0.6)" : "rgba(255,135,152,0.6)"}
+                fill={entry.d >= 0 ? "rgba(0,255,65,0.6)" : "rgba(255,51,85,0.6)"}
               />
             ))}
           </Bar>
@@ -135,9 +135,9 @@ function ExcessBars({
 
 /* ─── Action distribution donut ─── */
 const ACTION_COLORS: Record<string, string> = {
-  buy: "#5bf0ba",
-  wait: "#ffc772",
-  exclude: "#ff8798"
+  buy: "#00ff41",
+  wait: "#ffd700",
+  exclude: "#ff3355"
 };
 
 function ActionDonut({ stocks }: { stocks: EvaluatedStock[] }): JSX.Element | null {
@@ -219,9 +219,9 @@ function KpiCardsInner({
       {/* Card 1: Strategy Index */}
       <div className="card-surface group relative overflow-hidden p-5 transition-all duration-300 hover:shadow-glow-mint">
         <div className="absolute inset-y-0 left-0 w-[2px] bg-mint/50" />
-        <p className="text-xs uppercase tracking-wider text-text-muted">戦略指数</p>
+        <p className="font-orb text-[10px] uppercase tracking-widest text-text-muted">戦略指数</p>
         <div className="mt-1.5 flex items-baseline gap-2">
-          <p className="text-3xl md:text-4xl tabular-nums font-semibold tracking-kpi text-text-primary">
+          <p className="font-mono-tech text-3xl md:text-4xl tabular-nums font-semibold tracking-kpi text-text-primary">
             {managerIndex.toFixed(1)}
             <span className="ml-1 text-sm font-normal text-text-muted">pt</span>
           </p>
@@ -235,15 +235,15 @@ function KpiCardsInner({
           )}
         </div>
         <p className="mt-1 text-xs text-text-muted">初期日=100</p>
-        <Sparkline data={managerSparkData} color="#5bf0ba" gradientId="spark-manager" />
+        <Sparkline data={managerSparkData} color="#00ff41" gradientId="spark-manager" />
       </div>
 
       {/* Card 2: Benchmark */}
       <div className="card-surface group relative overflow-hidden p-5 transition-all duration-300 hover:shadow-glow-blue">
         <div className="absolute inset-y-0 left-0 w-[2px] bg-blue/50" />
-        <p className="text-xs uppercase tracking-wider text-text-muted">ベンチマーク指数</p>
+        <p className="font-orb text-[10px] uppercase tracking-widest text-text-muted">ベンチマーク指数</p>
         <div className="mt-1.5 flex items-baseline gap-2">
-          <p className="text-3xl md:text-4xl tabular-nums font-semibold tracking-kpi text-text-primary">
+          <p className="font-mono-tech text-3xl md:text-4xl tabular-nums font-semibold tracking-kpi text-text-primary">
             {benchmarkIndex.toFixed(1)}
             <span className="ml-1 text-sm font-normal text-text-muted">pt</span>
           </p>
@@ -257,7 +257,7 @@ function KpiCardsInner({
           )}
         </div>
         <p className="mt-1 text-xs text-text-muted">初期日=100</p>
-        <Sparkline data={benchmarkSparkData} color="#8bb0ff" gradientId="spark-bench" />
+        <Sparkline data={benchmarkSparkData} color="#00e5ff" gradientId="spark-bench" />
       </div>
 
       {/* Card 3: Excess Return */}
@@ -274,10 +274,10 @@ function KpiCardsInner({
         }}
       >
         <div className={clsx("absolute inset-y-0 left-0 w-[2px]", excessTone === "positive" ? "bg-mint/50" : "bg-danger/50")} />
-        <p className="text-xs uppercase tracking-wider text-text-muted">超過リターン</p>
+        <p className="font-orb text-[10px] uppercase tracking-widest text-text-muted">超過リターン</p>
         <p
           className={clsx(
-            "mt-1.5 text-3xl md:text-4xl tabular-nums font-semibold tracking-kpi",
+            "mt-1.5 font-mono-tech text-3xl md:text-4xl tabular-nums font-semibold tracking-kpi",
             excessTone === "positive" ? "text-mint" : "text-danger"
           )}
         >
@@ -291,8 +291,8 @@ function KpiCardsInner({
       {/* Card 4: Watch / Holdings */}
       <div className="card-surface group relative overflow-hidden p-5 transition-all duration-300 hover:shadow-glow-amber">
         <div className="absolute inset-y-0 left-0 w-[2px] bg-amber/50" />
-        <p className="text-xs uppercase tracking-wider text-text-muted">銘柄サマリー</p>
-        <p className="mt-1.5 text-3xl md:text-4xl tabular-nums font-semibold tracking-kpi text-text-primary">{totalCount}</p>
+        <p className="font-orb text-[10px] uppercase tracking-widest text-text-muted">銘柄サマリー</p>
+        <p className="mt-1.5 font-mono-tech text-3xl md:text-4xl tabular-nums font-semibold tracking-kpi text-text-primary">{totalCount}</p>
         <div className="mt-1 flex flex-wrap gap-x-3 text-xs text-text-muted">
           <span>監視: <span className="text-text-secondary">{watchCount}銘柄</span></span>
           <span>保有: <span className="text-text-secondary">{holdingsCount}銘柄</span></span>
@@ -303,10 +303,10 @@ function KpiCardsInner({
       {/* Card 5: Nikkei 225 */}
       <div className="card-surface group relative overflow-hidden p-5 transition-all duration-300 hover:shadow-glow-amber">
         <div className="absolute inset-y-0 left-0 w-[2px] bg-accent-warm/50" />
-        <p className="flex items-center gap-1.5 text-xs uppercase tracking-wider text-text-muted">
+        <p className="flex items-center gap-1.5 font-orb text-[10px] uppercase tracking-widest text-text-muted">
           日経平均 終値 <TrendArrow value={diff} />
         </p>
-        <p className="mt-1.5 text-3xl md:text-4xl tabular-nums font-semibold tracking-kpi text-text-primary">
+        <p className="mt-1.5 font-mono-tech text-3xl md:text-4xl tabular-nums font-semibold tracking-kpi text-text-primary">
           {nikkei?.latestClose != null
             ? `${Math.round(nikkei.latestClose).toLocaleString("ja-JP")}円`
             : "-"}
@@ -323,7 +323,7 @@ function KpiCardsInner({
           <p className="mt-0.5 text-[10px] text-text-muted">{nikkei.sourceLabel}</p>
         )}
         {nikkeiSparkData.length >= 2 && (
-          <Sparkline data={nikkeiSparkData} color="#ffc772" gradientId="spark-nikkei" />
+          <Sparkline data={nikkeiSparkData} color="#ffd700" gradientId="spark-nikkei" />
         )}
       </div>
     </section>

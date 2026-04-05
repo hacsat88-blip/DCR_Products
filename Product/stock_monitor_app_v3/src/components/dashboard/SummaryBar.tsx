@@ -161,7 +161,7 @@ function ConnectionTest(): JSX.Element {
         type="button"
         onClick={() => void runTest()}
         disabled={testing}
-        className="rounded-full border border-border-subtle px-3 py-1 text-[11px] font-medium text-text-secondary transition-colors hover:border-border-active hover:text-text-primary disabled:opacity-50"
+        className="rounded-none border border-border-subtle px-3 py-1 text-[11px] font-medium text-text-secondary transition-colors hover:border-border-active hover:text-text-primary disabled:opacity-50"
       >
         {testing ? "テスト中..." : "接続テスト"}
       </button>
@@ -231,11 +231,11 @@ function SummaryBarInner({
   return (
     <section className="card-surface p-5">
       <div className="flex flex-wrap items-center justify-between gap-3">
-        <h2 className="text-base font-semibold tracking-heading text-text-primary">全体サマリー</h2>
+        <h2 className="text-base font-semibold tracking-heading text-text-primary font-orb">全体サマリー</h2>
         <div className="flex flex-wrap items-center gap-2">
           <span
             className={clsx(
-              "inline-flex items-center gap-1.5 rounded-full border px-3 py-1 text-[11px] font-medium",
+              "inline-flex items-center gap-1.5 rounded-none border px-3 py-1 text-[11px] font-medium",
               dataMode === "live" && "border-mint/30 bg-mint/8 text-mint",
               dataMode === "fallback" && "border-amber/30 bg-amber/8 text-amber",
               dataMode === "mock" && "border-border-subtle bg-canvas-raised/60 text-text-secondary"
@@ -250,13 +250,13 @@ function SummaryBarInner({
             データモード: {dataModeLabel(dataMode)}
           </span>
           {isStale ? (
-            <span className="inline-flex items-center gap-1.5 rounded-full border border-amber/30 bg-amber/8 px-3 py-1 text-[11px] font-medium text-amber">
+            <span className="inline-flex items-center gap-1.5 rounded-none border border-amber/30 bg-amber/8 px-3 py-1 text-[11px] font-medium text-amber">
               <span className="h-1.5 w-1.5 rounded-full bg-amber" />
               取得時刻が古い
             </span>
           ) : null}
           {sourceStaleProviders.length > 0 ? (
-            <span className="inline-flex items-center gap-1.5 rounded-full border border-danger/30 bg-danger/8 px-3 py-1 text-[11px] font-medium text-danger">
+            <span className="inline-flex items-center gap-1.5 rounded-none border border-danger/30 bg-danger/8 px-3 py-1 text-[11px] font-medium text-danger">
               <span className="h-1.5 w-1.5 rounded-full bg-danger" />
               元データが古い可能性
             </span>
@@ -265,14 +265,14 @@ function SummaryBarInner({
             type="button"
             onClick={() => void onRefresh()}
             disabled={isLoading}
-            className="rounded-full border border-border-subtle px-3 py-1 text-[11px] font-medium text-text-secondary transition-colors hover:border-border-active hover:text-text-primary disabled:opacity-50"
+            className="rounded-none border border-border-subtle px-3 py-1 text-[11px] font-medium text-text-secondary transition-colors hover:border-border-active hover:text-text-primary disabled:opacity-50"
           >
             {isLoading ? "読み込み中..." : "再取得"}
           </button>
         </div>
       </div>
 
-      <p className="mt-2 text-xs text-text-muted">最終更新: <span className="text-text-secondary">{formatDateTime(lastUpdatedAt)}</span></p>
+      <p className="mt-2 text-xs text-text-muted">最終更新: <span className="font-mono-tech text-text-secondary">{formatDateTime(lastUpdatedAt)}</span></p>
       {providerStatusSummary ? (
         <p className="mt-1 text-xs text-text-muted">取得状況: <span className="text-text-secondary">{providerStatusSummary}</span></p>
       ) : null}
@@ -286,7 +286,7 @@ function SummaryBarInner({
           <div
             key={item.provider}
             className={clsx(
-              "rounded-xl border px-3 py-2.5 text-xs",
+              "rounded-none border px-3 py-2.5 text-xs",
               item.ok ? "border-border-subtle bg-canvas-deep/50 text-text-secondary" : "border-amber/25 bg-amber/5 text-amber"
             )}
           >
@@ -295,7 +295,7 @@ function SummaryBarInner({
               {providerLabel(item.provider)}
             </p>
             <p className="mt-1">状態: <span className="text-text-primary">{providerStatusLabel(item)}</span></p>
-            <p>最終更新: <span className="text-text-primary">{formatDateTime(item.sourceTimestamp)}</span></p>
+            <p>最終更新: <span className="font-mono-tech text-text-primary">{formatDateTime(item.sourceTimestamp)}</span></p>
             {item.sourceLabel ? <p>取得元: {item.sourceLabel}</p> : null}
             {providerReasonLabel(item) ? <p className="mt-1">理由: {providerReasonLabel(item)}</p> : null}
           </div>
@@ -303,13 +303,13 @@ function SummaryBarInner({
       </div>
 
       {dataMode === "fallback" || dataMode === "mock" || error ? (
-        <div className="mt-4 rounded-xl border border-amber/25 bg-amber/5 px-3 py-2 text-sm text-amber">
+        <div className="mt-4 rounded-none border border-amber/25 bg-amber/5 px-3 py-2 text-sm text-amber">
           {fallbackReason ?? "実データの取得に失敗したため、補助データを表示しています。"}
         </div>
       ) : null}
 
       {error ? (
-        <details className="mt-2 rounded-lg border border-border-subtle bg-canvas-deep/60 px-3 py-2 text-xs text-text-secondary">
+        <details className="mt-2 rounded-none border border-border-subtle bg-canvas-deep/60 px-3 py-2 text-xs text-text-secondary">
           <summary className="cursor-pointer text-text-secondary">詳細ログを表示</summary>
           <p className="mt-2 whitespace-pre-wrap break-all text-danger">{error}</p>
         </details>

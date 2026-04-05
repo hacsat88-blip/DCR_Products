@@ -24,7 +24,7 @@ function toNumberOrNull(value: string): number | null {
 function FilterGroup({ title, children }: { title: string; children: React.ReactNode }): JSX.Element {
   return (
     <div>
-      <p className="mb-2 text-[10px] font-semibold uppercase tracking-[0.2em] text-slate-500">{title}</p>
+      <p className="mb-2 text-[10px] font-semibold font-orb uppercase tracking-[0.2em] text-text-muted">{title}</p>
       <div className="grid grid-cols-1 gap-2 md:grid-cols-2">{children}</div>
     </div>
   );
@@ -57,17 +57,17 @@ function FilterPanelInner({
   }, [filters]);
 
   return (
-    <section className="rounded-2xl border border-glass-border bg-panel p-4 shadow-card">
+    <section className="rounded-none border border-glass-border bg-panel p-4 shadow-card">
       <div className="mb-4 flex items-center justify-between gap-3">
         <div className="flex items-center gap-2">
-          <h2 className="text-sm font-semibold text-slate-100">絞り込み</h2>
+          <h2 className="text-sm font-semibold font-orb text-text-primary">絞り込み</h2>
           {activeCount > 0 && (
-            <span className="rounded-full bg-blue/20 px-2 py-0.5 text-[10px] font-bold text-blue">
+            <span className="rounded-none bg-blue/20 px-2 py-0.5 text-[10px] font-bold text-blue">
               {activeCount}
             </span>
           )}
           {watchCount != null && (
-            <span className="rounded-full bg-amber/15 px-2 py-0.5 text-[10px] font-bold text-amber">
+            <span className="rounded-none bg-amber/15 px-2 py-0.5 text-[10px] font-bold text-amber">
               監視 {watchCount}
             </span>
           )}
@@ -75,7 +75,7 @@ function FilterPanelInner({
         <button
           type="button"
           onClick={onReset}
-          className="rounded-lg border border-slate-700 px-3 py-1.5 text-xs text-slate-400 transition-colors hover:border-slate-500 hover:text-slate-200"
+          className="rounded-none border border-border-subtle px-3 py-1.5 text-xs text-text-muted transition-colors hover:border-slate-500 hover:text-slate-200"
         >
           リセット
         </button>
