@@ -68,18 +68,18 @@ export function RuleManager({
   }, [notificationPermission, notificationsAvailable, notificationsEnabled]);
 
   return (
-    <section className="rounded-2xl border border-slate-700/60 bg-panel p-5 shadow-card">
+    <section className="rounded-lg border border-border-subtle bg-panel p-5 shadow-card">
       <div className="mb-3 flex flex-wrap items-center justify-between gap-3">
-        <h2 className="text-lg font-semibold text-slate-100">アラートルール管理</h2>
+        <h2 className="text-lg font-semibold font-semiboldtext-text-primary">アラートルール管理</h2>
         <button
           type="button"
           onClick={onToggleNotifications}
-          className="rounded-lg border border-slate-600 px-3 py-2 text-xs font-semibold text-slate-200"
+          className="rounded-lg border border-border-subtle px-3 py-2 text-xs font-semibold text-slate-200"
         >
           ブラウザ通知 設定変更
         </button>
       </div>
-      <p className="mb-3 text-xs text-slate-300">{notificationStatus}</p>
+      <p className="mb-3 text-xs text-text-secondary">{notificationStatus}</p>
 
       <div className="mb-4 grid gap-2 md:grid-cols-3">
         {Object.values(ALERT_PRESET_CATALOG).map((preset) => (
@@ -87,21 +87,21 @@ export function RuleManager({
             key={preset.id}
             type="button"
             onClick={() => onAddPreset(preset.id)}
-            className="rounded-xl border border-slate-700 bg-slate-900/60 px-3 py-3 text-left"
+            className="rounded-lg border border-border-subtle bg-canvas-deep/60 px-3 py-3 text-left"
           >
-            <p className="text-sm font-semibold text-slate-100">{preset.name}</p>
-            <p className="mt-1 text-xs leading-5 text-slate-400">{preset.description}</p>
+            <p className="text-sm font-semibold text-text-primary">{preset.name}</p>
+            <p className="mt-1 text-xs leading-5 text-text-muted">{preset.description}</p>
           </button>
         ))}
       </div>
 
-      <div className="rounded-xl border border-slate-700 bg-slate-900/60 p-3">
-        <p className="text-sm font-semibold text-slate-100">個別ルール追加</p>
+      <div className="rounded-lg border border-border-subtle bg-canvas-deep/60 p-3">
+        <p className="text-sm font-semibold text-text-primary">個別ルール追加</p>
         <div className="mt-3 grid gap-2 md:grid-cols-4 xl:grid-cols-7">
           <select
             value={type}
             onChange={(event) => setType(event.target.value as AlertRuleType)}
-            className="rounded-lg border border-slate-600 bg-slate-950/60 px-2 py-2 text-xs text-slate-100"
+            className="rounded-lg border border-border-subtle bg-canvas/90 px-2 py-2 text-xs text-text-primary"
           >
             {Object.entries(ALERT_RULE_TYPE_LABELS).map(([key, label]) => (
               <option key={key} value={key}>
@@ -113,7 +113,7 @@ export function RuleManager({
           <select
             value={scope}
             onChange={(event) => setScope(event.target.value as AlertRule["scope"])}
-            className="rounded-lg border border-slate-600 bg-slate-950/60 px-2 py-2 text-xs text-slate-100"
+            className="rounded-lg border border-border-subtle bg-canvas/90 px-2 py-2 text-xs text-text-primary"
           >
             <option value="global">全体</option>
             <option value="stock">銘柄単位</option>
@@ -124,7 +124,7 @@ export function RuleManager({
             value={stockCode}
             onChange={(event) => setStockCode(event.target.value)}
             disabled={scope !== "stock"}
-            className="rounded-lg border border-slate-600 bg-slate-950/60 px-2 py-2 text-xs text-slate-100 disabled:opacity-50"
+            className="rounded-lg border border-border-subtle bg-canvas/90 px-2 py-2 text-xs text-text-primary disabled:opacity-50"
           >
             {stocks.map((stock) => (
               <option key={stock.code} value={stock.code}>
@@ -137,20 +137,20 @@ export function RuleManager({
             value={threshold}
             onChange={(event) => setThreshold(event.target.value)}
             placeholder="閾値"
-            className="rounded-lg border border-slate-600 bg-slate-950/60 px-2 py-2 text-xs text-slate-100"
+            className="rounded-lg border border-border-subtle bg-canvas/90 px-2 py-2 text-xs text-text-primary"
           />
 
           <input
             value={cooldown}
             onChange={(event) => setCooldown(event.target.value)}
             placeholder="再通知間隔(分)"
-            className="rounded-lg border border-slate-600 bg-slate-950/60 px-2 py-2 text-xs text-slate-100"
+            className="rounded-lg border border-border-subtle bg-canvas/90 px-2 py-2 text-xs text-text-primary"
           />
 
           <select
             value={priority}
             onChange={(event) => setPriority(event.target.value as "high" | "medium" | "low")}
-            className="rounded-lg border border-slate-600 bg-slate-950/60 px-2 py-2 text-xs text-slate-100"
+            className="rounded-lg border border-border-subtle bg-canvas/90 px-2 py-2 text-xs text-text-primary"
           >
             <option value="high">優先度: 高</option>
             <option value="medium">優先度: 中</option>
@@ -161,13 +161,13 @@ export function RuleManager({
             type="date"
             value={dueDate}
             onChange={(event) => setDueDate(event.target.value)}
-            className="rounded-lg border border-slate-600 bg-slate-950/60 px-2 py-2 text-xs text-slate-100"
+            className="rounded-lg border border-border-subtle bg-canvas/90 px-2 py-2 text-xs text-text-primary"
           />
         </div>
         <button
           type="button"
           disabled={!canAddRule}
-          className="mt-3 rounded-lg border border-blue/40 bg-blue/10 px-3 py-2 text-xs font-semibold text-blue disabled:cursor-not-allowed disabled:opacity-50"
+          className="mt-3 rounded-lg border border-secondary/40 bg-secondary/10 px-3 py-2 text-xs font-semibold text-secondary disabled:cursor-not-allowed disabled:opacity-50"
           onClick={() =>
             onAddRule({
               type,
@@ -192,14 +192,14 @@ export function RuleManager({
         {sortedRules.map((rule) => (
           <article
             key={rule.id}
-            className="rounded-xl border border-slate-700 bg-slate-900/50 p-3"
+            className="rounded-lg border border-border-subtle bg-canvas-deep/50 p-3"
           >
             <div className="flex flex-wrap items-center justify-between gap-2">
-              <p className="text-sm font-semibold text-slate-100">{ALERT_RULE_TYPE_LABELS[rule.type]}</p>
+              <p className="text-sm font-semibold text-text-primary">{ALERT_RULE_TYPE_LABELS[rule.type]}</p>
               <button
                 type="button"
                 onClick={() => onDeleteRule(rule.id)}
-                className="rounded-lg border border-slate-600 px-2 py-1 text-xs text-slate-200"
+                className="rounded-lg border border-border-subtle px-2 py-1 text-xs text-slate-200"
               >
                 削除
               </button>
@@ -209,7 +209,7 @@ export function RuleManager({
             ) : null}
 
             <div className="mt-2 grid gap-2 text-xs md:grid-cols-7">
-              <label className="flex items-center gap-2 text-slate-300">
+              <label className="flex items-center gap-2 text-text-secondary">
                 <input
                   type="checkbox"
                   checked={rule.enabled}
@@ -226,7 +226,7 @@ export function RuleManager({
                     stockCode: event.target.value === "stock" ? rule.stockCode ?? stocks[0]?.code : undefined
                   })
                 }
-                className="rounded-lg border border-slate-600 bg-slate-950/60 px-2 py-1 text-xs text-slate-100"
+                className="rounded-lg border border-border-subtle bg-canvas/90 px-2 py-1 text-xs text-text-primary"
               >
                 <option value="global">全体</option>
                 <option value="stock">銘柄単位</option>
@@ -237,7 +237,7 @@ export function RuleManager({
                 value={rule.stockCode ?? ""}
                 disabled={rule.scope !== "stock"}
                 onChange={(event) => onUpdateRule(rule.id, { stockCode: event.target.value })}
-                className="rounded-lg border border-slate-600 bg-slate-950/60 px-2 py-1 text-xs text-slate-100 disabled:opacity-50"
+                className="rounded-lg border border-border-subtle bg-canvas/90 px-2 py-1 text-xs text-text-primary disabled:opacity-50"
               >
                 <option value="">-</option>
                 {stocks.map((stock) => (
@@ -254,7 +254,7 @@ export function RuleManager({
                     threshold: event.target.value === "" ? undefined : Number(event.target.value)
                   })
                 }
-                className="rounded-lg border border-slate-600 bg-slate-950/60 px-2 py-1 text-xs text-slate-100"
+                className="rounded-lg border border-border-subtle bg-canvas/90 px-2 py-1 text-xs text-text-primary"
               />
 
               <input
@@ -264,7 +264,7 @@ export function RuleManager({
                     cooldownMinutes: event.target.value === "" ? 30 : Number(event.target.value)
                   })
                 }
-                className="rounded-lg border border-slate-600 bg-slate-950/60 px-2 py-1 text-xs text-slate-100"
+                className="rounded-lg border border-border-subtle bg-canvas/90 px-2 py-1 text-xs text-text-primary"
               />
 
               <select
@@ -272,7 +272,7 @@ export function RuleManager({
                 onChange={(event) =>
                   onUpdateRule(rule.id, { priority: event.target.value as "high" | "medium" | "low" })
                 }
-                className="rounded-lg border border-slate-600 bg-slate-950/60 px-2 py-1 text-xs text-slate-100"
+                className="rounded-lg border border-border-subtle bg-canvas/90 px-2 py-1 text-xs text-text-primary"
               >
                 <option value="high">優先:高</option>
                 <option value="medium">優先:中</option>
@@ -287,7 +287,7 @@ export function RuleManager({
                     dueDate: event.target.value.trim() === "" ? null : event.target.value
                   })
                 }
-                className="rounded-lg border border-slate-600 bg-slate-950/60 px-2 py-1 text-xs text-slate-100"
+                className="rounded-lg border border-border-subtle bg-canvas/90 px-2 py-1 text-xs text-text-primary"
               />
             </div>
           </article>

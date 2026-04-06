@@ -116,7 +116,7 @@ function StockRadarChartInner({ stock }: StockRadarChartProps) {
         {details.map((d) => (
           <div key={d.label} className="flex items-baseline gap-1">
             <span className="text-[10px] text-text-muted">{d.label}</span>
-            <span className="text-xs text-text-secondary font-medium">{d.value}</span>
+            <span className="text-xs font-mono tabular-nums text-text-secondary font-medium">{d.value}</span>
           </div>
         ))}
       </div>

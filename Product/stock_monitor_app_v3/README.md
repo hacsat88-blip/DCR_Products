@@ -259,3 +259,57 @@ JSON破損時は壊れたレコードのみ除外し、schema version 不一致�
 - snapshot差分分析（期間比較）
 - exportテンプレート拡張
 - サーバー側アーカイブ/共有
+
+## Phase 6: サイバーデザイン + AI ナビゲーター + ローソク足チャート
+
+### 概要
+
+Investment Dashboard のサイバー風デザインと AI 投資パイプラインを統合しました。
+
+- **デザインシステム全面置換**: 黒背景 + 緑 #00ff41、Orbitron / Share Tech Mono フォント、スキャンライン、グロー効果
+- **日経225ローソク足チャート**: TradingView lightweight-charts で 5分足〜週足に対応
+- **AI 投資ナビゲーター**: Gemini API による 4段階パイプライン（マクロ分析 → 銘柄選定 → ディベート → 最終評価）
+
+### 追加環境変数
+
+```env
+# AI ナビゲーター（Gemini API）
+GEMINI_API_KEY=your_gemini_api_key_here
+
+# Alpha Vantage（5分足・15分足・1時間足に必要）
+ALPHA_VANTAGE_API_KEY=your_alpha_vantage_api_key_here
+```
+
+- `GEMINI_API_KEY` 未設定時: ナビゲーターは mock データで動作
+- `ALPHA_VANTAGE_API_KEY` 未設定時: 日足・週足のみ利用可能（Yahoo Finance 経由）
+- Alpha Vantage 無料枠: 25 リクエスト/日
+
+### ナビゲーター使い方
+
+1. マーケットタブ上部の **「AI NAVIGATOR」** ボタンをクリック
+2. モーダルで市場（JP / US / BOTH）、リスク許容度、投資期間を設定
+3. **「EXECUTE RESEARCH」** でパイプライン実行
+4. 結果はマーケットタブ上部に表示（マクロ環境、銘柄テーブル、ディベート判定、ベストピック）
+5. JSON エクスポート / インポートで結果を保存・復元可能
+
+### ローソク足チャート
+
+- 5分足 / 15分足 / 1時間足: Alpha Vantage API（要 API キー）
+- 日足 / 週足: Yahoo Finance（API キー不要）
+- ボリュームヒストグラム表示
+- サイバーテーマ（黒背景、緑/赤ローソク、緑グリッド）
+
+### 主要新規ファイル
+
+- `src/components/dashboard/NikkeiCandlestickChart.tsx` — ローソク足チャート
+- `src/components/navigator/` — AI ナビゲーター UI 一式
+- `src/services/gemini.ts` — Gemini API サービス層
+- `src/store/useNavigatorStore.ts` — ナビゲーター状態管理
+- `src/hooks/useNikkeiOhlc.ts` — OHLC データ取得フック
+- `src/types/navigator.ts` — ナビゲーター型定義
+- `src/app/api/navigator/` — ナビゲーター API ルート
+- `src/app/api/market-index-intraday/route.ts` — Alpha Vantage イントラデイ API
+
+### localStorage キー（追加）
+
+- `stock-navigator-state-v1` — ナビゲーター設定・結果の永続化

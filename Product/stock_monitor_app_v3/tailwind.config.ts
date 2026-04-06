@@ -9,96 +9,153 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        canvas: "#071327",
+        canvas: "#0B0E14",
+        "canvas-deep": "#070910",
+        "canvas-raised": "#141821",
         panel: {
-          DEFAULT: "rgba(13, 30, 56, 0.86)",
-          hover: "rgba(13, 30, 56, 0.96)",
-          elevated: "rgba(18, 38, 70, 0.92)",
-          solid: "#0d1e38"
+          DEFAULT: "rgba(255,255,255,0.03)",
+          hover: "rgba(255,255,255,0.05)",
+          elevated: "rgba(255,255,255,0.07)",
+          solid: "#161920"
         },
+        primary: {
+          DEFAULT: "#4C6EF5",
+          50: "#EEF2FF",
+          100: "#D8E0FE",
+          200: "#B3C2FD",
+          300: "#8BA3FB",
+          400: "#6B88F8",
+          500: "#4C6EF5",
+          600: "#3B5BDB",
+          700: "#2F4DC0",
+          800: "#243D9E",
+          900: "#1A2F7A"
+        },
+        // positive = gains/profit (alias: mint for backward compat)
+        positive: {
+          DEFAULT: "#22C55E",
+          50: "#ECFDF5",
+          100: "#D1FAE5",
+          200: "#A7F3D0",
+          300: "#6EE7B7",
+          400: "#34D399",
+          500: "#22C55E",
+          600: "#16A34A",
+          700: "#15803D",
+          800: "#166534",
+          900: "#14532D"
+        },
+        // backward compat alias
         mint: {
-          DEFAULT: "#5bf0ba",
-          50: "#effefb",
-          100: "#c9fef0",
-          200: "#93fce2",
-          300: "#5bf0ba",
-          400: "#2adba0",
-          500: "#0ec288",
-          600: "#069d6f",
-          700: "#087d5b",
-          800: "#0c634a",
-          900: "#0c513e"
+          DEFAULT: "#22C55E",
+          50: "#ECFDF5",
+          100: "#D1FAE5",
+          200: "#A7F3D0",
+          300: "#6EE7B7",
+          400: "#34D399",
+          500: "#22C55E",
+          600: "#16A34A",
+          700: "#15803D",
+          800: "#166534",
+          900: "#14532D"
         },
+        secondary: {
+          DEFAULT: "#06B6D4",
+          50: "#ECFEFF",
+          100: "#CFFAFE",
+          200: "#A5F3FC",
+          300: "#67E8F9",
+          400: "#22D3EE",
+          500: "#06B6D4",
+          600: "#0891B2",
+          700: "#0E7490",
+          800: "#155E75",
+          900: "#164E63"
+        },
+        // backward compat alias
         blue: {
-          DEFAULT: "#8bb0ff",
-          50: "#f0f4ff",
-          100: "#dce4ff",
-          200: "#c0cfff",
-          300: "#8bb0ff",
-          400: "#6b94ff",
-          500: "#4d78f5",
-          600: "#3358e8",
-          700: "#2845cc",
-          800: "#2439a4",
-          900: "#233482"
+          DEFAULT: "#06B6D4",
+          50: "#ECFEFF",
+          100: "#CFFAFE",
+          200: "#A5F3FC",
+          300: "#67E8F9",
+          400: "#22D3EE",
+          500: "#06B6D4",
+          600: "#0891B2",
+          700: "#0E7490",
+          800: "#155E75",
+          900: "#164E63"
         },
         amber: {
-          DEFAULT: "#ffc772",
-          50: "#fffbeb",
-          100: "#fff3c6",
-          200: "#ffe488",
-          300: "#ffc772",
-          400: "#ffb340",
-          500: "#f99316",
-          600: "#dd6e0b",
-          700: "#b74c0c",
-          800: "#943b11",
-          900: "#7a3111"
+          DEFAULT: "#F59E0B",
+          50: "#FFFBEB",
+          100: "#FEF3C7",
+          200: "#FDE68A",
+          300: "#FCD34D",
+          400: "#FBBF24",
+          500: "#F59E0B",
+          600: "#D97706",
+          700: "#B45309",
+          800: "#92400E",
+          900: "#78350F"
+        },
+        // negative = losses (alias: danger for backward compat)
+        negative: {
+          DEFAULT: "#EF4444",
+          50: "#FEF2F2",
+          100: "#FEE2E2",
+          200: "#FECACA",
+          300: "#FCA5A5",
+          400: "#F87171",
+          500: "#EF4444",
+          600: "#DC2626",
+          700: "#B91C1C",
+          800: "#991B1B",
+          900: "#7F1D1D"
         },
         danger: {
-          DEFAULT: "#ff8798",
-          50: "#fff1f2",
-          100: "#ffe1e4",
-          200: "#ffc8cf",
-          300: "#ff8798",
-          400: "#ff5c72",
-          500: "#f83b56",
-          600: "#e5183a",
-          700: "#c1102e",
-          800: "#a0112b",
-          900: "#86132b"
+          DEFAULT: "#EF4444",
+          50: "#FEF2F2",
+          100: "#FEE2E2",
+          200: "#FECACA",
+          300: "#FCA5A5",
+          400: "#F87171",
+          500: "#EF4444",
+          600: "#DC2626",
+          700: "#B91C1C",
+          800: "#991B1B",
+          900: "#7F1D1D"
         },
         glass: {
-          border: "rgba(255, 255, 255, 0.08)",
-          "border-light": "rgba(255, 255, 255, 0.12)"
+          border: "rgba(148,163,184,0.06)",
+          "border-light": "rgba(148,163,184,0.10)"
         },
-        "canvas-deep": "#040d1a",
-        "canvas-raised": "#0f1d32",
-        "accent-warm": "#e8a87c",
-        "text-primary": "#e8edf5",
-        "text-secondary": "#8fa3c4",
-        "text-muted": "#5a7194",
-        "border-subtle": "#1e3050",
-        "border-active": "#2a4a6b"
+        "accent-warm": "#F59E0B",
+        "text-primary": "#F1F5F9",
+        "text-secondary": "#94A3B8",
+        "text-muted": "#64748B",
+        "border-subtle": "rgba(148,163,184,0.10)",
+        "border-active": "rgba(76,110,245,0.4)"
       },
       boxShadow: {
-        card: "0 24px 80px rgba(0,0,0,.3)",
-        elevated: "0 8px 32px rgba(0,0,0,.4), 0 2px 8px rgba(0,0,0,.2)",
-        "glow-mint": "0 0 20px rgba(91, 240, 186, 0.15), 0 0 4px rgba(91, 240, 186, 0.1)",
-        "glow-blue": "0 0 20px rgba(139, 176, 255, 0.15), 0 0 4px rgba(139, 176, 255, 0.1)",
-        "glow-amber": "0 0 20px rgba(255, 199, 114, 0.15), 0 0 4px rgba(255, 199, 114, 0.1)",
-        "glow-danger": "0 0 20px rgba(255, 135, 152, 0.15), 0 0 4px rgba(255, 135, 152, 0.1)",
-        inner: "inset 0 1px 2px rgba(0,0,0,.2)",
-        "card-hover": "0 28px 90px rgba(0,0,0,.35), 0 0 1px rgba(91, 240, 186, 0.08)",
-        "ambient-mint": "0 0 40px rgba(91, 240, 186, 0.06)",
-        "ambient-blue": "0 0 40px rgba(139, 176, 255, 0.06)"
+        card: "0 1px 3px rgba(0,0,0,0.3), 0 1px 2px rgba(0,0,0,0.2)",
+        elevated: "0 4px 12px rgba(0,0,0,0.4)",
+        "card-hover": "0 8px 24px rgba(0,0,0,0.45)",
+        inner: "inset 0 1px 2px rgba(0,0,0,.4)",
+        "focus-ring": "0 0 0 3px rgba(76,110,245,0.25)"
       },
       backdropBlur: {
         panel: "8px"
       },
+      fontFamily: {
+        // backward compat: font-orb now maps to Inter
+        orb: ["var(--font-inter)", "var(--font-noto)", "system-ui", "sans-serif"],
+        // backward compat: font-mono-tech now maps to system mono
+        "mono-tech": ["'SF Mono'", "'Fira Code'", "'Cascadia Code'", "monospace"]
+      },
       fontSize: {
-        kpi: ["3.5rem", { lineHeight: "1", fontWeight: "700", letterSpacing: "-0.02em" }],
-        metric: ["1.5rem", { lineHeight: "1.2", fontWeight: "600" }]
+        kpi: ["2.5rem", { lineHeight: "1.1", fontWeight: "700", letterSpacing: "-0.02em" }],
+        metric: ["1.25rem", { lineHeight: "1.3", fontWeight: "600" }]
       },
       keyframes: {
         slideInRight: {
@@ -126,8 +183,20 @@ const config: Config = {
           "100%": { transform: "rotate(360deg)" }
         },
         "score-pulse": {
-          "0%, 100%": { filter: "drop-shadow(0 0 2px rgba(91,240,186,0.3))" },
-          "50%": { filter: "drop-shadow(0 0 6px rgba(91,240,186,0.5))" }
+          "0%, 100%": { filter: "drop-shadow(0 0 2px rgba(76,110,245,0.2))" },
+          "50%": { filter: "drop-shadow(0 0 6px rgba(76,110,245,0.35))" }
+        },
+        "radar-draw": {
+          from: { strokeDashoffset: "400" },
+          to: { strokeDashoffset: "0" }
+        },
+        "star-pop": {
+          "0%": { transform: "scale(0)", opacity: "0" },
+          "60%": { transform: "scale(1.4)" },
+          "100%": { transform: "scale(1)", opacity: "1" }
+        },
+        "bar-fill": {
+          from: { width: "0%" }
         },
         "fade-in": {
           "0%": { opacity: "0", transform: "translateY(4px)" },
@@ -142,7 +211,10 @@ const config: Config = {
         "pulse-soft": "pulse-soft 2s infinite ease-in-out",
         "spin-slow": "spin-slow 1s linear infinite",
         "score-pulse": "score-pulse 3s ease-in-out infinite",
-        "fade-in": "fade-in 300ms ease-out"
+        "fade-in": "fade-in 300ms ease-out",
+        "radar-draw": "radar-draw 0.9s cubic-bezier(0.4,0,0.2,1) forwards",
+        "star-pop": "star-pop 0.25s ease forwards",
+        "bar-fill": "bar-fill 0.7s cubic-bezier(0.4,0,0.2,1) forwards"
       },
       letterSpacing: {
         kpi: "-0.02em",

@@ -37,7 +37,7 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
   render(): ReactNode {
     if (this.state.hasError) {
       return (
-        <div className="rounded-2xl border border-danger/30 bg-danger/5 p-6 text-center">
+        <div className="rounded-lg border border-danger/30 bg-danger/5 p-6 text-center">
           <p className="text-sm font-semibold text-danger">
             {this.props.fallbackLabel ?? "このセクション"}でエラーが発生しました
           </p>
@@ -47,7 +47,7 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
           <button
             type="button"
             onClick={this.handleRetry}
-            className="mt-3 rounded-lg border border-slate-600 px-4 py-2 text-xs font-semibold text-slate-200 transition hover:border-slate-400"
+            className="mt-3 rounded-lg border border-border-subtle px-4 py-2 text-xs font-semibold text-text-secondary transition hover:border-primary/50"
           >
             再試行
           </button>

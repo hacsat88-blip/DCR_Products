@@ -9,10 +9,10 @@ interface ScoreRingProps {
 }
 
 function scoreColor(score: number): string {
-  if (score >= 75) return "#5bf0ba";
-  if (score >= 55) return "#8bb0ff";
-  if (score >= 40) return "#ffc772";
-  return "#ff8798";
+  if (score >= 75) return "#22C55E";
+  if (score >= 55) return "#4C6EF5";
+  if (score >= 40) return "#ffd700";
+  return "#EF4444";
 }
 
 function scoreGradientId(score: number): string {
@@ -35,20 +35,20 @@ export function ScoreRing({ score, size = 48, strokeWidth = 3, className, showLa
       <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`}>
         <defs>
           <linearGradient id="score-grad-mint" x1="0%" y1="0%" x2="100%" y2="100%">
-            <stop offset="0%" stopColor="#5bf0ba" />
-            <stop offset="100%" stopColor="#2adba0" />
+            <stop offset="0%" stopColor="#22C55E" />
+            <stop offset="100%" stopColor="#16A34A" />
           </linearGradient>
           <linearGradient id="score-grad-blue" x1="0%" y1="0%" x2="100%" y2="100%">
-            <stop offset="0%" stopColor="#8bb0ff" />
-            <stop offset="100%" stopColor="#6b94ff" />
+            <stop offset="0%" stopColor="#4C6EF5" />
+            <stop offset="100%" stopColor="#3B5BDB" />
           </linearGradient>
           <linearGradient id="score-grad-amber" x1="0%" y1="0%" x2="100%" y2="100%">
-            <stop offset="0%" stopColor="#ffc772" />
-            <stop offset="100%" stopColor="#ffb340" />
+            <stop offset="0%" stopColor="#ffd700" />
+            <stop offset="100%" stopColor="#ccac00" />
           </linearGradient>
           <linearGradient id="score-grad-danger" x1="0%" y1="0%" x2="100%" y2="100%">
-            <stop offset="0%" stopColor="#ff8798" />
-            <stop offset="100%" stopColor="#ff5c72" />
+            <stop offset="0%" stopColor="#EF4444" />
+            <stop offset="100%" stopColor="#DC2626" />
           </linearGradient>
         </defs>
         <circle cx={size / 2} cy={size / 2} r={radius} className="score-ring-track" />
@@ -63,7 +63,7 @@ export function ScoreRing({ score, size = 48, strokeWidth = 3, className, showLa
         />
       </svg>
       {showLabel && (
-        <span className="absolute text-xs font-bold" style={{ color }}>
+        <span className="absolute font-mono tabular-nums text-xs font-bold" style={{ color }}>
           {score}
         </span>
       )}

@@ -13,7 +13,7 @@ interface AlertToastStackProps {
 function tone(severity: AlertEvent["severity"]): string {
   if (severity === "critical") return "border-danger/60 bg-danger/20 text-danger";
   if (severity === "warning") return "border-amber/60 bg-amber/20 text-amber";
-  return "border-blue/60 bg-blue/20 text-blue";
+  return "border-secondary/60 bg-secondary/20 text-secondary";
 }
 
 const TOAST_TTL_MS = 12_000;
@@ -97,11 +97,11 @@ export function AlertToastStack({ events, onDismiss }: AlertToastStackProps): JS
   }
 
   return (
-    <div className="fixed right-3 top-3 z-50 grid w-[min(360px,calc(100vw-24px))] gap-2 md:right-6 md:top-6">
+    <div role="log" aria-live="polite" aria-label="アラート通知" className="fixed right-3 top-3 z-50 grid w-[min(360px,calc(100vw-24px))] gap-2 md:right-6 md:top-6">
       {visible.map((event) => (
         <article
           key={event.id}
-          className={clsx("rounded-xl border px-3 py-3 shadow-2xl backdrop-blur", tone(event.severity))}
+          className={clsx("rounded-lg border px-3 py-3 shadow-2xl backdrop-blur", tone(event.severity))}
         >
           <div className="flex items-start justify-between gap-2">
             <p className="text-xs font-semibold">{event.title}</p>
@@ -111,14 +111,14 @@ export function AlertToastStack({ events, onDismiss }: AlertToastStackProps): JS
                 removeToast(event.id);
                 onDismiss?.(event.id);
               }}
-              className="rounded border border-slate-400/40 px-1.5 py-0.5 text-[10px] font-semibold text-slate-100 hover:bg-slate-900/40"
+              className="rounded-lg border border-slate-400/40 px-1.5 py-0.5 text-[10px] font-semibold text-text-primary hover:bg-canvas-deep/40"
               aria-label="アラートを閉じる"
               title="閉じる"
             >
               ✕
             </button>
           </div>
-          <p className="mt-1 text-xs leading-5 text-slate-100">{event.message}</p>
+          <p className="mt-1 text-xs leading-5 text-text-primary">{event.message}</p>
         </article>
       ))}
     </div>
