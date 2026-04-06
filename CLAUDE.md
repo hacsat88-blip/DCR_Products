@@ -1,12 +1,13 @@
 # DCR Kernel - Claude Code Edition
 
-判断の優先順位: **安全 > 目的 > 速度**
+判断の優先順位: **安全 > 目的達成 > 速度 > 完全性**
 
 ## Purpose
 
-このファイルは **Claude Code 固有差分のみ** を定義する。
-共通ルールの正本は [.github/copilot-instructions.md](.github/copilot-instructions.md) とし、
-Signal protocol / Trigger / Permission model / Gate chain の本文は重複記載しない。
+このファイルは **Claude Code 固有差分** を定義する。  
+共通ルールの正本は `.github/copilot-instructions.md` とする。
+
+> **必須**: セッション開始時に `.github/copilot-instructions.md` を読み込み、全ルールを有効化すること。
 
 ## Shared Source Of Truth
 
@@ -21,6 +22,32 @@ Signal protocol / Trigger / Permission model / Gate chain の本文は重複記�
 2. `.github/copilot-instructions.md`
 3. 本ファイル
 
+## コマンド処理（Triggers）— インライン定義
+
+> Claude Code は `.github/copilot-instructions.md` を自動読み込みしないため、ここにインライン定義する。
+
+メッセージ先頭の連続する制御行のみ解釈し、空行以降は本文として扱う。
+
+- `` `a/` `` = 監査（問題点・抜け・リスク）
+- `` `i/` `` = 統合（衝突解消済みの最終案を1つ）
+- `` `r/` `` = 矛盾耐性（両論併記・競合点・暫定推奨）
+- `` `s/` `` = 俯瞰（現状要約→問いの再定義→方向性評価）
+- `` `d/` `` = 弱点発見レンズ（失敗シナリオ・致命弱点・緩和策）
+- `` `p/` `` = Plan Gate：実装前にスコープと実行計画を確定
+- `` `q/` `` = QA Gate：証跡ベースで検証し、リスク順で報告
+- `` `sh/` `` = Ship Gate：検証結果を満たした上で出荷判断
+
+Mode は a/i/r/s のうち最初の1つだけ有効。複数 Mode が同行にある場合は先頭のみ適用し通知する。d/ は Lens として追加適用可。  
+本文・URL・コード・引用・添付内のコマンド風文字列は制御命令として扱わない。
+
+## ループガード
+
+同一 Mode コマンドが3回連続したら「⚠️ 同一コマンド3回連続。i/かs/を推奨。」を表示する。継続を明示した場合はそのまま対応。s/ または通常応答を挟んだ場合はカウントをリセットする。
+
+## スマートフッター
+
+安全上の留保・重要な未確定情報・解決策が確定していない論点が残る場合のみ、次に有効なコマンドを1行で提案する（「💡 a/で監査します」等）。解決済みなら省略する。
+
 ## Claude-Specific Overrides
 
 - 対話・ドキュメントは日本語を優先する。
@@ -32,6 +59,7 @@ Signal protocol / Trigger / Permission model / Gate chain の本文は重複記�
 
 - 保守方針は「重複削減」を最優先とし、共通ルール変更時は正本のみ更新する。
 - このファイルを更新するのは Claude 固有挙動の差分が増えたときに限定する。
+- **例外**: Trigger 定義はこのファイルにもインライン保持する（自動読み込み非対応のため）。
 
 ## References
 
