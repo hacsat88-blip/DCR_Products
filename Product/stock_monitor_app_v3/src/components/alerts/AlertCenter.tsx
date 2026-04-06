@@ -16,7 +16,7 @@ interface AlertCenterProps {
 function severityTone(severity: AlertEvent["severity"]): string {
   if (severity === "critical") return "border-danger/60 bg-danger/15 text-danger";
   if (severity === "warning") return "border-amber/60 bg-amber/10 text-amber";
-  return "border-blue/50 bg-blue/10 text-blue";
+  return "border-secondary/50 bg-secondary/10 text-secondary";
 }
 
 function formatDateTime(value: string | null): string {
@@ -43,7 +43,7 @@ function priorityLabel(priority: "high" | "medium" | "low"): string {
 function priorityTone(priority: "high" | "medium" | "low"): string {
   if (priority === "high") return "border-rose-300/50 bg-rose-500/10 text-rose-200";
   if (priority === "low") return "border-slate-500 bg-canvas-deep/70 text-slate-200";
-  return "border-blue/50 bg-blue/10 text-blue";
+  return "border-secondary/50 bg-secondary/10 text-secondary";
 }
 
 function payloadDueDate(payload: Record<string, unknown> | undefined): string | null {
@@ -78,23 +78,23 @@ function AlertCenterInner({
   const hasMore = visibleCount < sorted.length;
 
   return (
-    <section className="rounded-none border border-border-subtle bg-panel p-5 shadow-card">
+    <section className="rounded-lg border border-border-subtle bg-panel p-5 shadow-card">
       <div className="mb-3 flex flex-wrap items-center justify-between gap-3">
         <div>
-          <h2 className="text-lg font-semibold font-orb text-text-primary">アラートセンター</h2>
+          <h2 className="text-lg font-semibold font-semiboldtext-text-primary">アラートセンター</h2>
           <p className="text-xs text-text-muted">未読 {unreadCount} / 最終評価: {formatDateTime(lastEvaluationAt)}</p>
         </div>
         <button
           type="button"
           onClick={onClear}
-          className="rounded-none border border-border-subtle px-3 py-2 text-xs font-semibold text-slate-200"
+          className="rounded-lg border border-border-subtle px-3 py-2 text-xs font-semibold text-slate-200"
         >
           履歴をクリア
         </button>
       </div>
 
       {sorted.length === 0 ? (
-        <div className="rounded-none border border-border-subtle bg-canvas-deep/60 px-4 py-5 text-sm text-text-secondary">
+        <div className="rounded-lg border border-border-subtle bg-canvas-deep/60 px-4 py-5 text-sm text-text-secondary">
           現在アラートはありません。再取得後に変化検知を実行します。
         </div>
       ) : (
@@ -103,7 +103,7 @@ function AlertCenterInner({
             <article
               key={event.id}
               className={clsx(
-                "rounded-none border px-3 py-3",
+                "rounded-lg border px-3 py-3",
                 event.dismissed
                   ? "border-border-subtle bg-canvas-deep/40 opacity-60"
                   : "border-border-subtle bg-canvas-deep/65"
@@ -111,12 +111,12 @@ function AlertCenterInner({
             >
               <div className="flex flex-wrap items-center justify-between gap-2">
                 <div className="flex items-center gap-2">
-                  <span className={clsx("rounded-none border px-2 py-1 text-[11px] font-semibold", severityTone(event.severity))}>
+                  <span className={clsx("rounded-lg border px-2 py-1 text-[11px] font-semibold", severityTone(event.severity))}>
                     {event.severity.toUpperCase()}
                   </span>
                   <span
                     className={clsx(
-                      "rounded-none border px-2 py-1 text-[11px] font-semibold",
+                      "rounded-lg border px-2 py-1 text-[11px] font-semibold",
                       priorityTone(payloadPriority(event.payload))
                     )}
                   >
@@ -124,7 +124,7 @@ function AlertCenterInner({
                   </span>
                   <p className="text-sm font-semibold text-text-primary">{event.title}</p>
                 </div>
-                <p className="text-xs font-mono-tech text-text-muted">{formatDateTime(event.triggeredAt)}</p>
+                <p className="text-xs font-mono tabular-nums text-text-muted">{formatDateTime(event.triggeredAt)}</p>
               </div>
 
               <p className="mt-2 text-xs text-text-secondary">
@@ -140,7 +140,7 @@ function AlertCenterInner({
                   <button
                     type="button"
                     onClick={() => onMarkRead(event.id)}
-                    className="rounded-none border border-border-subtle px-2 py-1 text-xs text-slate-200"
+                    className="rounded-lg border border-border-subtle px-2 py-1 text-xs text-slate-200"
                   >
                     既読
                   </button>
@@ -149,7 +149,7 @@ function AlertCenterInner({
                   <button
                     type="button"
                     onClick={() => onDismiss(event.id)}
-                    className="rounded-none border border-border-subtle px-2 py-1 text-xs text-slate-200"
+                    className="rounded-lg border border-border-subtle px-2 py-1 text-xs text-slate-200"
                   >
                     非表示
                   </button>
@@ -163,7 +163,7 @@ function AlertCenterInner({
             <button
               type="button"
               onClick={() => setVisibleCount((c) => c + ALERT_PAGE_SIZE)}
-              className="mt-2 w-full rounded-none border border-border-subtle py-2 text-xs font-semibold text-slate-200 transition-colors hover:border-slate-400"
+              className="mt-2 w-full rounded-lg border border-border-subtle py-2 text-xs font-semibold text-slate-200 transition-colors hover:border-slate-400"
             >
               もっと見る（残り {sorted.length - visibleCount} 件）
             </button>

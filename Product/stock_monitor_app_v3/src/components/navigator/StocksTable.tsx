@@ -14,7 +14,7 @@ import type {
 // ── Signal badge mapping ────────────────────────────────
 
 const SIGNAL_STYLE: Record<DebateSignal, { label: string; cls: string }> = {
-  go: { label: "🟢 go", cls: "border-mint/40 text-mint bg-mint/5" },
+  go: { label: "🟢 go", cls: "border-positive/40 text-positive bg-positive/5" },
   watch: { label: "🟡 watch", cls: "border-amber/40 text-amber bg-amber/5" },
   out: { label: "🔴 out", cls: "border-danger/40 text-danger bg-danger/5" },
 };
@@ -92,7 +92,7 @@ export function StocksTable({ stocks, debate }: StocksTableProps): JSX.Element {
 
   return (
     <section className="animate-fade-in border border-glass-border bg-panel">
-      <h3 className="border-b border-glass-border px-4 py-3 font-orb text-[10px] uppercase tracking-widest text-text-muted">
+      <h3 className="border-b border-glass-border px-4 py-3 font-semiboldtext-[10px] uppercase tracking-widest text-text-muted">
         ▸ STOCK SELECTION + DEBATE SIGNALS
       </h3>
 
@@ -114,9 +114,9 @@ export function StocksTable({ stocks, debate }: StocksTableProps): JSX.Element {
                 <th
                   key={label + i}
                   className={clsx(
-                    "whitespace-nowrap px-3 py-2 font-orb text-[10px] uppercase tracking-widest text-text-muted",
+                    "whitespace-nowrap px-3 py-2 font-semiboldtext-[10px] uppercase tracking-widest text-text-muted",
                     w,
-                    key && "cursor-pointer select-none hover:text-mint",
+                    key && "cursor-pointer select-none hover:text-primary",
                   )}
                   onClick={key ? () => toggleSort(key) : undefined}
                   role={key ? "button" : undefined}
@@ -139,36 +139,36 @@ export function StocksTable({ stocks, debate }: StocksTableProps): JSX.Element {
               return (
                 <tr
                   key={stock.code}
-                  className="border-b border-glass-border transition-colors hover:bg-mint/5"
+                  className="border-b border-glass-border transition-colors hover:bg-positive/5"
                 >
-                  <td className="px-3 py-2 font-mono-tech text-[10px] text-text-muted">
+                  <td className="px-3 py-2 font-mono tabular-nums text-[10px] text-text-muted">
                     {String(idx + 1).padStart(2, "0")}
                   </td>
-                  <td className="px-3 py-2 font-mono-tech text-sm text-text-primary">
+                  <td className="px-3 py-2 font-mono tabular-nums text-sm text-text-primary">
                     {stock.code}
                   </td>
-                  <td className="px-3 py-2 font-mono-tech text-sm text-text-primary">
+                  <td className="px-3 py-2 font-mono tabular-nums text-sm text-text-primary">
                     {stock.name}
                   </td>
-                  <td className="px-3 py-2 font-mono-tech text-sm text-text-secondary">
+                  <td className="px-3 py-2 font-mono tabular-nums text-sm text-text-secondary">
                     {stock.price}
                   </td>
-                  <td className="px-3 py-2 font-mono-tech text-sm text-mint">
+                  <td className="px-3 py-2 font-mono tabular-nums text-sm text-positive">
                     {stock.fcfYield}
                   </td>
-                  <td className="px-3 py-2 font-mono-tech text-sm text-text-secondary">
+                  <td className="px-3 py-2 font-mono tabular-nums text-sm text-text-secondary">
                     {stock.cfMargin}
                   </td>
-                  <td className="px-3 py-2 font-mono-tech text-sm text-text-secondary">
+                  <td className="px-3 py-2 font-mono tabular-nums text-sm text-text-secondary">
                     {stock.cfTrend}
                   </td>
-                  <td className="px-3 py-2 font-mono-tech text-[11px] text-text-muted">
+                  <td className="px-3 py-2 font-mono tabular-nums text-[11px] text-text-muted">
                     {stock.sector}
                   </td>
                   <td className="px-3 py-2">
                     <span
                       className={clsx(
-                        "inline-block rounded-none border px-2 py-0.5 font-mono-tech text-[10px] uppercase",
+                        "inline-block rounded-lg border px-2 py-0.5 font-mono tabular-nums text-[10px] uppercase",
                         cfg.cls,
                       )}
                     >

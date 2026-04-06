@@ -13,7 +13,7 @@ interface AlertToastStackProps {
 function tone(severity: AlertEvent["severity"]): string {
   if (severity === "critical") return "border-danger/60 bg-danger/20 text-danger";
   if (severity === "warning") return "border-amber/60 bg-amber/20 text-amber";
-  return "border-blue/60 bg-blue/20 text-blue";
+  return "border-secondary/60 bg-secondary/20 text-secondary";
 }
 
 const TOAST_TTL_MS = 12_000;
@@ -101,7 +101,7 @@ export function AlertToastStack({ events, onDismiss }: AlertToastStackProps): JS
       {visible.map((event) => (
         <article
           key={event.id}
-          className={clsx("rounded-none border px-3 py-3 shadow-2xl backdrop-blur", tone(event.severity))}
+          className={clsx("rounded-lg border px-3 py-3 shadow-2xl backdrop-blur", tone(event.severity))}
         >
           <div className="flex items-start justify-between gap-2">
             <p className="text-xs font-semibold">{event.title}</p>
@@ -111,7 +111,7 @@ export function AlertToastStack({ events, onDismiss }: AlertToastStackProps): JS
                 removeToast(event.id);
                 onDismiss?.(event.id);
               }}
-              className="rounded-none border border-slate-400/40 px-1.5 py-0.5 text-[10px] font-semibold text-text-primary hover:bg-canvas-deep/40"
+              className="rounded-lg border border-slate-400/40 px-1.5 py-0.5 text-[10px] font-semibold text-text-primary hover:bg-canvas-deep/40"
               aria-label="アラートを閉じる"
               title="閉じる"
             >

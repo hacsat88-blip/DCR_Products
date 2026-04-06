@@ -24,7 +24,7 @@ function toNumberOrNull(value: string): number | null {
 function FilterGroup({ title, children }: { title: string; children: React.ReactNode }): JSX.Element {
   return (
     <div>
-      <p className="mb-2 text-[10px] font-semibold font-orb uppercase tracking-[0.2em] text-text-muted">{title}</p>
+      <p className="mb-2 text-[10px] font-semibold font-semibolduppercase tracking-[0.2em] text-text-muted">{title}</p>
       <div className="grid grid-cols-1 gap-2 md:grid-cols-2">{children}</div>
     </div>
   );
@@ -57,17 +57,17 @@ function FilterPanelInner({
   }, [filters]);
 
   return (
-    <section className="rounded-none border border-glass-border bg-panel p-4 shadow-card">
+    <section className="rounded-lg border border-glass-border bg-panel p-4 shadow-card">
       <div className="mb-4 flex items-center justify-between gap-3">
         <div className="flex items-center gap-2">
-          <h2 className="text-sm font-semibold font-orb text-text-primary">絞り込み</h2>
+          <h2 className="text-sm font-semibold font-semiboldtext-text-primary">絞り込み</h2>
           {activeCount > 0 && (
-            <span className="rounded-none bg-blue/20 px-2 py-0.5 text-[10px] font-bold text-blue">
+            <span className="rounded-lg bg-secondary/20 px-2 py-0.5 text-[10px] font-bold text-secondary">
               {activeCount}
             </span>
           )}
           {watchCount != null && (
-            <span className="rounded-none bg-amber/15 px-2 py-0.5 text-[10px] font-bold text-amber">
+            <span className="rounded-lg bg-amber/15 px-2 py-0.5 text-[10px] font-bold text-amber">
               監視 {watchCount}
             </span>
           )}
@@ -75,7 +75,7 @@ function FilterPanelInner({
         <button
           type="button"
           onClick={onReset}
-          className="rounded-none border border-border-subtle px-3 py-1.5 text-xs text-text-muted transition-colors hover:border-slate-500 hover:text-slate-200"
+          className="rounded-lg border border-border-subtle px-3 py-1.5 text-xs text-text-muted transition-colors hover:border-slate-500 hover:text-slate-200"
         >
           リセット
         </button>
@@ -90,7 +90,7 @@ function FilterPanelInner({
               value={filters.priceMin ?? ""}
               onChange={(e) => onChange({ priceMin: toNumberOrNull(e.target.value) })}
               placeholder="0"
-              className={clsx(filters.priceMin != null && "!border-mint/30")}
+              className={clsx(filters.priceMin != null && "!border-primary/30")}
             />
           </label>
           <label className="filter-field">
@@ -100,7 +100,7 @@ function FilterPanelInner({
               value={filters.priceMax ?? ""}
               onChange={(e) => onChange({ priceMax: toNumberOrNull(e.target.value) })}
               placeholder="1000"
-              className={clsx(filters.priceMax != null && "!border-mint/30")}
+              className={clsx(filters.priceMax != null && "!border-primary/30")}
             />
           </label>
           <label className="filter-field">
@@ -110,7 +110,7 @@ function FilterPanelInner({
               value={filters.perMax ?? ""}
               onChange={(e) => onChange({ perMax: toNumberOrNull(e.target.value) })}
               placeholder="30"
-              className={clsx(filters.perMax != null && "!border-mint/30")}
+              className={clsx(filters.perMax != null && "!border-primary/30")}
             />
           </label>
           <label className="filter-field">
@@ -120,7 +120,7 @@ function FilterPanelInner({
               value={filters.pbrMax ?? ""}
               onChange={(e) => onChange({ pbrMax: toNumberOrNull(e.target.value) })}
               placeholder="3"
-              className={clsx(filters.pbrMax != null && "!border-mint/30")}
+              className={clsx(filters.pbrMax != null && "!border-primary/30")}
             />
           </label>
         </FilterGroup>
@@ -133,7 +133,7 @@ function FilterPanelInner({
               value={filters.revenueGrowthMin ?? ""}
               onChange={(e) => onChange({ revenueGrowthMin: toNumberOrNull(e.target.value) })}
               placeholder="15"
-              className={clsx(filters.revenueGrowthMin != null && "!border-mint/30")}
+              className={clsx(filters.revenueGrowthMin != null && "!border-primary/30")}
             />
           </label>
           <label className="filter-field">
@@ -143,7 +143,7 @@ function FilterPanelInner({
               value={filters.opGrowthMin ?? ""}
               onChange={(e) => onChange({ opGrowthMin: toNumberOrNull(e.target.value) })}
               placeholder="15"
-              className={clsx(filters.opGrowthMin != null && "!border-mint/30")}
+              className={clsx(filters.opGrowthMin != null && "!border-primary/30")}
             />
           </label>
           <label className="filter-field">
@@ -153,13 +153,13 @@ function FilterPanelInner({
               value={filters.operatingCFMin ?? ""}
               onChange={(e) => onChange({ operatingCFMin: toNumberOrNull(e.target.value) })}
               placeholder="0"
-              className={clsx(filters.operatingCFMin != null && "!border-mint/30")}
+              className={clsx(filters.operatingCFMin != null && "!border-primary/30")}
             />
           </label>
           <label className="filter-field">
             <span>配当</span>
             <select value={filters.dividend} onChange={(e) => onChange({ dividend: e.target.value as StockFilters["dividend"] })}
-              className={clsx(filters.dividend !== "all" && "!border-mint/30")}>
+              className={clsx(filters.dividend !== "all" && "!border-primary/30")}>
               <option value="all">すべて</option>
               <option value="with">配当あり</option>
               <option value="without">配当なし</option>
@@ -171,7 +171,7 @@ function FilterPanelInner({
           <label className="filter-field">
             <span>業態</span>
             <select value={filters.sector} onChange={(e) => onChange({ sector: e.target.value })}
-              className={clsx(filters.sector !== "all" && "!border-mint/30")}>
+              className={clsx(filters.sector !== "all" && "!border-primary/30")}>
               {sectors.map((sector) => (
                 <option key={sector} value={sector}>
                   {sector === "all" ? "すべて" : sector}
@@ -182,7 +182,7 @@ function FilterPanelInner({
           <label className="filter-field">
             <span>アクション</span>
             <select value={filters.action} onChange={(e) => onChange({ action: e.target.value as StockFilters["action"] })}
-              className={clsx(filters.action !== "all" && "!border-mint/30")}>
+              className={clsx(filters.action !== "all" && "!border-primary/30")}>
               <option value="all">すべて</option>
               <option value="buy_now">今買う</option>
               <option value="wait_earnings">決算待ち</option>
@@ -193,7 +193,7 @@ function FilterPanelInner({
           <label className="filter-field">
             <span>時価総額帯</span>
             <select value={filters.marketCapBand} onChange={(e) => onChange({ marketCapBand: e.target.value as StockFilters["marketCapBand"] })}
-              className={clsx(filters.marketCapBand !== "all" && "!border-mint/30")}>
+              className={clsx(filters.marketCapBand !== "all" && "!border-primary/30")}>
               <option value="all">すべて</option>
               <option value="small">小型 (&lt; 3000億円)</option>
               <option value="mid">中型 (3000億〜7000億円)</option>
@@ -203,7 +203,7 @@ function FilterPanelInner({
           <label className="filter-field">
             <span>監視状態</span>
             <select value={filters.watch} onChange={(e) => onChange({ watch: e.target.value as StockFilters["watch"] })}
-              className={clsx(filters.watch !== "all" && "!border-mint/30")}>
+              className={clsx(filters.watch !== "all" && "!border-primary/30")}>
               <option value="all">すべて</option>
               <option value="watching">監視中のみ</option>
               <option value="not_watching">未監視のみ</option>

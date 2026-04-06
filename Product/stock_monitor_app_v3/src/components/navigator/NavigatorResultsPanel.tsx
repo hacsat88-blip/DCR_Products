@@ -61,7 +61,7 @@ export function NavigatorResultsPanel(): JSX.Element | null {
   return (
     <div className="space-y-4">
       {/* ── Meta header ── */}
-      <div className="flex flex-wrap items-center gap-x-3 gap-y-1 font-mono-tech text-xs text-text-muted">
+      <div className="flex flex-wrap items-center gap-x-3 gap-y-1 font-mono tabular-nums text-xs text-text-muted">
         <span>
           {marketLabel} {"//"} RISK:{riskLabel} {"//"} HORIZON:{horizonLabel}
         </span>
@@ -69,7 +69,7 @@ export function NavigatorResultsPanel(): JSX.Element | null {
           <span
             className={
               analysisMode === "live"
-                ? "rounded border border-mint/30 bg-mint/10 px-1.5 py-0.5 text-mint"
+                ? "rounded border border-positive/30 bg-positive/10 px-1.5 py-0.5 text-positive"
                 : "rounded border border-yellow-500/40 bg-yellow-500/10 px-1.5 py-0.5 text-yellow-300"
             }
           >
@@ -110,7 +110,7 @@ export function NavigatorResultsPanel(): JSX.Element | null {
       )}
 
       {/* ── Disclaimer ── */}
-      <div className="border-t border-mint/10 pt-3 font-mono-tech text-[10px] leading-relaxed text-text-muted">
+      <div className="border-t border-primary/10 pt-3 font-mono tabular-nums text-[10px] leading-relaxed text-text-muted">
         ⚠️ 本分析は情報提供・教育目的のみです。投資は自己責任で行い、必要に応じてFAへご相談ください。
       </div>
     </div>

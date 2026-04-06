@@ -100,8 +100,8 @@ export function HoldingInput({ stockId, price, compact = false }: HoldingInputPr
   );
 
   const btnClass = compact
-    ? "flex h-[28px] w-[28px] items-center justify-center rounded-none bg-white/5 text-xs text-text-secondary hover:bg-white/10 transition-colors"
-    : "flex h-[36px] w-[36px] items-center justify-center rounded-none bg-white/5 text-sm text-text-secondary hover:bg-white/10 transition-colors";
+    ? "flex h-[28px] w-[28px] items-center justify-center rounded-lg bg-white/5 text-xs text-text-secondary hover:bg-white/10 transition-colors"
+    : "flex h-[36px] w-[36px] items-center justify-center rounded-lg bg-white/5 text-sm text-text-secondary hover:bg-white/10 transition-colors";
 
   const evalValue = price && shares > 0 ? shares * price : null;
 
@@ -120,16 +120,16 @@ export function HoldingInput({ stockId, price, compact = false }: HoldingInputPr
             onChange={handleDraftChange}
             onBlur={commitEdit}
             onKeyDown={handleKeyDown}
-            className="h-[28px] w-[56px] rounded-none border border-border-subtle bg-canvas/90 text-center font-mono text-xs text-text-primary outline-none"
+            className="h-[28px] w-[56px] rounded-lg border border-border-subtle bg-canvas/90 text-center font-mono text-xs text-text-primary outline-none"
           />
         ) : (
           <button
             type="button"
             onClick={startEdit}
             className={clsx(
-              "h-[28px] min-w-[56px] rounded-none border px-1 text-center font-mono text-xs transition-colors",
+              "h-[28px] min-w-[56px] rounded-lg border px-1 text-center font-mono text-xs transition-colors",
               shares > 0
-                ? "border-mint/30 bg-mint/5 text-mint"
+                ? "border-positive/30 bg-positive/5 text-positive"
                 : "border-border-subtle/40 bg-canvas-deep/40 text-text-muted"
             )}
           >
@@ -140,7 +140,7 @@ export function HoldingInput({ stockId, price, compact = false }: HoldingInputPr
           +
         </button>
         {saved && (
-          <span className="ml-1 text-[10px] text-blue animate-fade-up" role="status" aria-live="polite">保存済み</span>
+          <span className="ml-1 text-[10px] text-secondary animate-fade-up" role="status" aria-live="polite">保存済み</span>
         )}
       </div>
     );
@@ -162,16 +162,16 @@ export function HoldingInput({ stockId, price, compact = false }: HoldingInputPr
             onChange={handleDraftChange}
             onBlur={commitEdit}
             onKeyDown={handleKeyDown}
-            className="h-[36px] w-[80px] rounded-none border border-border-subtle bg-canvas/90 text-center font-mono text-sm text-text-primary outline-none"
+            className="h-[36px] w-[80px] rounded-lg border border-border-subtle bg-canvas/90 text-center font-mono text-sm text-text-primary outline-none"
           />
         ) : (
           <button
             type="button"
             onClick={startEdit}
             className={clsx(
-              "h-[36px] min-w-[80px] rounded-none border px-2 text-center font-mono text-sm transition-colors",
+              "h-[36px] min-w-[80px] rounded-lg border px-2 text-center font-mono text-sm transition-colors",
               shares > 0
-                ? "border-mint/30 bg-mint/5 text-mint"
+                ? "border-positive/30 bg-positive/5 text-positive"
                 : "border-border-subtle/40 bg-canvas-deep/40 text-text-muted"
             )}
           >
@@ -182,7 +182,7 @@ export function HoldingInput({ stockId, price, compact = false }: HoldingInputPr
           +
         </button>
         {saved && (
-          <span className="ml-1 text-xs text-blue animate-fade-up" role="status" aria-live="polite">保存済み</span>
+          <span className="ml-1 text-xs text-secondary animate-fade-up" role="status" aria-live="polite">保存済み</span>
         )}
       </div>
       {evalValue !== null && (

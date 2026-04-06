@@ -9,103 +9,153 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        canvas: "#000000",
+        canvas: "#0B0E14",
+        "canvas-deep": "#070910",
+        "canvas-raised": "#141821",
         panel: {
-          DEFAULT: "rgba(0,255,65,0.03)",
-          hover: "rgba(0,255,65,0.06)",
-          elevated: "rgba(0,255,65,0.08)",
-          solid: "#050a05"
+          DEFAULT: "rgba(255,255,255,0.03)",
+          hover: "rgba(255,255,255,0.05)",
+          elevated: "rgba(255,255,255,0.07)",
+          solid: "#161920"
         },
+        primary: {
+          DEFAULT: "#4C6EF5",
+          50: "#EEF2FF",
+          100: "#D8E0FE",
+          200: "#B3C2FD",
+          300: "#8BA3FB",
+          400: "#6B88F8",
+          500: "#4C6EF5",
+          600: "#3B5BDB",
+          700: "#2F4DC0",
+          800: "#243D9E",
+          900: "#1A2F7A"
+        },
+        // positive = gains/profit (alias: mint for backward compat)
+        positive: {
+          DEFAULT: "#22C55E",
+          50: "#ECFDF5",
+          100: "#D1FAE5",
+          200: "#A7F3D0",
+          300: "#6EE7B7",
+          400: "#34D399",
+          500: "#22C55E",
+          600: "#16A34A",
+          700: "#15803D",
+          800: "#166534",
+          900: "#14532D"
+        },
+        // backward compat alias
         mint: {
-          DEFAULT: "#00ff41",
-          50: "#eaffef",
-          100: "#c0ffd0",
-          200: "#80ff9e",
-          300: "#40ff6f",
-          400: "#00ff41",
-          500: "#00cc33",
-          600: "#009926",
-          700: "#007a1f",
-          800: "#005c17",
-          900: "#003d0f"
+          DEFAULT: "#22C55E",
+          50: "#ECFDF5",
+          100: "#D1FAE5",
+          200: "#A7F3D0",
+          300: "#6EE7B7",
+          400: "#34D399",
+          500: "#22C55E",
+          600: "#16A34A",
+          700: "#15803D",
+          800: "#166534",
+          900: "#14532D"
         },
+        secondary: {
+          DEFAULT: "#06B6D4",
+          50: "#ECFEFF",
+          100: "#CFFAFE",
+          200: "#A5F3FC",
+          300: "#67E8F9",
+          400: "#22D3EE",
+          500: "#06B6D4",
+          600: "#0891B2",
+          700: "#0E7490",
+          800: "#155E75",
+          900: "#164E63"
+        },
+        // backward compat alias
         blue: {
-          DEFAULT: "#00e5ff",
-          50: "#e0fbff",
-          100: "#b3f5ff",
-          200: "#66ecff",
-          300: "#33e8ff",
-          400: "#00e5ff",
-          500: "#00b8cc",
-          600: "#008c99",
-          700: "#006b75",
-          800: "#004d54",
-          900: "#003038"
+          DEFAULT: "#06B6D4",
+          50: "#ECFEFF",
+          100: "#CFFAFE",
+          200: "#A5F3FC",
+          300: "#67E8F9",
+          400: "#22D3EE",
+          500: "#06B6D4",
+          600: "#0891B2",
+          700: "#0E7490",
+          800: "#155E75",
+          900: "#164E63"
         },
         amber: {
-          DEFAULT: "#ffd700",
-          50: "#fffce0",
-          100: "#fff7b3",
-          200: "#ffef66",
-          300: "#ffe833",
-          400: "#ffd700",
-          500: "#ccac00",
-          600: "#998100",
-          700: "#756300",
-          800: "#544700",
-          900: "#382f00"
+          DEFAULT: "#F59E0B",
+          50: "#FFFBEB",
+          100: "#FEF3C7",
+          200: "#FDE68A",
+          300: "#FCD34D",
+          400: "#FBBF24",
+          500: "#F59E0B",
+          600: "#D97706",
+          700: "#B45309",
+          800: "#92400E",
+          900: "#78350F"
+        },
+        // negative = losses (alias: danger for backward compat)
+        negative: {
+          DEFAULT: "#EF4444",
+          50: "#FEF2F2",
+          100: "#FEE2E2",
+          200: "#FECACA",
+          300: "#FCA5A5",
+          400: "#F87171",
+          500: "#EF4444",
+          600: "#DC2626",
+          700: "#B91C1C",
+          800: "#991B1B",
+          900: "#7F1D1D"
         },
         danger: {
-          DEFAULT: "#ff3355",
-          50: "#ffe5ea",
-          100: "#ffbfca",
-          200: "#ff8099",
-          300: "#ff5577",
-          400: "#ff3355",
-          500: "#cc2944",
-          600: "#991f33",
-          700: "#751828",
-          800: "#54111c",
-          900: "#380b13"
+          DEFAULT: "#EF4444",
+          50: "#FEF2F2",
+          100: "#FEE2E2",
+          200: "#FECACA",
+          300: "#FCA5A5",
+          400: "#F87171",
+          500: "#EF4444",
+          600: "#DC2626",
+          700: "#B91C1C",
+          800: "#991B1B",
+          900: "#7F1D1D"
         },
         glass: {
-          border: "rgba(0,255,65,0.08)",
-          "border-light": "rgba(0,255,65,0.12)"
+          border: "rgba(148,163,184,0.06)",
+          "border-light": "rgba(148,163,184,0.10)"
         },
-        "canvas-deep": "#000000",
-        "canvas-raised": "#050a05",
-        "accent-warm": "#ffd700",
-        "text-primary": "#00ff41",
-        "text-secondary": "#00cc33",
-        "text-muted": "#00a82b",
-        "border-subtle": "rgba(0,255,65,0.18)",
-        "border-active": "rgba(0,255,65,0.4)",
-        "cyber-green": "#00ff41",
-        "cyber-dim": "#007a1f",
-        "cyber-glow": "rgba(0,255,65,0.5)"
+        "accent-warm": "#F59E0B",
+        "text-primary": "#F1F5F9",
+        "text-secondary": "#94A3B8",
+        "text-muted": "#64748B",
+        "border-subtle": "rgba(148,163,184,0.10)",
+        "border-active": "rgba(76,110,245,0.4)"
       },
       boxShadow: {
-        card: "0 0 20px rgba(0,255,65,0.08)",
-        elevated: "0 0 30px rgba(0,255,65,0.12)",
-        "glow-mint": "0 0 20px rgba(0,255,65,0.3), 0 0 4px rgba(0,255,65,0.2)",
-        "glow-blue": "0 0 20px rgba(0,229,255,0.15), 0 0 4px rgba(0,229,255,0.1)",
-        "glow-amber": "0 0 20px rgba(255,215,0,0.15), 0 0 4px rgba(255,215,0,0.1)",
-        "glow-danger": "0 0 20px rgba(255,51,85,0.15), 0 0 4px rgba(255,51,85,0.1)",
+        card: "0 1px 3px rgba(0,0,0,0.3), 0 1px 2px rgba(0,0,0,0.2)",
+        elevated: "0 4px 12px rgba(0,0,0,0.4)",
+        "card-hover": "0 8px 24px rgba(0,0,0,0.45)",
         inner: "inset 0 1px 2px rgba(0,0,0,.4)",
-        "card-hover": "0 0 30px rgba(0,255,65,0.2), 0 0 1px rgba(0,255,65,0.3)",
-        "ambient-mint": "0 0 40px rgba(0,255,65,0.08)",
-        "ambient-blue": "0 0 40px rgba(0,229,255,0.06)"
+        "focus-ring": "0 0 0 3px rgba(76,110,245,0.25)"
       },
       backdropBlur: {
         panel: "8px"
       },
       fontFamily: {
-        orb: ["var(--font-orbitron)", "monospace"],
-        "mono-tech": ["var(--font-share-tech-mono)", "'Courier New'", "monospace"]
+        // backward compat: font-orb now maps to Inter
+        orb: ["var(--font-inter)", "var(--font-noto)", "system-ui", "sans-serif"],
+        // backward compat: font-mono-tech now maps to system mono
+        "mono-tech": ["'SF Mono'", "'Fira Code'", "'Cascadia Code'", "monospace"]
       },
       fontSize: {
-        kpi: ["3.5rem", { lineHeight: "1", fontWeight: "700", letterSpacing: "-0.02em" }],
-        metric: ["1.5rem", { lineHeight: "1.2", fontWeight: "600" }]
+        kpi: ["2.5rem", { lineHeight: "1.1", fontWeight: "700", letterSpacing: "-0.02em" }],
+        metric: ["1.25rem", { lineHeight: "1.3", fontWeight: "600" }]
       },
       keyframes: {
         slideInRight: {
@@ -133,26 +183,8 @@ const config: Config = {
           "100%": { transform: "rotate(360deg)" }
         },
         "score-pulse": {
-          "0%, 100%": { filter: "drop-shadow(0 0 2px rgba(0,255,65,0.3))" },
-          "50%": { filter: "drop-shadow(0 0 6px rgba(0,255,65,0.5))" }
-        },
-        glitch: {
-          "0%, 89%, 100%": { transform: "none", textShadow: "0 0 10px #00ff41, 0 0 20px #00ff41" },
-          "90%": { transform: "translate(-3px, 1px)", textShadow: "-2px 0 #ff3355, 2px 0 #00e5ff" },
-          "92%": { transform: "translate(3px, -1px)", textShadow: "2px 0 #ff3355, -2px 0 #00e5ff" },
-          "94%": { transform: "translate(-1px, 0)" },
-          "96%": { transform: "translate(1px, 0)" }
-        },
-        pborder: {
-          "0%, 100%": { boxShadow: "0 0 5px rgba(0,255,65,0.3)" },
-          "50%": { boxShadow: "0 0 14px rgba(0,255,65,0.6)" }
-        },
-        "cyber-blink": {
-          "0%, 100%": { opacity: "1" },
-          "50%": { opacity: "0.1" }
-        },
-        sweep: {
-          to: { left: "200%" }
+          "0%, 100%": { filter: "drop-shadow(0 0 2px rgba(76,110,245,0.2))" },
+          "50%": { filter: "drop-shadow(0 0 6px rgba(76,110,245,0.35))" }
         },
         "radar-draw": {
           from: { strokeDashoffset: "400" },
@@ -180,10 +212,6 @@ const config: Config = {
         "spin-slow": "spin-slow 1s linear infinite",
         "score-pulse": "score-pulse 3s ease-in-out infinite",
         "fade-in": "fade-in 300ms ease-out",
-        glitch: "glitch 9s infinite",
-        pborder: "pborder 3s infinite",
-        "cyber-blink": "cyber-blink 1s infinite",
-        sweep: "sweep 1.4s linear infinite",
         "radar-draw": "radar-draw 0.9s cubic-bezier(0.4,0,0.2,1) forwards",
         "star-pop": "star-pop 0.25s ease forwards",
         "bar-fill": "bar-fill 0.7s cubic-bezier(0.4,0,0.2,1) forwards"

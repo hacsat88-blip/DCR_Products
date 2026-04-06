@@ -11,7 +11,7 @@ interface BadgeProps {
 }
 
 const toneStyles: Record<BadgeTone, string> = {
-  buy: "border-mint/25 bg-mint/8 text-mint",
+  buy: "border-positive/25 bg-positive/8 text-positive",
   wait: "border-blue/25 bg-blue/8 text-blue",
   exclude: "border-danger/25 bg-danger/8 text-danger",
   info: "border-blue/25 bg-blue/8 text-blue",
@@ -20,7 +20,7 @@ const toneStyles: Record<BadgeTone, string> = {
 };
 
 const accentStyles: Record<BadgeTone, string> = {
-  buy: "border-l-2 border-l-mint/60",
+  buy: "border-l-2 border-l-positive/60",
   wait: "border-l-2 border-l-blue/60",
   exclude: "border-l-2 border-l-danger/60",
   info: "border-l-2 border-l-blue/60",
@@ -29,11 +29,11 @@ const accentStyles: Record<BadgeTone, string> = {
 };
 
 const glowStyles: Record<BadgeTone, string> = {
-  buy: "shadow-glow-mint",
-  wait: "shadow-glow-blue",
-  exclude: "shadow-glow-danger",
-  info: "shadow-glow-blue",
-  warning: "shadow-glow-amber",
+  buy: "shadow-elevated",
+  wait: "shadow-elevated",
+  exclude: "",
+  info: "shadow-elevated",
+  warning: "",
   neutral: ""
 };
 
@@ -42,8 +42,8 @@ export function Badge({ tone, children, size = "sm", glow = false, accent = fals
     <span
       className={clsx(
         "inline-flex items-center border font-medium tracking-wide",
-        accent ? accentStyles[tone] : "rounded-none",
-        !accent && "rounded-none",
+        accent ? accentStyles[tone] : "rounded-lg",
+        !accent && "rounded-lg",
         toneStyles[tone],
         glow && glowStyles[tone],
         size === "sm" && "px-2.5 py-0.5 text-[11px]",

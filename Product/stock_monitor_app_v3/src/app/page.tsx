@@ -63,8 +63,8 @@ const StockDetailDrawer = React.lazy(() =>
 
 function LazyFallback(): JSX.Element {
   return (
-    <div className="flex items-center justify-center rounded-none border border-slate-700/60 bg-panel p-8">
-      <div className="h-6 w-6 animate-spin rounded-full border-2 border-slate-600 border-t-mint" />
+    <div className="flex items-center justify-center rounded-lg border border-border-subtle bg-panel p-8">
+      <div className="h-6 w-6 animate-spin rounded-full border-2 border-slate-600 border-t-primary" />
     </div>
   );
 }
@@ -91,7 +91,7 @@ const TabNav = React.memo(function TabNav({
     <nav
       role="tablist"
       aria-label="メインナビゲーションタブ"
-      className="sticky top-0 z-30 rounded-none border border-border-subtle bg-canvas/90 backdrop-blur-md"
+      className="sticky top-0 z-30 rounded-lg border border-border-subtle bg-canvas/90 backdrop-blur-md"
     >
       <div className="flex">
         {TAB_ITEMS.map((tab) => {
@@ -108,9 +108,9 @@ const TabNav = React.memo(function TabNav({
               aria-controls={`tabpanel-${tab.id}`}
               tabIndex={on ? 0 : -1}
               className={[
-                "relative flex flex-1 items-center justify-center gap-1.5 px-3 py-3 font-orb uppercase tracking-wider text-[12px] font-medium transition-all duration-300",
+                "relative flex flex-1 items-center justify-center gap-1.5 px-3 py-3 text-[12px] font-medium tracking-wide transition-all duration-300",
                 on
-                  ? "text-mint"
+                  ? "text-primary"
                   : "text-text-muted hover:bg-white/5 hover:text-text-secondary",
               ].join(" ")}
             >
@@ -119,12 +119,12 @@ const TabNav = React.memo(function TabNav({
               </span>
               <span className="text-[11px] sm:text-xs">{tab.label}</span>
               {badge != null && badge > 0 && (
-                <span className="ml-0.5 inline-flex h-4 min-w-4 items-center justify-center rounded-none bg-amber px-1 text-[10px] font-bold leading-none text-slate-900">
+                <span className="ml-0.5 inline-flex h-4 min-w-4 items-center justify-center rounded-md bg-amber px-1 text-[10px] font-bold leading-none text-slate-900">
                   {badge > 99 ? "99+" : badge}
                 </span>
               )}
               {on && (
-                <span className="absolute bottom-0 left-3 right-3 h-0.5 bg-mint" />
+                <span className="absolute bottom-0 left-3 right-3 h-0.5 rounded-full bg-primary" />
               )}
             </button>
           );
@@ -331,10 +331,10 @@ export default function HomePage(): JSX.Element {
             onExportCsv={exportRankingCsv}
           />
 
-          <section className="rounded-none border border-border-subtle bg-panel p-4 shadow-card">
+          <section className="rounded-xl border border-border-subtle bg-panel p-4 shadow-card">
             <div className="mb-3 flex items-center justify-between gap-3">
-              <h2 className="font-orb text-lg font-semibold text-text-primary">銘柄一覧</h2>
-              <p className="text-xs text-text-secondary">表示件数: <span className="font-mono-tech">{filteredStocks.length}</span></p>
+              <h2 className="text-lg font-semibold text-text-primary">銘柄一覧</h2>
+              <p className="text-xs text-text-secondary">表示件数: <span className="font-mono tabular-nums">{filteredStocks.length}</span></p>
             </div>
 
             {isLoading ? (

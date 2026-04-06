@@ -13,7 +13,7 @@ import type {
 // ── Colour maps ─────────────────────────────────────────
 
 const RETURN_COLOR: Record<ReturnLevel, string> = {
-  高: "text-mint",
+  高: "text-positive",
   中: "text-amber",
   低: "text-text-muted",
 };
@@ -21,7 +21,7 @@ const RETURN_COLOR: Record<ReturnLevel, string> = {
 const RISK_COLOR: Record<RiskLevel, string> = {
   高: "text-danger",
   中: "text-amber",
-  低: "text-mint",
+  低: "text-positive",
 };
 
 // ── Matrix cards ────────────────────────────────────────
@@ -35,7 +35,7 @@ function MatrixCard({ entry }: { entry: MatrixEntry }): JSX.Element {
       )}
     >
       <div className="mb-1 flex items-center gap-2">
-        <span className="font-mono-tech text-sm font-bold text-text-primary">
+        <span className="font-mono tabular-nums text-sm font-bold text-text-primary">
           {entry.name}
         </span>
         {entry.warn && (
@@ -45,7 +45,7 @@ function MatrixCard({ entry }: { entry: MatrixEntry }): JSX.Element {
         )}
       </div>
 
-      <div className="space-y-0.5 font-mono-tech text-[10px]">
+      <div className="space-y-0.5 font-mono tabular-nums text-[10px]">
         <div>
           <span className="text-text-muted">RET: </span>
           <span className={RETURN_COLOR[entry.ret]}>{entry.ret}</span>
@@ -61,12 +61,12 @@ function MatrixCard({ entry }: { entry: MatrixEntry }): JSX.Element {
         <div className="mt-1 border-t border-glass-border pt-1">
           <span
             className={clsx(
-              "font-orb text-[9px] uppercase tracking-wider",
+              "font-semiboldtext-[9px] uppercase tracking-wider",
               entry.pos === "コア"
-                ? "text-mint"
+                ? "text-positive"
                 : entry.pos === "サテライト"
                   ? "text-amber"
-                  : "text-blue",
+                  : "text-secondary",
             )}
           >
             {entry.pos}
@@ -91,7 +91,7 @@ function AllocationBar({ alloc }: { alloc: AllocationConfig }): JSX.Element {
       <div className="flex h-4 overflow-hidden border border-glass-border">
         {pctStocks > 0 && (
           <div
-            className="flex items-center justify-center bg-mint/40 font-mono-tech text-[8px] text-canvas transition-all duration-700"
+            className="flex items-center justify-center bg-positive/40 font-mono tabular-nums text-[8px] text-canvas transition-all duration-700"
             style={{ width: `${pctStocks}%` }}
           >
             {pctStocks >= 10 && `${alloc.stocks}%`}
@@ -99,7 +99,7 @@ function AllocationBar({ alloc }: { alloc: AllocationConfig }): JSX.Element {
         )}
         {pctFunds > 0 && (
           <div
-            className="flex items-center justify-center bg-blue/40 font-mono-tech text-[8px] text-canvas transition-all duration-700"
+            className="flex items-center justify-center bg-secondary/40 font-mono tabular-nums text-[8px] text-canvas transition-all duration-700"
             style={{ width: `${pctFunds}%` }}
           >
             {pctFunds >= 10 && `${alloc.funds}%`}
@@ -107,7 +107,7 @@ function AllocationBar({ alloc }: { alloc: AllocationConfig }): JSX.Element {
         )}
         {pctCash > 0 && (
           <div
-            className="flex items-center justify-center bg-text-muted/30 font-mono-tech text-[8px] text-text-muted transition-all duration-700"
+            className="flex items-center justify-center bg-text-muted/30 font-mono tabular-nums text-[8px] text-text-muted transition-all duration-700"
             style={{ width: `${pctCash}%` }}
           >
             {pctCash >= 10 && `${alloc.cash}%`}
@@ -116,11 +116,11 @@ function AllocationBar({ alloc }: { alloc: AllocationConfig }): JSX.Element {
       </div>
 
       {/* Labels */}
-      <div className="mt-1.5 flex justify-between font-mono-tech text-[10px]">
-        <span className="text-mint">
+      <div className="mt-1.5 flex justify-between font-mono tabular-nums text-[10px]">
+        <span className="text-positive">
           ■ 個別株 {alloc.stocks}%
         </span>
-        <span className="text-blue">
+        <span className="text-secondary">
           ■ ETF/投信 {alloc.funds}%
         </span>
         <span className="text-text-muted">
@@ -138,20 +138,20 @@ function CorrelationTable({ pairs }: { pairs: CorrelationPair[] }): JSX.Element 
 
   return (
     <div>
-      <h4 className="mb-2 font-orb text-[10px] uppercase tracking-widest text-text-muted">
+      <h4 className="mb-2 font-semiboldtext-[10px] uppercase tracking-widest text-text-muted">
         CORRELATION MATRIX
       </h4>
       <div className="overflow-x-auto">
         <table className="w-full border-collapse text-left">
           <thead>
             <tr className="border-b border-glass-border">
-              <th className="px-3 py-1.5 font-orb text-[10px] uppercase tracking-widest text-text-muted">
+              <th className="px-3 py-1.5 font-semiboldtext-[10px] uppercase tracking-widest text-text-muted">
                 PAIR
               </th>
-              <th className="px-3 py-1.5 font-orb text-[10px] uppercase tracking-widest text-text-muted">
+              <th className="px-3 py-1.5 font-semiboldtext-[10px] uppercase tracking-widest text-text-muted">
                 COEFF
               </th>
-              <th className="px-3 py-1.5 font-orb text-[10px] uppercase tracking-widest text-text-muted">
+              <th className="px-3 py-1.5 font-semiboldtext-[10px] uppercase tracking-widest text-text-muted">
                 LEVEL
               </th>
             </tr>
@@ -169,7 +169,7 @@ function CorrelationTable({ pairs }: { pairs: CorrelationPair[] }): JSX.Element 
                 color = "text-amber";
                 levelLabel = "中";
               } else {
-                color = "text-mint";
+                color = "text-positive";
                 levelLabel = "低";
               }
 
@@ -178,13 +178,13 @@ function CorrelationTable({ pairs }: { pairs: CorrelationPair[] }): JSX.Element 
                   key={`${pair.a}-${pair.b}`}
                   className="border-b border-glass-border"
                 >
-                  <td className="px-3 py-1.5 font-mono-tech text-xs text-text-primary">
+                  <td className="px-3 py-1.5 font-mono tabular-nums text-xs text-text-primary">
                     {pair.a} × {pair.b}
                   </td>
-                  <td className={clsx("px-3 py-1.5 font-mono-tech text-xs", color)}>
+                  <td className={clsx("px-3 py-1.5 font-mono tabular-nums text-xs", color)}>
                     {coeff.toFixed(2)}
                   </td>
-                  <td className={clsx("px-3 py-1.5 font-mono-tech text-[10px]", color)}>
+                  <td className={clsx("px-3 py-1.5 font-mono tabular-nums text-[10px]", color)}>
                     {levelLabel}
                   </td>
                 </tr>
@@ -212,7 +212,7 @@ export function RiskMatrixSection({
 }: RiskMatrixSectionProps): JSX.Element {
   return (
     <section className="animate-fade-in border border-glass-border bg-panel p-4">
-      <h3 className="mb-4 font-orb text-[10px] uppercase tracking-widest text-text-muted">
+      <h3 className="mb-4 font-semiboldtext-[10px] uppercase tracking-widest text-text-muted">
         ▸ RISK-RETURN MATRIX + ALLOCATION
       </h3>
 
@@ -225,7 +225,7 @@ export function RiskMatrixSection({
 
       {/* Allocation */}
       <div className="mb-4">
-        <h4 className="mb-2 font-orb text-[10px] uppercase tracking-widest text-text-muted">
+        <h4 className="mb-2 font-semiboldtext-[10px] uppercase tracking-widest text-text-muted">
           TARGET ALLOCATION
         </h4>
         <AllocationBar alloc={alloc} />

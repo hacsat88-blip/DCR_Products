@@ -101,10 +101,10 @@ function SelectorButton<T extends string>({
       aria-checked={selected}
       aria-label={option.label}
       className={clsx(
-        "rounded-none border px-4 py-2 font-mono-tech text-sm transition-all duration-200",
+        "rounded-lg border px-4 py-2 font-mono tabular-nums text-sm transition-all duration-200",
         selected
-          ? "border-mint bg-mint/20 text-mint shadow-[0_0_12px_rgba(0,255,65,0.15)]"
-          : "border-mint/20 text-text-secondary hover:border-mint/40 hover:text-mint/80",
+          ? "border-primary bg-primary/20 text-primary"
+          : "border-primary/20 text-text-secondary hover:border-primary/40 hover:text-primary/80",
       )}
     >
       {option.icon && <span className="mr-1.5">{option.icon}</span>}
@@ -130,8 +130,8 @@ function OptionGroup<T extends string>({
 }: OptionGroupProps<T>): JSX.Element {
   return (
     <div className="space-y-2.5">
-      <p className="font-orb text-xs uppercase tracking-widest text-mint/60">
-        ▸ {label}
+      <p className="text-xs font-semibold uppercase tracking-widest text-primary/60">
+        {label}
       </p>
       <div role="radiogroup" aria-label={label} className="flex flex-wrap gap-2">
         {options.map((opt) => (
@@ -159,7 +159,7 @@ function StepRow({
   return (
     <div
       className={clsx(
-        "flex items-center gap-3 font-mono-tech text-sm transition-all duration-300",
+        "flex items-center gap-3 font-mono tabular-nums text-sm transition-all duration-300",
         // stagger entrance from left
         "animate-fade-in",
       )}
@@ -169,8 +169,8 @@ function StepRow({
       <span
         className={clsx(
           "w-4 text-center",
-          step.status === "done" && "text-mint/70",
-          step.status === "running" && "text-mint animate-pulse",
+          step.status === "done" && "text-positive/70",
+          step.status === "running" && "text-positive animate-pulse",
           step.status === "error" && "text-danger",
           step.status === "standby" && "text-text-muted",
         )}
@@ -182,8 +182,8 @@ function StepRow({
       <span
         className={clsx(
           "flex-1",
-          step.status === "done" && "text-mint/70",
-          step.status === "running" && "text-mint",
+          step.status === "done" && "text-positive/70",
+          step.status === "running" && "text-positive",
           step.status === "error" && "text-danger",
           step.status === "standby" && "text-text-muted/60",
         )}
@@ -195,8 +195,8 @@ function StepRow({
       <span
         className={clsx(
           "w-24 text-right text-xs uppercase tracking-wider",
-          step.status === "done" && "text-mint/50",
-          step.status === "running" && "text-mint animate-pulse-soft",
+          step.status === "done" && "text-positive/50",
+          step.status === "running" && "text-positive animate-pulse-soft",
           step.status === "error" && "text-danger",
           step.status === "standby" && "text-text-muted/40",
         )}
@@ -212,13 +212,13 @@ function StepRow({
 function ProgressBar({ value }: { value: number }): JSX.Element {
   return (
     <div className="space-y-1.5">
-      <div className="flex items-center justify-between font-mono-tech text-xs text-mint/60">
+      <div className="flex items-center justify-between font-mono tabular-nums text-xs text-primary/60">
         <span>PROGRESS</span>
         <span>{Math.round(value)}%</span>
       </div>
-      <div className="h-2 w-full overflow-hidden border border-mint/20 bg-canvas">
+      <div className="h-2 w-full overflow-hidden rounded-lg border border-primary/20 bg-canvas">
         <div
-          className="h-full bg-mint transition-all duration-500 ease-smooth shadow-[0_0_10px_rgba(0,255,65,0.4)]"
+          className="h-full bg-primary transition-all duration-500 ease-smooth"
           style={{ width: `${value}%` }}
         />
       </div>
@@ -231,13 +231,13 @@ function ProgressBar({ value }: { value: number }): JSX.Element {
 function DoneOverlay(): JSX.Element {
   return (
     <div className="flex flex-col items-center justify-center gap-3 py-10 animate-scale-in">
-      <span className="text-4xl text-mint drop-shadow-[0_0_20px_rgba(0,255,65,0.5)]">
+      <span className="text-4xl text-positive">
         ✓
       </span>
-      <span className="font-orb text-lg uppercase tracking-widest text-mint">
-        PIPELINE COMPLETE
+      <span className="text-lg font-semibold uppercase tracking-widest text-positive">
+        Pipeline Complete
       </span>
-      <span className="font-mono-tech text-xs text-mint/50">
+      <span className="font-mono tabular-nums text-xs text-positive/50">
         Results ready — closing...
       </span>
     </div>
@@ -328,13 +328,13 @@ export function NavigatorSetupModal(): JSX.Element | null {
       {/* ── Modal panel ── */}
       <div
         className={clsx(
-          "relative mx-4 w-full max-w-lg border border-mint/30 bg-canvas shadow-[0_0_40px_rgba(0,255,65,0.06)]",
+          "relative mx-4 w-full max-w-lg rounded-xl border border-primary/30 bg-canvas shadow-elevated",
           "animate-scale-in",
         )}
       >
         {/* ── Header bar ── */}
-        <div className="flex items-center justify-between border-b border-mint/20 px-5 py-3">
-          <h2 className="font-orb text-sm uppercase tracking-widest text-mint">
+        <div className="flex items-center justify-between border-b border-primary/20 px-5 py-3">
+          <h2 className="text-sm font-semibold uppercase tracking-widest text-primary">
             {isRunning
               ? "EXECUTING PIPELINE..."
               : isDone
@@ -345,7 +345,7 @@ export function NavigatorSetupModal(): JSX.Element | null {
             <button
               type="button"
               onClick={closeModal}
-              className="font-mono-tech text-sm text-mint/40 transition-colors hover:text-mint"
+              className="font-mono tabular-nums text-sm text-primary/40 transition-colors hover:text-primary"
               aria-label="Close modal"
             >
               [X]
@@ -384,12 +384,12 @@ export function NavigatorSetupModal(): JSX.Element | null {
 
               {/* Error display */}
               {error && (
-                <div className="border border-danger/30 bg-danger/5 px-4 py-2">
-                  <p className="font-mono-tech text-xs text-danger">
+                <div className="rounded-lg border border-danger/30 bg-danger/5 px-4 py-2">
+                  <p className="font-mono tabular-nums text-xs text-danger">
                     ✗ ERROR: {error}
                   </p>
                   {diagnosticMessage && (
-                    <p className="mt-1 break-words font-mono-tech text-[10px] text-danger/80">
+                    <p className="mt-1 break-words font-mono tabular-nums text-[10px] text-danger/80">
                       DETAIL: {diagnosticMessage}
                     </p>
                   )}
@@ -397,8 +397,8 @@ export function NavigatorSetupModal(): JSX.Element | null {
               )}
 
               {analysisMode === "mock-fallback" && (
-                <div className="border border-yellow-500/30 bg-yellow-500/10 px-4 py-2">
-                  <p className="font-mono-tech text-xs text-yellow-300">
+                <div className="rounded-lg border border-yellow-500/30 bg-yellow-500/10 px-4 py-2">
+                  <p className="font-mono tabular-nums text-xs text-yellow-300">
                     ⚠ SOURCE: MOCK FALLBACK (要再実行)
                   </p>
                 </div>
@@ -410,10 +410,10 @@ export function NavigatorSetupModal(): JSX.Element | null {
                 onClick={handleExecute}
                 disabled={!canExecute}
                 className={clsx(
-                  "w-full rounded-none border px-6 py-3 font-orb text-sm uppercase tracking-widest transition-all",
+                  "w-full rounded-lg border px-6 py-3 text-sm font-semibold uppercase tracking-widest transition-all",
                   canExecute
-                    ? "border-mint bg-mint/10 text-mint hover:bg-mint/20 hover:shadow-[0_0_20px_rgba(0,255,65,0.2)] animate-pborder"
-                    : "border-mint/10 text-mint/30 opacity-30 cursor-not-allowed",
+                    ? "border-primary bg-primary/10 text-primary hover:bg-primary/20 hover:shadow-card-hover"
+                    : "border-primary/10 text-primary/30 opacity-30 cursor-not-allowed",
                 )}
               >
                 {executeLabel(settings?.market)}
@@ -426,7 +426,7 @@ export function NavigatorSetupModal(): JSX.Element | null {
             <div className="space-y-5" aria-live="polite" aria-atomic="true">
               <ProgressBar value={progress} />
 
-              <div className="space-y-2.5 border-t border-mint/10 pt-4">
+              <div className="space-y-2.5 border-t border-primary/10 pt-4">
                 {steps.map((step, i) => (
                   <StepRow key={step.step} step={step} index={i} />
                 ))}
@@ -439,13 +439,7 @@ export function NavigatorSetupModal(): JSX.Element | null {
         </div>
 
         {/* ── Decorative scanline / CRT effect ── */}
-        <div
-          className="pointer-events-none absolute inset-0 opacity-[0.03]"
-          style={{
-            backgroundImage:
-              "repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,255,65,0.08) 2px, rgba(0,255,65,0.08) 4px)",
-          }}
-        />
+        {/* decorative element removed for clean professional look */}
       </div>
     </div>
   );

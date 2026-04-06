@@ -65,7 +65,7 @@ function RadarChart({ pick }: { pick: BestPick }): JSX.Element {
             key={lv}
             d={d}
             fill="none"
-            stroke="rgba(0,255,65,0.08)"
+            stroke="rgba(76,110,245,0.08)"
             strokeWidth={0.4}
           />
         );
@@ -79,7 +79,7 @@ function RadarChart({ pick }: { pick: BestPick }): JSX.Element {
           y1={CY}
           x2={pt[0]}
           y2={pt[1]}
-          stroke="rgba(0,255,65,0.15)"
+          stroke="rgba(76,110,245,0.15)"
           strokeWidth={0.3}
         />
       ))}
@@ -87,8 +87,8 @@ function RadarChart({ pick }: { pick: BestPick }): JSX.Element {
       {/* Data polygon */}
       <path
         d={dataPath}
-        fill="rgba(0,255,65,0.1)"
-        stroke="#00ff41"
+        fill="rgba(76,110,245,0.1)"
+        stroke="#4C6EF5"
         strokeWidth={1}
         strokeLinejoin="round"
         style={{
@@ -106,8 +106,8 @@ function RadarChart({ pick }: { pick: BestPick }): JSX.Element {
           y={labelPoints[i][1]}
           textAnchor="middle"
           dominantBaseline="central"
-          className="font-mono-tech"
-          fill="rgba(0,255,65,0.6)"
+          className="font-mono tabular-nums"
+          fill="rgba(76,110,245,0.6)"
           fontSize={5}
         >
           {label}
@@ -122,7 +122,7 @@ function RadarChart({ pick }: { pick: BestPick }): JSX.Element {
 function StarDisplay({ count }: { count: number }): JSX.Element {
   const filled = Math.max(0, Math.min(5, Math.round(count)));
   return (
-    <span className="font-mono-tech text-sm tracking-wider">
+    <span className="font-mono tabular-nums text-sm tracking-wider">
       {Array.from({ length: 5 }, (_, i) => (
         <span
           key={i}
@@ -154,16 +154,16 @@ function ScoreBar({
 
   return (
     <div className="flex items-center gap-2">
-      <span className="w-12 text-right font-mono-tech text-[10px] text-text-muted">
+      <span className="w-12 text-right font-mono tabular-nums text-[10px] text-text-muted">
         {label}
       </span>
-      <div className="h-1.5 flex-1 bg-mint/10">
+      <div className="h-1.5 flex-1 bg-positive/10">
         <div
-          className="h-full animate-bar-fill bg-mint"
+          className="h-full animate-bar-fill bg-positive"
           style={{ width: `${pct}%`, animationDelay: `${delay}ms` }}
         />
       </div>
-      <span className="w-4 font-mono-tech text-[10px] text-text-primary">
+      <span className="w-4 font-mono tabular-nums text-[10px] text-text-primary">
         {score}
       </span>
     </div>
@@ -179,13 +179,13 @@ function PickCard({ pick }: { pick: BestPick }): JSX.Element {
     <div className="border border-glass-border bg-panel p-3 transition-shadow hover:shadow-card">
       {/* Rank + Name */}
       <div className="mb-1 flex items-center gap-2">
-        <span className="font-orb text-[10px] text-amber">
+        <span className="font-semiboldtext-[10px] text-amber">
           [{pick.rank}位]
         </span>
-        <span className="font-mono-tech text-sm font-bold text-text-primary">
+        <span className="font-mono tabular-nums text-sm font-bold text-text-primary">
           {pick.name}
         </span>
-        <span className="font-mono-tech text-[10px] text-text-muted">
+        <span className="font-mono tabular-nums text-[10px] text-text-muted">
           ({pick.code})
         </span>
       </div>
@@ -214,13 +214,13 @@ function PickCard({ pick }: { pick: BestPick }): JSX.Element {
 
       {/* CF mini section */}
       <div className="mb-2 space-y-0.5 border-t border-glass-border pt-2">
-        <p className="font-mono-tech text-[10px] text-text-secondary">
-          FCFイールド: <span className="text-mint">{pick.fcfYield}</span>
+        <p className="font-mono tabular-nums text-[10px] text-text-secondary">
+          FCFイールド: <span className="text-positive">{pick.fcfYield}</span>
         </p>
-        <p className="font-mono-tech text-[10px] text-text-secondary">
+        <p className="font-mono tabular-nums text-[10px] text-text-secondary">
           CFマージン: <span className="text-text-primary">{pick.cfMargin}</span>
         </p>
-        <p className="font-mono-tech text-[10px] text-text-secondary">
+        <p className="font-mono tabular-nums text-[10px] text-text-secondary">
           CF傾向: <span className="text-text-primary">{pick.cfTrend}</span>
         </p>
       </div>
@@ -230,7 +230,7 @@ function PickCard({ pick }: { pick: BestPick }): JSX.Element {
         type="button"
         onClick={() => setExpanded((p) => !p)}
         aria-expanded={expanded}
-        className="font-mono-tech text-[10px] text-text-muted transition-colors hover:text-mint"
+        className="font-mono tabular-nums text-[10px] text-text-muted transition-colors hover:text-primary"
       >
         [{expanded ? "−" : "+"}] {expanded ? "閉じる" : "リスク詳細"}
       </button>
@@ -243,13 +243,13 @@ function PickCard({ pick }: { pick: BestPick }): JSX.Element {
       >
         <div className="overflow-hidden">
           <div className="space-y-1 border-t border-glass-border pt-2">
-            <p className="font-mono-tech text-[10px] text-amber/80">
+            <p className="font-mono tabular-nums text-[10px] text-amber/80">
               ⚠ {pick.risk1}
             </p>
-            <p className="font-mono-tech text-[10px] text-amber/80">
+            <p className="font-mono tabular-nums text-[10px] text-amber/80">
               ⚠ {pick.risk2}
             </p>
-            <p className="font-mono-tech text-[10px] text-text-muted">
+            <p className="font-mono tabular-nums text-[10px] text-text-muted">
               ▸ ヘッジ: {pick.hedge}
             </p>
           </div>
@@ -272,14 +272,14 @@ export function BestPicksSection({
 }: BestPicksSectionProps): JSX.Element {
   return (
     <section className="animate-fade-in border border-glass-border bg-panel p-4">
-      <h3 className="mb-4 font-orb text-[10px] uppercase tracking-widest text-text-muted">
+      <h3 className="mb-4 font-semiboldtext-[10px] uppercase tracking-widest text-text-muted">
         ▸ BEST PICKS
       </h3>
 
       {/* Best Stocks */}
       {bestStocks.length > 0 && (
         <div className="mb-6">
-          <h4 className="mb-3 font-orb text-[10px] uppercase tracking-widest text-text-muted">
+          <h4 className="mb-3 font-semiboldtext-[10px] uppercase tracking-widest text-text-muted">
             個別株 // TOP STOCKS
           </h4>
           <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
@@ -293,7 +293,7 @@ export function BestPicksSection({
       {/* Best Funds */}
       {bestFunds.length > 0 && (
         <div>
-          <h4 className="mb-3 font-orb text-[10px] uppercase tracking-widest text-text-muted">
+          <h4 className="mb-3 font-semiboldtext-[10px] uppercase tracking-widest text-text-muted">
             ETF/投信 // TOP FUNDS
           </h4>
           <div className="grid grid-cols-1 gap-4 md:grid-cols-3">

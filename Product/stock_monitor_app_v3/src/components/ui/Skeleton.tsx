@@ -11,10 +11,10 @@ export function Skeleton({ className, variant = "text", width, height }: Skeleto
   return (
     <div
       className={clsx(
-        "animate-shimmer bg-gradient-to-r from-canvas-deep via-mint/5 to-canvas-deep bg-[length:200%_100%]",
+        "animate-shimmer bg-gradient-to-r from-canvas-deep via-white/5 to-canvas-deep bg-[length:200%_100%]",
         variant === "text" && "h-4 rounded",
         variant === "circle" && "rounded-full",
-        variant === "rect" && "rounded-none",
+        variant === "rect" && "rounded-lg",
         className
       )}
       style={{ width, height }}
@@ -25,7 +25,7 @@ export function Skeleton({ className, variant = "text", width, height }: Skeleto
 
 export function SkeletonCard(): JSX.Element {
   return (
-    <div className="rounded-none border border-glass-border bg-panel p-4 shadow-card">
+    <div className="rounded-xl border border-glass-border bg-panel p-4 shadow-card">
       <div className="flex items-start justify-between gap-2">
         <div className="space-y-2">
           <Skeleton width={60} />
@@ -48,9 +48,9 @@ export function SkeletonCard(): JSX.Element {
 export function SkeletonTable({ rows = 5 }: { rows?: number }): JSX.Element {
   return (
     <div className="space-y-2">
-      <Skeleton variant="rect" height={40} className="rounded-none opacity-60" />
+      <Skeleton variant="rect" height={40} className="rounded-lg opacity-60" />
       {Array.from({ length: rows }).map((_, i) => (
-        <Skeleton key={i} variant="rect" height={48} className={i % 2 === 0 ? "rounded-none opacity-40" : "rounded-none opacity-30"} />
+        <Skeleton key={i} variant="rect" height={48} className={i % 2 === 0 ? "rounded-lg opacity-40" : "rounded-lg opacity-30"} />
       ))}
     </div>
   );

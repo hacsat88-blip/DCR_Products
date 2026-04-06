@@ -12,8 +12,8 @@ const SIGNAL_CONFIG: Record<
 > = {
   go: {
     label: "🟢 採用",
-    border: "border-mint/40",
-    badge: "bg-mint/10 text-mint border-mint/30",
+    border: "border-positive/40",
+    badge: "bg-positive/10 text-positive border-positive/30",
   },
   watch: {
     label: "🟡 条件付",
@@ -28,7 +28,7 @@ const SIGNAL_CONFIG: Record<
 };
 
 const PRIORITY_COLOR: Record<string, string> = {
-  高: "text-mint",
+  高: "text-positive",
   中: "text-amber",
   低: "text-text-muted",
 };
@@ -42,7 +42,7 @@ interface DebateSectionProps {
 export function DebateSection({ debate }: DebateSectionProps): JSX.Element {
   return (
     <section className="animate-fade-in border border-glass-border bg-panel p-4">
-      <h3 className="mb-4 font-orb text-[10px] uppercase tracking-widest text-text-muted">
+      <h3 className="mb-4 font-semiboldtext-[10px] uppercase tracking-widest text-text-muted">
         ▸ CONVERGENCE DEBATE
       </h3>
 
@@ -60,12 +60,12 @@ export function DebateSection({ debate }: DebateSectionProps): JSX.Element {
             >
               {/* Header: code + signal badge */}
               <div className="mb-2 flex items-center justify-between">
-                <span className="font-mono-tech text-base font-bold text-text-primary">
+                <span className="font-mono tabular-nums text-base font-bold text-text-primary">
                   {v.code}
                 </span>
                 <span
                   className={clsx(
-                    "inline-block border px-2 py-0.5 font-mono-tech text-[10px]",
+                    "inline-block border px-2 py-0.5 font-mono tabular-nums text-[10px]",
                     cfg.badge,
                   )}
                 >
@@ -74,7 +74,7 @@ export function DebateSection({ debate }: DebateSectionProps): JSX.Element {
               </div>
 
               {/* Priority */}
-              <div className="mb-2 font-mono-tech text-[10px]">
+              <div className="mb-2 font-mono tabular-nums text-[10px]">
                 <span className="text-text-muted">優先度: </span>
                 <span className={PRIORITY_COLOR[v.priority] ?? "text-text-muted"}>
                   {v.priority}
@@ -83,11 +83,11 @@ export function DebateSection({ debate }: DebateSectionProps): JSX.Element {
 
               {/* Pro / Con */}
               <div className="space-y-1">
-                <p className="font-mono-tech text-xs leading-relaxed text-mint/80">
+                <p className="font-mono tabular-nums text-xs leading-relaxed text-positive/80">
                   <span className="mr-1 text-text-muted">+</span>
                   {v.pro}
                 </p>
-                <p className="font-mono-tech text-xs leading-relaxed text-amber/80">
+                <p className="font-mono tabular-nums text-xs leading-relaxed text-amber/80">
                   <span className="mr-1 text-text-muted">−</span>
                   {v.con}
                 </p>
@@ -95,7 +95,7 @@ export function DebateSection({ debate }: DebateSectionProps): JSX.Element {
 
               {/* CF note */}
               <div className="mt-2 border-t border-glass-border pt-2">
-                <p className="font-mono-tech text-[10px] leading-relaxed text-text-muted">
+                <p className="font-mono tabular-nums text-[10px] leading-relaxed text-text-muted">
                   CF: {v.cfNote}
                 </p>
               </div>
