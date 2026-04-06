@@ -49,8 +49,9 @@ Step 7（運用観測）の記録テンプレートは `docs/dcr/operation-metri
 Source layer
 	.ai/           共通カーネル・モジュール・構造マップ
 	.ai/kernel/gates/ トリガーゲート (a/ i/ r/ s/ d/ p/ q/ sh/)
+	DESIGN.md      UI/UX の見た目とトーンの正本
 	rules/         エージェントルール (62件) — 正本
-	skills/        スキル定義 (57件, DCR 統合済み) — 正本
+	skills/        スキル定義 (59件, DCR 統合済み) — 正本
 	templates/     init-project.ps1 用テンプレート入力
 
 Runtime / generated layer

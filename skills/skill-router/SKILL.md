@@ -49,6 +49,8 @@ description: "タスクに最適なスキルを選定し、Transparency for dele
 | model-route | タスク難易度に応じたモデル選択 |
 | strategic-compact | コンテキスト圧縮タイミングの提案 |
 | tdd-workflow | テスト駆動開発ワークフロー |
+| prd-to-issues | PRD を実装可能な Issue 群に分解 |
+| improve-codebase-architecture | 構造改善ポイントの探索と提案 |
 
 ## Layer 3: Manual-Only スキル（手動発火のみ — インデックス）
 
@@ -116,6 +118,8 @@ description: "タスクに最適なスキルを選定し、Transparency for dele
 | using-git-worktrees | feature用のgit worktree分離 |
 | webapp-testing | Playwrightでのローカルウェブアプリテスト |
 | vercel-composition-patterns | Reactコンポーネント設計パターン |
+| prd-to-issues | PRD を独立 Issue へ分解 |
+| improve-codebase-architecture | テスタビリティ重視の構造改善提案 |
 
 ### メタ・監査
 
