@@ -24,6 +24,17 @@ AI エージェント設定・ルール・スキルの一元管理リポジト�
 
 詳細な共通仕様は `.ai/module/unified-integration.md` を参照。
 
+## 開発ワークフロー標準
+
+- **統合運用ドキュメント**: [docs/dcr/development-workflow.md](docs/dcr/development-workflow.md)
+  - 3段階運用モデル（ローカル開発 → 小PR化 → リリース前自動検証）
+  - 必須チェックリスト
+  - Branch Protection推奨設定
+  - Copilot Agent 自動化オプション
+- **PRテンプレート**: [.github/pull_request_template.md](.github/pull_request_template.md)
+  - 背景・変更内容・テスト結果の必須記載
+  - Pre-Review チェックリスト
+
 ## 個人運用の入口 (Step 6)
 
 - 運用方針の正本: `docs/dcr/instruction-governance.md`
