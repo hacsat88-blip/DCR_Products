@@ -7,6 +7,12 @@ alwaysApply: false
 
 # Continuous Learning — セッションの学びを蓄積する
 
+## v2 との関係
+
+- この skill は標準記録フロー（instinct の収集と蓄積）を担当する
+- `skills/continuous-learning-v2/SKILL.md` は scope/confidence を使った高度運用（status/export/import/evolve/promote）を担当する
+- まず本 skill で記録し、再利用性が見えた段階で v2 の promote ルールに従って昇格する
+
 ## 目的
 
 セッション中に得た知見を `/memories/repo/` に構造化して記録し、

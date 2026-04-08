@@ -122,17 +122,24 @@ async function handleInbound(cfg: GatewayConfig, inbound: InboundMessage): Promi
 
   // --- Typing indicator loop ---
   const TYPING_INTERVAL_MS = 5000;
+  const TYPING_MAX_MS = 120000; // Auto-stop typing after 2 minutes
   let typingTimer: ReturnType<typeof setInterval> | undefined;
+  let typingMaxTimer: ReturnType<typeof setTimeout> | undefined;
 
   const startTypingLoop = async () => {
     await inbound.sendComposing();
     typingTimer = setInterval(() => { void inbound.sendComposing(); }, TYPING_INTERVAL_MS);
+    typingMaxTimer = setTimeout(() => stopTypingLoop(), TYPING_MAX_MS);
   };
 
   const stopTypingLoop = () => {
     if (typingTimer) {
       clearInterval(typingTimer);
       typingTimer = undefined;
+    }
+    if (typingMaxTimer) {
+      clearTimeout(typingMaxTimer);
+      typingMaxTimer = undefined;
     }
   };
 
@@ -180,16 +187,38 @@ async function handleInbound(cfg: GatewayConfig, inbound: InboundMessage): Promi
     console.log(`Processing message with agent...`);
     debugLog(`[gateway] running agent for session=${route.sessionKey}`);
     const startedAt = Date.now();
-    const model = getSetting('modelId', 'gpt-5.4') as string;
-    const modelProvider = getSetting('provider', 'openai') as string;
-    const answer = await runAgentForMessage({
-      sessionKey: route.sessionKey,
-      query,
-      model,
-      modelProvider,
-      channel: inbound.channel,
-      groupContext,
-    });
+    const model = process.env.DEXTER_MODEL || getSetting('modelId', 'gpt-5.4') as string;
+    const modelProvider = process.env.DEXTER_PROVIDER || getSetting('provider', 'openai') as string;
+    const agentTimeoutMs = parseInt(process.env.DEXTER_AGENT_TIMEOUT_MS || '120000', 10);
+    const agentController = new AbortController();
+    const agentTimer = setTimeout(() => agentController.abort(), agentTimeoutMs);
+    let answer: string;
+    try {
+      const maxIter = process.env.DEXTER_PUBLIC_GATEWAY === '1' ? 5 : 10;
+      answer = await runAgentForMessage({
+        sessionKey: route.sessionKey,
+        query,
+        model,
+        modelProvider,
+        maxIterations: maxIter,
+        channel: inbound.channel,
+        groupContext,
+        signal: agentController.signal,
+      });
+    } catch (e: unknown) {
+      const msg = e instanceof Error ? e.message : String(e);
+      if (msg.includes('abort')) {
+        answer = `⏱️ 処理が${agentTimeoutMs / 1000}秒を超えたため中断しました。もう少し具体的な質問にするか、時間を空けて再度お試しください。`;
+      } else {
+        if (msg.includes('rate limit') || msg.includes('429') || msg.includes('quota')) {
+        answer = '⏳ APIのレート制限に達しました。少し時間を置いてから再度お試しください。';
+      } else {
+        answer = `Error: ${msg.slice(0, 200)}`;
+      }
+      }
+    } finally {
+      clearTimeout(agentTimer);
+    }
     const durationMs = Date.now() - startedAt;
     debugLog(`[gateway] agent answer length=${answer.length}`);
 
