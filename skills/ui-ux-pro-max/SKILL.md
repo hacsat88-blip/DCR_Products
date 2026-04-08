@@ -1,12 +1,14 @@
 ---
 name: ui-ux-pro-max
-description: "UI/UX design intelligence with creative design philosophy and compliance review. 50 styles, 21 palettes, 50 font pairings, 20 charts, 9 stacks (React, Next.js, Vue, Svelte, SwiftUI, React Native, Flutter, Tailwind, shadcn/ui). Actions: plan, build, create, design, implement, review, fix, improve, optimize, enhance, refactor, check UI/UX code. Projects: website, landing page, dashboard, admin panel, e-commerce, SaaS, portfolio, blog, mobile app, .html, .tsx, .vue, .svelte. Elements: button, modal, navbar, sidebar, card, table, form, chart. Styles: glassmorphism, claymorphism, minimalism, brutalism, neumorphism, bento grid, dark mode, responsive, skeuomorphism, flat design. Topics: color palette, accessibility, animation, layout, typography, font pairing, spacing, hover, shadow, gradient. Also use when asked to 'review my UI', 'check accessibility', 'audit design', or 'review UX'. Integrations: shadcn/ui MCP for component search and examples."
+description: "Use when: designing UI, building landing pages, dashboards, reviewing code for UX issues, checking accessibility, auditing design systems. Generates design system recommendations, suggests styles/colors/typography by product type, provides stack-specific guidelines (React, Next.js, Vue, Svelte, Tailwind, shadcn, mobile). Actions: plan, build, create, design, implement, review, fix, improve, check accessibility. Also use when asked 'review my UI', 'design system', 'should this be accessible', 'pick a style'."
 disable-model-invocation: true
 ---
 
 # UI/UX Pro Max - Design Intelligence
 
-Comprehensive design guide for web and mobile applications. Contains 50+ styles, 97 color palettes, 57 font pairings, 99 UX guidelines, and 25 chart types across 9 technology stacks. Searchable database with priority-based recommendations.
+**Local Workspace Version**: A comprehensive design assistant that provides design system generation, style recommendations, and UX guidelines through a Python CLI tool. Data and actual capabilities depend on the local `skills/ui-ux-pro-max/data/` folder and `scripts/` implementation. 
+
+For version & maintenance details, see the [Version & Maintenance](#version--maintenance) section at the end of this guide.
 
 ## When to Apply
 
@@ -426,3 +428,64 @@ https://raw.githubusercontent.com/vercel-labs/web-interface-guidelines/main/comm
 2. Read the specified files (or ask user which files to review)
 3. Check against all rules in the fetched guidelines
 4. Output findings in terse `file:line` format
+
+---
+
+## Version & Maintenance
+
+### Local Scope
+This SKILL.md describes **local workspace configuration only**. Do not cite internal section numbers or feature counts as authoritative across contexts. The skill is driven by:
+- `skills/ui-ux-pro-max/scripts/search.py` — Search and design system engine
+- `skills/ui-ux-pro-max/data/` — CSV data files (styles, colors, typography, charts, etc.)
+
+Actual capability depends on what's in these folders, not on this documentation.
+
+### Upstream Reference
+The original repository is [nextlevelbuilder/ui-ux-pro-max-skill](https://github.com/nextlevelbuilder/ui-ux-pro-max-skill). If porting updates from upstream:
+1. Compare `src/ui-ux-pro-max/data/*.csv` counts with this doc
+2. Update description if data files grow significantly  
+3. Test with `python3 skills/ui-ux-pro-max/scripts/search.py --help` to verify CLI still works
+4. Do NOT cite upstream feature counts (e.g., "161 reasoning rules") in this doc unless they also apply locally
+
+### Self-Validation
+Before committing changes to this skill:
+```bash
+# Verify scripts exist
+test -f skills/ui-ux-pro-max/scripts/search.py && echo "✓ Script found"
+
+# Verify data folder exists
+test -d skills/ui-ux-pro-max/data && echo "✓ Data folder found"
+
+# Quick test: generate a design system
+python3 skills/ui-ux-pro-max/scripts/search.py "SaaS beauty minimal" --design-system 2>&1 | head -20
+```
+
+If any check fails, rollback changes before merge.
+
+---
+
+## Related Rules — Division of Responsibility
+
+This skill generates **design systems and recommendations**. Other UI/UX rules handle complementary aspects:
+
+| Role | Focus | Use When |
+|------|-------|----------|
+| **ui-ux-pro-max** (this skill) | Design system generation engine by product type, styles, colors, typography | User asks "what design should I use?" or "build a landing page for..." |
+| **ui-designer** (rule in rules/) | Visual design systems, component libraries, pixel-perfect interface | User asks to create detailed component specs, design token systems, or design QA |
+| **ux-architect** (rule in rules/) | CSS foundations, layout frameworks, responsive architecture, tech structure | User needs layout system, grid setup, theme variables, or implementation guidance |
+| **brand-guardian** (rule in rules/) | Brand identity, consistency, visual language across product | User asks to maintain/define brand visual standards |
+
+### Practical Discrimination
+
+- 🟢 **ui-ux-pro-max**: "I'm building a SaaS landing page — help me decide on a style/color/typography"
+- 🟢 **ui-designer**: "I've chosen a style — now design the actual component library and make it pixel-perfect"
+- 🟢 **ux-architect**: "I have the design comps — how do I structure CSS and build the layout system?"
+- 🟢 **brand-guardian**: "Ensure all our UI aligns with our brand color palette and tone"
+
+When a user request spans multiple roles, agent invocation should:
+1. Start with **ui-ux-pro-max** to generate design system
+2. Hand off to **ui-designer** for component polish
+3. Then **ux-architect** for implementation structure
+4. Verify with **brand-guardian** for consistency
+
+This avoids redundant descriptions and ensures each rule owns one clear responsibility.

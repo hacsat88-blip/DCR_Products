@@ -7,6 +7,12 @@ alwaysApply: false
 
 # Continuous Learning v2 (Light)
 
+## v1 との関係
+
+- `skills/continuous-learning/SKILL.md` を基盤フローとして利用する
+- v2 は既存記録を project/global と confidence で再編成し、昇格判断を追加する拡張レイヤー
+- 初回導入時は v1 の運用を優先し、慣れたら v2 コマンド運用を段階適用する
+
 ## 目的
 
 `skills/continuous-learning` の記録を拡張し、知見を次の2層で管理する。
