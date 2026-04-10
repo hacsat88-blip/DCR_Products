@@ -2,7 +2,7 @@
   "compilerOptions": {
     "target": "ESNext",
     "module": "ESNext",
-    "moduleResolution": "bundler",
+    "moduleResolution": "Bundler",
     "jsx": "react-jsx",
     "strict": true,
     "esModuleInterop": true,
@@ -13,6 +13,7 @@
     "declarationMap": true,
     "outDir": "./dist",
     "rootDir": "./src",
+    "ignoreDeprecations": "6.0",
     "baseUrl": ".",
     "paths": {
       "@/*": ["./src/*"]
