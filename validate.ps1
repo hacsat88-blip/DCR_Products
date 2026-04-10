@@ -172,8 +172,8 @@ if (-not (Test-Path $RoutingIndexScript)) {
             Write-Fail "routing index generation — exit $LASTEXITCODE"
             if ($Verbose -and $result) { Write-Host "  $result" -ForegroundColor DarkGray }
         } else {
-            $existing = Get-Content -Path $RoutingIndexFile -Raw -Encoding utf8
-            $generated = Get-Content -Path $tempIndex -Raw -Encoding utf8
+            $existing = (Get-Content -Path $RoutingIndexFile -Raw -Encoding utf8) -replace "`r`n", "`n"
+            $generated = (Get-Content -Path $tempIndex -Raw -Encoding utf8) -replace "`r`n", "`n"
             if ($existing -ceq $generated) {
                 if ($Verbose) { Write-Ok "rules/_ROUTING_INDEX.md — up to date" }
                 else { $script:passed++ }

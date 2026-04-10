@@ -85,7 +85,7 @@ foreach ($row in $rows) {
 }
 
 $utf8NoBom = New-Object System.Text.UTF8Encoding($false)
-[System.IO.File]::WriteAllText($OutputPath, ($lines -join "`r`n") + "`r`n", $utf8NoBom)
+[System.IO.File]::WriteAllText($OutputPath, ($lines -join "`n") + "`n", $utf8NoBom)
 
 Write-Host "Generated routing index:" -ForegroundColor Green
 Write-Host "  $OutputPath"
