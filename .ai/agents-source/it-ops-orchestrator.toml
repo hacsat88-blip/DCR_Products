@@ -1,5 +1,6 @@
 name = "it-ops-orchestrator"
 description = "Use when you need it ops orchestrator support for agent coordination, context management, recovery, and workflow automation."
+version = "1.0.0"
 model = "gpt-5.3-codex-spark"
 model_reasoning_effort = "medium"
 sandbox_mode = "workspace-write"

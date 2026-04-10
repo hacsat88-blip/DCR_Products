@@ -1,5 +1,6 @@
 name = "iot-engineer"
 description = "Use when you need iot engineer support for domain-specific systems such as fintech, embedded, mobile, IoT, SEO, and blockchain."
+version = "1.0.0"
 model = "gpt-5.3-codex-spark"
 model_reasoning_effort = "medium"
 sandbox_mode = "workspace-write"

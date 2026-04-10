@@ -1,7 +1,10 @@
+"use client";
+
 import React from "react";
 
 import { EmptyState } from "@/components/common/EmptyState";
 import { EvaluatedStock } from "@/types/stock";
+import { motion, staggerContainerVariants, staggerItemVariants } from "@/components/ui/MotionPrimitives";
 
 import { StockCard } from "./StockCard";
 
@@ -24,18 +27,24 @@ function StockGridInner({ stocks, selectedId, onSelect, onToggleWatch, onRemove 
   }
 
   return (
-    <section className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
+    <motion.section
+      className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3"
+      variants={staggerContainerVariants}
+      initial="hidden"
+      animate="visible"
+    >
       {stocks.map((stock) => (
-        <StockCard
-          key={stock.id}
-          stock={stock}
-          selected={selectedId === stock.id}
-          onSelect={onSelect}
-          onToggleWatch={onToggleWatch}
-          onRemove={onRemove}
-        />
+        <motion.div key={stock.id} variants={staggerItemVariants}>
+          <StockCard
+            stock={stock}
+            selected={selectedId === stock.id}
+            onSelect={onSelect}
+            onToggleWatch={onToggleWatch}
+            onRemove={onRemove}
+          />
+        </motion.div>
       ))}
-    </section>
+    </motion.section>
   );
 }
 

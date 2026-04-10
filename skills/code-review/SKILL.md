@@ -1,6 +1,29 @@
 ---
 name: code-review
 description: Use when requesting code reviews, dispatching reviewer subagents, or receiving and responding to code review feedback. Covers both sides of the review process with technical rigor.
+contract:
+  preconditions:
+    - "code changes exist (diff, PR, or modified files)"
+  postconditions:
+    - "severity-ordered findings list with actionable remediation"
+    - "approve or request-changes verdict"
+  invariants:
+    - "review is evidence-based, not opinion-based"
+composable:
+  input_type: code
+  output_type: review
+  chains_with:
+    - verification-before-completion
+    - systematic-debugging
+package:
+  version: "1.0.0"
+  compat: "dcr >= 2.0"
+  exports:
+    - SKILL.md
+  dependencies: []
+  tags:
+    - review
+    - quality
 ---
 
 # Code Review

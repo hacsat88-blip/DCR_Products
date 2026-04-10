@@ -39,6 +39,12 @@ npm-debug.log*
 !/.dcr/config.json
 !/.dcr/templates/
 !/.dcr/templates/*.md
+!/.dcr/phase.yaml
+!/.dcr/intent-log-schema.md
+!/.dcr/compositions.yaml
+!/.dcr/adversarial-pairs.yaml
+!/.dcr/registry.yaml
+# intent-log.jsonl and intent-weights.md are local runtime data (not tracked)
 codex_Product/
 
 # Nested git repos (unregistered submodules)

@@ -4,7 +4,7 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 import { useStockStore } from "@/store/useStockStore";
 import { EvaluatedStock } from "@/types/stock";
 
-import { useDashboardDerived } from "./useDashboardDerived";
+import { deriveActionLanes, deriveRankingRows, useDashboardDerived } from "./useDashboardDerived";
 
 function makeStock(code: string, score: number): EvaluatedStock {
   return {
@@ -72,5 +72,35 @@ describe("useDashboardDerived", () => {
 
     expect(result.current.filteredStocks.map((stock) => stock.code)).toEqual(["2337"]);
     expect(result.current.rankedRows.map((stock) => stock.code)).toEqual(["2337"]);
+  });
+
+  it("exposes all Phase 5 panels in the expected tabs", () => {
+    const { result } = renderHook(() => useDashboardDerived());
+
+    const panelTabs =
+      ((result.current as unknown as { dashboardPanels?: Record<string, string> }).dashboardPanels ?? {});
+
+    expect(panelTabs).toMatchObject({
+      ranking: "market",
+      compare: "analysis",
+      snapshot: "analysis",
+      timeline: "analysis",
+      export: "portfolio",
+      savedScreens: "settings",
+      navigator: "market"
+    });
+  });
+
+  it("uses the same evaluated action in ranking and action lane", () => {
+    const stocks = [makeStock("9424", 88), makeStock("2337", 72), makeStock("4477", 64)];
+    stocks[1].evaluatedAction = "wait_pullback";
+    stocks[2].evaluatedAction = "exclude";
+
+    const ranked = deriveRankingRows(stocks, "action_priority", []);
+    const lanes = deriveActionLanes(stocks);
+
+    expect(ranked.map((stock) => stock.evaluatedAction).sort()).toEqual(
+      lanes.flatMap((lane) => lane.items.map((stock) => stock.evaluatedAction)).sort()
+    );
   });
 });

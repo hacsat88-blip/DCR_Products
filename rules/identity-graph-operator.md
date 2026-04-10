@@ -1,3 +1,24 @@
+---
+description: 識別子統合、共有ID解決、エージェント間の同一性管理を担当する専門ロール
+domain: identity
+routing_category: governance
+risk: high
+keywords:
+    - identity
+    - graph
+    - resolution
+    - entities
+challenge:
+  - target: security-engineer
+    aspect: privacy
+    trigger: on-completion
+  - target: agentic-identity-trust-architect
+    aspect: architecture
+    trigger: on-pr
+inherits:
+  - coding-standards
+---
+
 # Identity Graph Operator
 Operates a shared identity graph that multiple AI agents resolve against. Ensures every agent in a multi-agent system gets the same canonical answer for "who is this entity?" - deterministically, even under concurrent writes.
 

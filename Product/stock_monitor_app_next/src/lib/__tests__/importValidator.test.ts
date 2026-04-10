@@ -1,9 +1,11 @@
-import { describe, it, expect } from "vitest";
+import { beforeEach, describe, it, expect } from "vitest";
 import {
   validateExportPayload,
   validateCsvImport,
   parseCsvWatchlistRows,
 } from "@/lib/importValidator";
+import { normalizeExportPayloadForImport, useStockStore } from "@/store/useStockStore";
+import type { ExportPayload, StockSnapshot } from "@/types/archive";
 
 describe("validateExportPayload", () => {
   describe("valid payloads", () => {
@@ -165,6 +167,132 @@ describe("validateExportPayload", () => {
       expect(result.preview.snapshotCount).toBe(1);
       expect(result.warnings.some((w) => w.includes("スナップショット"))).toBe(true);
     });
+  });
+});
+
+describe("snapshot capture integrity", () => {
+  it("preserves captureId and captureSource through export/import normalization", () => {
+    const createSnapshot = (overrides: Partial<StockSnapshot>): StockSnapshot => ({
+      id: "snapshot-default",
+      captureId: "capture-default",
+      code: "0000",
+      name: "default",
+      checkedAt: "2024-01-01T00:00:00Z",
+      price: null,
+      changePercent: null,
+      marketCap: null,
+      per: null,
+      pbr: null,
+      dividendYield: null,
+      revenueGrowth: null,
+      opGrowth: null,
+      operatingCF: null,
+      score: null,
+      evaluatedAction: null,
+      scoreSummary: "",
+      ...overrides,
+    });
+
+    const exported: ExportPayload = {
+      schemaVersion: "phase5-export-v1",
+      exportedAt: "2024-01-01T00:00:00Z",
+      snapshots: [
+        createSnapshot({
+          id: "snap-1",
+          captureId: "",
+          code: "9424",
+          name: "日本通信",
+          checkedAt: "2024-01-01T00:00:00Z",
+        }),
+        createSnapshot({
+          id: "snap-2",
+          captureId: "capture-existing",
+          code: "2337",
+          name: "いちご",
+          checkedAt: "2024-01-01T00:05:00Z",
+        }),
+      ],
+    };
+
+    const normalized = normalizeExportPayloadForImport(exported);
+
+    expect(normalized.snapshots?.[0]).toMatchObject({
+      captureId: expect.any(String),
+      captureSource: "manual",
+    });
+    expect(normalized.snapshots?.[1]).toMatchObject({
+      captureId: "capture-existing",
+      captureSource: "manual",
+    });
+  });
+});
+
+describe("snapshot import hardening", () => {
+  beforeEach(() => {
+    window.localStorage.clear();
+    useStockStore.setState(useStockStore.getInitialState(), true);
+  });
+
+  it("does not crash on malformed checkedAt rows and keeps import stable", () => {
+    const createSnapshot = (overrides: Partial<StockSnapshot>): StockSnapshot => ({
+      id: "snapshot-default",
+      captureId: "capture-default",
+      code: "0000",
+      name: "default",
+      checkedAt: "2024-01-01T00:00:00Z",
+      price: null,
+      changePercent: null,
+      marketCap: null,
+      per: null,
+      pbr: null,
+      dividendYield: null,
+      revenueGrowth: null,
+      opGrowth: null,
+      operatingCF: null,
+      score: null,
+      evaluatedAction: null,
+      scoreSummary: "",
+      ...overrides,
+    });
+
+    const exported: ExportPayload = {
+      schemaVersion: "phase5-export-v1",
+      exportedAt: "2024-01-01T00:00:00Z",
+      snapshots: [
+        createSnapshot({
+          id: "snap-valid",
+          code: "9424",
+          name: "日本通信",
+          checkedAt: "2024-01-01T00:00:00Z",
+        }),
+        createSnapshot({
+          id: "snap-malformed",
+          captureId: "",
+          code: "2337",
+          name: "いちご",
+          checkedAt: 12345 as unknown as string,
+        }),
+      ],
+    };
+
+    expect(() => normalizeExportPayloadForImport(exported)).not.toThrow();
+    const normalized = normalizeExportPayloadForImport(exported);
+
+    expect(normalized.snapshots?.[1]).toMatchObject({
+      captureId: expect.stringContaining("capture-import-unknown-"),
+      captureSource: "manual",
+      checkedAt: 12345,
+    });
+
+    const result = useStockStore.getState().importData(normalized, {
+      mergeStrategy: "overwrite",
+      targets: { snapshots: true },
+    });
+
+    expect(result.errors).toEqual([]);
+    expect(result.imported).toBe(1);
+    expect(useStockStore.getState().snapshots).toHaveLength(1);
+    expect(useStockStore.getState().snapshots[0].id).toBe("snap-valid");
   });
 });
 

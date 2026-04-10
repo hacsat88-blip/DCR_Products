@@ -1,7 +1,7 @@
 import { useCallback, useRef, useState } from"react";
 
 import { parseCsvWatchlistRows, validateCsvImport, validateExportPayload } from"@/lib/importValidator";
-import { useStockStore } from"@/store/useStockStore";
+import { normalizeExportPayloadForImport, useStockStore } from"@/store/useStockStore";
 import type { ExportPayload, ImportOptions, ImportValidationResult } from"@/types/archive";
 
 type FileType ="json" |"csv" | null;
@@ -140,10 +140,11 @@ export function ImportPanel(): JSX.Element {
  setDragOver(false);
  }, []);
 
- const executeImport = useCallback(() => {
- if (fileType ==="json" && rawJson && validation?.valid) {
- const result = importData(rawJson, { mergeStrategy, targets });
- const parts: string[] = [];
+  const executeImport = useCallback(() => {
+  if (fileType ==="json" && rawJson && validation?.valid) {
+  const normalizedPayload = normalizeExportPayloadForImport(rawJson);
+  const result = importData(normalizedPayload, { mergeStrategy, targets });
+  const parts: string[] = [];
  if (result.imported > 0) parts.push(`${result.imported}件インポート`);
  if (result.skipped > 0) parts.push(`${result.skipped}件スキップ`);
  if (result.errors.length > 0) parts.push(`${result.errors.length}件エラー`);

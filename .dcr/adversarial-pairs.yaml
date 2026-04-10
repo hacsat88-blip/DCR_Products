@@ -1,0 +1,68 @@
+# Adversarial Review Pairs
+# Central definition of challenger-target relationships.
+# The skill-router references this when deciding whether to auto-spawn a challenger.
+
+pairs:
+
+  security-review:
+    challenger: security-engineer
+    targets:
+      - backend-architect
+      - frontend-developer
+      - senior-developer
+    aspects:
+      - security
+      - architecture
+    trigger: on-completion
+    description: "実装完了後にセキュリティ観点で自動レビュー"
+
+  performance-review:
+    challenger: performance-benchmarker
+    targets:
+      - backend-architect
+      - frontend-developer
+    aspects:
+      - performance
+    trigger: on-completion
+    description: "実装完了後にパフォーマンス観点で自動レビュー"
+
+  accessibility-review:
+    challenger: accessibility-auditor
+    targets:
+      - frontend-developer
+      - ui-designer
+    aspects:
+      - ux
+      - correctness
+    trigger: on-completion
+    description: "UI実装完了後にアクセシビリティ観点で自動レビュー"
+
+  qa-reality-check:
+    challenger: qa-reality-checker
+    targets:
+      - senior-developer
+      - rapid-prototyper
+    aspects:
+      - correctness
+    trigger: on-completion
+    description: "実装完了後に現実的なQA観点で検証"
+
+  evidence-collection:
+    challenger: evidence-collector
+    targets:
+      - senior-developer
+      - frontend-developer
+      - backend-architect
+    aspects:
+      - correctness
+    trigger: on-pr
+    description: "PR作成時に証跡ベースで検証"
+
+# Escalation rules
+escalation:
+  # If challenger finds severity >= high, escalate to P3
+  severity_threshold: high
+  # Maximum challengers per single task
+  max_challengers: 2
+  # Challenger timeout (advisory, not enforced)
+  timeout_hint: "5 minutes per challenger"

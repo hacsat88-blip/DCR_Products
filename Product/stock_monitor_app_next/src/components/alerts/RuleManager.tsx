@@ -70,7 +70,7 @@ export function RuleManager({
   return (
     <section className="rounded-lg border border-border-subtle bg-panel p-5 shadow-card">
       <div className="mb-3 flex flex-wrap items-center justify-between gap-3">
-        <h2 className="text-lg font-semibold font-semiboldtext-text-primary">アラートルール管理</h2>
+        <h2 className="text-lg font-semibold text-text-primary">アラートルール管理</h2>
         <button
           type="button"
           onClick={onToggleNotifications}

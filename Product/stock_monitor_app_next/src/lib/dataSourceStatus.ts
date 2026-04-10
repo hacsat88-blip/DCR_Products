@@ -2,6 +2,7 @@ import { DataMode, ProviderHealth } from "@/services/providers/types";
 import { StockSourceMeta } from "@/types/source";
 
 export type DataSourceStatus = "live" | "fallback" | "mock" | "error";
+const DEFAULT_FALLBACK_REASON = "実データの取得に失敗したため、補助データを表示しています。";
 
 interface ResolveDataSourceStatusInput {
   dataMode: DataMode;
@@ -26,7 +27,10 @@ function hasHardError(health: ProviderHealth[]): boolean {
 
 function alphaFallbackUsed(health: ProviderHealth[]): boolean {
   const alphaHealth = health.find((item) => item.provider === "alphaVantage");
-  return alphaHealth?.message?.toLowerCase().includes("fallback used") ?? false;
+  if (!alphaHealth) {
+    return false;
+  }
+  return alphaHealth.decision === "used" || (alphaHealth.message?.toLowerCase().includes("fallback used") ?? false);
 }
 
 export function resolveDataSourceStatus({
@@ -72,5 +76,19 @@ export function dataSourceStatusBadgeClass(status: DataSourceStatus): string {
   if (status === "fallback") return "border-amber/35 bg-amber/10 text-amber";
   if (status === "mock") return "border-border-subtle bg-canvas-deep/60 text-text-muted";
   return "border-danger/35 bg-danger/10 text-danger";
+}
+
+export function resolveFallbackReasonLabel(
+  status: DataSourceStatus,
+  fallbackReason?: string | null
+): string | null {
+  const normalized = fallbackReason?.trim() ?? "";
+  if (normalized.length > 0) {
+    return normalized;
+  }
+  if (status === "fallback" || status === "mock" || status === "error") {
+    return DEFAULT_FALLBACK_REASON;
+  }
+  return null;
 }
 

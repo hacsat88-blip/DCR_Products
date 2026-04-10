@@ -23,13 +23,15 @@ function formatExecutedAt(iso: string): string {
 // ══════════════════════════════════════════════════
 
 export function NavigatorLaunchButton(): JSX.Element {
-  const { openModal, status, executedAt, logHistory } = useNavigatorStore();
+  const { openModal, status, executedAt, logHistory, restartPipeline } = useNavigatorStore();
   const hasPreviousRun =
     Boolean(executedAt) || logHistory.length > 0 || status === "done" || status === "error";
   const runLabel = executedAt ? formatExecutedAt(executedAt) : "--";
+  const isRunning = status === "running";
 
   return (
-    <div className="inline-flex flex-col items-start gap-1">
+    <div className="inline-flex flex-col items-start gap-1.5">
+      <div className="flex items-center gap-2">
       <button
         type="button"
         onClick={openModal}
@@ -38,6 +40,16 @@ export function NavigatorLaunchButton(): JSX.Element {
       >
         {status === "running" ? "Executing..." : hasPreviousRun ? "AI Navigator (Re-run)" : "AI Navigator"}
       </button>
+        {hasPreviousRun && !isRunning && (
+          <button
+            type="button"
+            onClick={restartPipeline}
+            className="rounded-lg border border-danger/30 px-3 py-2.5 text-sm font-semibold text-danger/70 transition-colors hover:border-danger/60 hover:text-danger"
+          >
+            クリア
+          </button>
+        )}
+      </div>
 
       {/* Last execution timestamp */}
       {hasPreviousRun && (

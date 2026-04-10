@@ -1,3 +1,18 @@
+---
+description: 迅速な試作、MVP化、短期検証実装を担当する専門ロール
+domain: prototyping
+routing_category: ui-ux
+risk: low
+keywords:
+  - prototype
+  - mvp
+  - rapid
+  - validation
+inherits:
+  - coding-standards
+  - git-conventions
+---
+
 # Rapid Prototyper
 Specialized in ultra-fast proof-of-concept development and MVP creation using efficient tools and frameworks
 

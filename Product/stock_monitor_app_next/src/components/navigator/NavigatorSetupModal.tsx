@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useRef } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import clsx from "clsx";
 
 import { useNavigatorStore } from "@/store/useNavigatorStore";
@@ -10,6 +10,8 @@ import type {
   InvestmentHorizon,
   PipelineStepState,
 } from "@/types/navigator";
+
+import { getRetryCooldownState } from "./cooldown";
 
 // ── Option descriptors ──────────────────────────
 
@@ -228,7 +230,15 @@ function ProgressBar({ value }: { value: number }): JSX.Element {
 
 // ── Done overlay ────────────────────────────────
 
-function DoneOverlay(): JSX.Element {
+function DoneOverlay({
+  onClose,
+  onRestart,
+  onClear,
+}: {
+  onClose: () => void;
+  onRestart: () => void;
+  onClear: () => void;
+}): JSX.Element {
   return (
     <div className="flex flex-col items-center justify-center gap-3 py-10 animate-scale-in">
       <span className="text-4xl text-positive">
@@ -237,9 +247,32 @@ function DoneOverlay(): JSX.Element {
       <span className="text-lg font-semibold uppercase tracking-widest text-positive">
         Pipeline Complete
       </span>
-      <span className="font-mono tabular-nums text-xs text-positive/50">
-        Results ready — closing...
+      <span className="font-mono tabular-nums text-xs text-positive/70">
+        Results ready
       </span>
+      <div className="flex gap-2 mt-1">
+        <button
+          type="button"
+          onClick={onRestart}
+          className="rounded border border-primary/30 bg-primary/10 px-4 py-1.5 font-mono tabular-nums text-xs text-primary transition-colors hover:bg-primary/20"
+        >
+          再実行
+        </button>
+        <button
+          type="button"
+          onClick={onClear}
+          className="rounded border border-danger/20 px-4 py-1.5 font-mono tabular-nums text-xs text-danger/60 transition-colors hover:text-danger/90"
+        >
+          全クリア
+        </button>
+        <button
+          type="button"
+          onClick={onClose}
+          className="rounded border border-primary/20 px-4 py-1.5 font-mono tabular-nums text-xs text-primary/50 transition-colors hover:text-primary/80"
+        >
+          Close
+        </button>
+      </div>
     </div>
   );
 }
@@ -258,17 +291,27 @@ export function NavigatorSetupModal(): JSX.Element | null {
     progress,
     error,
     diagnosticMessage,
+    retryState,
     closeModal,
     updateSettings,
     runPipeline,
+    resetPipeline,
+    restartPipeline,
   } = useNavigatorStore();
 
   const overlayRef = useRef<HTMLDivElement>(null);
+  const [now, setNow] = useState(() => Date.now());
   const isSetup = status === "idle" || status === "error";
   const isRunning = status === "running";
   const isDone = status === "done";
-  const canClose = isSetup;
-  const canExecute = Boolean(settings?.market);
+  const canClose = isSetup || isDone;
+  const { active: cooldownActive, retryLabel } = getRetryCooldownState(retryState, now);
+  const baseCanExecute = Boolean(settings?.market);
+  const canExecute = baseCanExecute && !cooldownActive;
+
+  useEffect(() => {
+    setNow(Date.now());
+  }, [retryState?.reason, retryState?.retryAfterSeconds, retryState?.retryAt]);
 
   // ── Escape key handler ──────────────────────────
 
@@ -291,6 +334,16 @@ export function NavigatorSetupModal(): JSX.Element | null {
       document.body.style.overflow = "";
     };
   }, [isModalOpen, handleKeyDown]);
+
+  useEffect(() => {
+    if (!cooldownActive) return;
+    const timer = window.setInterval(() => {
+      setNow(Date.now());
+    }, 1000);
+    return () => {
+      window.clearInterval(timer);
+    };
+  }, [cooldownActive]);
 
   // ── Click-outside handler ─────────────────────
 
@@ -382,6 +435,21 @@ export function NavigatorSetupModal(): JSX.Element | null {
                 onChange={(v) => updateSettings({ horizon: v })}
               />
 
+              <div className="space-y-2.5">
+                <p className="text-xs font-semibold uppercase tracking-widest text-primary/60">
+                  追加指示 (任意)
+                </p>
+                <textarea
+                  value={settings?.freeInput ?? ""}
+                  onChange={(e) => updateSettings({ freeInput: e.target.value })}
+                  placeholder="例: 金融セクターを重視し、ディフェンシブ銘柄の比率を上げる"
+                  className="min-h-24 w-full rounded-lg border border-primary/20 bg-canvas px-3 py-2 font-mono tabular-nums text-xs text-text-primary outline-none transition-colors focus:border-primary/50"
+                />
+                <p className="font-mono tabular-nums text-[10px] text-text-muted">
+                  入力内容は各ステップのAIプロンプトへ追加されます。
+                </p>
+              </div>
+
               {/* Error display */}
               {error && (
                 <div className="rounded-lg border border-danger/30 bg-danger/5 px-4 py-2">
@@ -393,6 +461,17 @@ export function NavigatorSetupModal(): JSX.Element | null {
                       DETAIL: {diagnosticMessage}
                     </p>
                   )}
+                </div>
+              )}
+
+              {cooldownActive && (
+                <div className="rounded-lg border border-yellow-500/30 bg-yellow-500/10 px-4 py-2">
+                  <p className="font-mono tabular-nums text-xs text-yellow-300">
+                    ⚠ API混雑のため待機中
+                  </p>
+                  <p className="mt-1 font-mono tabular-nums text-[10px] text-yellow-200/80">
+                    {retryLabel}
+                  </p>
                 </div>
               )}
 
@@ -434,8 +513,8 @@ export function NavigatorSetupModal(): JSX.Element | null {
             </div>
           )}
 
-          {/* Done phase (brief flash before auto-close) */}
-          {isDone && <DoneOverlay />}
+          {/* Done phase */}
+          {isDone && <DoneOverlay onClose={closeModal} onRestart={restartPipeline} onClear={resetPipeline} />}
         </div>
 
         {/* ── Decorative scanline / CRT effect ── */}

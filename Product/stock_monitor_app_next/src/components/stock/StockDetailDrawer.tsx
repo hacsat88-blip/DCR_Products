@@ -19,7 +19,10 @@ import {
   formatPercent
 } from "@/lib/format";
 import {
+  addToCompareSelection,
+  canSelectForCompare,
   formatStockChangeDisplay,
+  getCompareSelectionStatus,
   formatStockMarketCapDisplay,
   formatStockPriceDisplay,
   getStockDisplayName,
@@ -27,6 +30,7 @@ import {
   getStockNarrativeSummaryText
 } from "@/lib/stockPresentation";
 import { Badge } from "@/components/ui/Badge";
+import { DataFreshnessBadge } from "@/components/ui/DataFreshnessBadge";
 import { SrcMetaDots } from "@/components/ui/SrcDot";
 import { ScoreRing } from "@/components/ui/ScoreRing";
 import { CollapsibleSection } from "@/components/ui/CollapsibleSection";
@@ -150,6 +154,10 @@ export function StockDetailDrawer({
   }, [open, onClose]);
 
   const tone = useMemo(() => (stock ? actionTone(stock.evaluatedAction) : "wait"), [stock]);
+  const compareSelection = useStockStore((s) => s.compareSelection);
+  const addToCompare = useStockStore((s) => s.addToCompare);
+  const removeFromCompare = useStockStore((s) => s.removeFromCompare);
+  const compareStatus = useMemo(() => getCompareSelectionStatus(compareSelection), [compareSelection]);
 
   if (!stock) {
     return <></>;
@@ -157,6 +165,9 @@ export function StockDetailDrawer({
   const displayName = getStockDisplayName(stock);
   const insightText = getStockInsightText(stock);
   const overviewText = getStockNarrativeSummaryText(stock);
+  const fundamentalsTimestamp = stock.fundamentalsSubmitDate ?? stock.fundamentalsUpdatedAt;
+  const selectedInCompare = compareSelection.includes(stock.code);
+  const canAddCompare = canSelectForCompare(compareSelection, stock.code);
 
   const handleSave = (): void => {
     onSaveMemo(stock.id, memoDraft);
@@ -185,6 +196,17 @@ export function StockDetailDrawer({
       setHypothesisSavedLabel("");
       hypothesisTimerRef.current = null;
     }, 1200);
+  };
+  const handleCompareToggle = (): void => {
+    if (selectedInCompare) {
+      removeFromCompare(stock.code);
+      return;
+    }
+    const nextSelection = addToCompareSelection(compareSelection, stock.code);
+    if (nextSelection.length === compareSelection.length) {
+      return;
+    }
+    addToCompare(stock.code);
   };
 
   return (
@@ -237,6 +259,20 @@ export function StockDetailDrawer({
           <span className="rounded-lg border border-border-subtle px-3 py-1 text-xs text-text-secondary">
             {formatStockMarketCapDisplay(stock)}
           </span>
+          <DataFreshnessBadge kind="price" timestamp={stock.priceUpdatedAt} />
+          <DataFreshnessBadge kind="fundamentals" timestamp={fundamentalsTimestamp} />
+          <span
+            className={clsx(
+              "rounded-lg border px-3 py-1 text-xs",
+              selectedInCompare
+                ? "border-secondary/35 bg-secondary/10 text-secondary"
+                : compareStatus.isFull
+                  ? "border-amber/35 bg-amber/10 text-amber"
+                  : "border-border-subtle text-text-secondary"
+            )}
+          >
+            {selectedInCompare ? "比較中" : `比較 ${compareStatus.count}/${compareStatus.limit}`}
+          </span>
         </div>
 
         <div className="sticky top-0 z-10 mb-4 card-surface p-4 backdrop-blur border-secondary/20">
@@ -249,6 +285,9 @@ export function StockDetailDrawer({
           </p>
           <p className="mt-1 text-sm text-text-secondary">
             崩れる条件: {stock.collapseCondition}
+          </p>
+          <p className="mt-1 text-xs text-text-muted">
+            取得ソース: <span className="font-mono text-text-secondary">P:{stock.priceSourceLabel ?? "-"} / F:{stock.fundamentalsSourceLabel ?? "-"}</span>
           </p>
         </div>
 
@@ -414,13 +453,30 @@ export function StockDetailDrawer({
           </div>
         </CollapsibleSection>
 
-        <button
-          type="button"
-          onClick={() => onToggleWatch(stock.id)}
-          className="mt-4 w-full rounded-lg border border-primary/30 px-4 py-3 text-sm font-medium text-text-secondary transition-colors hover:border-primary/50 hover:text-text-primary"
-        >
-          {stock.watched ? "監視から外す" : "監視に追加"}
-        </button>
+        <div className="mt-4 grid grid-cols-2 gap-2">
+          <button
+            type="button"
+            onClick={handleCompareToggle}
+            disabled={!selectedInCompare && !canAddCompare}
+            title={!selectedInCompare && !canAddCompare ? `比較は最大${compareStatus.limit}銘柄です` : undefined}
+            className={clsx(
+              "rounded-lg border px-4 py-3 text-sm font-medium transition-colors",
+              selectedInCompare
+                ? "border-secondary/35 bg-secondary/10 text-secondary hover:bg-secondary/15"
+                : "border-border-subtle text-text-secondary hover:border-border-active hover:text-text-primary",
+              !selectedInCompare && !canAddCompare && "cursor-not-allowed opacity-50"
+            )}
+          >
+            {selectedInCompare ? "比較から外す" : canAddCompare ? "比較に追加" : "比較上限"}
+          </button>
+          <button
+            type="button"
+            onClick={() => onToggleWatch(stock.id)}
+            className="rounded-lg border border-primary/30 px-4 py-3 text-sm font-medium text-text-secondary transition-colors hover:border-primary/50 hover:text-text-primary"
+          >
+            {stock.watched ? "監視から外す" : "監視に追加"}
+          </button>
+        </div>
       </aside>
     </>
   );

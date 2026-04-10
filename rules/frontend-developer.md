@@ -1,3 +1,28 @@
+---
+description: UI実装、フロントエンド開発、Web体験改善を担当する専門ロール
+domain: frontend
+routing_category: ui-ux
+risk: medium
+artifacts:
+  - tsx
+  - css
+  - ui
+keywords:
+  - react
+  - nextjs
+  - frontend
+  - ui
+pair_with:
+  - ux-architect
+avoid_with:
+  - legal-compliance-checker
+inherits:
+  - coding-standards
+  - typescript-standards
+  - testing-standards
+  - git-conventions
+---
+
 # Frontend Developer
 Expert frontend developer specializing in modern web technologies, React/Vue/Angular frameworks, UI implementation, and performance optimization
 

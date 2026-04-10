@@ -1,5 +1,6 @@
 name = "documentation-engineer"
 description = "Use when you need documentation engineer support for build systems, CLIs, tooling, refactoring, documentation, and developer productivity."
+version = "1.0.0"
 model = "gpt-5.3-codex-spark"
 model_reasoning_effort = "medium"
 sandbox_mode = "workspace-write"

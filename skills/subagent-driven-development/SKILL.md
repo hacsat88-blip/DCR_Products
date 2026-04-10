@@ -308,6 +308,58 @@ When all agents return:
 - Implementer (same subagent) fixes them
 - Reviewer reviews again
 - Repeat until approved
+
+## Transparency Report (DCR 準拠)
+
+DCR の「Transparency for delegation」ルールに基づき、サブエージェント・マルチエージェント発火前に以下のフォーマットで報告する。
+
+### 発火前報告テンプレート
+
+```
+📋 サブエージェント実行計画:
+| # | Agent | Role | Target |
+|---|-------|------|--------|
+| 1 | [agent-name] | Implementer | [task summary] |
+| 2 | [agent-name] | Spec Reviewer | Task 1 review |
+| 3 | [agent-name] | Quality Reviewer | Task 1 review |
+```
+
+### 完了時報告テンプレート
+
+```
+✅ サブエージェント実行結果:
+| # | Agent | Status | Summary |
+|---|-------|--------|---------|
+| 1 | [agent-name] | DONE / DONE_WITH_CONCERNS / BLOCKED | [1行要約] |
+| 2 | [agent-name] | ✅ Approved / ❌ Issues found | [1行要約] |
+```
+
+### 報告ルール
+
+- 単一サブエージェントでも省略しない
+- 並列ディスパッチ時は全エージェントを一覧で表示
+- BLOCKED/NEEDS_CONTEXT の場合は理由を報告に含める
+- review loop が2回以上発生した場合はループ回数を記載
+
+## team: パイプライン可視化
+
+`team:` execution mode 使用時は、パイプラインの各フェーズを明示する。
+
+### フェーズ遷移表示
+
+```
+🔄 team: pipeline status
+━━━━━━━━━━━━━━━━━━━━━━━━
+[✅] plan    — スコープ確定済み
+[🔄] prd     — 要件詳細化中
+[⬚] exec    — 未着手
+[⬚] verify  — 未着手
+[⬚] fix     — 未着手
+━━━━━━━━━━━━━━━━━━━━━━━━
+```
+
+- フェーズ遷移ごとにステータスバーを更新表示する
+- 各フェーズの所要コンテキスト消費量が大きい場合は strategic-compact を提案する
 - Don't skip the re-review
 
 **If subagent fails task:**

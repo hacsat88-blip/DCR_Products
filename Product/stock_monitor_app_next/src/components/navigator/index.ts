@@ -4,4 +4,5 @@ export { NavigatorLaunchButton } from "./NavigatorLaunchButton";
 export { NavigatorLiveTerminal } from "./NavigatorLiveTerminal";
 export { ConfidenceBar } from "./ConfidenceBar";
 export { ConfMatrix } from "./ConfMatrix";
+export { VIXAlertBanner } from "./VIXAlertBanner";
 

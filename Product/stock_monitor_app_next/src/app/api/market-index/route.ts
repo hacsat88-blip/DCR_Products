@@ -30,7 +30,10 @@ type NikkeiPayload = {
   diff: number | null;
   diffPercent: number | null;
   asOf: string | null;
+  sourceTimestamp: string | null;
+  fetchedAt: string;
   source: string;
+  sourceLabel: "YF";
   history: NikkeiHistoryPoint[];
 };
 
@@ -50,7 +53,10 @@ type OhlcPayload = {
   diff: number | null;
   diffPercent: number | null;
   asOf: string | null;
+  sourceTimestamp: string | null;
+  fetchedAt: string;
   source: string;
+  sourceLabel: "YF";
   ohlc: OhlcPoint[];
 };
 
@@ -119,8 +125,11 @@ async function fetchNikkeiDaily(range: Range, interval: string): Promise<NikkeiP
   const meta = result.meta ?? {};
   const closesArray = result.indicators?.quote?.[0]?.close;
   const closes = pickLastTwo(closesArray);
-  const latestClose = closes.latest ?? toNumber(meta.regularMarketPrice);
-  const prevClose = closes.previous ?? toNumber(meta.previousClose);
+  // latestClose: prefer meta.regularMarketPrice (always the live price)
+  const latestClose = toNumber(meta.regularMarketPrice) ?? closes.latest;
+  // prevClose: always prefer meta.previousClose (prev session's close) for correct 前日比.
+  // closes.previous is the second-to-last candle which is wrong for intraday timeframes.
+  const prevClose = toNumber(meta.previousClose) ?? closes.previous;
   const diff =
     latestClose !== null && prevClose !== null && Number.isFinite(latestClose) && Number.isFinite(prevClose)
       ? latestClose - prevClose
@@ -146,7 +155,10 @@ async function fetchNikkeiDaily(range: Range, interval: string): Promise<NikkeiP
     diff,
     diffPercent,
     asOf: toIso(latestTs),
+    sourceTimestamp: toIso(latestTs),
+    fetchedAt: new Date().toISOString(),
     source: "Yahoo Finance ^N225",
+    sourceLabel: "YF",
     history
   };
 }
@@ -233,7 +245,10 @@ async function fetchNikkeiOhlc(range: Range, interval: string): Promise<OhlcPayl
     diff,
     diffPercent,
     asOf: toIso(latestTs),
+    sourceTimestamp: toIso(latestTs),
+    fetchedAt: new Date().toISOString(),
     source: "Yahoo Finance ^N225",
+    sourceLabel: "YF",
     ohlc,
   };
 }
@@ -287,7 +302,10 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
       diff: null,
       diffPercent: null,
       asOf: null,
+      sourceTimestamp: null,
+      fetchedAt: new Date().toISOString(),
       source: "Nikkei fetch failed",
+      sourceLabel: "YF",
       error: error instanceof Error ? error.message : "Unknown error"
     };
     return NextResponse.json(

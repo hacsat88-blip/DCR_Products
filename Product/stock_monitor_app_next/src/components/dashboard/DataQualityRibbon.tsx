@@ -4,7 +4,9 @@ import { useEffect, useState } from"react";
 
 import clsx from"clsx";
 
-import { DataMode, ProviderHealth } from"@/services/providers/types";
+import { resolveSessionStateLabel, resolveUpdateStateLabel, SessionStateLabel, UpdateStateLabel } from "@/lib/dataQualityRibbonStatus";
+import { getTokyoMarketSession } from "@/lib/tradingHours";
+import { DataMode, ProviderHealth, getProviderLabel } from"@/services/providers/types";
 import { StockSourceMeta } from "@/types/source";
 
 interface DataQualityRibbonProps {
@@ -24,14 +26,13 @@ function modeLabel(mode: DataMode): string {
 }
 
 function providerLabel(provider: ProviderHealth["provider"]): string {
- if (provider === "edinetDb") return "財務";
- if (provider === "alphaVantage") return "価格(AV)";
- return "価格";
+ return getProviderLabel(provider);
 }
 
 function providerIcon(provider: ProviderHealth["provider"]): string {
  if (provider === "edinetDb") return "📋";
  if (provider === "alphaVantage") return "🅰️";
+ if (provider === "jquants") return "🇯";
  return "📊";
 }
 
@@ -40,6 +41,19 @@ function formatDateTime(value: string | null): string {
  const parsed = new Date(value);
  if (Number.isNaN(parsed.getTime())) return value;
  return parsed.toLocaleString("ja-JP");
+}
+
+function compactStatusBadgeClass(label: SessionStateLabel | UpdateStateLabel): string {
+  if (label === "取引中" || label === "リアルタイム相当") {
+    return "border-positive/25 bg-positive/8 text-positive";
+  }
+  if (label === "遅延") {
+    return "border-amber/25 bg-amber/8 text-amber";
+  }
+  if (label === "モック") {
+    return "border-border-subtle bg-canvas-raised/60 text-text-secondary";
+  }
+  return "border-border-subtle bg-canvas-deep/50 text-text-muted";
 }
 
 function useElapsed(lastUpdatedAt: string | null): string {
@@ -132,10 +146,17 @@ export function DataQualityRibbon({
  autoRefreshEnabled = false,
  refreshIntervalMinutes = 15
 }: DataQualityRibbonProps): JSX.Element {
- const elapsed = useElapsed(lastUpdatedAt);
- const nextRefresh = useNextRefreshLabel(lastUpdatedAt, autoRefreshEnabled, refreshIntervalMinutes);
+  const elapsed = useElapsed(lastUpdatedAt);
+  const nextRefresh = useNextRefreshLabel(lastUpdatedAt, autoRefreshEnabled, refreshIntervalMinutes);
+  const marketSession = getTokyoMarketSession();
+  const sessionState = resolveSessionStateLabel(marketSession);
+  const updateState = resolveUpdateStateLabel({
+    dataMode,
+    lastUpdatedAt,
+    session: marketSession
+  });
 
- return (
+  return (
  <section
  className={clsx(
 "card-surface px-4 py-3 transition-all duration-300",
@@ -160,7 +181,23 @@ export function DataQualityRibbon({
  dataMode ==="mock" &&"bg-text-muted"
  )}
  />
-  {modeLabel(dataMode)}
+   {modeLabel(dataMode)}
+   </span>
+  <span
+  className={clsx(
+  "inline-flex items-center rounded-lg border px-2.5 py-1 text-[10px] font-medium leading-none",
+  compactStatusBadgeClass(sessionState)
+  )}
+  >
+  {sessionState}
+  </span>
+  <span
+  className={clsx(
+  "inline-flex items-center rounded-lg border px-2.5 py-1 text-[10px] font-medium leading-none",
+  compactStatusBadgeClass(updateState)
+  )}
+  >
+  {updateState}
   </span>
   {sourceMeta ? (
   <span className="inline-flex items-center gap-1.5 rounded-lg border border-border-subtle bg-canvas-deep/50 px-3 py-1 text-text-secondary">

@@ -1,3 +1,15 @@
+---
+description: プロジェクト計画、進行管理、優先順位整理を担当する専門ロール
+domain: project-mgmt
+routing_category: governance
+risk: medium
+keywords:
+	- planning
+	- project
+	- delivery
+	- priorities
+---
+
 # Senior Project Manager
 Converts specs to tasks, manages cross-functional coordination, and applies data-driven prioritization frameworks. Focused on realistic scope, stakeholder alignment, and agile sprint delivery.
 

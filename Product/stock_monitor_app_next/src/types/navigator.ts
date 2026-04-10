@@ -10,6 +10,8 @@ export interface NavigatorSettings {
   market: MarketScope;
   risk: RiskTolerance;
   horizon: InvestmentHorizon;
+  /** Optional free-form instruction appended to prompts across all steps. */
+  freeInput?: string;
 }
 
 // ────────────────────────────────────────────────
@@ -31,6 +33,48 @@ export interface MacroRisk {
   trend: "↑" | "→" | "↓";
 }
 
+// ────────────────────────────────────────────────
+// Geopolitical & Market Sentiment (v1.1 extensions)
+// ────────────────────────────────────────────────
+
+export interface GeopoliticalRisk {
+  event: string;
+  region: string;
+  /** 1-5 severity */
+  severity: number;
+  impact: string;
+  trend: "↑" | "→" | "↓";
+  affectedSectors: string[];
+}
+
+export interface EconomicIndicator {
+  name: string;
+  value: string;
+  trend: "↑" | "→" | "↓";
+  impact: "positive" | "neutral" | "negative";
+}
+
+export interface MarketSentiment {
+  vixLevel: number | null;
+  marketPhase: "risk-on" | "neutral" | "risk-off";
+  currencyRisk: "low" | "mid" | "high";
+  bondYieldTrend: "↑" | "→" | "↓";
+}
+
+export interface CentralBankPolicy {
+  bank: "FRB" | "BOJ";
+  stance: string;
+  rateDirection: "hawkish" | "neutral" | "dovish";
+  keyPoint: string;
+}
+
+export interface VIXAlert {
+  isAbnormal: boolean;
+  level: number | null;
+  reason: string | null;
+  recommendation: string | null;
+}
+
 /** Result of the macro-environment analysis stage. */
 export interface MacroResult {
   environment: MarketEnvironment;
@@ -39,6 +83,16 @@ export interface MacroResult {
   risks: MacroRisk[];
   /** Cross-market chain insight. Non-null only when market === "BOTH". */
   chain: string | null;
+  /** v1.1: Geopolitical risk factors (★3+). */
+  geopoliticalRisks?: GeopoliticalRisk[];
+  /** v1.1: Market sentiment gauges. */
+  sentiment?: MarketSentiment;
+  /** v1.1: Key economic indicators. */
+  economicIndicators?: EconomicIndicator[];
+  /** v1.1: Central bank policy summaries. */
+  centralBankPolicies?: CentralBankPolicy[];
+  /** v1.1: VIX abnormality alert. */
+  vixAlert?: VIXAlert;
 }
 
 // ────────────────────────────────────────────────
@@ -74,6 +128,13 @@ export interface StockSelectionResult {
 
 export type DebateSignal = "go" | "watch" | "out";
 export type DebatePriority = "高" | "中" | "低";
+export type ConvergenceStatus = "🟢採用" | "🟡条件付き" | "🔴除外";
+
+export interface PanelistVote {
+  role: "バリュー投資家" | "投資未経験者" | "成長株アナリスト" | "リスク管理者" | "マクロストラテジスト";
+  signal: DebateSignal;
+  reason: string;
+}
 
 export interface DebateVerdict {
   code: string;
@@ -84,6 +145,10 @@ export interface DebateVerdict {
   pro: string;
   con: string;
   cfNote: string;
+  /** v1.1: Per-panelist votes. */
+  panelVotes?: PanelistVote[];
+  /** v1.1: Convergence status derived from panel votes. */
+  convergence?: ConvergenceStatus;
 }
 
 export interface DebateResult {
@@ -168,6 +233,12 @@ export type PipelineStep = 0 | 1 | 2 | 3;
 export type PipelineStatus = "idle" | "running" | "done" | "error";
 export type NavigatorAnalysisMode = "live" | "mock-fallback" | null;
 
+export interface NavigatorRetryState {
+  reason: "rate_limit";
+  retryAfterSeconds: number | null;
+  retryAt: string | null;
+}
+
 export interface PipelineStepState {
   step: PipelineStep;
   label: string;
@@ -212,6 +283,8 @@ export interface NavigatorState {
   analysisMode: NavigatorAnalysisMode;
   /** Additional diagnostic detail from the latest failed run. */
   diagnosticMessage: string | null;
+  /** Retry state for temporary upstream rate limiting. */
+  retryState: NavigatorRetryState | null;
   status: PipelineStatus;
   currentStep: PipelineStep;
   steps: PipelineStepState[];
@@ -269,6 +342,7 @@ export const INITIAL_NAVIGATOR_STATE: NavigatorState = {
   final: null,
   analysisMode: null,
   diagnosticMessage: null,
+  retryState: null,
   status: "idle",
   currentStep: 0,
   steps: DEFAULT_PIPELINE_STEPS.map((s) => ({ ...s })),

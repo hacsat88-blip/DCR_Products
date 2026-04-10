@@ -102,7 +102,7 @@ export function StocksTable({ stocks, debate }: StocksTableProps): JSX.Element {
 
   return (
     <section className="animate-fade-in border border-glass-border bg-panel">
-      <h3 className="border-b border-glass-border px-4 py-3 font-semiboldtext-[10px] uppercase tracking-widest text-text-muted">
+      <h3 className="border-b border-glass-border px-4 py-3 font-semibold text-[10px] uppercase tracking-widest text-text-muted">
         ▸ STOCK SELECTION + DEBATE SIGNALS
       </h3>
 
@@ -125,7 +125,7 @@ export function StocksTable({ stocks, debate }: StocksTableProps): JSX.Element {
                 <th
                   key={label + i}
                   className={clsx(
-                    "whitespace-nowrap px-3 py-2 font-semiboldtext-[10px] uppercase tracking-widest text-text-muted",
+                    "whitespace-nowrap px-3 py-2 font-semibold text-[10px] uppercase tracking-widest text-text-muted",
                     w,
                     key && "cursor-pointer select-none hover:text-primary",
                   )}

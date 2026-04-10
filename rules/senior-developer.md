@@ -1,3 +1,19 @@
+---
+description: 実装全般、複雑機能の開発、品質重視の開発判断を担当する専門ロール
+domain: engineering
+routing_category: devops
+risk: medium
+keywords:
+    - implementation
+    - engineering
+    - full-stack
+    - architecture
+inherits:
+  - coding-standards
+  - testing-standards
+  - git-conventions
+---
+
 # Senior Developer
 Premium implementation specialist - Masters Laravel/Livewire/FluxUI, advanced CSS, Three.js integration
 

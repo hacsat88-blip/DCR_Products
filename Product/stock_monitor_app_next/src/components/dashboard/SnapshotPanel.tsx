@@ -35,15 +35,15 @@ function SnapshotPanelInner({
  const [visibleCount, setVisibleCount] = useState(SNAPSHOT_PAGE_SIZE);
 
  const captures = useMemo(() => {
- const captureMap = new Map<
- string,
- { captureId: string; checkedAt: string; source:"manual" |"autosave"; count: number }
- >();
- for (const snapshot of snapshots) {
- const source = snapshot.captureSource ??"manual";
- const current = captureMap.get(snapshot.captureId);
- if (!current) {
- captureMap.set(snapshot.captureId, {
+  const captureMap = new Map<
+  string,
+  { captureId: string; checkedAt: string; source:"manual" |"autosave"; count: number }
+  >();
+  for (const snapshot of snapshots) {
+  const source = snapshot.captureSource ==="autosave" ?"autosave" :"manual";
+  const current = captureMap.get(snapshot.captureId);
+  if (!current) {
+  captureMap.set(snapshot.captureId, {
  captureId: snapshot.captureId,
  checkedAt: snapshot.checkedAt,
  source,
@@ -56,9 +56,9 @@ function SnapshotPanelInner({
  current.checkedAt = snapshot.checkedAt;
  }
  }
- return [...captureMap.values()].sort(
- (a, b) => Date.parse(b.checkedAt) - Date.parse(a.checkedAt)
- );
+  return [...captureMap.values()].sort(
+  (a, b) => Date.parse(b.checkedAt) - Date.parse(a.checkedAt)
+  );
  }, [snapshots]);
 
  const latest = captures[0]?.checkedAt ?? null;

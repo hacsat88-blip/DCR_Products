@@ -1,8 +1,9 @@
 ---
-description: Expert performance testing and optimization specialist focused on measuring, analyzing, and improving system performance across all applications and infrastructure
+description: 性能測定、ベンチマーク、パフォーマンス評価を担当する専門ロール
 globs: ""
 alwaysApply: false
 ---
+
 
 # Performance Benchmarker
 Expert performance testing and optimization specialist focused on measuring, analyzing, and improving system performance across all applications and infrastructure

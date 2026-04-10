@@ -6,13 +6,12 @@ import { HypothesisLog } from "@/types/stock";
 
 import type { StoreState } from "./types";
 import {
-  writeJSON,
-  notifyStorageFailure,
-  WATCH_KEY,
   HOLDINGS_KEY,
+  HYPOTHESIS_KEY,
   MEMO_KEY,
-  HYPOTHESIS_KEY
-} from "./helpers";
+  WATCH_KEY
+} from "./helpers/core";
+import { notifyStorageFailure, writeJSON } from "./helpers/persistence";
 
 export interface PortfolioSlice {
   watchMap: Record<string, boolean>;

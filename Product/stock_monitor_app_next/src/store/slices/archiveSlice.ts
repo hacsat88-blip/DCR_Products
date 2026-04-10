@@ -14,41 +14,38 @@ import {
   SavedScreen,
   StockSnapshot
 } from "@/types/archive";
-import { EvaluatedStock, StockFilters } from "@/types/stock";
+import { EvaluatedStock } from "@/types/stock";
+import { restoreSavedScreenState } from "@/store/useStockStore";
 
 import type { StoreState } from "./types";
 import {
-  createId,
-  writeJSON,
-  writeString,
-  notifyStorageFailure,
-  normalizeRegisteredCodes,
+  ARCHIVE_AUTOSAVE_KEY,
+  ARCHIVE_COMPARE_KEY,
+  ARCHIVE_EXPORT_SCHEMA_VERSION,
+  ARCHIVE_SAVED_SCREENS_KEY,
+  ARCHIVE_SNAPSHOTS_KEY,
+  applySnapshotLimits,
+  COMPARE_MAX,
+  createSnapshot,
+  csvEscape,
+  downloadTextFile,
   normalizeCompareSelection,
   normalizeSavedScreens,
-  applySnapshotLimits,
-  summarizeProviderHealth,
-  createSnapshot,
-  safeSortKey,
-  safeRankingSortKey,
-  sortStocksForRanking,
-  downloadTextFile,
-  csvEscape,
-  ARCHIVE_SNAPSHOTS_KEY,
-  ARCHIVE_SAVED_SCREENS_KEY,
-  ARCHIVE_COMPARE_KEY,
-  ARCHIVE_AUTOSAVE_KEY,
-  ARCHIVE_EXPORT_SCHEMA_VERSION,
-  ALERT_EVENTS_KEY,
-  BACKTEST_RESULTS_KEY,
-  BACKTEST_RESULTS_MAX,
-  REGISTERED_CODES_KEY,
-  REGISTERED_CODES_MAX,
-  REGISTERED_NAME_MAP_KEY,
   RANKING_SORT_KEY,
   SAVED_SCREENS_MAX,
-  COMPARE_MAX,
-  DEFAULT_FILTERS
-} from "./helpers";
+  sortStocksForRanking,
+  summarizeProviderHealth
+} from "./helpers/archive";
+import { ALERT_EVENTS_KEY } from "./helpers/alert";
+import { BACKTEST_RESULTS_KEY, BACKTEST_RESULTS_MAX } from "./helpers/backtest";
+import {
+  createId,
+  normalizeRegisteredCodes,
+  REGISTERED_CODES_KEY,
+  REGISTERED_CODES_MAX,
+  REGISTERED_NAME_MAP_KEY
+} from "./helpers/core";
+import { notifyStorageFailure, writeJSON, writeString } from "./helpers/persistence";
 
 export interface ArchiveSlice {
   snapshots: StockSnapshot[];
@@ -263,19 +260,13 @@ export const createArchiveSlice: StateCreator<StoreState, [], [], ArchiveSlice> 
       if (!target) {
         return {};
       }
-      const filters = {
-        ...DEFAULT_FILTERS,
-        ...(target.filters as Partial<StockFilters>)
-      };
-      const sortKey = safeSortKey(target.sortKey);
-      const rankingSortKey = safeRankingSortKey(target.rankingSortKey ?? target.sortKey);
-      const compareSelection = normalizeCompareSelection(target.compareSelection ?? []);
-      const rankingPersisted = writeString(RANKING_SORT_KEY, rankingSortKey);
-      const comparePersisted = writeJSON(ARCHIVE_COMPARE_KEY, compareSelection);
+      const restored = restoreSavedScreenState(target);
+      const rankingPersisted = writeString(RANKING_SORT_KEY, restored.rankingSortKey);
+      const comparePersisted = writeJSON(ARCHIVE_COMPARE_KEY, restored.compareSelection);
       if (!rankingPersisted || !comparePersisted) {
         notifyStorageFailure("applySavedScreen");
       }
-      return { filters, sortKey, rankingSortKey, compareSelection };
+      return restored;
     });
   },
 

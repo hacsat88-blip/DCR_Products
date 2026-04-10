@@ -6,11 +6,14 @@ import { DataMode, ProviderHealth } from "@/services/providers/types";
 import { useStockStore } from "@/store/useStockStore";
 import { SourceLabel, StockSourceMeta } from "@/types/source";
 
+import { PollingOptions, startPolling } from "./polling";
+
 type MarketDataPhase = "idle" | "phase1_price" | "phase2_fundamentals";
 
-interface UseMarketDataOptions {
+export interface UseMarketDataOptions {
   enabled?: boolean;
   refreshIntervalMs?: number;
+  polling?: PollingOptions;
 }
 
 interface UseMarketDataResult {
@@ -34,7 +37,7 @@ function shouldFetchFundamentals(): boolean {
     (stock) => stock.revenueGrowth === null || stock.opGrowth === null || stock.operatingCF === null
   );
   const edinetHealth = state.health.find((item) => item.provider === "edinetDb");
-  const isDeferred = edinetHealth?.message === "deferred to phase2";
+  const isDeferred = edinetHealth?.decision === "deferred" || edinetHealth?.message === "deferred to phase2";
   return hasMissingFundamentals || Boolean(isDeferred);
 }
 
@@ -43,7 +46,9 @@ function isAbortError(error: unknown): boolean {
 }
 
 export function useMarketData(options: UseMarketDataOptions = {}): UseMarketDataResult {
-  const { enabled = true, refreshIntervalMs = 5 * 60 * 1000 } = options;
+  const { enabled = true, refreshIntervalMs = 5 * 60 * 1000, polling } = options;
+  const pollingMode = polling?.mode ?? "interval";
+  const pollingSchedule = polling?.controller?.schedule;
   const registeredCodesKey = useStockStore((s) => s.registeredCodes.join(","));
   const refreshStocks = useStockStore((s) => s.refreshStocks);
   const isLoading = useStockStore((s) => s.isLoading);
@@ -100,15 +105,15 @@ export function useMarketData(options: UseMarketDataOptions = {}): UseMarketData
     }
 
     void refresh();
-    const timer = window.setInterval(() => {
+    const stopPolling = startPolling(() => {
       void refresh();
-    }, refreshIntervalMs);
+    }, refreshIntervalMs, pollingSchedule ? { mode: pollingMode, controller: { schedule: pollingSchedule } } : { mode: pollingMode });
 
     return () => {
-      window.clearInterval(timer);
+      stopPolling();
       cancelActiveRequest();
     };
-  }, [enabled, refresh, refreshIntervalMs, registeredCodesKey, cancelActiveRequest]);
+  }, [enabled, refresh, refreshIntervalMs, registeredCodesKey, cancelActiveRequest, pollingMode, pollingSchedule]);
 
   return {
     phase,

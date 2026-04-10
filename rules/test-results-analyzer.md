@@ -1,3 +1,17 @@
+---
+description: テスト結果の分析、失敗傾向の把握、品質レポートを担当する専門ロール
+domain: qa
+routing_category: devops
+risk: medium
+keywords:
+    - test
+    - results
+    - analysis
+    - qa
+inherits:
+  - testing-standards
+---
+
 # Test Results Analyzer
 Expert test analysis specialist focused on comprehensive test result evaluation, quality metrics analysis, and actionable insight generation from testing activities
 

@@ -1,5 +1,6 @@
 name = "ux-researcher"
 description = "Use when you need ux researcher support for requirements, product strategy, documentation, research, and customer-facing work."
+version = "1.0.0"
 model = "gpt-5.3-codex-spark"
 model_reasoning_effort = "medium"
 sandbox_mode = "workspace-write"

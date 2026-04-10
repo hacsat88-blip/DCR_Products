@@ -141,9 +141,23 @@ describe("CompositeProvider fallback sequence", () => {
     expect(result.dataMode).toBe("live");
     expect(result.sourceLabel).toBe("C");
     expect(result.sourceMeta).toEqual({ overall: "C", price: "C", fundamentals: "C" });
+    expect(result.providerOrder).toEqual({
+      quotes: ["yahoo", "alphaVantage", "mock"],
+      fundamentals: ["edinetDb", "mock"]
+    });
     expect(result.error).toBeNull();
-    expect(result.health.find((h) => h.provider === "yahoo")?.ok).toBe(true);
-    expect(result.health.find((h) => h.provider === "alphaVantage")?.ok).toBe(true);
+    expect(result.health.find((h) => h.provider === "yahoo")).toMatchObject({
+      ok: true,
+      decision: "used"
+    });
+    expect(result.health.find((h) => h.provider === "alphaVantage")).toMatchObject({
+      ok: true,
+      decision: "used"
+    });
+    expect(result.health.find((h) => h.provider === "edinetDb")).toMatchObject({
+      ok: true,
+      decision: "used"
+    });
     expect(providerMocks.getAlphaQuotes).toHaveBeenCalledWith(["2222"]);
     expect(result.stocks.find((s) => s.code === "1111")?.priceSourceLabel).toBe("YF");
     expect(result.stocks.find((s) => s.code === "2222")?.priceSourceLabel).toBe("AV");
@@ -164,9 +178,41 @@ describe("CompositeProvider fallback sequence", () => {
     expect(result.dataMode).toBe("fallback");
     expect(result.error).toContain("Alpha Vantage");
     expect(result.sourceMeta).toEqual({ overall: "YF", price: "C", fundamentals: "C" });
-    expect(result.health.find((h) => h.provider === "alphaVantage")?.errorCode).toBe("auth_failure");
+    expect(result.health.find((h) => h.provider === "alphaVantage")).toMatchObject({
+      errorCode: "auth_failure",
+      decision: "failed"
+    });
     expect(result.fallbackReason).toContain("価格必須項目");
     expect(result.stocks.find((s) => s.code === "2222")?.priceSourceLabel).toBe("M");
+  });
+
+  it("marks Alpha Vantage as not required when Yahoo covers all requested quotes", async () => {
+    providerMocks.getMockStocks.mockResolvedValueOnce([makeMockStock("1111"), makeMockStock("2222")]);
+    providerMocks.getYahooQuotes.mockResolvedValueOnce([makeYahooQuote("1111"), makeYahooQuote("2222")]);
+    providerMocks.getFundamentals.mockResolvedValueOnce([makeFundamental("1111"), makeFundamental("2222")]);
+
+    const provider = new CompositeProvider();
+    const result = await provider.load(["1111", "2222"]);
+
+    expect(providerMocks.getAlphaQuotes).not.toHaveBeenCalled();
+    expect(result.health.find((h) => h.provider === "alphaVantage")).toMatchObject({
+      ok: true,
+      decision: "not_required"
+    });
+  });
+
+  it("marks EDINET as deferred during price-only phase", async () => {
+    providerMocks.getMockStocks.mockResolvedValueOnce([makeMockStock("1111")]);
+    providerMocks.getYahooQuotes.mockResolvedValueOnce([makeYahooQuote("1111")]);
+
+    const provider = new CompositeProvider();
+    const result = await provider.load(["1111"], { phase: "price" });
+
+    expect(providerMocks.getFundamentals).not.toHaveBeenCalled();
+    expect(result.health.find((h) => h.provider === "edinetDb")).toMatchObject({
+      ok: true,
+      decision: "deferred"
+    });
   });
 
   it("enriches fallback stock narratives from quote and fundamentals", async () => {
@@ -299,5 +345,82 @@ describe("CompositeProvider fallback sequence", () => {
     expect(addedStock?.riskSignal).toContain("PBRが高め");
     expect(addedStock?.riskSignal).toContain("成長率または営業CFが欠けている");
     expect(addedStock?.collapseCondition).toContain("両方が確認できない");
+  });
+
+  it("preserves the provider source label for fallback stock fundamentals", async () => {
+    providerMocks.getMockStocks.mockResolvedValueOnce([makeMockStock("1111")]);
+    providerMocks.getYahooQuotes.mockResolvedValueOnce([
+      makeYahooQuote("1111"),
+      {
+        code: "6666",
+        name: "Provider 6666",
+        price: 880,
+        changePercent: 1.1,
+        sourceTimestamp: "2024-01-05T00:00:00Z",
+        sourceLabel: "YF"
+      }
+    ]);
+    providerMocks.getAlphaQuotes.mockResolvedValueOnce([]);
+    providerMocks.getFundamentals.mockResolvedValueOnce([
+      makeFundamental("1111"),
+      {
+        code: "6666",
+        revenueGrowth: 18,
+        opGrowth: 12,
+        operatingCF: 900,
+        sourceTimestamp: "2024-01-05T00:00:00Z",
+        sourceLabel: "AV",
+        sector: "SaaS",
+        marketCap: null,
+        per: null,
+        pbr: null,
+        dividendYield: null
+      }
+    ]);
+
+    const provider = new CompositeProvider();
+    const result = await provider.load(["1111", "6666"]);
+    const addedStock = result.stocks.find((stock) => stock.code === "6666");
+
+    expect(addedStock?.fundamentalsSourceLabel).toBe("AV");
+  });
+
+  it("normalizes invalid source labels on fallback stocks", async () => {
+    providerMocks.getMockStocks.mockResolvedValueOnce([makeMockStock("1111")]);
+    providerMocks.getYahooQuotes.mockResolvedValueOnce([
+      makeYahooQuote("1111"),
+      {
+        code: "5555",
+        name: "Invalid Source 5555",
+        price: 920,
+        changePercent: 1.8,
+        sourceTimestamp: "2024-01-05T00:00:00Z",
+        sourceLabel: "invalid-source" as unknown as Quote["sourceLabel"]
+      }
+    ]);
+    providerMocks.getAlphaQuotes.mockResolvedValueOnce([]);
+    providerMocks.getFundamentals.mockResolvedValueOnce([
+      makeFundamental("1111"),
+      {
+        code: "5555",
+        revenueGrowth: 16,
+        opGrowth: 9,
+        operatingCF: 420,
+        sourceTimestamp: "2024-01-05T00:00:00Z",
+        sourceLabel: "AV",
+        sector: "Services",
+        marketCap: null,
+        per: null,
+        pbr: null,
+        dividendYield: null
+      }
+    ]);
+
+    const provider = new CompositeProvider();
+    const result = await provider.load(["1111", "5555"]);
+    const addedStock = result.stocks.find((stock) => stock.code === "5555");
+
+    expect(addedStock?.priceSourceLabel).toBe("M");
+    expect(addedStock?.fundamentalsSourceLabel).toBe("AV");
   });
 });

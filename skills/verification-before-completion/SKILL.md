@@ -1,6 +1,29 @@
 ---
 name: verification-before-completion
 description: Use when about to claim work is complete, fixed, or passing, before committing or creating PRs - requires running verification commands and confirming output before making any success claims; evidence before assertions always
+contract:
+  preconditions:
+    - "implementation work is believed to be complete"
+  postconditions:
+    - "all verification commands executed with captured output"
+    - "pass/fail status confirmed with evidence"
+  invariants:
+    - "never claim success without running verification commands"
+    - "no P3 operations without explicit approval"
+composable:
+  input_type: code
+  output_type: report
+  chains_with:
+    - code-review
+package:
+  version: "1.0.0"
+  compat: "dcr >= 2.0"
+  exports:
+    - SKILL.md
+  dependencies: []
+  tags:
+    - verification
+    - quality
 ---
 
 # Verification Before Completion

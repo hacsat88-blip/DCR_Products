@@ -81,7 +81,7 @@ function AlertCenterInner({
     <section className="rounded-lg border border-border-subtle bg-panel p-5 shadow-card">
       <div className="mb-3 flex flex-wrap items-center justify-between gap-3">
         <div>
-          <h2 className="text-lg font-semibold font-semiboldtext-text-primary">アラートセンター</h2>
+          <h2 className="text-lg font-semibold text-text-primary">アラートセンター</h2>
           <p className="text-xs text-text-muted">未読 {unreadCount} / 最終評価: {formatDateTime(lastEvaluationAt)}</p>
         </div>
         <button

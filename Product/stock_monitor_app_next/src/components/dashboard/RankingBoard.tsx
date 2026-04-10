@@ -3,12 +3,16 @@ import clsx from "clsx";
 
 import { formatActionLabel } from"@/lib/format";
 import {
+  addToCompareSelection,
+  canSelectForCompare,
   formatStockChangeDisplay,
   formatStockPriceDisplay,
+  getCompareSelectionStatus,
   getStockDisplayName,
   getStockInsightText,
   isStockPricePending
 } from "@/lib/stockPresentation";
+import { DataFreshnessBadge } from "@/components/ui/DataFreshnessBadge";
 import { SrcMetaDots } from "@/components/ui/SrcDot";
 import { AlertEvent } from"@/types/alert";
 import { RankingSortKey } from"@/types/archive";
@@ -38,19 +42,33 @@ export const RankingBoard = memo(function RankingBoard({
  onOpenDetail,
  onExportCsv
 }: RankingBoardProps): JSX.Element {
- const activeAlerts = useMemo(
- () => alertEvents.filter((event) => !event.dismissed),
- [alertEvents]
- );
- const holdingsMap = useStockStore((s) => s.holdingsMap);
+  const activeAlerts = useMemo(
+  () => alertEvents.filter((event) => !event.dismissed),
+  [alertEvents]
+  );
+  const holdingsMap = useStockStore((s) => s.holdingsMap);
+  const compareStatus = useMemo(() => getCompareSelectionStatus(compareSelection), [compareSelection]);
 
- return (
- <section className="card-surface p-5">
- <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
- <div>
- <h2 className="text-base font-semibold tracking-heading text-text-primary">ランキング</h2>
- <p className="mt-0.5 text-xs text-text-muted">現在の絞り込み結果をランキング表示します。</p>
- </div>
+  return (
+  <section className="card-surface p-5">
+  <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
+  <div>
+  <h2 className="text-base font-semibold tracking-heading text-text-primary">ランキング</h2>
+  <p className="mt-0.5 text-xs text-text-muted">現在の絞り込み結果をランキング表示します。</p>
+  <div className="mt-2 flex flex-wrap items-center gap-2 text-[11px]">
+    <span className="rounded-lg border border-border-subtle bg-canvas-deep/50 px-2 py-0.5 text-text-secondary">
+      比較 {compareStatus.count}/{compareStatus.limit}
+    </span>
+    <span className="rounded-lg border border-border-subtle bg-canvas-deep/50 px-2 py-0.5 text-text-muted">
+      残り {compareStatus.slotsLeft}枠
+    </span>
+    {compareStatus.isFull ? (
+      <span className="rounded-lg border border-amber/35 bg-amber/10 px-2 py-0.5 text-amber">
+        比較上限に到達
+      </span>
+    ) : null}
+  </div>
+  </div>
  <div className="flex flex-wrap items-center gap-2">
  <select
  value={rankingSortKey}
@@ -97,21 +115,48 @@ export const RankingBoard = memo(function RankingBoard({
  </tr>
  </thead>
  <tbody>
-  {rows.map((stock, index) => {
-   const selected = compareSelection.includes(stock.code);
-   const alertCount = activeAlerts.filter((event) => event.stockCode === stock.code).length;
-   const canAddCompare = selected || compareSelection.length < 4;
-   const pricePending = isStockPricePending(stock);
-   const changePositive = !pricePending && stock.changePercent >= 0;
-   const displayName = getStockDisplayName(stock);
-   const insightText = getStockInsightText(stock);
-   return (
- <tr key={stock.id} className="transition-colors hover:bg-panel-hover">
- <td className="border-b border-border-subtle/50 px-3 py-2.5 font-semibold text-text-primary font-mono tabular-nums">{index + 1}</td>
-  <td className="border-b border-border-subtle/50 px-3 py-2.5">
-  <p className="font-mono text-[10px] text-text-muted">{stock.code}</p>
-  <p className="text-text-primary">{displayName}</p>
-  </td>
+   {rows.map((stock, index) => {
+    const selected = compareSelection.includes(stock.code);
+     const alertCount = activeAlerts.filter((event) => event.stockCode === stock.code).length;
+    const canAddCompare = canSelectForCompare(compareSelection, stock.code);
+    const pricePending = isStockPricePending(stock);
+    const changePositive = !pricePending && stock.changePercent >= 0;
+    const displayName = getStockDisplayName(stock);
+    const insightText = getStockInsightText(stock);
+    const holdingCount = holdingsMap[stock.id] ?? 0;
+    const fundamentalsTimestamp = stock.fundamentalsSubmitDate ?? stock.fundamentalsUpdatedAt;
+    return (
+  <tr key={stock.id} className={clsx("transition-colors hover:bg-panel-hover", selected && "bg-secondary/5")}>
+  <td className="border-b border-border-subtle/50 px-3 py-2.5 font-semibold text-text-primary font-mono tabular-nums">{index + 1}</td>
+   <td className="border-b border-border-subtle/50 px-3 py-2.5">
+   <p className="font-mono text-[10px] text-text-muted">{stock.code}</p>
+   <p className="text-text-primary">{displayName}</p>
+   <div className="mt-1 flex flex-wrap items-center gap-1">
+     <span className="rounded-lg border border-border-subtle/70 bg-canvas-deep/50 px-1.5 py-0.5 text-[10px] text-text-muted">
+       {stock.sector}
+     </span>
+     {selected ? (
+       <span className="rounded-lg border border-secondary/40 bg-secondary/10 px-1.5 py-0.5 text-[10px] text-secondary">
+         比較中
+       </span>
+     ) : null}
+     {stock.watched ? (
+       <span className="rounded-lg border border-amber/40 bg-amber/10 px-1.5 py-0.5 text-[10px] text-amber">
+         監視中
+       </span>
+     ) : null}
+     {holdingCount > 0 ? (
+       <span className="rounded-lg border border-border-subtle/70 bg-canvas-deep/50 px-1.5 py-0.5 text-[10px] text-text-secondary">
+         保有 {holdingCount.toLocaleString("ja-JP")}
+       </span>
+     ) : null}
+     {alertCount > 0 ? (
+       <span className="rounded-lg border border-danger/35 bg-danger/10 px-1.5 py-0.5 text-[10px] text-danger">
+         アラート {alertCount}
+       </span>
+     ) : null}
+   </div>
+   </td>
  <td className="border-b border-border-subtle/50 px-3 py-2.5 font-semibold text-text-primary font-mono tabular-nums">{stock.score}</td>
  <td className="border-b border-border-subtle/50 px-3 py-2.5">{formatActionLabel(stock.evaluatedAction)}</td>
    <td className="border-b border-border-subtle/50 px-3 py-2.5">
@@ -131,9 +176,13 @@ export const RankingBoard = memo(function RankingBoard({
    {formatStockChangeDisplay(stock)}
    </span>
    </td>
-  <td className="border-b border-border-subtle/50 px-3 py-2.5">
-  <SrcMetaDots priceLabel={stock.priceSourceLabel} fundamentalsLabel={stock.fundamentalsSourceLabel} />
-  </td>
+   <td className="border-b border-border-subtle/50 px-3 py-2.5">
+   <SrcMetaDots priceLabel={stock.priceSourceLabel} fundamentalsLabel={stock.fundamentalsSourceLabel} />
+   <div className="mt-1 flex flex-wrap gap-1">
+     <DataFreshnessBadge kind="price" timestamp={stock.priceUpdatedAt} />
+     <DataFreshnessBadge kind="fundamentals" timestamp={fundamentalsTimestamp} />
+   </div>
+   </td>
   <td className="border-b border-border-subtle/50 px-3 py-2.5">
   {stock.coreKpiLabel}: <span className="text-text-primary">{stock.coreKpiValue}</span>
   </td>
@@ -142,11 +191,11 @@ export const RankingBoard = memo(function RankingBoard({
   </td>
  <td className="border-b border-border-subtle/50 px-3 py-2.5">{alertCount}</td>
  <td className="border-b border-border-subtle/50 px-3 py-2.5">{stock.watched ?"あり" :"なし"}</td>
- <td className="border-b border-border-subtle/50 px-3 py-2.5 font-mono">
- {(holdingsMap[stock.id] ?? 0) > 0
- ? (holdingsMap[stock.id] ?? 0).toLocaleString("ja-JP")
- :"-"}
- </td>
+  <td className="border-b border-border-subtle/50 px-3 py-2.5 font-mono">
+  {holdingCount > 0
+  ? holdingCount.toLocaleString("ja-JP")
+  :"-"}
+  </td>
  <td className="border-b border-border-subtle/50 px-3 py-2.5">
  <div className="flex flex-wrap gap-1">
  <button
@@ -165,15 +214,25 @@ export const RankingBoard = memo(function RankingBoard({
  比較から外す
  </button>
  ) : (
- <button
- type="button"
- disabled={!canAddCompare}
- onClick={() => onAddToCompare(stock.code)}
- className="rounded-lg border border-border-subtle px-2 py-0.5 text-[11px] text-text-secondary transition-colors hover:border-border-active hover:text-text-primary disabled:cursor-not-allowed disabled:opacity-50"
- >
- 比較に追加
- </button>
- )}
+  <button
+  type="button"
+  disabled={!canAddCompare}
+  onClick={() => {
+    if (!canAddCompare) {
+      return;
+    }
+    const nextSelection = addToCompareSelection(compareSelection, stock.code);
+    if (nextSelection.length === compareSelection.length && !selected) {
+      return;
+    }
+    onAddToCompare(stock.code);
+  }}
+  title={!canAddCompare ? "比較は4銘柄までです" : undefined}
+  className="rounded-lg border border-border-subtle px-2 py-0.5 text-[11px] text-text-secondary transition-colors hover:border-border-active hover:text-text-primary disabled:cursor-not-allowed disabled:opacity-50"
+  >
+  {canAddCompare ? "比較に追加" : "比較上限"}
+  </button>
+  )}
  </div>
  </td>
  </tr>

@@ -23,3 +23,18 @@
 - q/ で検証する checklist を必ず生成する
 - 実装後は `💡 q/ でQA検証を実行します` を提示する
 - feature proposal が必要なら `rules/feature-proposal.md` を参照する
+
+## Gate state persistence
+
+- p/ 承認後、`/memories/session/gate-state.md` に以下を記録する:
+  ```
+  plan_approved: true
+  plan_date: YYYY-MM-DD HH:MM
+  scope_resets: 0
+  checklist:
+    - [ ] item 1
+    - [ ] item 2
+  ```
+- 3ステップ以上の計画は `docs/dcr/plans/YYYY-MM-DD-<feature>.md` にも保存する
+- スコープ変更検知時は `plan_approved: false` にリセットし `scope_resets` をインクリメントする
+- `scope_resets >= 3` で `⚠️ s/ で目的と前提を再整理することを推奨します` を提示する

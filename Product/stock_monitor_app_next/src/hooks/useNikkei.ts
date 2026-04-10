@@ -18,10 +18,20 @@ const INITIAL: NikkeiState = {
   history: []
 };
 
-export function useNikkei(lastUpdatedAt: string | null, range?: string): NikkeiState {
+export interface UseNikkeiOptions {
+  enabled?: boolean;
+}
+
+export function useNikkei(lastUpdatedAt: string | null, range?: string, options: UseNikkeiOptions = {}): NikkeiState {
+  const { enabled = true } = options;
   const [nikkei, setNikkei] = useState<NikkeiState>(INITIAL);
 
   useEffect(() => {
+    if (!enabled) {
+      setNikkei(INITIAL);
+      return;
+    }
+
     let cancelled = false;
     const load = async (): Promise<void> => {
       try {
@@ -35,9 +45,17 @@ export function useNikkei(lastUpdatedAt: string | null, range?: string): NikkeiS
           diff?: number | null;
           diffPercent?: number | null;
           source?: string | null;
+          sourceLabel?: string | null;
           asOf?: string | null;
+          sourceTimestamp?: string | null;
           history?: { date: string; close: number }[];
         };
+        const sourceTimestamp =
+          typeof payload.sourceTimestamp === "string" && payload.sourceTimestamp.trim()
+            ? payload.sourceTimestamp
+            : typeof payload.asOf === "string" && payload.asOf.trim()
+              ? payload.asOf
+              : null;
         if (cancelled) return;
         setNikkei({
           latestClose:
@@ -50,8 +68,8 @@ export function useNikkei(lastUpdatedAt: string | null, range?: string): NikkeiS
               ? payload.diffPercent
               : null,
           sourceLabel:
-            typeof payload.asOf === "string" && payload.asOf.trim()
-              ? `実測終値 (${payload.asOf.slice(0, 10)})`
+            sourceTimestamp
+              ? `実測終値 (${sourceTimestamp.slice(0, 10)})`
               : typeof payload.source === "string" && payload.source.trim()
                 ? payload.source
                 : null,
@@ -65,7 +83,7 @@ export function useNikkei(lastUpdatedAt: string | null, range?: string): NikkeiS
     };
     void load();
     return () => { cancelled = true; };
-  }, [lastUpdatedAt, range]);
+  }, [enabled, lastUpdatedAt, range]);
 
   return nikkei;
 }

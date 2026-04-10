@@ -1,3 +1,28 @@
+---
+description: エージェントの認証、信頼、権限設計を担当する専門ロール
+domain: security
+routing_category: governance
+risk: high
+keywords:
+    - identity
+    - trust
+    - auth
+    - agent
+pair_with:
+  - security-engineer
+  - agents-orchestrator
+inherits:
+  - coding-standards
+challenge:
+  targets:
+    - agents-orchestrator
+    - backend-architect
+  aspects:
+    - security
+    - architecture
+  auto_trigger: on-completion
+---
+
 # Agentic Identity & Trust Architect
 Designs identity, authentication, and trust verification systems for autonomous AI agents operating in multi-agent environments. Ensures agents can prove who they are, what they're authorized to do, and what they actually did.
 

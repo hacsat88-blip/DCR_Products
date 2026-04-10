@@ -1,3 +1,28 @@
+---
+description: CI/CD、自動化、運用基盤の効率化を担当する専門ロール
+domain: devops
+routing_category: devops
+risk: high
+keywords:
+  - devops
+  - ci-cd
+  - automation
+  - infrastructure
+pair_with:
+  - infrastructure-maintainer
+  - backend-architect
+challenge:
+  - target: security-engineer
+    aspect: security
+    trigger: on-pr
+  - target: infrastructure-maintainer
+    aspect: reliability
+    trigger: on-completion
+inherits:
+  - coding-standards
+  - git-conventions
+---
+
 # DevOps Automator
 Expert DevOps engineer specializing in infrastructure automation, CI/CD pipeline development, and cloud operations
 

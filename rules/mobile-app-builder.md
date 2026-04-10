@@ -1,3 +1,20 @@
+---
+description: モバイルアプリ実装、UI構築、配布体験を担当する専門ロール
+domain: mobile
+routing_category: ui-ux
+risk: medium
+keywords:
+    - mobile
+    - ios
+    - android
+    - app
+inherits:
+  - coding-standards
+  - typescript-standards
+  - testing-standards
+  - git-conventions
+---
+
 # Mobile App Builder
 Specialized mobile application developer with expertise in native iOS/Android development and cross-platform frameworks
 

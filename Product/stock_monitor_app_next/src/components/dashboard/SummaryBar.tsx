@@ -1,7 +1,8 @@
 import React, { useCallback, useMemo, useState } from"react";
 import clsx from"clsx";
 
-import { DataMode, ProviderHealth } from"@/services/providers/types";
+import { resolveDataSourceStatus, resolveFallbackReasonLabel } from "@/lib/dataSourceStatus";
+import { DataMode, ProviderHealth, getProviderLabel } from"@/services/providers/types";
 import { EvaluatedStock } from"@/types/stock";
 import { StockSourceMeta } from "@/types/source";
 
@@ -62,22 +63,6 @@ function formatDurationSince(value: string | null): string {
  const hours = Math.floor(totalMinutes / 60);
  const minutes = totalMinutes % 60;
  return minutes > 0 ? `${hours}時間${minutes}分` : `${hours}時間`;
-}
-
-function providerLabel(provider: ProviderHealth["provider"]): string {
- if (provider === "edinetDb") {
-  return "財務データ（EDINET DB）";
- }
- if (provider === "alphaVantage") {
-  return "価格データ（Alpha Vantage fallback）";
- }
- return "価格データ（Yahoo Finance）";
-}
-
-function shortProviderLabel(provider: ProviderHealth["provider"]): string {
- if (provider === "edinetDb") return "財務";
- if (provider === "alphaVantage") return "価格(AV)";
- return "価格(YF)";
 }
 
 function sourceStaleThresholdMs(provider: ProviderHealth["provider"]): number {
@@ -216,18 +201,20 @@ function SummaryBarInner({
  ?"条件に合う銘柄がありません。価格帯や成長率の条件を少し緩めて、候補を再評価してください。"
  : `現在 ${stocks.length} 銘柄。${buy.length ? `今買うは ${buy.join("、")}。` :""}${wait.length ? `決算待ちは ${wait.join("、")}。` :""}${dip.length ? `押し目待ちは ${dip.join("、")}。` :""}数字と散文を並べて、壊れ方まで先に点検する設計です。`;
  }, [stocks]);
+ const dataSourceStatus = resolveDataSourceStatus({ dataMode, sourceMeta, health, error });
+ const fallbackReasonLabel = resolveFallbackReasonLabel(dataSourceStatus, fallbackReason);
  const sourceStaleProviders = health.filter((item) => isSourceStale(item)).map((item) => item.provider);
  const fallbackOngoing = dataMode ==="fallback" || dataMode ==="mock";
  const providerStatusSummary = health
  .map((item) => {
  const backoffMinutes = extractBackoffMinutes(item.message);
  if (item.ok) {
- return `${shortProviderLabel(item.provider)}: 正常`;
+ return `${getProviderLabel(item.provider)}: 正常`;
  }
  if (backoffMinutes !== null) {
- return `${shortProviderLabel(item.provider)}: 待機中（あと${backoffMinutes}分）`;
+ return `${getProviderLabel(item.provider)}: 待機中（あと${backoffMinutes}分）`;
  }
- return `${shortProviderLabel(item.provider)}: 失敗`;
+ return `${getProviderLabel(item.provider)}: 失敗`;
  })
  .join(" /");
 
@@ -296,10 +283,10 @@ function SummaryBarInner({
  item.ok ?"border-border-subtle bg-canvas-deep/50 text-text-secondary" :"border-amber/25 bg-amber/5 text-amber"
  )}
  >
- <p className="flex items-center gap-1.5 font-medium">
- <span className={clsx("h-1.5 w-1.5 rounded-full", item.ok ?"bg-positive" :"bg-amber")} />
- {providerLabel(item.provider)}
- </p>
+  <p className="flex items-center gap-1.5 font-medium">
+  <span className={clsx("h-1.5 w-1.5 rounded-full", item.ok ?"bg-positive" :"bg-amber")} />
+  {getProviderLabel(item.provider, "long")}
+  </p>
  <p className="mt-1">状態: <span className="text-text-primary">{providerStatusLabel(item)}</span></p>
  <p>最終更新: <span className="font-mono tabular-nums text-text-primary">{formatDateTime(item.sourceTimestamp)}</span></p>
  {item.sourceLabel ? <p>取得元: {item.sourceLabel}</p> : null}
@@ -308,11 +295,11 @@ function SummaryBarInner({
  ))}
  </div>
 
- {dataMode ==="fallback" || dataMode ==="mock" || error ? (
- <div className="mt-4 rounded-lg border border-amber/25 bg-amber/5 px-3 py-2 text-sm text-amber">
- {fallbackReason ??"実データの取得に失敗したため、補助データを表示しています。"}
- </div>
- ) : null}
+  {fallbackReasonLabel ? (
+  <div className="mt-4 rounded-lg border border-amber/25 bg-amber/5 px-3 py-2 text-sm text-amber">
+  {fallbackReasonLabel}
+  </div>
+  ) : null}
 
  {error ? (
  <details className="mt-2 rounded-lg border border-border-subtle bg-canvas-deep/60 px-3 py-2 text-xs text-text-secondary">

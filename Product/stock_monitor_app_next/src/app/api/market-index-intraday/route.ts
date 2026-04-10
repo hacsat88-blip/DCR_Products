@@ -24,7 +24,11 @@ type IntradayPayload = {
   symbol: string;
   interval: string;
   source: string;
+  sourceLabel: "AV";
   ohlc: OhlcPoint[];
+  asOf: string | null;
+  sourceTimestamp: string | null;
+  fetchedAt: string;
   error: string | null;
 };
 
@@ -60,9 +64,21 @@ function emptyPayload(
     symbol,
     interval,
     source: "alpha_vantage",
+    sourceLabel: "AV",
     ohlc: [],
+    asOf: null,
+    sourceTimestamp: null,
+    fetchedAt: new Date().toISOString(),
     error,
   };
+}
+
+function toIsoDatetime(dt: string): string | null {
+  const unixSeconds = parseDatetime(dt);
+  if (unixSeconds === 0) {
+    return null;
+  }
+  return new Date(unixSeconds * 1000).toISOString();
 }
 
 // ---------------------------------------------------------------------------
@@ -134,7 +150,11 @@ async function fetchIntraday(
     symbol,
     interval,
     source: "alpha_vantage",
+    sourceLabel: "AV",
     ohlc,
+    asOf: ohlc.length > 0 ? toIsoDatetime(ohlc[ohlc.length - 1].date) : null,
+    sourceTimestamp: ohlc.length > 0 ? toIsoDatetime(ohlc[ohlc.length - 1].date) : null,
+    fetchedAt: new Date().toISOString(),
     error: null,
   };
 }

@@ -34,13 +34,20 @@ export interface Fundamentals {
 }
 
 export type ProviderName = "jquants" | "edinetDb" | "yahoo" | "alphaVantage";
+export type MarketSourceName = "yahoo_finance" | "alpha_vantage" | "jquants";
 
 export type ProviderErrorCode = "auth_failure" | "rate_limit" | "network" | "parse_error" | "timeout" | null;
+export type ProviderDecision = "used" | "not_required" | "deferred" | "disabled" | "failed" | "route_fallback";
+export type ProviderFallbackOrder = {
+  quotes: Array<ProviderName | "mock">;
+  fundamentals: Array<ProviderName | "mock">;
+};
 
 export interface ProviderHealth {
   provider: ProviderName;
   ok: boolean;
   message: string | null;
+  decision?: ProviderDecision;
   errorCode: ProviderErrorCode;
   latencyMs: number | null;
   fetchedAt: string | null;
@@ -54,6 +61,7 @@ export interface StockFetchResult {
   dataMode: DataMode;
   sourceLabel?: SourceLabel | null;
   sourceMeta?: StockSourceMeta;
+  providerOrder?: ProviderFallbackOrder;
   lastUpdatedAt: string;
   error: string | null;
   fallbackReason: string | null;
@@ -70,4 +78,60 @@ export interface FundamentalsProvider {
 
 export interface StockDataProvider {
   getStocks(codes: string[]): Promise<Stock[]>;
+}
+
+const PROVIDER_LABELS = {
+  short: {
+    yahoo: "価格(YF)",
+    alphaVantage: "価格(AV)",
+    jquants: "価格(JQ)",
+    edinetDb: "財務",
+  },
+  long: {
+    yahoo: "価格データ（Yahoo Finance）",
+    alphaVantage: "価格データ（Alpha Vantage fallback）",
+    jquants: "価格データ（J-Quants）",
+    edinetDb: "財務データ（EDINET DB）",
+  },
+} as const;
+
+const MARKET_SOURCE_ALIASES: Record<string, MarketSourceName> = {
+  yahoo: "yahoo_finance",
+  yf: "yahoo_finance",
+  yahoo_finance: "yahoo_finance",
+  "yahoo finance ^n225": "yahoo_finance",
+  alpha_vantage: "alpha_vantage",
+  av: "alpha_vantage",
+  "alpha vantage": "alpha_vantage",
+  alphavantage: "alpha_vantage",
+  jquants: "jquants",
+};
+
+const MARKET_SOURCE_LABELS: Record<MarketSourceName, string> = {
+  yahoo_finance: "Yahoo Finance",
+  alpha_vantage: "Alpha Vantage",
+  jquants: "J-Quants",
+};
+
+export function getProviderLabel(provider: ProviderName, format: "short" | "long" = "short"): string {
+  return PROVIDER_LABELS[format][provider];
+}
+
+export function normalizeMarketSourceName(source: string | null | undefined): MarketSourceName | null {
+  if (!source) {
+    return null;
+  }
+  const normalized = MARKET_SOURCE_ALIASES[source.trim().toLowerCase()];
+  return normalized ?? null;
+}
+
+export function getMarketSourceLabel(source: string | null | undefined): string | null {
+  const normalized = normalizeMarketSourceName(source);
+  if (!normalized) {
+    if (!source || !source.trim()) {
+      return null;
+    }
+    return source;
+  }
+  return MARKET_SOURCE_LABELS[normalized];
 }

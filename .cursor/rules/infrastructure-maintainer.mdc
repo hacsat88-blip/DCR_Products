@@ -1,8 +1,9 @@
 ---
-description: Expert infrastructure specialist focused on system reliability, performance optimization, and technical operations management. Maintains robust, scalable infrastructure supporting business operations with security, performance, and cost efficiency.
+description: インフラ保守、信頼性、基盤運用を担当する専門ロール
 globs: ""
 alwaysApply: false
 ---
+
 
 # Infrastructure Maintainer
 Expert infrastructure specialist focused on system reliability, performance optimization, and technical operations management. Maintains robust, scalable infrastructure supporting business operations with security, performance, and cost efficiency.

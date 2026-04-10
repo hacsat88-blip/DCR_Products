@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { memo, useMemo, useState } from "react";
 
 import clsx from "clsx";
 
@@ -32,7 +32,7 @@ function polarPoint(index: number, value: number): [number, number] {
   return [CX + r * Math.cos(angle), CY + r * Math.sin(angle)];
 }
 
-function RadarChart({ pick }: { pick: BestPick }): JSX.Element {
+const RadarChart = memo(function RadarChart({ pick }: { pick: BestPick }): JSX.Element {
   // Grid rings at levels 1-5
   const rings = [1, 2, 3, 4, 5];
 
@@ -119,7 +119,7 @@ function RadarChart({ pick }: { pick: BestPick }): JSX.Element {
       ))}
     </svg>
   );
-}
+});
 
 // ── Star rating ─────────────────────────────────────────
 
@@ -193,7 +193,7 @@ function PickCard({
     <div className="border border-glass-border bg-panel p-3 transition-shadow hover:shadow-card">
       {/* Rank + Name */}
       <div className="mb-1 flex items-center gap-2">
-        <span className="font-semiboldtext-[10px] text-amber">
+        <span className="font-semibold text-[10px] text-amber">
           [{pick.rank}位]
         </span>
         <span className="font-mono tabular-nums text-sm font-bold text-text-primary">
@@ -244,6 +244,17 @@ function PickCard({
 
       {/* CF mini section */}
       <div className="mb-2 space-y-0.5 border-t border-glass-border pt-2">
+        <div className="mb-1 flex items-center gap-1.5">
+          <span className="font-mono tabular-nums text-[10px] text-text-muted">CF健全性:</span>
+          <span className={clsx(
+            "inline-block border px-1.5 py-0.5 font-mono tabular-nums text-[9px] font-bold",
+            pick.cf >= 4 ? "border-positive/30 bg-positive/10 text-positive"
+              : pick.cf >= 3 ? "border-amber/30 bg-amber/10 text-amber"
+              : "border-danger/30 bg-danger/10 text-danger",
+          )}>
+            {pick.cf >= 4 ? "🟢 良好" : pick.cf >= 3 ? "🟡 普通" : "🔴 注意"}
+          </span>
+        </div>
         <p className="font-mono tabular-nums text-[10px] text-text-secondary">
           FCFイールド: <span className="text-positive">{pick.fcfYield}</span>
         </p>
@@ -338,7 +349,7 @@ export function BestPicksSection({
       {/* Best Stocks */}
       {bestStocks.length > 0 && (
         <div className="mb-6">
-          <h4 className="mb-3 font-semiboldtext-[10px] uppercase tracking-widest text-text-muted">
+          <h4 className="mb-3 font-semibold text-[10px] uppercase tracking-widest text-text-muted">
             個別株 // TOP STOCKS
           </h4>
           <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
@@ -347,7 +358,7 @@ export function BestPicksSection({
               const diffLabel = diff ? formatRecommendationDiffBadge(diff) : null;
               return (
                 <PickCard
-                  key={pick.code}
+                  key={`${pick.code}-${pick.rank}`}
                   pick={pick}
                   confidence={confidenceForPick(pick)}
                   diffLabel={diffLabel}
@@ -362,7 +373,7 @@ export function BestPicksSection({
       {/* Best Funds */}
       {bestFunds.length > 0 && (
         <div>
-          <h4 className="mb-3 font-semiboldtext-[10px] uppercase tracking-widest text-text-muted">
+          <h4 className="mb-3 font-semibold text-[10px] uppercase tracking-widest text-text-muted">
             ETF/投信 // TOP FUNDS
           </h4>
           <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
@@ -371,7 +382,7 @@ export function BestPicksSection({
               const diffLabel = diff ? formatRecommendationDiffBadge(diff) : null;
               return (
                 <PickCard
-                  key={pick.code}
+                  key={`${pick.code}-${pick.rank}`}
                   pick={pick}
                   confidence={confidenceForPick(pick)}
                   diffLabel={diffLabel}

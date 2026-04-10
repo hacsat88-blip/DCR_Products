@@ -1,6 +1,29 @@
 ---
 name: brainstorming
 description: "You MUST use this before any creative work - creating features, building components, adding functionality, or modifying behavior. Explores user intent, requirements and design before implementation."
+contract:
+  preconditions:
+    - "user request involves creating or modifying functionality"
+  postconditions:
+    - "clarified intent with acceptance criteria"
+    - "design decision record or spec ready for writing-plans"
+  invariants:
+    - "no implementation code produced during brainstorming"
+composable:
+  input_type: intent
+  output_type: spec
+  chains_with:
+    - writing-plans
+    - code-review
+package:
+  version: "1.0.0"
+  compat: "dcr >= 2.0"
+  exports:
+    - SKILL.md
+  dependencies: []
+  tags:
+    - planning
+    - ideation
 ---
 
 # Brainstorming Ideas Into Designs

@@ -1,6 +1,7 @@
 import { useState } from"react";
 
 import { RankingSortKey, SavedScreen } from"@/types/archive";
+import { restoreSavedScreenState } from"@/store/useStockStore";
 import { SortKey, StockFilters } from"@/types/stock";
 
 interface SavedScreenPanelProps {
@@ -94,17 +95,19 @@ export function SavedScreenPanel({
  <div className="mt-3 grid gap-2">
  {savedScreens.length === 0 ? (
  <p className="text-sm text-text-secondary">保存済みスクリーンはありません。</p>
- ) : (
- savedScreens.map((screen) => (
- <article key={screen.id} className="rounded-lg border border-border-subtle bg-canvas-deep/50 p-3">
- <div className="flex flex-wrap items-center justify-between gap-2">
- <p className="text-sm font-semibold text-text-primary">{screen.name}</p>
- <p className="text-[11px] text-text-muted">{formatDateTime(screen.updatedAt)}</p>
- </div>
- <p className="mt-1 text-xs text-text-muted">
- 並び替え: {screen.sortKey} / ランキング: {screen.rankingSortKey ??"score_desc"} / 比較数:{""}
- {screen.compareSelection?.length ?? 0} / フィルタ項目数: {Object.keys(screen.filters).length}
- </p>
+  ) : (
+  savedScreens.map((screen) => {
+  const restored = restoreSavedScreenState(screen);
+  return (
+  <article key={screen.id} className="rounded-lg border border-border-subtle bg-canvas-deep/50 p-3">
+  <div className="flex flex-wrap items-center justify-between gap-2">
+  <p className="text-sm font-semibold text-text-primary">{screen.name}</p>
+  <p className="text-[11px] text-text-muted">{formatDateTime(screen.updatedAt)}</p>
+  </div>
+  <p className="mt-1 text-xs text-text-muted">
+  並び替え: {restored.sortKey} / ランキング: {restored.rankingSortKey} / 比較数:{""}
+  {restored.compareSelection.length} / フィルタ項目数: {Object.keys(restored.filters).length}
+  </p>
  <div className="mt-2 flex flex-wrap gap-2">
  <button
  type="button"
@@ -145,10 +148,11 @@ export function SavedScreenPanel({
  >
  削除
  </button>
- </div>
- </article>
- ))
- )}
+  </div>
+  </article>
+  );
+  })
+  )}
  </div>
  </section>
  );

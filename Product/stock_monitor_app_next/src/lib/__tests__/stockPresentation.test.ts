@@ -1,6 +1,10 @@
 import { describe, expect, it } from "vitest";
 
 import {
+  addToCompareSelection,
+  canSelectForCompare,
+  COMPARE_SELECTION_LIMIT,
+  formatStockMarketCapDisplay,
   getRemoveStockAriaLabel,
   getRemoveStockConfirmMessage,
   getStockInsightText,
@@ -61,5 +65,38 @@ describe("stockPresentation narrative helpers", () => {
     };
 
     expect(getRemoveStockAriaLabel(stock)).toBe("BASE（4477）を削除");
+  });
+
+  it("keeps market-cap pending copy only for fallback stocks still waiting on fundamentals", () => {
+    expect(
+      formatStockMarketCapDisplay({
+        id: "live-6666",
+        marketCap: 0,
+        fundamentalsSourceLabel: "M"
+      })
+    ).toBe("時価総額取得待ち");
+
+    expect(
+      formatStockMarketCapDisplay({
+        id: "live-6666",
+        marketCap: 0,
+        fundamentalsSourceLabel: "AV"
+      })
+    ).toBe("0億円");
+  });
+
+  it("prevents adding a 5th compare item and keeps existing selection", () => {
+    const current = ["9424", "2337", "4477", "4419"];
+    const next = addToCompareSelection(current, "8306");
+
+    expect(next).toEqual(current);
+  });
+
+  it("keeps compare action disabled only for unselected stocks when slots are full", () => {
+    const full = ["9424", "2337", "4477", "4419"];
+
+    expect(COMPARE_SELECTION_LIMIT).toBe(4);
+    expect(canSelectForCompare(full, "8306")).toBe(false);
+    expect(canSelectForCompare(full, "9424")).toBe(true);
   });
 });

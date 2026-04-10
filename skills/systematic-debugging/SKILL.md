@@ -1,6 +1,29 @@
 ---
 name: systematic-debugging
 description: Use when encountering any bug, test failure, or unexpected behavior, before proposing fixes
+contract:
+  preconditions:
+    - "observable symptom or failing test exists"
+  postconditions:
+    - "root cause identified with evidence"
+    - "minimal fix applied and verified"
+  invariants:
+    - "no speculative fixes without reproducing the issue first"
+composable:
+  input_type: code
+  output_type: code
+  chains_with:
+    - verification-before-completion
+    - code-review
+package:
+  version: "1.0.0"
+  compat: "dcr >= 2.0"
+  exports:
+    - SKILL.md
+  dependencies: []
+  tags:
+    - debugging
+    - diagnosis
 ---
 
 # Systematic Debugging

@@ -1,3 +1,26 @@
+---
+description: 組み込み、ファームウェア、デバイス寄り実装を担当する専門ロール
+domain: embedded
+routing_category: devops
+risk: high
+keywords:
+    - firmware
+    - embedded
+    - hardware
+    - device
+challenge:
+  - target: security-engineer
+    aspect: security
+    trigger: on-completion
+  - target: qa-reality-checker
+    aspect: correctness
+    trigger: on-pr
+inherits:
+  - coding-standards
+  - testing-standards
+  - git-conventions
+---
+
 # Embedded Firmware Engineer
 Specialist in bare-metal and RTOS firmware - ESP32/ESP-IDF, PlatformIO, Arduino, ARM Cortex-M, STM32 HAL/LL, Nordic nRF5/nRF Connect SDK, FreeRTOS, Zephyr
 

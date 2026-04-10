@@ -3,7 +3,24 @@
 import React, { useMemo } from "react";
 import clsx from "clsx";
 
+import { getCompareSelectionStatus } from "@/lib/stockPresentation";
+import { useStockStore } from "@/store/useStockStore";
 import { SortKey, StockFilters } from "@/types/stock";
+
+const SORT_LABELS: Record<SortKey, string> = {
+  score_desc: "本命度順",
+  price_asc: "株価昇順",
+  price_desc: "株価降順",
+  revenue_growth_desc: "売上成長率順",
+  op_growth_desc: "営業利益成長率順"
+};
+
+const ACTION_LABELS: Record<Exclude<StockFilters["action"], "all">, string> = {
+  buy_now: "今買う",
+  wait_earnings: "決算待ち",
+  wait_pullback: "押し目待ち",
+  exclude: "除外"
+};
 
 interface FilterPanelProps {
   filters: StockFilters;
@@ -39,6 +56,7 @@ function FilterPanelInner({
   onSortChange,
   onReset
 }: FilterPanelProps): JSX.Element {
+  const compareSelection = useStockStore((s) => s.compareSelection);
   const activeCount = useMemo(() => {
     let count = 0;
     if (filters.priceMin != null) count++;
@@ -55,12 +73,40 @@ function FilterPanelInner({
     if (filters.watch !== "all") count++;
     return count;
   }, [filters]);
+  const activeSummaries = useMemo(() => {
+    const summaries = [`並び替え: ${SORT_LABELS[sortKey]}`];
+
+    if (filters.priceMin != null || filters.priceMax != null) {
+      summaries.push(`株価 ${filters.priceMin ?? 0}〜${filters.priceMax ?? "上限なし"}`);
+    }
+    if (filters.sector !== "all") summaries.push(`業態: ${filters.sector}`);
+    if (filters.action !== "all") summaries.push(`判定: ${ACTION_LABELS[filters.action]}`);
+    if (filters.marketCapBand !== "all") {
+      summaries.push(
+        filters.marketCapBand === "small"
+          ? "小型株"
+          : filters.marketCapBand === "mid"
+            ? "中型株"
+            : "大型株"
+      );
+    }
+    if (filters.revenueGrowthMin != null) summaries.push(`売上成長 ${filters.revenueGrowthMin}%〜`);
+    if (filters.opGrowthMin != null) summaries.push(`営業利益成長 ${filters.opGrowthMin}%〜`);
+    if (filters.operatingCFMin != null) summaries.push(`営業CF ${filters.operatingCFMin.toLocaleString("ja-JP")}〜`);
+    if (filters.dividend !== "all") summaries.push(filters.dividend === "with" ? "配当あり" : "配当なし");
+    if (filters.perMax != null) summaries.push(`PER ≤ ${filters.perMax}`);
+    if (filters.pbrMax != null) summaries.push(`PBR ≤ ${filters.pbrMax}`);
+    if (filters.watch !== "all") summaries.push(filters.watch === "watching" ? "監視中のみ" : "未監視のみ");
+
+    return summaries;
+  }, [filters, sortKey]);
+  const compareStatus = useMemo(() => getCompareSelectionStatus(compareSelection), [compareSelection]);
 
   return (
     <section className="rounded-lg border border-glass-border bg-panel p-4 shadow-card">
       <div className="mb-4 flex items-center justify-between gap-3">
         <div className="flex items-center gap-2">
-          <h2 className="text-sm font-semibold font-semiboldtext-text-primary">絞り込み</h2>
+          <h2 className="text-sm font-semibold text-text-primary">絞り込み</h2>
           {activeCount > 0 && (
             <span className="rounded-lg bg-secondary/20 px-2 py-0.5 text-[10px] font-bold text-secondary">
               {activeCount}
@@ -71,6 +117,14 @@ function FilterPanelInner({
               監視 {watchCount}
             </span>
           )}
+          <span
+            className={clsx(
+              "rounded-lg px-2 py-0.5 text-[10px] font-bold",
+              compareStatus.isFull ? "bg-amber/15 text-amber" : "bg-canvas-deep/70 text-text-secondary"
+            )}
+          >
+            比較 {compareStatus.count}/{compareStatus.limit}
+          </span>
         </div>
         <button
           type="button"
@@ -79,6 +133,27 @@ function FilterPanelInner({
         >
           リセット
         </button>
+      </div>
+      {compareStatus.isFull ? (
+        <p className="mb-3 rounded-lg border border-amber/25 bg-amber/5 px-3 py-1.5 text-[11px] text-amber">
+          比較は最大{compareStatus.limit}銘柄です。入れ替えるには比較パネルまたはランキングから外してください。
+        </p>
+      ) : null}
+
+      <div className="mb-4 flex gap-2 overflow-x-auto pb-1 xl:hidden">
+        {activeSummaries.map((summary, index) => (
+          <span
+            key={`${summary}-${index}`}
+            className={clsx(
+              "whitespace-nowrap rounded-lg border px-2.5 py-1 text-[11px]",
+              index === 0
+                ? "border-secondary/35 bg-secondary/10 text-secondary"
+                : "border-border-subtle bg-canvas-deep/50 text-text-secondary"
+            )}
+          >
+            {summary}
+          </span>
+        ))}
       </div>
 
       <div className="grid grid-cols-1 gap-4 xl:grid-cols-4">
