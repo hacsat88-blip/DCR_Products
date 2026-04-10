@@ -1,6 +1,29 @@
 ---
 name: writing-plans
 description: Use when you have a spec or requirements for a multi-step task, before touching code, or when executing a written plan in the current session
+contract:
+  preconditions:
+    - "spec, requirements, or user request with clear goal exists"
+  postconditions:
+    - "implementation plan with numbered tasks and verification steps"
+    - "file structure map with responsibilities"
+  invariants:
+    - "each task is independently testable and committable"
+composable:
+  input_type: spec
+  output_type: spec
+  chains_with:
+    - tdd-workflow
+    - subagent-driven-development
+package:
+  version: "1.0.0"
+  compat: "dcr >= 2.0"
+  exports:
+    - SKILL.md
+  dependencies: []
+  tags:
+    - planning
+    - workflow
 ---
 
 # Writing Plans

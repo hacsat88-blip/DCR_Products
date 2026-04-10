@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 
 import type { ProviderHealth } from "@/services/providers/types";
-import { resolveDataSourceStatus } from "@/lib/dataSourceStatus";
+import { resolveDataSourceStatus, resolveFallbackReasonLabel } from "@/lib/dataSourceStatus";
 
 function createHealth(
   provider: ProviderHealth["provider"],
@@ -74,5 +74,20 @@ describe("resolveDataSourceStatus", () => {
     });
 
     expect(status).toBe("error");
+  });
+
+  it("returns fallback helper text when fallback reason is blank", () => {
+    const status = resolveDataSourceStatus({
+      dataMode: "fallback",
+      sourceMeta: { overall: "YF", price: "YF", fundamentals: "C" },
+      health: [createHealth("yahoo", true)],
+      error: null,
+    });
+
+    const view = {
+      fallbackReason: resolveFallbackReasonLabel(status, "   "),
+    };
+
+    expect(view.fallbackReason).toContain("補助データ");
   });
 });

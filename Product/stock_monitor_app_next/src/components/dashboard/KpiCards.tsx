@@ -14,6 +14,7 @@ import {
 
 import { EvaluatedStock, StockAction } from"@/types/stock";
 import { ACTION_CHART_COLORS, CHART_COLORS, CHART_SERIES } from"@/components/ui/ChartTheme";
+import { AnimatedNumber, motion, staggerContainerVariants, staggerItemVariants } from"@/components/ui/MotionPrimitives";
 
 interface KpiCardsProps {
  managerIndex: number;
@@ -217,14 +218,19 @@ function KpiCardsInner({
  );
 
  return (
- <section className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-5">
+ <motion.section
+ className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-5"
+ variants={staggerContainerVariants}
+ initial="hidden"
+ animate="visible"
+ >
  {/* Card 1: Strategy Index */}
- <div className="card-surface group relative overflow-hidden p-5 transition-all duration-300 hover:shadow-elevated">
+ <motion.div variants={staggerItemVariants} className="card-surface group relative overflow-hidden p-5 transition-all duration-300 hover:shadow-elevated">
  <div className="absolute inset-y-0 left-0 w-[2px] bg-positive/50" />
  <p className="text-[10px] uppercase tracking-widest text-text-muted">戦略指数</p>
  <div className="mt-1.5 flex items-baseline gap-2">
  <p className="font-mono tabular-nums text-3xl md:text-4xl font-semibold tracking-kpi text-text-primary">
- {managerIndex.toFixed(1)}
+ <AnimatedNumber value={managerIndex} duration={0.8} formatFn={(n) => n.toFixed(1)} />
  <span className="ml-1 text-sm font-normal text-text-muted">pt</span>
  </p>
  {managerChange !== null && (
@@ -238,15 +244,15 @@ function KpiCardsInner({
  </div>
  <p className="mt-1 text-xs text-text-muted">初期日=100</p>
   <Sparkline data={managerSparkData} color={CHART_SERIES.strategy} gradientId="spark-manager" />
- </div>
+ </motion.div>
 
  {/* Card 2: Benchmark */}
- <div className="card-surface group relative overflow-hidden p-5 transition-all duration-300 hover:shadow-elevated">
+ <motion.div variants={staggerItemVariants} className="card-surface group relative overflow-hidden p-5 transition-all duration-300 hover:shadow-elevated">
  <div className="absolute inset-y-0 left-0 w-[2px] bg-secondary/50" />
  <p className="text-[10px] uppercase tracking-widest text-text-muted">ベンチマーク指数</p>
  <div className="mt-1.5 flex items-baseline gap-2">
  <p className="font-mono tabular-nums text-3xl md:text-4xl font-semibold tracking-kpi text-text-primary">
- {benchmarkIndex.toFixed(1)}
+ <AnimatedNumber value={benchmarkIndex} duration={0.8} formatFn={(n) => n.toFixed(1)} />
  <span className="ml-1 text-sm font-normal text-text-muted">pt</span>
  </p>
  {benchmarkChange !== null && (
@@ -260,10 +266,11 @@ function KpiCardsInner({
  </div>
  <p className="mt-1 text-xs text-text-muted">初期日=100</p>
   <Sparkline data={benchmarkSparkData} color={CHART_SERIES.benchmark} gradientId="spark-bench" />
- </div>
+ </motion.div>
 
  {/* Card 3: Excess Return */}
- <div
+ <motion.div
+ variants={staggerItemVariants}
  className={clsx(
 "card-surface group relative overflow-hidden p-5 transition-all duration-300",
  excessTone ==="positive" ?"border-positive/15 hover:shadow-elevated" :"border-danger/15"
@@ -283,34 +290,36 @@ function KpiCardsInner({
  excessTone ==="positive" ?"text-positive" :"text-danger"
  )}
  >
- {excessReturn >= 0 ?"+" :""}{excessReturn.toFixed(1)}
+ <AnimatedNumber value={excessReturn} duration={0.8} formatFn={(n) => `${n >= 0 ? "+" : "\u2212"}${Math.abs(n).toFixed(1)}`} />
  <span className="ml-1 text-sm font-normal opacity-60">pt</span>
  </p>
  <p className="mt-1 text-xs text-text-muted">戦略 − ベンチマーク</p>
  <ExcessBars managerSeries={managerSeries} benchmarkSeries={benchmarkSeries} />
- </div>
+ </motion.div>
 
  {/* Card 4: Watch / Holdings */}
- <div className="card-surface card-surface-hover group relative overflow-hidden p-5 transition-all duration-300">
+ <motion.div variants={staggerItemVariants} className="card-surface card-surface-hover group relative overflow-hidden p-5 transition-all duration-300">
  <div className="absolute inset-y-0 left-0 w-[2px] bg-amber/50" />
  <p className="text-[10px] uppercase tracking-widest text-text-muted">銘柄サマリー</p>
- <p className="mt-1.5 font-mono tabular-nums text-3xl md:text-4xl font-semibold tracking-kpi text-text-primary">{totalCount}</p>
+ <p className="mt-1.5 font-mono tabular-nums text-3xl md:text-4xl font-semibold tracking-kpi text-text-primary">
+ <AnimatedNumber value={totalCount} duration={0.6} formatFn={(n) => String(Math.round(n))} />
+ </p>
  <div className="mt-1 flex flex-wrap gap-x-3 text-xs text-text-muted">
  <span>監視: <span className="text-text-secondary">{watchCount}銘柄</span></span>
  <span>保有: <span className="text-text-secondary">{holdingsCount}銘柄</span></span>
  </div>
  <ActionDonut stocks={stocks} />
- </div>
+ </motion.div>
 
  {/* Card 5: Nikkei 225 */}
- <div className="card-surface group relative overflow-hidden p-5 transition-all duration-300">
+ <motion.div variants={staggerItemVariants} className="card-surface group relative overflow-hidden p-5 transition-all duration-300">
  <div className="absolute inset-y-0 left-0 w-[2px] bg-accent-warm/50" />
  <p className="flex items-center gap-1.5 text-[10px] uppercase tracking-widest text-text-muted">
  日経平均 終値 <TrendArrow value={diff} />
  </p>
  <p className="mt-1.5 font-mono tabular-nums text-3xl md:text-4xl font-semibold tracking-kpi text-text-primary">
  {nikkei?.latestClose != null
- ? `${Math.round(nikkei.latestClose).toLocaleString("ja-JP")}円`
+ ? <><AnimatedNumber value={Math.round(nikkei.latestClose)} duration={0.8} formatFn={(n) => Math.round(n).toLocaleString("ja-JP")} /><span>円</span></>
  :"-"}
  </p>
  <p
@@ -327,8 +336,8 @@ function KpiCardsInner({
  {nikkeiSparkData.length >= 2 && (
   <Sparkline data={nikkeiSparkData} color={CHART_SERIES.nikkei} gradientId="spark-nikkei" />
  )}
- </div>
- </section>
+ </motion.div>
+ </motion.section>
  );
 }
 

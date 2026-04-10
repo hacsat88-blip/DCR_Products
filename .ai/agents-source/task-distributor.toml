@@ -1,5 +1,6 @@
 name = "task-distributor"
 description = "Use when you need task distributor support for agent coordination, context management, recovery, and workflow automation."
+version = "1.0.0"
 model = "gpt-5.4"
 model_reasoning_effort = "medium"
 sandbox_mode = "read-only"

@@ -12,33 +12,32 @@ import { DEFAULT_SOURCE_META, SourceLabel, StockSourceMeta } from "@/types/sourc
 
 import type { StoreState } from "./types";
 import {
+  applyRegisteredProfile,
+  AUTO_REFRESH_KEY,
   evaluateStocks,
+  HOLDINGS_KEY,
+  HYPOTHESIS_KEY,
+  MEMO_KEY,
   normalizeRegisteredCodes,
   normalizeRegisteredNameMap,
   normalizeRegisteredProfileMap,
   omitRecordKeys,
-  readJSON,
-  writeJSON,
-  notifyStorageFailure,
-  WATCH_KEY,
-  HOLDINGS_KEY,
-  MEMO_KEY,
-  HYPOTHESIS_KEY,
-  ALERT_RULES_KEY,
-  ALERT_EVENTS_KEY,
-  ALERT_SNAPSHOTS_KEY,
-  ALERT_CONDITION_STATE_KEY,
+  REFRESH_INTERVAL_KEY,
   REGISTERED_CODES_KEY,
   REGISTERED_NAME_MAP_KEY,
   REGISTERED_PROFILE_MAP_KEY,
-  ARCHIVE_COMPARE_KEY,
-  REFRESH_INTERVAL_KEY,
-  AUTO_REFRESH_KEY,
-  applyRegisteredProfile,
-  initializeAlertStorage,
-  initializeBacktestStorage,
-  initializeArchiveStorage
-} from "./helpers";
+  WATCH_KEY
+} from "./helpers/core";
+import {
+  ALERT_CONDITION_STATE_KEY,
+  ALERT_EVENTS_KEY,
+  ALERT_RULES_KEY,
+  ALERT_SNAPSHOTS_KEY,
+  initializeAlertStorage
+} from "./helpers/alert";
+import { ARCHIVE_COMPARE_KEY, initializeArchiveStorage } from "./helpers/archive";
+import { initializeBacktestStorage } from "./helpers/backtest";
+import { hasStoredValue, notifyStorageFailure, readJSON, writeJSON } from "./helpers/persistence";
 
 export interface CoreSlice {
   stocks: EvaluatedStock[];
@@ -104,8 +103,7 @@ export const createCoreSlice: StateCreator<StoreState, [], [], CoreSlice> = (set
     const alertState = initializeAlertStorage();
     const backtestState = initializeBacktestStorage();
     const archiveState = initializeArchiveStorage();
-    const hasStoredRegisteredCodes =
-      typeof window !== "undefined" && window.localStorage.getItem(REGISTERED_CODES_KEY) !== null;
+    const hasStoredRegisteredCodes = hasStoredValue(REGISTERED_CODES_KEY);
     const rawRegisteredCodes = readJSON<unknown>(
       REGISTERED_CODES_KEY,
       hasStoredRegisteredCodes ? [] : [...DEFAULT_STOCK_CODES]

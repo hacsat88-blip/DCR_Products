@@ -2,9 +2,47 @@ import { formatMarketCap, formatPercent, formatYen } from "@/lib/format";
 import type { EvaluatedStock } from "@/types/stock";
 
 const PLACEHOLDER_STOCK_NAME = /^銘柄\s*\d{4}$/;
+export const COMPARE_SELECTION_LIMIT = 4;
 
 function isApiAddedStock(stock: Pick<EvaluatedStock, "id">): boolean {
   return stock.id.startsWith("live-");
+}
+
+export function canSelectForCompare(compareSelection: string[], code: string): boolean {
+  const normalizedCode = code.trim();
+  if (!normalizedCode) {
+    return false;
+  }
+  return compareSelection.includes(normalizedCode) || compareSelection.length < COMPARE_SELECTION_LIMIT;
+}
+
+export function addToCompareSelection(compareSelection: string[], code: string): string[] {
+  const normalizedCode = code.trim();
+  if (!normalizedCode) {
+    return compareSelection;
+  }
+  if (compareSelection.includes(normalizedCode)) {
+    return compareSelection;
+  }
+  if (compareSelection.length >= COMPARE_SELECTION_LIMIT) {
+    return compareSelection;
+  }
+  return [...compareSelection, normalizedCode];
+}
+
+export function getCompareSelectionStatus(compareSelection: string[]): {
+  count: number;
+  limit: number;
+  slotsLeft: number;
+  isFull: boolean;
+} {
+  const count = compareSelection.length;
+  return {
+    count,
+    limit: COMPARE_SELECTION_LIMIT,
+    slotsLeft: Math.max(0, COMPARE_SELECTION_LIMIT - count),
+    isFull: count >= COMPARE_SELECTION_LIMIT
+  };
 }
 
 export function getStockDisplayName(stock: Pick<EvaluatedStock, "id" | "code" | "name">): string {

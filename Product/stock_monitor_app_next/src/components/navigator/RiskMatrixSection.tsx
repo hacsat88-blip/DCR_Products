@@ -61,7 +61,7 @@ function MatrixCard({ entry }: { entry: MatrixEntry }): JSX.Element {
         <div className="mt-1 border-t border-glass-border pt-1">
           <span
             className={clsx(
-              "font-semiboldtext-[9px] uppercase tracking-wider",
+              "font-semibold text-[9px] uppercase tracking-wider",
               entry.pos === "コア"
                 ? "text-positive"
                 : entry.pos === "サテライト"
@@ -138,20 +138,20 @@ function CorrelationTable({ pairs }: { pairs: CorrelationPair[] }): JSX.Element 
 
   return (
     <div>
-      <h4 className="mb-2 font-semiboldtext-[10px] uppercase tracking-widest text-text-muted">
+      <h4 className="mb-2 font-semibold text-[10px] uppercase tracking-widest text-text-muted">
         CORRELATION MATRIX
       </h4>
       <div className="overflow-x-auto">
         <table className="w-full border-collapse text-left">
           <thead>
             <tr className="border-b border-glass-border">
-              <th className="px-3 py-1.5 font-semiboldtext-[10px] uppercase tracking-widest text-text-muted">
+              <th className="px-3 py-1.5 font-semibold text-[10px] uppercase tracking-widest text-text-muted">
                 PAIR
               </th>
-              <th className="px-3 py-1.5 font-semiboldtext-[10px] uppercase tracking-widest text-text-muted">
+              <th className="px-3 py-1.5 font-semibold text-[10px] uppercase tracking-widest text-text-muted">
                 COEFF
               </th>
-              <th className="px-3 py-1.5 font-semiboldtext-[10px] uppercase tracking-widest text-text-muted">
+              <th className="px-3 py-1.5 font-semibold text-[10px] uppercase tracking-widest text-text-muted">
                 LEVEL
               </th>
             </tr>
@@ -197,6 +197,63 @@ function CorrelationTable({ pairs }: { pairs: CorrelationPair[] }): JSX.Element 
   );
 }
 
+// ── Allocation Donut ────────────────────────────────────
+
+function AllocationDonut({ alloc }: { alloc: AllocationConfig }): JSX.Element {
+  const total = alloc.stocks + alloc.funds + alloc.cash;
+  if (total === 0) return <div />;
+
+  const R = 36;
+  const CX = 50;
+  const CY = 50;
+  const C = 2 * Math.PI * R;
+
+  const segments = [
+    { pct: alloc.stocks / total, color: "#22C55E", label: `個別株 ${alloc.stocks}%` },
+    { pct: alloc.funds / total, color: "#06B6D4", label: `ETF/投信 ${alloc.funds}%` },
+    { pct: alloc.cash / total, color: "#97AEC3", label: `現金 ${alloc.cash}%` },
+  ];
+
+  let offset = 0;
+  const arcs = segments.map((seg) => {
+    const dash = seg.pct * C;
+    const gap = C - dash;
+    const arc = { ...seg, dasharray: `${dash} ${gap}`, dashoffset: -offset };
+    offset += dash;
+    return arc;
+  });
+
+  return (
+    <div className="flex items-center gap-4">
+      <svg viewBox="0 0 100 100" className="h-[80px] w-[80px]">
+        {arcs.map((arc, i) => (
+          <circle
+            key={i}
+            cx={CX}
+            cy={CY}
+            r={R}
+            fill="none"
+            stroke={arc.color}
+            strokeWidth={10}
+            strokeDasharray={arc.dasharray}
+            strokeDashoffset={arc.dashoffset}
+            transform={`rotate(-90 ${CX} ${CY})`}
+            className="transition-all duration-700"
+          />
+        ))}
+      </svg>
+      <div className="space-y-1">
+        {segments.map((seg) => (
+          <div key={seg.label} className="flex items-center gap-1.5 font-mono tabular-nums text-[10px]">
+            <span className="inline-block h-2 w-2" style={{ backgroundColor: seg.color }} />
+            <span className="text-text-secondary">{seg.label}</span>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
 // ── Main component ──────────────────────────────────────
 
 interface RiskMatrixSectionProps {
@@ -212,7 +269,7 @@ export function RiskMatrixSection({
 }: RiskMatrixSectionProps): JSX.Element {
   return (
     <section className="animate-fade-in border border-glass-border bg-panel p-4">
-      <h3 className="mb-4 font-semiboldtext-[10px] uppercase tracking-widest text-text-muted">
+      <h3 className="mb-4 font-semibold text-[10px] uppercase tracking-widest text-text-muted">
         ▸ RISK-RETURN MATRIX + ALLOCATION
       </h3>
 
@@ -225,10 +282,13 @@ export function RiskMatrixSection({
 
       {/* Allocation */}
       <div className="mb-4">
-        <h4 className="mb-2 font-semiboldtext-[10px] uppercase tracking-widest text-text-muted">
+        <h4 className="mb-2 font-semibold text-[10px] uppercase tracking-widest text-text-muted">
           TARGET ALLOCATION
         </h4>
-        <AllocationBar alloc={alloc} />
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+          <AllocationDonut alloc={alloc} />
+          <AllocationBar alloc={alloc} />
+        </div>
       </div>
 
       {/* Correlation */}

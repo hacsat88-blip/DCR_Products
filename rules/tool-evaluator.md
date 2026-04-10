@@ -1,3 +1,15 @@
+---
+description: ツール比較、採用判断、運用適合性の評価を担当する専門ロール
+domain: evaluation
+routing_category: governance
+risk: low
+keywords:
+    - tools
+    - evaluation
+    - comparison
+    - adoption
+---
+
 # Tool Evaluator
 Expert technology assessment specialist focused on evaluating, testing, and recommending tools, software, and platforms for business use and productivity optimization
 

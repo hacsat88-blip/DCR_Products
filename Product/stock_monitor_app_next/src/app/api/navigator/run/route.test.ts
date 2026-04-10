@@ -13,13 +13,25 @@ const geminiMocks = vi.hoisted(() => ({
   runStockSelection: vi.fn(),
   runDebate: vi.fn(),
   runFinalEvaluation: vi.fn(),
+  GeminiRateLimitError: class GeminiRateLimitError extends Error {
+    retryAfterSeconds: number | null;
+
+    constructor(message = "Gemini API returned HTTP 429", retryAfterSeconds: number | null = null) {
+      super(message);
+      this.name = "GeminiRateLimitError";
+      this.retryAfterSeconds = retryAfterSeconds;
+    }
+  },
 }));
 
 vi.mock("@/services/gemini", () => ({
+  DEFAULT_GEMINI_RATE_LIMIT_COOLDOWN_SECONDS: 120,
   runMacroResearch: geminiMocks.runMacroResearch,
   runStockSelection: geminiMocks.runStockSelection,
   runDebate: geminiMocks.runDebate,
   runFinalEvaluation: geminiMocks.runFinalEvaluation,
+  GeminiRateLimitError: geminiMocks.GeminiRateLimitError,
+  isGeminiRateLimitError: (error: unknown) => error instanceof geminiMocks.GeminiRateLimitError,
 }));
 
 import { POST } from "./route";
@@ -95,6 +107,18 @@ function buildStep1WithoutMacroRequest(): NextRequest {
   });
 }
 
+function buildStep1WithInvalidMacroRequest(): NextRequest {
+  return new NextRequest("http://localhost:3000/api/navigator/run", {
+    method: "POST",
+    headers: { "content-type": "application/json" },
+    body: JSON.stringify({
+      step: 1,
+      settings: SETTINGS,
+      macro: { invalid: true },
+    }),
+  });
+}
+
 describe("POST /api/navigator/run", () => {
   beforeEach(() => {
     vi.clearAllMocks();
@@ -145,6 +169,18 @@ describe("POST /api/navigator/run", () => {
     expect(geminiMocks.runStockSelection).not.toHaveBeenCalled();
   });
 
+  it("returns 400 when previous-step schema is invalid", async () => {
+    process.env.GEMINI_API_KEY = "test-key";
+
+    const response = await POST(buildStep1WithInvalidMacroRequest());
+    const payload = await response.json();
+
+    expect(response.status).toBe(400);
+    expect(payload.result).toBeNull();
+    expect(payload.error).toContain("Invalid macro result schema");
+    expect(geminiMocks.runStockSelection).not.toHaveBeenCalled();
+  });
+
   it("returns 502 when live execution fails and does not fallback to mock", async () => {
     process.env.GEMINI_API_KEY = "test-key";
     geminiMocks.runMacroResearch.mockRejectedValueOnce(new Error("Gemini failed"));
@@ -156,6 +192,26 @@ describe("POST /api/navigator/run", () => {
     expect(payload.result).toBeNull();
     expect(payload.error).toContain("再実行してください");
     expect(payload.mock).toBeUndefined();
+  });
+
+  it("returns 429 with retry metadata when Gemini rate limit is hit", async () => {
+    process.env.GEMINI_API_KEY = "test-key";
+    geminiMocks.runMacroResearch.mockRejectedValueOnce(
+      new geminiMocks.GeminiRateLimitError("Gemini API returned HTTP 429", 120),
+    );
+
+    const response = await POST(buildRequest(0));
+    const payload = await response.json();
+
+    expect(response.status).toBe(429);
+    expect(payload.result).toBeNull();
+    expect(payload.error).toContain("API混雑");
+    expect(payload.retry).toEqual({
+      reason: "rate_limit",
+      retryAfterSeconds: 120,
+      retryAt: expect.any(String),
+    });
+    expect(response.headers.get("Retry-After")).toBe("120");
   });
 
   it("returns 502 when live response schema is invalid", async () => {

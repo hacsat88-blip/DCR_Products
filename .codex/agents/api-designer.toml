@@ -1,5 +1,6 @@
 name = "api-designer"
 description = "Use when you need api designer support for core feature work, module boundaries, and implementation across frontend and backend."
+version = "1.0.0"
 model = "gpt-5.3-codex-spark"
 model_reasoning_effort = "medium"
 sandbox_mode = "workspace-write"

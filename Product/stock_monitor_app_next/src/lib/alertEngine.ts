@@ -264,6 +264,21 @@ function threshold(rule: AlertRule, fallback: number): number {
   return fallback;
 }
 
+function normalizePriority(priority: AlertRule["priority"]): "high" | "medium" | "low" {
+  if (priority === "high" || priority === "medium" || priority === "low") {
+    return priority;
+  }
+  return "medium";
+}
+
+function normalizeDueDate(dueDate: string | null | undefined): string | null {
+  if (typeof dueDate !== "string") {
+    return null;
+  }
+  const trimmed = dueDate.trim();
+  return trimmed ? trimmed : null;
+}
+
 function evaluateRule(
   rule: AlertRule,
   stock: EvaluatedStock | undefined,
@@ -639,8 +654,8 @@ export function evaluateAlerts(input: AlertEngineInput): AlertEngineResult {
           ruleType: rule.type,
           scope: rule.scope,
           dataMode: input.dataMode,
-          priority: rule.priority ?? "medium",
-          dueDate: rule.dueDate ?? null
+          priority: normalizePriority(rule.priority),
+          dueDate: normalizeDueDate(rule.dueDate)
         }
       };
 

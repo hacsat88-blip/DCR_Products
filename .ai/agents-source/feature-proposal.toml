@@ -1,5 +1,6 @@
 name = "feature-proposal"
 description = "Use when brainstorming features, proposing enhancements, or managing feature batch implementation. Generates structured proposals with effort estimates, implementation checklists, known pitfalls, and completion reports to prevent implementation gaps."
+version = "1.0.0"
 model = "gpt-5.4"
 model_reasoning_effort = "medium"
 sandbox_mode = "read-only"

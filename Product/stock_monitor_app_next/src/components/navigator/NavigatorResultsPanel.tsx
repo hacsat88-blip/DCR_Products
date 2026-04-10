@@ -1,14 +1,20 @@
 "use client";
 
+import { useMemo } from "react";
+import dynamic from "next/dynamic";
+
 import { useNavigatorStore } from "@/store/useNavigatorStore";
 import type { MarketScope, RiskTolerance, InvestmentHorizon } from "@/types/navigator";
 
-import { MacroSection } from "./MacroSection";
-import { StocksTable } from "./StocksTable";
-import { DebateSection } from "./DebateSection";
-import { BestPicksSection } from "./BestPicksSection";
-import { RiskMatrixSection } from "./RiskMatrixSection";
+const MacroSection = dynamic(() => import("./MacroSection").then(m => m.MacroSection), { ssr: false });
+const StocksTable = dynamic(() => import("./StocksTable").then(m => m.StocksTable), { ssr: false });
+const DebateSection = dynamic(() => import("./DebateSection").then(m => m.DebateSection), { ssr: false });
+const BestPicksSection = dynamic(() => import("./BestPicksSection").then(m => m.BestPicksSection), { ssr: false });
+const RiskMatrixSection = dynamic(() => import("./RiskMatrixSection").then(m => m.RiskMatrixSection), { ssr: false });
+
+import { VIXAlertBanner } from "./VIXAlertBanner";
 import { NavigatorLiveTerminal } from "./NavigatorLiveTerminal";
+import { PipelineStepper, motion, fadeUpVariants, AnimatePresence } from "@/components/ui/MotionPrimitives";
 
 // ── Label maps ──────────────────────────────────────────
 
@@ -41,20 +47,27 @@ const HORIZON_LABEL: Record<InvestmentHorizon, string> = {
  * - RIGHT: Live terminal with typewriter logs and completed stage accordion
  */
 export function NavigatorResultsPanel(): JSX.Element | null {
-  const {
-    status,
-    progress,
-    steps,
-    intervention,
-    macro,
-    stocks,
-    debate,
-    final: finalEval,
-    settings,
-    analysisMode,
-    executedAt,
-    recommendationDiffs,
-  } = useNavigatorStore();
+  const status = useNavigatorStore((s) => s.status);
+  const progress = useNavigatorStore((s) => s.progress);
+  const steps = useNavigatorStore((s) => s.steps);
+  const intervention = useNavigatorStore((s) => s.intervention);
+  const macro = useNavigatorStore((s) => s.macro);
+  const stocks = useNavigatorStore((s) => s.stocks);
+  const debate = useNavigatorStore((s) => s.debate);
+  const finalEval = useNavigatorStore((s) => s.final);
+  const settings = useNavigatorStore((s) => s.settings);
+  const analysisMode = useNavigatorStore((s) => s.analysisMode);
+  const executedAt = useNavigatorStore((s) => s.executedAt);
+  const recommendationDiffs = useNavigatorStore((s) => s.recommendationDiffs);
+
+  const stepperSteps = useMemo(
+    () =>
+      steps.map((s) => ({
+        label: s.label,
+        status: s.status === "running" ? "running" as const : s.status === "done" ? "done" as const : s.status === "error" ? "error" as const : "idle" as const,
+      })),
+    [steps],
+  );
 
   // Nothing to show yet
   if (status === "idle" && !macro) return null;
@@ -101,19 +114,9 @@ export function NavigatorResultsPanel(): JSX.Element | null {
               {`progress ${Math.round(progress)}%`}
             </p>
           </div>
-          <div className="mb-2 grid grid-cols-1 gap-2 sm:grid-cols-2 xl:grid-cols-4">
-            {steps.map((step) => (
-              <div
-                key={step.step}
-                className="rounded border border-primary/15 bg-canvas px-2 py-1.5 font-mono tabular-nums text-[10px] text-text-muted"
-              >
-                <p className="truncate uppercase tracking-wide">{step.label}</p>
-                <p className="mt-1 text-[10px] uppercase tracking-wide text-text-secondary">
-                  {step.status}
-                </p>
-              </div>
-            ))}
-          </div>
+          <PipelineStepper
+            steps={stepperSteps}
+          />
           <div className="flex flex-wrap items-center gap-2 font-mono tabular-nums text-[10px] uppercase tracking-wide text-text-muted">
             {intervention && (
               <span className="rounded border border-primary/30 bg-primary/10 px-2 py-0.5 text-primary">
@@ -128,33 +131,68 @@ export function NavigatorResultsPanel(): JSX.Element | null {
           </div>
         </section>
 
+        {/* ── VIX Alert Banner ── */}
+        <AnimatePresence mode="wait">
+          {macro?.vixAlert && (
+            <motion.div key="vix-alert" variants={fadeUpVariants} initial="hidden" animate="visible" exit="exit">
+              <VIXAlertBanner alert={macro.vixAlert} />
+            </motion.div>
+          )}
+        </AnimatePresence>
+
         {/* ── STATE 1: Macro Environment ── */}
-        {macro && <MacroSection macro={macro} />}
+        <AnimatePresence mode="wait">
+          {macro && (
+            <motion.div key="macro" variants={fadeUpVariants} initial="hidden" animate="visible" exit="exit">
+              <MacroSection macro={macro} />
+            </motion.div>
+          )}
+        </AnimatePresence>
 
         {/* ── STATE 2 + 3: Stocks Table (with debate signals merged) ── */}
-        {stocks && debate && <StocksTable stocks={stocks} debate={debate} />}
+        <AnimatePresence mode="wait">
+          {stocks && debate && (
+            <motion.div key="stocks" variants={fadeUpVariants} initial="hidden" animate="visible" exit="exit">
+              <StocksTable stocks={stocks} debate={debate} />
+            </motion.div>
+          )}
+        </AnimatePresence>
 
         {/* ── STATE 3: Debate Verdicts ── */}
-        {debate && <DebateSection debate={debate} />}
+        <AnimatePresence mode="wait">
+          {debate && (
+            <motion.div key="debate" variants={fadeUpVariants} initial="hidden" animate="visible" exit="exit">
+              <DebateSection debate={debate} />
+            </motion.div>
+          )}
+        </AnimatePresence>
 
         {/* ── STATE 4: Best Picks ── */}
-        {finalEval && (
-          <BestPicksSection
-            bestStocks={finalEval.bestStocks}
-            bestFunds={finalEval.bestFunds}
-            debate={debate}
-            recommendationDiffs={recommendationDiffs}
-          />
-        )}
+        <AnimatePresence mode="wait">
+          {finalEval && (
+            <motion.div key="bestpicks" variants={fadeUpVariants} initial="hidden" animate="visible" exit="exit">
+              <BestPicksSection
+                bestStocks={finalEval.bestStocks}
+                bestFunds={finalEval.bestFunds}
+                debate={debate}
+                recommendationDiffs={recommendationDiffs}
+              />
+            </motion.div>
+          )}
+        </AnimatePresence>
 
         {/* ── STATE 4: Risk Matrix + Allocation ── */}
-        {finalEval && (
-          <RiskMatrixSection
-            matrix={finalEval.matrix}
-            alloc={finalEval.alloc}
-            corrMatrix={finalEval.corrMatrix}
-          />
-        )}
+        <AnimatePresence mode="wait">
+          {finalEval && (
+            <motion.div key="riskmatrix" variants={fadeUpVariants} initial="hidden" animate="visible" exit="exit">
+              <RiskMatrixSection
+                matrix={finalEval.matrix}
+                alloc={finalEval.alloc}
+                corrMatrix={finalEval.corrMatrix}
+              />
+            </motion.div>
+          )}
+        </AnimatePresence>
 
         {/* ── Disclaimer ── */}
         <div className="border-t border-primary/10 pt-3 font-mono tabular-nums text-[10px] leading-relaxed text-text-muted">

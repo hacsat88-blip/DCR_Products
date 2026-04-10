@@ -7,19 +7,24 @@ import type {
   DebateResult,
   FinalEvaluation,
   PipelineStep,
+  NavigatorRetryState,
 } from "@/types/navigator";
 import {
+  DEFAULT_GEMINI_RATE_LIMIT_COOLDOWN_SECONDS,
+  isGeminiRateLimitError,
   runMacroResearch,
   runStockSelection,
   runDebate,
   runFinalEvaluation,
 } from "@/services/gemini";
+import { fetchMacroMarketData, fetchStockFundamentals } from "@/services/marketDataFetcher";
 
 // ── Types ───────────────────────────────────────
 
 interface RunRequestBody {
   step: PipelineStep;
   settings: NavigatorSettings;
+  freeInput?: string;
   macro?: MacroResult;
   stocks?: StockSelectionResult;
   debate?: DebateResult;
@@ -35,6 +40,7 @@ interface RunResponse {
   result: StepResult | null;
   error: string | null;
   mock?: boolean;
+  retry?: NavigatorRetryState;
 }
 
 const CF_TRENDS = new Set(["↑", "↗", "→", "↘", "↓"]);
@@ -196,10 +202,37 @@ function errorResponse(message: string, status: number): NextResponse {
   return json({ result: null, error: message }, status);
 }
 
+function buildRetryState(retryAfterSeconds: number | null): NavigatorRetryState {
+  const seconds =
+    retryAfterSeconds != null && Number.isFinite(retryAfterSeconds) && retryAfterSeconds >= 0
+      ? retryAfterSeconds
+      : DEFAULT_GEMINI_RATE_LIMIT_COOLDOWN_SECONDS;
+
+  return {
+    reason: "rate_limit",
+    retryAfterSeconds: seconds,
+    retryAt: new Date(Date.now() + seconds * 1000).toISOString(),
+  };
+}
+
+function buildRateLimitMessage(step: PipelineStep, retryAfterSeconds: number | null): string {
+  const seconds =
+    retryAfterSeconds != null && Number.isFinite(retryAfterSeconds) && retryAfterSeconds >= 0
+      ? retryAfterSeconds
+      : DEFAULT_GEMINI_RATE_LIMIT_COOLDOWN_SECONDS;
+  const minutes = Math.max(1, Math.ceil(seconds / 60));
+
+  return `Step ${step} は API混雑のため一時停止しました。約${minutes}分後に再実行してください。`;
+}
+
 // ── POST /api/navigator/run ─────────────────────
 // Executes a single pipeline step server-side.
 // The client (Zustand store) orchestrates the pipeline by calling
 // this route once per step, passing previous-step results as context.
+
+const VALID_MARKETS = new Set(["US", "JP", "BOTH"]);
+const VALID_RISKS = new Set(["low", "mid", "high"]);
+const VALID_HORIZONS = new Set(["short", "mid", "long"]);
 
 export async function POST(request: NextRequest): Promise<NextResponse> {
   // ── Parse request body ────────────────────────
@@ -210,7 +243,10 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
     return errorResponse("Invalid JSON body", 400);
   }
 
-  const { step, settings, macro, stocks, debate } = body;
+  const { step, settings, macro, stocks, debate, freeInput } = body;
+  const userInstruction = typeof freeInput === "string"
+    ? freeInput.trim().slice(0, 1200)
+    : "";
 
   // ── Validate step number ──────────────────────
   if (step == null || ![0, 1, 2, 3].includes(step)) {
@@ -220,6 +256,13 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
   // ── Validate settings ─────────────────────────
   if (!settings || !settings.market || !settings.risk || !settings.horizon) {
     return errorResponse("Missing or incomplete settings", 400);
+  }
+  if (
+    !VALID_MARKETS.has(settings.market) ||
+    !VALID_RISKS.has(settings.risk) ||
+    !VALID_HORIZONS.has(settings.horizon)
+  ) {
+    return errorResponse("Invalid settings values", 400);
   }
 
   // ── Check API key ─────────────────────────────
@@ -232,28 +275,74 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
   if (step >= 1 && !macro) {
     return errorResponse("Step 1+ requires macro result from previous step", 400);
   }
+  if (step >= 1 && macro && !isMacroResult(macro)) {
+    return errorResponse("Invalid macro result schema from previous step", 400);
+  }
   if (step >= 2 && !stocks) {
     return errorResponse("Step 2+ requires stocks result from previous step", 400);
   }
+  if (step >= 2 && stocks && !isStockSelectionResult(stocks)) {
+    return errorResponse("Invalid stocks result schema from previous step", 400);
+  }
   if (step >= 3 && !debate) {
     return errorResponse("Step 3 requires debate result from previous step", 400);
+  }
+  if (step >= 3 && debate && !isDebateResult(debate)) {
+    return errorResponse("Invalid debate result schema from previous step", 400);
   }
 
   // ── Execute pipeline step ─────────────────────
   try {
     let liveResult: StepResult | null = null;
     switch (step) {
-      case 0:
-        liveResult = await runMacroResearch(settings, apiKey);
+      case 0: {
+        // Fetch live market data to inject into macro analysis
+        // If Yahoo is blocked/slow, proceed without live context
+        let marketContext: string | undefined;
+        try {
+          const marketData = await fetchMacroMarketData(settings.market);
+          // Only pass context if real data was fetched (not the fallback message)
+          if (marketData.indices.some((q) => q.price != null)) {
+            marketContext = marketData.summary;
+          }
+        } catch (e) {
+          console.warn("[navigator/run] Market data fetch failed, proceeding without:", e);
+        }
+        liveResult = await runMacroResearch(settings, apiKey, marketContext, userInstruction);
         break;
-      case 1:
-        liveResult = await runStockSelection(settings, macro!, apiKey);
+      }
+      case 1: {
+        // Fetch top stock fundamentals for reference
+        // If Yahoo is blocked/slow, proceed without stock context
+        let stockDataContext: string | undefined;
+        try {
+          const topCodes = settings.market === "US"
+            ? ["AAPL", "MSFT", "GOOGL", "AMZN", "JPM", "V"]
+            : settings.market === "JP"
+              ? ["7203", "8306", "6758", "7974", "9984", "6861"]
+              : ["AAPL", "MSFT", "7203", "8306", "6758", "9984"];
+          const fundamentals = await fetchStockFundamentals(topCodes, settings.market);
+          const lines = fundamentals
+            .filter((f) => f.price != null)
+            .map((f) => {
+              const chg = f.changePercent != null ? ` (${f.changePercent >= 0 ? "+" : ""}${f.changePercent.toFixed(1)}%)` : "";
+              return `${f.code} ${f.name}: ¥${f.price?.toLocaleString()}${chg}`;
+            })
+            .join("\n");
+          if (lines) {
+            stockDataContext = lines;
+          }
+        } catch (e) {
+          console.warn("[navigator/run] Stock fundamentals fetch failed, proceeding without:", e);
+        }
+        liveResult = await runStockSelection(settings, macro!, apiKey, stockDataContext, userInstruction);
         break;
+      }
       case 2:
-        liveResult = await runDebate(settings, stocks!, macro!, apiKey);
+        liveResult = await runDebate(settings, stocks!, macro!, apiKey, userInstruction);
         break;
       case 3:
-        liveResult = await runFinalEvaluation(settings, stocks!, debate!, macro!, apiKey);
+        liveResult = await runFinalEvaluation(settings, stocks!, debate!, macro!, apiKey, userInstruction);
         break;
     }
 
@@ -269,10 +358,24 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
   } catch (err: unknown) {
     const message = err instanceof Error ? err.message : "Unknown error";
     console.error(`[navigator/run] Step ${step} failed:`, err);
+    if (isGeminiRateLimitError(err)) {
+      const retry = buildRetryState(err.retryAfterSeconds);
+      const response = json(
+        {
+          result: null,
+          error: buildRateLimitMessage(step, err.retryAfterSeconds),
+          retry,
+        },
+        429,
+      );
+      response.headers.set("Retry-After", String(retry.retryAfterSeconds));
+      return response;
+    }
     const timeoutLike = /timed out|timeout/i.test(message);
     const status = timeoutLike ? 504 : 502;
+    console.error(`[navigator/run] Step ${step} detail: ${message}`);
     return errorResponse(
-      `Step ${step} の処理に失敗しました。時間をおいて再実行してください。 (detail: ${message})`,
+      `Step ${step} の処理に失敗しました。時間をおいて再実行してください。`,
       status,
     );
   }

@@ -9,10 +9,12 @@ export type RankingSortKey =
   | "backtest_excess_desc"
   | "action_priority";
 
+export type SnapshotCaptureSource = "manual" | "autosave";
+
 export interface StockSnapshot {
   id: string;
   captureId: string;
-  captureSource?: "manual" | "autosave";
+  captureSource?: SnapshotCaptureSource;
   code: string;
   name: string;
   checkedAt: string;
@@ -48,6 +50,15 @@ export interface SavedScreen {
   createdAt: string;
   updatedAt: string;
 }
+
+export type NormalizedStockSnapshot = Omit<StockSnapshot, "captureSource"> & {
+  captureSource: SnapshotCaptureSource;
+};
+
+export type NormalizedSavedScreen = Omit<SavedScreen, "rankingSortKey" | "compareSelection"> & {
+  rankingSortKey: RankingSortKey;
+  compareSelection: string[];
+};
 
 export interface CompareSelection {
   codes: string[];

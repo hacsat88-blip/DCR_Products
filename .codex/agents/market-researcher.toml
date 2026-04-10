@@ -1,5 +1,6 @@
 name = "market-researcher"
 description = "Use when you need market researcher support for search, synthesis, market analysis, and documentation-backed verification."
+version = "1.0.0"
 model = "gpt-5.4"
 model_reasoning_effort = "medium"
 sandbox_mode = "read-only"

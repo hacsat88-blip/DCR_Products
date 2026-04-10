@@ -1,5 +1,32 @@
 # IMPLEMENTATION_NOTES (Phase 5 Patch)
 
+## Single HTML v1（`artifact-dashboard.html`）実装
+
+- 単一ファイルで動作する前提を維持しつつ、永続化と検索を host 注入フック対応に変更。
+- 永続化:
+  - 優先: `globalThis.__STOCK_MONITOR_PERSISTENCE__`
+  - fallback: `localStorage`
+  - 最終fallback: メモリ（Map）
+- 検索:
+  - 優先: `globalThis.__STOCK_MONITOR_CLAUDE_SEARCH__`（タイムアウト/失敗時は即fallback）
+  - fallback: ローカルカタログ検索
+- compare/watch/export/import/ranking の既存導線は維持。
+- Host実行依存（Claude/Gemini/Grok）に関する注意を README に追記。
+
+## S1 Task6: Final verification + S2 handoff package
+
+- `docs/dcr/specs/dependency-map-s1.md` を実コード確認ベースで更新。
+  - Next route依存: `/api/stocks`, `/api/market-index*`, `/api/navigator/run`, `/api/data-source-info`, `/api/health`
+  - env依存: `DATA_MODE`, `ENABLE_LIVE_DATA`, API keys, TTL, `NEXT_PUBLIC_STOCK_MONITOR_RUNTIME`
+  - browser API依存: `localStorage`, `window.*` event/UI API, `Blob`, `FileReader`, `Notification`
+  - adapter隔離: `__STOCK_MONITOR_PERSISTENCE__`, `__STOCK_MONITOR_RUNTIME__`, `PollingController`, `__STOCK_MONITOR_CLAUDE_SEARCH__`
+- 検証コマンド（Task6）:
+  - `npm run lint` ✅
+  - `npm run test` ✅ (26 files, 209 tests passed)
+  - `npm run build` ✅ (Next.js production build success)
+- S2 handoff:
+  - dependency-map を正本として、route/env/browser 依存は adapter 置換前提で抽出する。
+
 ## A〜U UX 拡張（最小差分）
 
 - A系
@@ -24,6 +51,11 @@ Phase 5 の骨格実装に対して、最小差分で挙動整合を追加。
 既存の `provider / scoring / backtest / alert engine / UI` を維持しつつ、保存モデル・並び順・通知意味づけを修正。
 
 ## 今回の修正要点
+
+0. Next.js / Artifact ランタイム分岐
+- `src/lib/runtimeConfig.ts` を追加し、既定は `nextjs`、必要時のみ `artifact` を選択
+- `src/lib/persistenceLayer.ts` を追加し、Next.js は `localStorage`、Artifact は注入アダプタまたはメモリ退避を利用
+- store helper / navigator store の永続化をこの層経由へ寄せ、`window.localStorage` 直参照を減らした
 
 1. silent alert baseline 更新
 - `setScoringConfig()` / `resetScoringConfig()` で score/action を再計算

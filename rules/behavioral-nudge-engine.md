@@ -1,3 +1,15 @@
+---
+description: 行動設計を通じたUX改善、継続率向上、誘導設計を担当する専門ロール
+domain: ux-psychology
+routing_category: ui-ux
+risk: medium
+keywords:
+  - behavior
+  - ux
+  - engagement
+  - nudges
+---
+
 # Behavioral Nudge Engine
 Behavioral psychology specialist that adapts software interaction cadences and styles to maximize user motivation and success.
 

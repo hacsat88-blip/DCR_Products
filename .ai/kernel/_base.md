@@ -55,6 +55,28 @@
 
 > `ralph:` は `ulw` を内包する。`team:` は大規模タスク向け。
 
+### Mode selection guide
+
+- 1-2ステップの単純タスク → プレフィックスなし（直接処理）
+- 3ステップ以上の実装 → `autopilot:` で自動連鎖
+- テスト通過が必須の修正 → `ralph:` で完了保証
+- 独立タスクが3つ以上 → `ulw` で並列処理
+- 計画の精度が重要 → `ralplan:` で反復プラン
+- 要件が曖昧 → `deep-interview:` で整理してから実装
+- 設計判断が複雑 → `ultrathink:` で多角分析
+- 既存コードの理解が不足 → `deepsearch:` で調査先行
+- 大規模マルチフェーズ → `team:` でフェーズ管理
+
+### `team:` mode rules
+
+`team:` 使用時は以下を遵守する:
+
+1. **フェーズ遷移を可視化する** — 各フェーズ (plan/prd/exec/verify/fix) の開始・完了を明示表示する
+2. **p/ 承認なしに exec へ進まない** — plan フェーズで p/ gate を通過すること
+3. **verify フェーズは q/ gate で実行する** — 手動確認ではなく証跡ベース
+4. **fix フェーズ後に verify を再実行する** — fix→verify ループは q/ 通過まで継続
+5. **フェーズ間でコンテキスト圧縮を検討する** — strategic-compact skill を参照
+
 ## Routing priority
 
 1. ユーザーが明示した role / skill
@@ -63,6 +85,16 @@
 4. direct processing
 
 skills と rules が両方一致した場合は skills を優先する。
+
+## Tool routing priority
+
+全環境共通のツール選択優先順位。環境固有の上書きは `environments/` を参照。
+
+1. Code Intelligence (LSP, type info, symbol resolution)
+2. Semantic search / grep (codebase context)
+3. File read (targeted reads)
+4. Terminal execution (builds, tests, commands)
+5. Web fetch (external documentation)
 
 ## Pipeline gate chain
 
@@ -74,6 +106,24 @@ skills と rules が両方一致した場合は skills を優先する。
 - q/ では plan のチェックリストを検証する
 - sh/ は q/ 通過後のみ進める
 - スコープ変更を検知した場合は p/ へ戻す
+
+### Gate state persistence
+
+ゲート通過状態をセッションメモリに記録し、後続ゲートで機械的に検証する。
+
+- p/ 承認時: `/memories/session/gate-state.md` に `plan_approved: true` + チェックリストを保存
+- q/ 通過時: 同ファイルに `qa_passed: true` + findings サマリーを追記
+- sh/ 起動時: `qa_passed: true` が存在しなければ `🔴 Stop — q/ QA Gate を通過していません。sh/ を中止します` で **ブロック**（警告ではなく拒否）
+- スコープ変更検知時: `plan_approved` をリセットし、p/ への差し戻しカウントをインクリメント
+- 差し戻し3回で `⚠️ スコープが安定しません。s/ で目的と前提を再整理することを推奨します`
+
+### Cross-session plan handoff
+
+環境をまたぐ作業では `docs/dcr/plans/` を正式な計画リポジトリとして使用する。
+
+- p/ で生成した計画は `docs/dcr/plans/YYYY-MM-DD-<feature>.md` に保存する
+- 別セッション/別環境で作業を継続する場合、計画ファイルを読み込んで再開する
+- `/memories/session/gate-state.md` はセッション内のみ有効。永続的な計画状態は plans/ に保持する
 
 ## Footer rule
 

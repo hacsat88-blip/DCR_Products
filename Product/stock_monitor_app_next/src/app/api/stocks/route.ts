@@ -20,6 +20,10 @@ const CACHE_TTL_SECONDS = Math.min(
 );
 
 const routeCache = new Map<string, { expiresAt: number; payload: StockFetchResult }>();
+const DEFAULT_PROVIDER_ORDER = {
+  quotes: ["yahoo", "alphaVantage", "mock"],
+  fundamentals: ["edinetDb", "mock"]
+} as const;
 
 function normalizeCodes(codes: string[]): string[] {
   const uniq = new Set<string>();
@@ -103,6 +107,7 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
         dataMode: "mock",
         sourceLabel: "M",
         sourceMeta: DEFAULT_SOURCE_META,
+        providerOrder: DEFAULT_PROVIDER_ORDER,
         lastUpdatedAt: fetchedAt,
         error: message,
         fallbackReason: "API取得に失敗したため mock データを表示しています。",
@@ -111,6 +116,7 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
             provider: "yahoo",
             ok: false,
             message: "route fallback",
+            decision: "route_fallback",
             errorCode: "network",
             latencyMs: null,
             fetchedAt,
@@ -121,6 +127,7 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
             provider: "alphaVantage",
             ok: false,
             message: "route fallback",
+            decision: "route_fallback",
             errorCode: "network",
             latencyMs: null,
             fetchedAt,
@@ -131,6 +138,7 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
             provider: "edinetDb",
             ok: false,
             message: "route fallback",
+            decision: "route_fallback",
             errorCode: "network",
             latencyMs: null,
             fetchedAt,

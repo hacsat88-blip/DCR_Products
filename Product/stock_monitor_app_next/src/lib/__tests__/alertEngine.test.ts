@@ -1,6 +1,7 @@
-import { describe, it, expect } from "vitest";
-import { evaluateAlerts, buildAlertSnapshots, ALERT_EVENTS_MAX } from "@/lib/alertEngine";
-import type { AlertEngineInput, AlertRule, AlertEvent, PreviousStockSnapshot } from "@/types/alert";
+import { beforeEach, describe, expect, it } from "vitest";
+import { evaluateAlerts, buildAlertSnapshots } from "@/lib/alertEngine";
+import { useStockStore } from "@/store/useStockStore";
+import type { AlertEngineInput, AlertRule, PreviousStockSnapshot } from "@/types/alert";
 import type { EvaluatedStock } from "@/types/stock";
 import type { ProviderHealth, DataMode } from "@/services/providers/types";
 
@@ -92,6 +93,11 @@ function makeInput(overrides: Partial<AlertEngineInput> = {}): AlertEngineInput 
     checkedAt: "2024-01-01T01:00:00Z",
     ...overrides,
   };
+}
+
+function resetAlertStoreState(): void {
+  useStockStore.setState(useStockStore.getInitialState(), true);
+  window.localStorage.clear();
 }
 
 describe("evaluateAlerts", () => {
@@ -349,5 +355,83 @@ describe("buildAlertSnapshots", () => {
     const stocks = [makeEvaluatedStock({ code: "9424", priceUpdatedAt: null })];
     const snapshots = buildAlertSnapshots(stocks, "mock", HEALTHY, "2024-01-01T00:00:00Z");
     expect(snapshots["9424"].priceUpdatedAt).toBe("2024-01-01T00:30:00Z");
+  });
+});
+
+describe("alert slice integration", () => {
+  beforeEach(() => {
+    resetAlertStoreState();
+  });
+
+  it("suppresses the first persistent alert after rule creation when condition is already true", () => {
+    useStockStore.setState({
+      stocks: [makeEvaluatedStock({ code: "9424", price: 300 })],
+      dataMode: "live",
+      health: HEALTHY,
+      alertRules: [],
+      alertEvents: [],
+      previousSnapshots: {},
+      alertConditionState: {},
+      lastEvaluationAt: null,
+    });
+
+    useStockStore.getState().addRule({
+      scope: "stock",
+      stockCode: "9424",
+      type: "price_above",
+      threshold: 200,
+      cooldownMinutes: 60,
+    });
+    useStockStore.getState().runAlertEvaluation();
+
+    expect(useStockStore.getState().alertEvents).toHaveLength(0);
+  });
+
+  it("supports alert CRUD and reflects updated priority/dueDate in event payload", () => {
+    useStockStore.setState({
+      stocks: [makeEvaluatedStock({ code: "9424", price: 100 })],
+      dataMode: "live",
+      health: HEALTHY,
+      alertRules: [],
+      alertEvents: [],
+      previousSnapshots: {},
+      alertConditionState: {},
+      lastEvaluationAt: null,
+    });
+
+    useStockStore.getState().addRule({
+      scope: "stock",
+      stockCode: "9424",
+      type: "price_above",
+      threshold: 200,
+      priority: "low",
+      dueDate: "2026-01-20",
+      cooldownMinutes: 30,
+    });
+
+    const createdRule = useStockStore.getState().alertRules[0];
+    expect(createdRule).toBeDefined();
+
+    useStockStore.getState().updateRule(createdRule.id, {
+      priority: "high",
+      dueDate: "   ",
+    });
+
+    const updatedRule = useStockStore.getState().alertRules[0];
+    expect(updatedRule.priority).toBe("high");
+    expect(updatedRule.dueDate).toBeNull();
+
+    useStockStore.setState({
+      stocks: [makeEvaluatedStock({ code: "9424", price: 320 })],
+    });
+    useStockStore.getState().runAlertEvaluation();
+
+    const event = useStockStore.getState().alertEvents[0];
+    expect(event.ruleId).toBe(createdRule.id);
+    expect(event.payload?.priority).toBe("high");
+    expect(event.payload?.dueDate).toBeNull();
+
+    useStockStore.getState().deleteRule(createdRule.id);
+    expect(useStockStore.getState().alertRules).toHaveLength(0);
   });
 });

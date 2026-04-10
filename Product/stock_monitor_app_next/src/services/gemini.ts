@@ -14,15 +14,59 @@ import type {
   MarketScope,
   RiskTolerance,
   InvestmentHorizon,
+  GeopoliticalRisk,
+  MarketSentiment,
+  EconomicIndicator,
+  CentralBankPolicy,
+  VIXAlert,
+  PanelistVote,
+  ConvergenceStatus,
 } from "@/types/navigator";
 
 // ────────────────────────────────────────────────
 // Constants
 // ────────────────────────────────────────────────
 
-const GEMINI_MODEL = "gemini-2.0-flash";
+const GEMINI_MODEL = "gemini-3.1-flash-lite-preview";
 const GEMINI_ENDPOINT = `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent`;
 const REQUEST_TIMEOUT_MS = 30_000;
+export const DEFAULT_GEMINI_RATE_LIMIT_COOLDOWN_SECONDS = 120;
+
+export class GeminiRateLimitError extends Error {
+  readonly retryAfterSeconds: number | null;
+
+  constructor(message = "Gemini API returned HTTP 429", retryAfterSeconds: number | null = null) {
+    super(message);
+    this.name = "GeminiRateLimitError";
+    this.retryAfterSeconds = retryAfterSeconds;
+  }
+}
+
+export function isGeminiRateLimitError(error: unknown): error is GeminiRateLimitError {
+  return error instanceof GeminiRateLimitError || (
+    error instanceof Error &&
+    error.name === "GeminiRateLimitError"
+  );
+}
+
+function parseRetryAfterSeconds(value: string | null): number | null {
+  if (!value) {
+    return null;
+  }
+
+  const seconds = Number(value);
+  if (Number.isFinite(seconds) && seconds >= 0) {
+    return Math.floor(seconds);
+  }
+
+  const retryAtMs = Date.parse(value);
+  if (!Number.isFinite(retryAtMs)) {
+    return null;
+  }
+
+  const deltaSeconds = Math.ceil((retryAtMs - Date.now()) / 1000);
+  return deltaSeconds > 0 ? deltaSeconds : 0;
+}
 
 // ────────────────────────────────────────────────
 // Label Mappings
@@ -56,6 +100,9 @@ const HORIZON_LABELS: Record<InvestmentHorizon, string> = {
  *
  * @returns Parsed JSON object, or `null` on any failure.
  */
+const MAX_RETRIES = 2;
+const RETRY_BASE_DELAY_MS = 5_000;
+
 async function callGemini(
   systemPrompt: string,
   userPrompt: string,
@@ -79,51 +126,118 @@ async function callGemini(
     },
   };
 
-  const controller = new AbortController();
-  const timeout = setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS);
+  let lastError: unknown = null;
 
-  try {
-    const response = await fetch(url, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "x-goog-api-key": apiKey,
-      },
-      body: JSON.stringify(body),
-      signal: controller.signal,
-    });
-
-    if (!response.ok) {
-      const errorBody = await response.text().catch(() => "");
-      console.error(`[gemini] API error ${response.status}: ${errorBody.slice(0, 200)}`);
-      throw new Error(`Gemini API returned HTTP ${response.status}`);
+  for (let attempt = 0; attempt <= MAX_RETRIES; attempt++) {
+    if (attempt > 0) {
+      // Exponential backoff: 5s, 10s
+      const delay = RETRY_BASE_DELAY_MS * Math.pow(2, attempt - 1);
+      console.warn(`[gemini] Retry ${attempt}/${MAX_RETRIES} after ${delay}ms`);
+      await new Promise((resolve) => setTimeout(resolve, delay));
     }
 
-    const json = await response.json();
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS);
 
-    // Extract text from Gemini response structure
-    const text: string | undefined =
-      json?.candidates?.[0]?.content?.parts?.[0]?.text;
+    try {
+      const response = await fetch(url, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "x-goog-api-key": apiKey,
+        },
+        body: JSON.stringify(body),
+        signal: controller.signal,
+      });
 
-    if (typeof text !== "string" || text.trim().length === 0) {
-      throw new Error("Gemini returned empty or malformed content.");
+      if (!response.ok) {
+        const errorBody = await response.text().catch(() => "");
+        console.error(`[gemini] API error ${response.status}: ${errorBody.slice(0, 200)}`);
+        if (response.status === 429) {
+          lastError = new GeminiRateLimitError(
+            `Gemini API returned HTTP ${response.status}`,
+            parseRetryAfterSeconds(response.headers.get("retry-after")),
+          );
+          // Retry on 429 unless this is the last attempt
+          if (attempt < MAX_RETRIES) {
+            continue;
+          }
+          throw lastError;
+        }
+        throw new Error(`Gemini API returned HTTP ${response.status}`);
+      }
+
+      const json = await response.json();
+
+      // Extract text from Gemini response structure
+      const text: string | undefined =
+        json?.candidates?.[0]?.content?.parts?.[0]?.text;
+
+      if (typeof text !== "string" || text.trim().length === 0) {
+        throw new Error("Gemini returned empty or malformed content.");
+      }
+
+      // Strip markdown code fences (```json ... ``` or ``` ... ```)
+      const stripped = text
+        .replace(/^```(?:json)?\s*\n?/i, "")
+        .replace(/\n?```\s*$/i, "")
+        .trim();
+
+      return JSON.parse(stripped);
+    } catch (error: unknown) {
+      if (error instanceof DOMException && error.name === "AbortError") {
+        throw new Error(`Gemini API request timed out after ${REQUEST_TIMEOUT_MS}ms`);
+      }
+      // Only retry 429 errors
+      if (error instanceof GeminiRateLimitError && attempt < MAX_RETRIES) {
+        lastError = error;
+        continue;
+      }
+      throw error;
+    } finally {
+      clearTimeout(timeout);
     }
-
-    // Strip markdown code fences (```json ... ``` or ``` ... ```)
-    const stripped = text
-      .replace(/^```(?:json)?\s*\n?/i, "")
-      .replace(/\n?```\s*$/i, "")
-      .trim();
-
-    return JSON.parse(stripped);
-  } catch (error: unknown) {
-    if (error instanceof DOMException && error.name === "AbortError") {
-      throw new Error(`Gemini API request timed out after ${REQUEST_TIMEOUT_MS}ms`);
-    }
-    throw error;
-  } finally {
-    clearTimeout(timeout);
   }
+
+  // Should not reach here, but safety net
+  throw lastError ?? new Error("Gemini call failed after retries");
+}
+
+// ────────────────────────────────────────────────
+// Lightweight response validators
+// ────────────────────────────────────────────────
+// Validates top-level shape of Gemini responses to catch malformed JSON
+// before it hits components. This avoids a Zod dependency while still
+// providing runtime safety at the API boundary.
+
+function hasKeys(obj: unknown, keys: string[]): obj is Record<string, unknown> {
+  if (typeof obj !== "object" || obj === null) return false;
+  return keys.every((k) => k in obj);
+}
+
+function validateMacroResult(raw: unknown): MacroResult | null {
+  if (!hasKeys(raw, ["environment", "label", "sectors", "risks"])) return null;
+  if (!Array.isArray((raw as Record<string, unknown>).sectors)) return null;
+  return raw as unknown as MacroResult;
+}
+
+function validateStockSelectionResult(raw: unknown): StockSelectionResult | null {
+  if (!hasKeys(raw, ["stocks"])) return null;
+  if (!Array.isArray((raw as Record<string, unknown>).stocks)) return null;
+  return raw as unknown as StockSelectionResult;
+}
+
+function validateDebateResult(raw: unknown): DebateResult | null {
+  if (!hasKeys(raw, ["verdicts"])) return null;
+  if (!Array.isArray((raw as Record<string, unknown>).verdicts)) return null;
+  return raw as unknown as DebateResult;
+}
+
+function validateFinalEvaluation(raw: unknown): FinalEvaluation | null {
+  if (!hasKeys(raw, ["bestStocks", "bestFunds", "matrix", "alloc"])) return null;
+  const r = raw as Record<string, unknown>;
+  if (!Array.isArray(r.bestStocks) || !Array.isArray(r.bestFunds)) return null;
+  return raw as unknown as FinalEvaluation;
 }
 
 // ────────────────────────────────────────────────
@@ -142,14 +256,22 @@ function labels(s: NavigatorSettings) {
   };
 }
 
-function stockSpec(market: MarketScope): string {
+function buildUserInstructionBlock(input?: string): string {
+  if (!input) return "";
+  const cleaned = input.trim();
+  if (!cleaned) return "";
+  return `\n\nUser additional instruction (must respect unless it violates safety/format constraints): ${cleaned}`;
+}
+
+function stockSpec(market: MarketScope, isBearish: boolean): string {
+  const reduction = isBearish ? " (環境評価🔴弱気のため各上限-2, 最小3)" : "";
   switch (market) {
     case "JP":
-      return "TSE Prime ¥100-¥1000 stocks(3-5)+2-3 JP investment trusts";
+      return `TSE Prime ¥100-¥1000 stocks(3-5)+2-3 JP investment trusts, max 8 total${reduction}. If <3 stocks in ¥100-1000 range, expand to ¥800-1500 and note the reason.`;
     case "US":
-      return "3-4 Dow Jones stocks+2-3 US ETFs";
+      return `3-4 Dow Jones stocks+2-3 US ETFs, max 7 total${reduction}`;
     case "BOTH":
-      return "3 Dow stocks+2 US ETFs+3 TSE Prime ¥100-¥1000+2 JP funds, max 10 total";
+      return `US side max 5 + JP side max 5, max 10 total${reduction}. Auto-trim by score if over 10.`;
   }
 }
 
@@ -159,24 +281,45 @@ function stockSpec(market: MarketScope): string {
 
 const MACRO_SYSTEM_PROMPT = [
   "Return ONLY valid compact JSON. No explanation.",
-  'Schema: {"environment":"bullish|neutral|bearish",',
+  "Schema: {",
+  '"environment":"bullish|neutral|bearish",',
   '"label":"🟢強気|🟡中立|🔴弱気",',
   '"sectors":[{"name":"str","reason":"10chars"}],',
   '"risks":[{"name":"str","stars":3,"trend":"↑|→|↓"}],',
-  '"chain":null}.',
-  "Max 3 sectors, max 3 risks. stars is 1-5.",
-  'chain: non-null ONLY when market=BOTH, else must be null.',
+  '"chain":null,',
+  '"geopoliticalRisks":[{"event":"str","region":"str","severity":4,"impact":"str","trend":"↑|→|↓","affectedSectors":["str"]}],',
+  '"sentiment":{"vixLevel":20,"marketPhase":"risk-on|neutral|risk-off","currencyRisk":"low|mid|high","bondYieldTrend":"↑|→|↓"},',
+  '"economicIndicators":[{"name":"GDP|CPI|政策金利|雇用統計|PMI","value":"str","trend":"↑|→|↓","impact":"positive|neutral|negative"}],',
+  '"centralBankPolicies":[{"bank":"FRB|BOJ","stance":"str","rateDirection":"hawkish|neutral|dovish","keyPoint":"str"}]',
+  "}.",
+  "Max 3 sectors. Max 3 risks (stars 1-5).",
+  "geopoliticalRisks: only ★3+ severity events. Include event name, region, affected sectors.",
+  "economicIndicators: include GDP, CPI, policy rate, employment, PMI for the target market.",
+  "centralBankPolicies: FRB when market includes US, BOJ when includes JP.",
+  "chain: non-null ONLY when market=BOTH, else must be null.",
+  "sentiment.vixLevel: current VIX estimate.",
 ].join(" ");
 
 /**
  * STATE 1: Analyzes the current global macro environment and returns
- * market outlook, promising sectors, and key risk factors.
+ * market outlook, promising sectors, key risk factors, geopolitical risks,
+ * economic indicators, central bank policies, and market sentiment.
+ *
+ * @param marketDataContext - Optional real market data string to inject
+ *   into the prompt. When provided, Gemini uses factual data instead
+ *   of relying on training knowledge.
  */
 export async function runMacroResearch(
   settings: NavigatorSettings,
   apiKey: string,
+  marketDataContext?: string,
+  userInstruction?: string,
 ): Promise<MacroResult | null> {
   const { marketLabel, riskLabel, horizonLabel } = labels(settings);
+
+  const contextBlock = marketDataContext
+    ? `\n\n--- LIVE MARKET DATA ---\n${marketDataContext}\n--- END MARKET DATA ---\nUse the above market data as factual basis for your analysis.\n\n`
+    : "";
 
   const userPrompt = [
     `Market:${settings.market}`,
@@ -184,10 +327,16 @@ export async function runMacroResearch(
     `Risk:${riskLabel}`,
     `Horizon:${horizonLabel}.`,
     `Analyze current global macro for ${marketLabel} equity investment.`,
+    "Include: (1) economic indicators (GDP/CPI/policy rate/employment/PMI),",
+    "(2) geopolitical risks ★3+ with affected sectors,",
+    "(3) central bank policy stance (FRB if US included, BOJ if JP included),",
+    "(4) market sentiment (VIX level, market phase, currency risk, bond yield trend).",
+    contextBlock,
+    buildUserInstructionBlock(userInstruction),
   ].join(" ");
 
   const result = await callGemini(MACRO_SYSTEM_PROMPT, userPrompt, apiKey);
-  return result as MacroResult;
+  return validateMacroResult(result);
 }
 
 // ────────────────────────────────────────────────
@@ -202,19 +351,31 @@ const SELECTION_SYSTEM_PROMPT = [
   '"sector":"str","type":"stock|etf|fund",',
   '"reason":"20chars"}]}.',
   "cfTrend values: ↑ ↗ → ↘ ↓.",
+  "Scoring weights: CF健全性25% > バリュー25% > マクロ整合性20% > モメンタム15% > リスク耐性15%.",
+  "CF evaluation: FCFイールド, 営業CFマージン, FCF成長率を総合評価.",
+  "If CF data unavailable, mark as N/A（推定）.",
 ].join(" ");
 
 /**
  * STATE 2: Selects stocks, ETFs, and/or investment trusts based on
  * the macro environment and cash-flow analysis.
+ *
+ * @param stockDataContext - Optional real stock data string to inject.
  */
 export async function runStockSelection(
   settings: NavigatorSettings,
   macro: MacroResult,
   apiKey: string,
+  stockDataContext?: string,
+  userInstruction?: string,
 ): Promise<StockSelectionResult | null> {
   const { riskLabel, horizonLabel } = labels(settings);
-  const spec = stockSpec(settings.market);
+  const isBearish = macro.environment === "bearish";
+  const spec = stockSpec(settings.market, isBearish);
+
+  const contextBlock = stockDataContext
+    ? `\n\n--- REFERENCE STOCK DATA ---\n${stockDataContext}\n--- END STOCK DATA ---\nUse the above stock data as factual reference for prices and metrics.\n\n`
+    : "";
 
   const userPrompt = [
     `Select ${spec}.`,
@@ -222,10 +383,12 @@ export async function runStockSelection(
     `Risk:${riskLabel}`,
     `Horizon:${horizonLabel}.`,
     "Focus on sector diversification and CF quality.",
+    contextBlock,
+    buildUserInstructionBlock(userInstruction),
   ].join(" ");
 
   const result = await callGemini(SELECTION_SYSTEM_PROMPT, userPrompt, apiKey);
-  return result as StockSelectionResult;
+  return validateStockSelectionResult(result);
 }
 
 // ────────────────────────────────────────────────
@@ -239,7 +402,13 @@ const DEBATE_SYSTEM_PROMPT = [
   '"priority":"高|中|低",',
   '"confidence":0-100,',
   '"pro":"15chars","con":"15chars",',
-  '"cfNote":"str"}]}.',
+  '"cfNote":"str",',
+  '"panelVotes":[{"role":"バリュー投資家|投資未経験者|成長株アナリスト|リスク管理者|マクロストラテジスト","signal":"go|watch|out","reason":"str"}],',
+  '"convergence":"🟢採用|🟡条件付き|🔴除外"}]}.',
+  "5-panel debate: バリュー投資家(割安性/FCF), 投資未経験者(暗黙前提の可視化, MUST NOT DELETE),",
+  "成長株アナリスト(モメンタム/成長), リスク管理者(ダウンサイド/CF悪化, MUST NOT DELETE),",
+  "マクロストラテジスト(地政学/市場環境).",
+  "Convergence: 🟢採用=全員or3名以上合意, 🟡条件付き=2対2or3周未収束, 🔴除外=リスク管理者が安全リスク指摘.",
   "go=consensus buy, watch=split opinion, out=fatal risk found.",
   "confidence is integer percentage (0-100).",
 ].join(" ");
@@ -253,6 +422,7 @@ export async function runDebate(
   stocks: StockSelectionResult,
   macro: MacroResult,
   apiKey: string,
+  userInstruction?: string,
 ): Promise<DebateResult | null> {
   const { riskLabel, horizonLabel } = labels(settings);
 
@@ -269,10 +439,13 @@ export async function runDebate(
     `Macro:${macro.label}.`,
     `Risk:${riskLabel}`,
     `Horizon:${horizonLabel}.`,
+    "Debate topics: (1) macro環境に最も適合する銘柄, (2) risk_tolerance/horizonとの整合,",
+    "(3) 銘柄間の相関と分散効果, (4) CF健全性を含むダウンサイドリスク.",
+    buildUserInstructionBlock(userInstruction),
   ].join(" ");
 
   const result = await callGemini(DEBATE_SYSTEM_PROMPT, userPrompt, apiKey);
-  return result as DebateResult;
+  return validateDebateResult(result);
 }
 
 // ────────────────────────────────────────────────
@@ -291,10 +464,13 @@ const FINAL_SYSTEM_PROMPT = [
   '"cf":"🟢|🟡|🔴","pos":"コア|サテライト|ヘッジ","warn":false}],',
   '"alloc":{"stocks":60,"funds":30,"cash":10},',
   '"corrMatrix":[{"a":"str","b":"str","coeff":0.5}]}.',
-  "bestStocks: top 3 individual stocks with go or watch signal.",
+  "★ scoring weights: マクロ整合性20% + CF健全性25% + バリュー25% + モメンタム15% + リスク耐性15%.",
+  "★ conversion: 4.5-5.0→★5, 3.8-4.4→★4, 3.0-3.7→★3, 2.0-2.9→★2, <2.0→★1.",
+  "bestStocks: top 3 stocks with go or watch signal.",
   "bestFunds: top 3 etf/fund with go or watch signal.",
-  "corrMatrix: all unique pairs of selected instruments.",
-  "alloc should sum to 100.",
+  "corrMatrix: all unique pairs. Mark coeff>0.7 pairs with ⚠️ in matrix warn=true.",
+  "alloc should sum to 100. Adjust by risk: low=stocks20/funds40/cash40, mid=40/40/20, high=60/30/10.",
+  "Max position per stock: low=5%, mid=10%, high=15%.",
 ].join(" ");
 
 /**
@@ -307,6 +483,7 @@ export async function runFinalEvaluation(
   debate: DebateResult,
   macro: MacroResult,
   apiKey: string,
+  userInstruction?: string,
 ): Promise<FinalEvaluation | null> {
   const { riskLabel, horizonLabel } = labels(settings);
 
@@ -316,10 +493,11 @@ export async function runFinalEvaluation(
     `Macro:${macro.label}.`,
     `Risk:${riskLabel}`,
     `Horizon:${horizonLabel}.`,
+    buildUserInstructionBlock(userInstruction),
   ].join(" ");
 
   const result = await callGemini(FINAL_SYSTEM_PROMPT, userPrompt, apiKey);
-  return result as FinalEvaluation;
+  return validateFinalEvaluation(result);
 }
 
 // ────────────────────────────────────────────────
@@ -357,6 +535,51 @@ export async function runMockPipeline(settings: NavigatorSettings): Promise<{
       { name: "長期金利上昇", stars: 3, trend: "↑" },
     ],
     chain: null,
+    geopoliticalRisks: [
+      {
+        event: "米中関税引き上げ・貿易摩擦",
+        region: "米国・中国",
+        severity: 4,
+        impact: "サプライチェーン混乱、輸出企業の収益圧迫",
+        trend: "↑",
+        affectedSectors: ["半導体", "自動車", "電子部品"],
+      },
+      {
+        event: "中東地政学リスク",
+        region: "中東",
+        severity: 3,
+        impact: "原油価格上昇リスク",
+        trend: "→",
+        affectedSectors: ["エネルギー", "輸送", "化学"],
+      },
+    ],
+    sentiment: {
+      vixLevel: 18.5,
+      marketPhase: "neutral",
+      currencyRisk: "mid",
+      bondYieldTrend: "↑",
+    },
+    economicIndicators: [
+      { name: "GDP", value: "+1.2%（年率）", trend: "→", impact: "neutral" },
+      { name: "CPI", value: "+3.2%", trend: "↑", impact: "negative" },
+      { name: "政策金利", value: "0.25%（日銀）", trend: "↑", impact: "neutral" },
+      { name: "雇用統計", value: "完全失業率2.5%", trend: "→", impact: "positive" },
+      { name: "PMI", value: "49.8（製造業）", trend: "↓", impact: "negative" },
+    ],
+    centralBankPolicies: [
+      {
+        bank: "BOJ",
+        stance: "緩やかな金融正常化を継続",
+        rateDirection: "hawkish",
+        keyPoint: "追加利上げの可能性を示唆。YCC撤廃後の長期金利上昇を容認。",
+      },
+    ],
+    vixAlert: {
+      isAbnormal: false,
+      level: 18.5,
+      reason: null,
+      recommendation: null,
+    },
   };
 
   // ── STATE 2 mock ──
@@ -433,6 +656,14 @@ export async function runMockPipeline(settings: NavigatorSettings): Promise<{
         pro: "利上げ恩恵で業績改善確実",
         con: "海外景気後退なら融資悪化",
         cfNote: "FCF yield 6.2%は銀行セクター内で上位水準。",
+        panelVotes: [
+          { role: "バリュー投資家", signal: "go", reason: "FCFイールド6.2%は魅力的な水準" },
+          { role: "投資未経験者", signal: "go", reason: "銀行は身近で理解しやすい業種" },
+          { role: "成長株アナリスト", signal: "go", reason: "利上げ局面での利鞘拡大が追い風" },
+          { role: "リスク管理者", signal: "watch", reason: "海外融資の不良債権化リスクに注意" },
+          { role: "マクロストラテジスト", signal: "go", reason: "日銀利上げサイクルに合致" },
+        ],
+        convergence: "🟢採用",
       },
       {
         code: "6723",
@@ -442,6 +673,14 @@ export async function runMockPipeline(settings: NavigatorSettings): Promise<{
         pro: "車載半導体の需要は構造的",
         con: "在庫調整局面入りリスク",
         cfNote: "CF margin 22%、キャッシュ創出力は堅実。",
+        panelVotes: [
+          { role: "バリュー投資家", signal: "go", reason: "CFマージン22%は半導体として良好" },
+          { role: "投資未経験者", signal: "watch", reason: "半導体サイクルが読みにくい" },
+          { role: "成長株アナリスト", signal: "go", reason: "車載半導体の構造的需要増" },
+          { role: "リスク管理者", signal: "watch", reason: "在庫調整局面のダウンサイドに注意" },
+          { role: "マクロストラテジスト", signal: "go", reason: "AI・EV需要と整合" },
+        ],
+        convergence: "🟢採用",
       },
       {
         code: "4568",
@@ -451,6 +690,14 @@ export async function runMockPipeline(settings: NavigatorSettings): Promise<{
         pro: "エンハーツのグローバル展開",
         con: "研究開発費の増加で利益圧迫",
         cfNote: "FCF yield 2.1%はやや低め。パイプライン次第。",
+        panelVotes: [
+          { role: "バリュー投資家", signal: "watch", reason: "FCFイールド2.1%は低水準" },
+          { role: "投資未経験者", signal: "watch", reason: "新薬開発の成否が不透明" },
+          { role: "成長株アナリスト", signal: "go", reason: "エンハーツの海外売上が拡大中" },
+          { role: "リスク管理者", signal: "watch", reason: "研究開発費増でCF圧迫リスク" },
+          { role: "マクロストラテジスト", signal: "watch", reason: "ディフェンシブだが成長性限定的" },
+        ],
+        convergence: "🟡条件付き",
       },
       {
         code: "03311187",
@@ -460,6 +707,14 @@ export async function runMockPipeline(settings: NavigatorSettings): Promise<{
         pro: "低コストで究極の分散投資",
         con: "為替リスクをフルに受ける",
         cfNote: "ファンドのためCF評価対象外。",
+        panelVotes: [
+          { role: "バリュー投資家", signal: "go", reason: "低コストで幅広い分散効果" },
+          { role: "投資未経験者", signal: "go", reason: "全世界株式で初心者向け" },
+          { role: "成長株アナリスト", signal: "watch", reason: "成長株への偏りが少ない" },
+          { role: "リスク管理者", signal: "go", reason: "分散度が高くリスク低減" },
+          { role: "マクロストラテジスト", signal: "go", reason: "地域分散で地政学リスクを緩和" },
+        ],
+        convergence: "🟢採用",
       },
       {
         code: "29311218",
@@ -469,6 +724,14 @@ export async function runMockPipeline(settings: NavigatorSettings): Promise<{
         pro: "米国大型株の長期成長力",
         con: "S&P500集中リスクあり",
         cfNote: "ファンドのためCF評価対象外。",
+        panelVotes: [
+          { role: "バリュー投資家", signal: "watch", reason: "現在のバリュエーションは割高" },
+          { role: "投資未経験者", signal: "go", reason: "S&P500は初心者に分かりやすい" },
+          { role: "成長株アナリスト", signal: "go", reason: "米国テクの長期成長は堅い" },
+          { role: "リスク管理者", signal: "watch", reason: "米国集中リスクに注意" },
+          { role: "マクロストラテジスト", signal: "go", reason: "米国経済の底堅さに整合" },
+        ],
+        convergence: "🟢採用",
       },
     ],
   };
@@ -566,20 +829,20 @@ export async function runMockPipeline(settings: NavigatorSettings): Promise<{
       },
       {
         rank: 3,
-        code: "03311187",
-        name: "eMAXIS Slim 全世界株式",
-        stars: 4,
-        macro: 4,
+        code: "64315221",
+        name: "eMAXIS Slim 国内債券インデックス",
+        stars: 3,
+        macro: 3,
         cf: 3,
         value: 4,
-        momentum: 4,
-        riskScore: 2,
+        momentum: 2,
+        riskScore: 1,
         fcfYield: "N/A",
         cfMargin: "N/A",
         cfTrend: "→",
-        risk1: "世界同時不況",
-        risk2: "為替リスク",
-        hedge: "コア配分を維持しつつリバランス",
+        risk1: "金利上昇による債券価格下落",
+        risk2: "インフレによる実質リターン低下",
+        hedge: "株式との逆相関でポートフォリオ安定化",
       },
     ],
     matrix: [
@@ -600,11 +863,16 @@ export async function runMockPipeline(settings: NavigatorSettings): Promise<{
       { a: "6723", b: "4568", coeff: 0.15 },
       { a: "8306", b: "03311187", coeff: 0.55 },
       { a: "8306", b: "29311218", coeff: 0.45 },
+      { a: "8306", b: "64315221", coeff: -0.15 },
       { a: "6723", b: "03311187", coeff: 0.5 },
       { a: "6723", b: "29311218", coeff: 0.6 },
+      { a: "6723", b: "64315221", coeff: -0.1 },
       { a: "4568", b: "03311187", coeff: 0.4 },
       { a: "4568", b: "29311218", coeff: 0.3 },
+      { a: "4568", b: "64315221", coeff: -0.05 },
       { a: "03311187", b: "29311218", coeff: 0.85 },
+      { a: "03311187", b: "64315221", coeff: 0.2 },
+      { a: "29311218", b: "64315221", coeff: 0.1 },
     ],
   };
 

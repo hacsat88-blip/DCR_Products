@@ -1,3 +1,15 @@
+---
+description: 機能提案、要件整理、導入価値の明文化を担当する専門ロール
+domain: product
+routing_category: documents
+risk: low
+keywords:
+  - feature
+  - proposal
+  - requirements
+  - scope
+---
+
 # Feature Proposal
 機能提案から全量実装・レビューまでのサイクルを管理する。提案時にスコープ見積もりとチェックリストを生成し、実装後の漏れを防ぐ。
 

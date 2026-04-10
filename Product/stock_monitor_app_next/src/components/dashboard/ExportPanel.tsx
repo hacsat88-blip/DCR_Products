@@ -1,6 +1,7 @@
 import { useState } from"react";
 
 interface ExportSelection {
+ compareSelection: boolean;
  snapshots: boolean;
  alertEvents: boolean;
  savedScreens: boolean;
@@ -9,6 +10,7 @@ interface ExportSelection {
 }
 
 interface ExportPreview {
+ compareSelectionCount?: number;
  snapshotCount: number;
  alertEventCount: number;
  savedScreenCount: number;
@@ -32,14 +34,18 @@ export function ExportPanel({
  preview
 }: ExportPanelProps): JSX.Element {
  const [selection, setSelection] = useState<ExportSelection>({
- snapshots: true,
- alertEvents: true,
- savedScreens: true,
- backtestResults: true,
- holdings: false
+  compareSelection: true,
+  snapshots: true,
+  alertEvents: true,
+  savedScreens: true,
+  backtestResults: true,
+  holdings: false
  });
 
  const previewParts: string[] = [];
+ if (selection.compareSelection && (preview.compareSelectionCount ?? 0) > 0) {
+ previewParts.push(`比較銘柄: ${preview.compareSelectionCount}件`);
+ }
  if (selection.snapshots && preview.snapshotCount > 0) {
  previewParts.push(`スナップショット: ${preview.snapshotCount}件`);
  }
@@ -64,9 +70,18 @@ export function ExportPanel({
  </div>
 
  <div className="grid gap-2 md:grid-cols-2">
- <label className="rounded-lg border border-border-subtle bg-canvas-deep/60 px-3 py-2 text-xs text-text-primary">
- <input
- type="checkbox"
+  <label className="rounded-lg border border-border-subtle bg-canvas-deep/60 px-3 py-2 text-xs text-text-primary">
+  <input
+  type="checkbox"
+  checked={selection.compareSelection}
+  onChange={(event) => setSelection((prev) => ({ ...prev, compareSelection: event.target.checked }))}
+  className="mr-2"
+  />
+  比較銘柄
+  </label>
+  <label className="rounded-lg border border-border-subtle bg-canvas-deep/60 px-3 py-2 text-xs text-text-primary">
+  <input
+  type="checkbox"
  checked={selection.snapshots}
  onChange={(event) => setSelection((prev) => ({ ...prev, snapshots: event.target.checked }))}
  className="mr-2"

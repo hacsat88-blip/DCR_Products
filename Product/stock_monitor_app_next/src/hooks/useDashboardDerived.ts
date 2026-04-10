@@ -6,7 +6,7 @@ import { filterStocks, sortStocks } from "@/lib/filters";
 import { useSelectedStock, useStockStore } from "@/store/useStockStore";
 import { RankingSortKey } from "@/types/archive";
 import { BacktestResult } from "@/types/backtest";
-import { EvaluatedStock } from "@/types/stock";
+import { EvaluatedStock, StockAction } from "@/types/stock";
 
 function average(values: number[]): number {
   if (values.length === 0) return 0;
@@ -17,7 +17,28 @@ function lastValue<T>(values: T[]): T | undefined {
   return values.length > 0 ? values[values.length - 1] : undefined;
 }
 
-function sortForRanking(
+const ACTION_LANE_ORDER: StockAction[] = ["buy_now", "wait_earnings", "wait_pullback", "exclude"];
+const ACTION_PRIORITY: Record<StockAction, number> = {
+  buy_now: 0,
+  wait_earnings: 1,
+  wait_pullback: 2,
+  exclude: 3
+};
+
+function resolveEvaluatedAction(stock: Pick<EvaluatedStock, "evaluatedAction">): StockAction {
+  if (stock.evaluatedAction === "buy_now") return "buy_now";
+  if (stock.evaluatedAction === "wait_earnings") return "wait_earnings";
+  if (stock.evaluatedAction === "wait_pullback") return "wait_pullback";
+  if (stock.evaluatedAction === "exclude") return "exclude";
+  return "wait_earnings";
+}
+
+export interface ActionLane {
+  action: StockAction;
+  items: EvaluatedStock[];
+}
+
+export function deriveRankingRows(
   stocks: EvaluatedStock[],
   rankingSortKey: RankingSortKey,
   backtestResults: BacktestResult[]
@@ -28,12 +49,6 @@ function sortForRanking(
       excessMap.set(result.stockCode, result.excessReturnPct);
     }
   }
-  const actionPriority: Record<string, number> = {
-    buy_now: 0,
-    wait_earnings: 1,
-    wait_pullback: 2,
-    exclude: 3
-  };
   const copied = [...stocks];
   copied.sort((a, b) => {
     if (rankingSortKey === "score_desc") return b.score - a.score;
@@ -44,9 +59,26 @@ function sortForRanking(
     if (rankingSortKey === "operating_cf_desc") return (b.operatingCF ?? -Infinity) - (a.operatingCF ?? -Infinity);
     if (rankingSortKey === "per_asc") return (a.per ?? Infinity) - (b.per ?? Infinity);
     if (rankingSortKey === "backtest_excess_desc") return (excessMap.get(b.code) ?? -Infinity) - (excessMap.get(a.code) ?? -Infinity);
-    return (actionPriority[a.evaluatedAction] ?? 99) - (actionPriority[b.evaluatedAction] ?? 99);
+    return ACTION_PRIORITY[resolveEvaluatedAction(a)] - ACTION_PRIORITY[resolveEvaluatedAction(b)];
   });
   return copied;
+}
+
+export function deriveActionLanes(stocks: EvaluatedStock[]): ActionLane[] {
+  const map = new Map<StockAction, EvaluatedStock[]>();
+  for (const action of ACTION_LANE_ORDER) {
+    map.set(action, []);
+  }
+  for (const stock of stocks) {
+    map.get(resolveEvaluatedAction(stock))?.push(stock);
+  }
+  for (const action of ACTION_LANE_ORDER) {
+    map.get(action)?.sort((a, b) => b.score - a.score);
+  }
+  return ACTION_LANE_ORDER.map((action) => ({
+    action,
+    items: map.get(action) ?? []
+  }));
 }
 
 export function useDashboardDerived() {
@@ -128,8 +160,21 @@ export function useDashboardDerived() {
   }, [lastUpdatedAt, now]);
 
   const rankedRows = useMemo(
-    () => sortForRanking(filteredStocks, rankingSortKey, backtestResults),
+    () => deriveRankingRows(filteredStocks, rankingSortKey, backtestResults),
     [filteredStocks, rankingSortKey, backtestResults]
+  );
+
+  const dashboardPanels = useMemo(
+    () => ({
+      ranking: "market",
+      compare: "analysis",
+      snapshot: "analysis",
+      timeline: "analysis",
+      export: "portfolio",
+      savedScreens: "settings",
+      navigator: "market"
+    }),
+    []
   );
 
   return {
@@ -147,6 +192,7 @@ export function useDashboardDerived() {
     selectedBacktestResult,
     selectedHypothesis,
     isStale,
-    rankedRows
+    rankedRows,
+    dashboardPanels
   };
 }

@@ -3,6 +3,16 @@
 日本株監視アプリの Phase 5 実装です。  
 Phase 4 までの `live/mock/fallback + scoring + alert + backtest` を維持しつつ、`蓄積・比較・振り返り` レイヤーを追加しました。
 
+## S1 完了状態 / S2 引き継ぎ（Task6）
+
+- S1（Next.js 版フル実装）の最終検証・引き継ぎパッケージを更新済み。
+- S2 単一HTML抽出の依存ブロッカーは `docs/dcr/specs/dependency-map-s1.md` に集約（Next route / env / browser API / adapter境界）。
+- S2 で優先して差し替える境界:
+  - API route 呼び出し（`/api/stocks`, `/api/market-index*`, `/api/navigator/run`, `/api/data-source-info`, `/api/health`）
+  - env 依存（API key / TTL / runtime）
+  - host 制約を受ける browser API（storage / download / import / notification）
+  - 注入済み adapter（`__STOCK_MONITOR_PERSISTENCE__`, `__STOCK_MONITOR_RUNTIME__`, `__STOCK_MONITOR_CLAUDE_SEARCH__`, `PollingController`）
+
 ## セットアップ
 
 ```bash
@@ -11,6 +21,31 @@ npm run dev
 ```
 
 起動後: `http://localhost:3000`
+
+Artifact 互換ランタイムを使う場合は `NEXT_PUBLIC_STOCK_MONITOR_RUNTIME=artifact` を指定し、必要に応じて `globalThis.__STOCK_MONITOR_PERSISTENCE__` に Storage 互換アダプタを注入してください。未注入時はセッション内メモリに退避します。
+
+## Single HTML v1（`artifact-dashboard.html`）
+
+`artifact-dashboard.html` は React/Next.js なしでそのまま実行できる単一ファイル版です。
+
+- ローカルで開く: `Product\stock_monitor_app_next\artifact-dashboard.html` をブラウザで直接開く
+- 簡易サーバーで開く（推奨）:
+
+```bash
+npx serve .
+```
+
+### Host 互換性（Claude / Gemini / Grok）
+
+- コード生成はどのモデルでも可能ですが、**実行可否はモデルではなくホストの実行環境依存**です。
+- そのため「コードを渡せば必ず動く」ではなく、「実行面（Artifact/Canvas/Preview等）があると動く」が正確です。
+
+### Single HTML v1 の実装ポリシー
+
+- 検索: `globalThis.__STOCK_MONITOR_CLAUDE_SEARCH__` があれば優先利用、未注入時はローカル検索へフォールバック
+- 永続化: `globalThis.__STOCK_MONITOR_PERSISTENCE__` があれば利用、未注入時は `localStorage`、さらに不可ならメモリへフォールバック
+- compare/watch/export/import/ranking は単一ファイル内で継続動作
+- APIキーや secret は埋め込まない
 
 検証:
 

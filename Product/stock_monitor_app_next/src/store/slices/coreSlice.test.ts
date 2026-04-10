@@ -19,6 +19,7 @@ vi.mock("@/services/stockSearchService", () => ({
 
 import { DEFAULT_STOCK_CODES } from "@/services/providers/types";
 import { useStockStore } from "@/store/useStockStore";
+import type { EvaluatedStock } from "@/types/stock";
 
 import {
   ALERT_CONDITION_STATE_KEY,
@@ -45,7 +46,7 @@ function makeStock(
     sector: string;
     watched: boolean;
   }> = {}
-) {
+): EvaluatedStock {
   const name = overrides.name ?? `銘柄 ${code}`;
   return {
     id: overrides.id ?? `live-${code}`,
@@ -77,7 +78,13 @@ function makeStock(
     fundamentalsSubmitDate: "2024-01-05T00:00:00Z",
     fundamentalsSourceLabel: "C",
     watched: overrides.watched ?? false,
-    chartData: []
+    chartData: [],
+    score: 70,
+    evaluatedAction: "buy_now",
+    breakdown: [],
+    scoreSummary: "テスト用の判定要約",
+    actionReason: "テスト用の判定理由",
+    riskFlags: []
   };
 }
 

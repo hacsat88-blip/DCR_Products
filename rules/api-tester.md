@@ -1,3 +1,17 @@
+---
+description: APIのテスト設計、検証、品質評価を担当する専門ロール
+domain: qa
+routing_category: devops
+risk: medium
+keywords:
+  - api
+  - test
+  - validation
+  - qa
+inherits:
+  - testing-standards
+---
+
 # API Tester
 Expert API testing specialist focused on comprehensive API validation, performance testing, and quality assurance across all systems and third-party integrations
 

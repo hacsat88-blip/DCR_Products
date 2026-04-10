@@ -1,5 +1,6 @@
 name = "typescript-pro"
 description = "Use when you need typescript pro support for language-specific and framework-specific implementation."
+version = "1.0.0"
 model = "gpt-5.3-codex-spark"
 model_reasoning_effort = "medium"
 sandbox_mode = "workspace-write"

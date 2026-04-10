@@ -8,26 +8,25 @@ import {
   createRulesFromPreset,
   defaultRuleThreshold
 } from "@/lib/alertPresets";
-import { evaluateAlerts } from "@/lib/alertEngine";
+import { buildAlertConditionBaseline, evaluateAlerts } from "@/lib/alertEngine";
 import { AlertEvent, AlertRule, PreviousStockSnapshot } from "@/types/alert";
 
 import type { StoreState } from "./types";
 import {
-  normalizeAlertRules,
-  normalizeAlertEvents,
-  createId,
-  writeJSON,
-  notifyStorageFailure,
-  readNotificationPermission,
+  ALERT_CONDITION_STATE_KEY,
+  ALERT_EVENTS_KEY,
+  ALERT_NOTIFICATIONS_KEY,
+  ALERT_RULES_KEY,
+  ALERT_SNAPSHOTS_KEY,
   isNotificationAvailable,
   maybeSendBrowserNotification,
+  normalizeAlertEvents,
+  normalizeAlertRules,
   NotificationPermissionState,
-  ALERT_RULES_KEY,
-  ALERT_EVENTS_KEY,
-  ALERT_SNAPSHOTS_KEY,
-  ALERT_CONDITION_STATE_KEY,
-  ALERT_NOTIFICATIONS_KEY
-} from "./helpers";
+  readNotificationPermission
+} from "./helpers/alert";
+import { createId } from "./helpers/core";
+import { notifyStorageFailure, writeJSON } from "./helpers/persistence";
 
 export interface AlertSlice {
   alertRules: AlertRule[];
@@ -47,6 +46,33 @@ export interface AlertSlice {
   dismissAlert: (eventId: string) => void;
   clearAlerts: () => void;
   toggleNotifications: () => void;
+}
+
+function normalizePriority(priority: AlertRule["priority"] | undefined): AlertRule["priority"] {
+  if (priority === "high" || priority === "medium" || priority === "low") {
+    return priority;
+  }
+  return "medium";
+}
+
+function normalizeDueDate(dueDate: string | null | undefined): string | null {
+  if (typeof dueDate !== "string") {
+    return null;
+  }
+  const trimmed = dueDate.trim();
+  return trimmed ? trimmed : null;
+}
+
+function rebuildConditionBaseline(state: StoreState, alertRules: AlertRule[]): Record<string, boolean> {
+  const checkedAt = state.lastUpdatedAt ?? new Date().toISOString();
+  return buildAlertConditionBaseline({
+    stocks: state.stocks,
+    rules: alertRules,
+    dataMode: state.dataMode,
+    health: state.health,
+    checkedAt,
+    previousSnapshots: state.previousSnapshots
+  });
 }
 
 export const createAlertSlice: StateCreator<StoreState, [], [], AlertSlice> = (set, get) => ({
@@ -77,36 +103,46 @@ export const createAlertSlice: StateCreator<StoreState, [], [], AlertSlice> = (s
           : defaultRuleThreshold(type),
       messageTemplate: ruleInput.messageTemplate,
       cooldownMinutes: ruleInput.cooldownMinutes ?? 30,
-      priority: ruleInput.priority ?? "medium",
-      dueDate:
-        typeof ruleInput.dueDate === "string" && ruleInput.dueDate.trim()
-          ? ruleInput.dueDate
-          : null,
+      priority: normalizePriority(ruleInput.priority),
+      dueDate: normalizeDueDate(ruleInput.dueDate),
       createdAt: now,
       updatedAt: now
     };
     set((state) => {
       const alertRules = normalizeAlertRules([next, ...state.alertRules]);
+      const alertConditionState = rebuildConditionBaseline(state, alertRules);
       writeJSON(ALERT_RULES_KEY, alertRules);
-      return { alertRules };
+      writeJSON(ALERT_CONDITION_STATE_KEY, alertConditionState);
+      return { alertRules, alertConditionState };
     });
   },
 
   updateRule: (ruleId, patch) => {
     set((state) => {
+      const normalizedPatch: Partial<AlertRule> = { ...patch };
+      if ("priority" in patch) {
+        normalizedPatch.priority = normalizePriority(patch.priority);
+      }
+      if ("dueDate" in patch) {
+        normalizedPatch.dueDate = normalizeDueDate(patch.dueDate);
+      }
       const alertRules = normalizeAlertRules(state.alertRules.map((rule) =>
-        rule.id === ruleId ? { ...rule, ...patch, updatedAt: new Date().toISOString() } : rule
+        rule.id === ruleId ? { ...rule, ...normalizedPatch, updatedAt: new Date().toISOString() } : rule
       ));
+      const alertConditionState = rebuildConditionBaseline(state, alertRules);
       writeJSON(ALERT_RULES_KEY, alertRules);
-      return { alertRules };
+      writeJSON(ALERT_CONDITION_STATE_KEY, alertConditionState);
+      return { alertRules, alertConditionState };
     });
   },
 
   deleteRule: (ruleId) => {
     set((state) => {
       const alertRules = state.alertRules.filter((rule) => rule.id !== ruleId);
+      const alertConditionState = rebuildConditionBaseline(state, alertRules);
       writeJSON(ALERT_RULES_KEY, alertRules);
-      return { alertRules };
+      writeJSON(ALERT_CONDITION_STATE_KEY, alertConditionState);
+      return { alertRules, alertConditionState };
     });
   },
 
@@ -131,8 +167,10 @@ export const createAlertSlice: StateCreator<StoreState, [], [], AlertSlice> = (s
         return true;
       });
       const alertRules = normalizeAlertRules([...deduped, ...state.alertRules]);
+      const alertConditionState = rebuildConditionBaseline(state, alertRules);
       writeJSON(ALERT_RULES_KEY, alertRules);
-      return { alertRules };
+      writeJSON(ALERT_CONDITION_STATE_KEY, alertConditionState);
+      return { alertRules, alertConditionState };
     });
   },
 

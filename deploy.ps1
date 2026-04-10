@@ -31,7 +31,9 @@ param(
     [ValidateSet("all", "vscode", "cursor", "agents", "dcr")]
     [string]$Target = "all",
     [switch]$DryRun,
-    [switch]$Check
+    [switch]$Check,
+    [switch]$Watch,
+    [switch]$Backup
 )
 
 $ErrorActionPreference = "Stop"
@@ -445,6 +447,37 @@ function Compare-Directories {
     }
 }
 
+# ── Backup ──
+function Backup-DeployTarget {
+    param(
+        [string]$TargetPath,
+        [string]$Label
+    )
+
+    if (-not (Test-Path $TargetPath)) { return }
+
+    $backupRoot = Join-Path $TargetPath ".bak"
+    $timestamp = Get-Date -Format "yyyyMMdd-HHmmss"
+    $backupDir = Join-Path $backupRoot $timestamp
+
+    New-Item -ItemType Directory -Path $backupDir -Force | Out-Null
+
+    $items = Get-ChildItem -Path $TargetPath -File | Where-Object { $_.Name -ne '.bak' -and $_.DirectoryName -ne $backupRoot }
+    foreach ($item in $items) {
+        Copy-Item -Path $item.FullName -Destination $backupDir -Force
+    }
+
+    # Keep only last 3 backups
+    $backups = Get-ChildItem -Path $backupRoot -Directory | Sort-Object Name -Descending
+    if ($backups.Count -gt 3) {
+        $backups | Select-Object -Skip 3 | ForEach-Object {
+            Remove-Item -Path $_.FullName -Recurse -Force
+        }
+    }
+
+    Write-Host "[BACKUP] $Label : $($items.Count) files → $backupDir" -ForegroundColor DarkCyan
+}
+
 # ── Main ──
 Write-Host ""
 Write-Host "DCR Products Deploy" -ForegroundColor Cyan
@@ -545,10 +578,12 @@ if ($Check) {
 }
 
 if ($Target -eq "all" -or $Target -eq "vscode") {
+    if ($Backup) { Backup-DeployTarget -TargetPath $DestVSCodeSkills -Label "VS Code Copilot skills" }
     Sync-Directory -Source $SourceSkills -Destination $DestVSCodeSkills -Label "VS Code Copilot skills"
 }
 
 if ($Target -eq "all" -or $Target -eq "cursor") {
+    if ($Backup) { Backup-DeployTarget -TargetPath $DestCursorRules -Label "Cursor rules (user)" }
     $cursorTempDir = Get-TempDirectory
     try {
         New-CursorRulePackage -RulesSource $SourceRules -SkillsSource $SourceSkills -KernelSource $SourceCursorKernel -OutputDir $cursorTempDir
@@ -575,4 +610,72 @@ if ($DryRun) {
     Write-Host "Dry run complete. No files were copied." -ForegroundColor Yellow
 } else {
     Write-Host "Deploy complete." -ForegroundColor Green
+}
+
+# ── Watch Mode ──
+if ($Watch) {
+    Write-Host ""
+    Write-Host "Watch mode active. Monitoring rules/, skills/, .ai/agents-source/ for changes..." -ForegroundColor Cyan
+    Write-Host "Press Ctrl+C to stop." -ForegroundColor DarkGray
+    Write-Host ""
+
+    $watchPaths = @($SourceRules, $SourceSkills, $SourceAgents) | Where-Object { Test-Path $_ }
+    $watchers = @()
+
+    foreach ($watchPath in $watchPaths) {
+        $watcher = New-Object System.IO.FileSystemWatcher
+        $watcher.Path = $watchPath
+        $watcher.Filter = "*.*"
+        $watcher.IncludeSubdirectories = $true
+        $watcher.NotifyFilter = [System.IO.NotifyFilters]::FileName -bor [System.IO.NotifyFilters]::LastWrite
+        $watcher.EnableRaisingEvents = $false
+        $watchers += $watcher
+    }
+
+    $lastDeploy = [DateTime]::MinValue
+    $debounceSeconds = 2
+
+    try {
+        foreach ($w in $watchers) { $w.EnableRaisingEvents = $true }
+
+        while ($true) {
+            $changed = $false
+            foreach ($w in $watchers) {
+                $result = $w.WaitForChanged([System.IO.WatcherChangeTypes]::All, 1000)
+                if (-not $result.TimedOut) { $changed = $true }
+            }
+
+            if ($changed -and ([DateTime]::Now - $lastDeploy).TotalSeconds -ge $debounceSeconds) {
+                $lastDeploy = [DateTime]::Now
+                Write-Host ""
+                Write-Host "[WATCH] Change detected at $(Get-Date -Format 'HH:mm:ss'). Re-deploying..." -ForegroundColor Yellow
+
+                # Re-run deploy logic
+                if ($Target -eq "all" -or $Target -eq "vscode") {
+                    Sync-Directory -Source $SourceSkills -Destination $DestVSCodeSkills -Label "VS Code Copilot skills"
+                }
+                if ($Target -eq "all" -or $Target -eq "cursor") {
+                    $cursorWatchDir = Get-TempDirectory
+                    try {
+                        New-CursorRulePackage -RulesSource $SourceRules -SkillsSource $SourceSkills -KernelSource $SourceCursorKernel -OutputDir $cursorWatchDir
+                        Sync-Files -Source $cursorWatchDir -Destination $DestCursorRules -Label "Cursor rules (user)" -Prune -PruneManifestPath $DestCursorManifest
+                        Sync-Files -Source $cursorWatchDir -Destination $DestProjectCursorRules -Label "Cursor rules (project)" -Prune
+                    } finally {
+                        if (Test-Path $cursorWatchDir) { Remove-Item -Path $cursorWatchDir -Recurse -Force }
+                    }
+                }
+                if ($Target -eq "all" -or $Target -eq "agents") {
+                    Sync-Agents -Source $SourceAgents -CodexDest $DestCodexAgents -ClaudeDest $DestClaudeAgents
+                }
+
+                Write-Host "[WATCH] Deploy complete. Watching..." -ForegroundColor Green
+            }
+        }
+    } finally {
+        foreach ($w in $watchers) {
+            $w.EnableRaisingEvents = $false
+            $w.Dispose()
+        }
+        Write-Host "Watch mode stopped." -ForegroundColor DarkGray
+    }
 }

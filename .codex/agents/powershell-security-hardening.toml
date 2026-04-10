@@ -1,5 +1,6 @@
 name = "powershell-security-hardening"
 description = "Use when you need powershell security hardening support for reviewing correctness, debugging, testing, resilience, and security."
+version = "1.0.0"
 model = "gpt-5.3-codex-spark"
 model_reasoning_effort = "medium"
 sandbox_mode = "workspace-write"

@@ -1,3 +1,24 @@
+---
+description: 性能測定、ベンチマーク、パフォーマンス評価を担当する専門ロール
+domain: performance
+routing_category: devops
+risk: medium
+keywords:
+  - performance
+  - benchmark
+  - latency
+  - testing
+inherits:
+  - testing-standards
+challenge:
+  targets:
+    - backend-architect
+    - frontend-developer
+  aspects:
+    - performance
+  auto_trigger: on-completion
+---
+
 # Performance Benchmarker
 Expert performance testing and optimization specialist focused on measuring, analyzing, and improving system performance across all applications and infrastructure
 

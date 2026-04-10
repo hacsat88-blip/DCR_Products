@@ -1,5 +1,7 @@
-import { describe, it, expect } from "vitest";
+import { beforeEach, describe, it, expect } from "vitest";
 import { filterStocks, sortStocks, DEFAULT_FILTERS } from "@/lib/filters";
+import { restoreSavedScreenState, useStockStore } from "@/store/useStockStore";
+import type { SavedScreen } from "@/types/archive";
 import type { EvaluatedStock, StockFilters } from "@/types/stock";
 
 function makeEvaluatedStock(overrides: Partial<EvaluatedStock> = {}): EvaluatedStock {
@@ -314,5 +316,137 @@ describe("sortStocks", () => {
     const result = sortStocks(STOCKS, "revenue_growth_desc");
     const nullStock = result.find((s) => s.revenueGrowth === null);
     expect(result.indexOf(nullStock!)).toBe(result.length - 1);
+  });
+});
+
+describe("saved-screen restore parity", () => {
+  it("restores filters/sort/rankingSort/compare exactly from saved screen", () => {
+    const screen: SavedScreen = {
+      id: "screen-1",
+      name: "buy-now-watch",
+      filters: {
+        query: "通信",
+        sector: "IT",
+        action: "buy_now",
+        watch: "watching",
+        priceMax: 500,
+      },
+      sortKey: "price_asc",
+      rankingSortKey: "operating_cf_desc",
+      compareSelection: ["9424", "2337"],
+      createdAt: "2024-01-01T00:00:00Z",
+      updatedAt: "2024-01-01T00:00:00Z",
+    };
+
+    const restored = restoreSavedScreenState(screen);
+
+    expect(restored).toMatchObject({
+      filters: {
+        ...DEFAULT_FILTERS,
+        query: "通信",
+        sector: "IT",
+        action: "buy_now",
+        watch: "watching",
+        priceMax: 500,
+      },
+      sortKey: "price_asc",
+      rankingSortKey: "operating_cf_desc",
+      compareSelection: ["9424", "2337"],
+    });
+  });
+
+  it("ignores invalid filter value types and enums", () => {
+    const screen: SavedScreen = {
+      id: "screen-invalid",
+      name: "invalid-filters",
+      filters: {
+        query: 123,
+        sector: "IT",
+        action: "invalid",
+        marketCapBand: "small",
+        dividend: "with",
+        watch: "invalid",
+        priceMin: "100",
+        priceMax: 500,
+        pbrMax: Number.NaN,
+      },
+      sortKey: "score_desc",
+      createdAt: "2024-01-01T00:00:00Z",
+      updatedAt: "2024-01-01T00:00:00Z",
+    };
+
+    const restored = restoreSavedScreenState(screen);
+
+    expect(restored.filters).toMatchObject({
+      ...DEFAULT_FILTERS,
+      sector: "IT",
+      marketCapBand: "small",
+      dividend: "with",
+      priceMax: 500,
+      action: "all",
+      watch: "all",
+      priceMin: null,
+      pbrMax: null,
+      query: "",
+    });
+  });
+
+  it("trims compareSelection values and removes whitespace-only duplicates", () => {
+    const screen: SavedScreen = {
+      id: "screen-compare-trim",
+      name: "compare-trim",
+      filters: {},
+      sortKey: "score_desc",
+      compareSelection: [" 9424 ", "", "9424", "  ", "2337 "],
+      createdAt: "2024-01-01T00:00:00Z",
+      updatedAt: "2024-01-01T00:00:00Z",
+    };
+
+    const restored = restoreSavedScreenState(screen);
+
+    expect(restored.compareSelection).toEqual(["9424", "2337"]);
+  });
+});
+
+describe("saved-screen apply parity", () => {
+  beforeEach(() => {
+    window.localStorage.clear();
+    useStockStore.setState(useStockStore.getInitialState(), true);
+  });
+
+  it("applySavedScreen matches restoreSavedScreenState semantics", () => {
+    const screen: SavedScreen = {
+      id: "screen-apply",
+      name: "screen-apply",
+      filters: {
+        query: 123,
+        action: "buy_now",
+        watch: "invalid",
+        priceMax: 500,
+      },
+      sortKey: "invalid-sort-key",
+      rankingSortKey: "invalid-ranking-key",
+      compareSelection: ["9424", "", "9424", 123 as unknown as string],
+      createdAt: "2024-01-01T00:00:00Z",
+      updatedAt: "2024-01-01T00:00:00Z",
+    };
+
+    const expected = restoreSavedScreenState(screen);
+
+    useStockStore.setState({
+      savedScreens: [screen],
+      filters: { ...DEFAULT_FILTERS, query: "before" },
+      sortKey: "price_desc",
+      rankingSortKey: "action_priority",
+      compareSelection: ["4477"],
+    });
+
+    useStockStore.getState().applySavedScreen(screen.id);
+    const state = useStockStore.getState();
+
+    expect(state.filters).toEqual(expected.filters);
+    expect(state.sortKey).toBe(expected.sortKey);
+    expect(state.rankingSortKey).toBe(expected.rankingSortKey);
+    expect(state.compareSelection).toEqual(expected.compareSelection);
   });
 });
