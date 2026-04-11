@@ -1,7 +1,11 @@
 import json
+import logging
 import os
+import re
 import anthropic
 from server.models import PriceRequest, TradeDecision, Position, RiskSettings
+
+_logger = logging.getLogger(__name__)
 
 _SYSTEM_PROMPT = """あなたは日本株の短期トレーダーです。
 与えられた株価データと現在のポジション情報をもとに、
@@ -43,9 +47,13 @@ class AITrader:
             messages=[{"role": "user", "content": user_prompt}],
         )
         text = response.content[0].text.strip()
-        data = json.loads(text)
+        # Extract JSON even if Claude adds surrounding text
+        match = re.search(r"\{.*\}", text, re.DOTALL)
+        if not match:
+            raise ValueError(f"No JSON object found in response: {text[:80]}")
+        data = json.loads(match.group())
         return TradeDecision(
-            action=data["action"],
+            action=data["action"].lower(),  # normalize "BUY" → "buy"
             qty=data.get("qty", 0),
             reason=data.get("reason", ""),
         )
@@ -60,6 +68,7 @@ class AITrader:
         try:
             return self.decide(req, position, settings)
         except Exception as e:
+            _logger.exception("AITrader.decide failed")
             return TradeDecision(
                 action="hold",
                 qty=0,

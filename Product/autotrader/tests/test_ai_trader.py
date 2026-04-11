@@ -70,3 +70,29 @@ def test_decide_safe_returns_hold_on_invalid_json(mock_anthropic_cls):
     trader = AITrader()
     result = trader.decide_safe(PRICE_REQ, POSITION, SETTINGS)
     assert result.action == "hold"
+    assert "AI判断エラー" in result.reason
+
+
+@patch("server.engine.ai_trader.anthropic.Anthropic")
+def test_decide_with_json_wrapped_in_text(mock_anthropic_cls):
+    mock_client = MagicMock()
+    mock_anthropic_cls.return_value = mock_client
+    mock_client.messages.create.return_value = _mock_response(
+        'Sure! {"action": "buy", "qty": 50, "reason": "強いシグナル"}'
+    )
+    trader = AITrader()
+    result = trader.decide(PRICE_REQ, POSITION, SETTINGS)
+    assert result.action == "buy"
+    assert result.qty == 50
+
+
+@patch("server.engine.ai_trader.anthropic.Anthropic")
+def test_decide_normalizes_uppercase_action(mock_anthropic_cls):
+    mock_client = MagicMock()
+    mock_anthropic_cls.return_value = mock_client
+    mock_client.messages.create.return_value = _mock_response(
+        '{"action": "BUY", "qty": 100, "reason": "テスト"}'
+    )
+    trader = AITrader()
+    result = trader.decide(PRICE_REQ, POSITION, SETTINGS)
+    assert result.action == "buy"
