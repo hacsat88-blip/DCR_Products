@@ -1,5 +1,5 @@
 import pytest
-from datetime import datetime, timedelta
+from datetime import datetime, time, timedelta
 from server.models import TradeDecision, Position, RiskSettings
 from server.engine.risk_guard import RiskGuard, WARMUP_SECONDS
 
@@ -88,3 +88,30 @@ def test_update_settings(guard):
     new_settings = RiskSettings(limit_per_order=200_000, stop_loss_pct=5.0, max_qty_per_order=200)
     guard.update_settings(new_settings)
     assert guard.settings.limit_per_order == 200_000
+
+
+def test_market_hours_boundary_am_close(guard, empty_position):
+    # 11:30:00 は AM クローズ時刻 → 市場時間外扱い
+    t = time(11, 30, 0)
+    now = datetime.combine(MARKET_TIME.date(), t)
+    result = guard.apply(BUY, empty_position, 2500.0, now)
+    assert result.action == "hold"
+    assert "市場時間外" in result.reason
+
+
+def test_market_hours_boundary_pm_close(guard, empty_position):
+    # 15:30:00 は PM クローズ時刻 → 市場時間外扱い
+    t = time(15, 30, 0)
+    now = datetime.combine(MARKET_TIME.date(), t)
+    result = guard.apply(BUY, empty_position, 2500.0, now)
+    assert result.action == "hold"
+    assert "市場時間外" in result.reason
+
+
+def test_ai_sell_not_qty_capped(guard):
+    # 200株の売り注文はmax_qty_per_order=100にキャップされてはならない
+    position = Position(code="7203", qty=200, avg_cost=2500.0, pnl=0.0, pnl_pct=0.0)
+    decision = TradeDecision(action="sell", qty=200, reason="全売り")
+    result = guard.apply(decision, position, 2500.0, MARKET_TIME)
+    assert result.action == "sell"
+    assert result.qty == 200
