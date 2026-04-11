@@ -33,8 +33,8 @@ class RiskGuard:
 
         # 2. 市場時間外
         t = now.time()
-        in_am = _MARKET_AM[0] <= t <= _MARKET_AM[1]
-        in_pm = _MARKET_PM[0] <= t <= _MARKET_PM[1]
+        in_am = _MARKET_AM[0] <= t < _MARKET_AM[1]
+        in_pm = _MARKET_PM[0] <= t < _MARKET_PM[1]
         if not (in_am or in_pm):
             return TradeDecision(action="hold", qty=0, reason="市場時間外")
 
@@ -49,15 +49,16 @@ class RiskGuard:
         if decision.action == "hold":
             return decision
 
-        # 4. 数量上限
-        qty = min(decision.qty, s.max_qty_per_order)
-
-        # 5. 金額上限（単価上限まで数量を削減。1株でも超過するなら全拒否）
         if decision.action == "buy":
+            # 4. 買い数量上限
+            qty = min(decision.qty, s.max_qty_per_order)
+            # 5. 金額上限（単価上限まで数量を削減。1株でも超過するなら全拒否）
             max_qty_by_limit = int(s.limit_per_order / price) if price > 0 else 0
             qty = min(qty, max_qty_by_limit)
             if qty <= 0:
                 return TradeDecision(action="hold", qty=0, reason="発注上限金額超過")
+        else:
+            qty = decision.qty
 
         return TradeDecision(
             action=decision.action,
