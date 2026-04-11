@@ -1,6 +1,6 @@
 import pytest
 from datetime import datetime, timedelta
-from unittest.mock import AsyncMock, MagicMock, patch
+from unittest.mock import AsyncMock, MagicMock
 from fastapi.testclient import TestClient
 from fastapi import FastAPI
 from server.models import RiskSettings, TradeDecision
@@ -29,11 +29,9 @@ def setup(tmp_path, monkeypatch):
     return pos_mgr, guard, broadcast
 
 
-@patch("server.routes.price_feed.AITrader")
-def test_price_feed_returns_hold_by_default(mock_ai_cls, setup):
+def test_price_feed_returns_hold_by_default(setup):
     pos_mgr, guard, broadcast = setup
     mock_ai = MagicMock()
-    mock_ai_cls.return_value = mock_ai
     mock_ai.decide_safe.return_value = TradeDecision(action="hold", qty=0, reason="様子見")
 
     app = FastAPI()
@@ -41,15 +39,14 @@ def test_price_feed_returns_hold_by_default(mock_ai_cls, setup):
     tc = TestClient(app)
 
     res = tc.post("/api/price", json=PRICE_PAYLOAD)
+    broadcast.assert_called_once()
     assert res.status_code == 200
     assert res.json()["action"] == "hold"
 
 
-@patch("server.routes.price_feed.AITrader")
-def test_price_feed_buy_updates_position(mock_ai_cls, setup):
+def test_price_feed_buy_updates_position(setup):
     pos_mgr, guard, broadcast = setup
     mock_ai = MagicMock()
-    mock_ai_cls.return_value = mock_ai
     mock_ai.decide_safe.return_value = TradeDecision(action="buy", qty=10, reason="強い")
 
     app = FastAPI()
@@ -58,16 +55,15 @@ def test_price_feed_buy_updates_position(mock_ai_cls, setup):
 
     # 10株 × 2500円 = 25,000 < limit 100,000 → allow
     res = tc.post("/api/price", json=PRICE_PAYLOAD)
+    broadcast.assert_called_once()
     assert res.status_code == 200
     assert res.json()["action"] == "buy"
     assert pos_mgr.position.qty == 10
 
 
-@patch("server.routes.price_feed.AITrader")
-def test_price_feed_risk_guard_blocks_excessive_buy(mock_ai_cls, setup):
+def test_price_feed_risk_guard_blocks_excessive_buy(setup):
     pos_mgr, guard, broadcast = setup
     mock_ai = MagicMock()
-    mock_ai_cls.return_value = mock_ai
     # 2500円 × 100株 = 250,000 > limit 100,000 → qty adjusted to 40 or hold
     mock_ai.decide_safe.return_value = TradeDecision(action="buy", qty=100, reason="過剰")
 
@@ -76,6 +72,7 @@ def test_price_feed_risk_guard_blocks_excessive_buy(mock_ai_cls, setup):
     tc = TestClient(app)
 
     res = tc.post("/api/price", json=PRICE_PAYLOAD)
+    broadcast.assert_called_once()
     assert res.status_code == 200
     data = res.json()
     # qty が上限金額内に縮小されるか hold になる

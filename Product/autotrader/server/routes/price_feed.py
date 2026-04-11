@@ -26,7 +26,11 @@ def make_price_router(
         if decision.action == "buy":
             await pos_mgr.apply_buy(req.code, decision.qty, req.price)
         elif decision.action == "sell":
-            await pos_mgr.apply_sell(decision.qty, req.price)
+            try:
+                await pos_mgr.apply_sell(decision.qty, req.price)
+            except ValueError as e:
+                from fastapi import HTTPException
+                raise HTTPException(status_code=400, detail=str(e))
 
         await broadcast(
             price={"code": req.code, "current": req.price, "volume": req.volume},
