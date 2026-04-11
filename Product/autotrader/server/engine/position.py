@@ -1,3 +1,4 @@
+import asyncio
 import json
 from pathlib import Path
 from server.models import Position
@@ -8,6 +9,7 @@ STATE_FILE = Path("state.json")
 class PositionManager:
     def __init__(self):
         self._position = Position()
+        self._lock = asyncio.Lock()
         self._load()
 
     def _load(self):
@@ -19,35 +21,42 @@ class PositionManager:
                 self._position = Position()
 
     def _save(self):
-        STATE_FILE.write_text(
+        tmp = STATE_FILE.with_suffix(".tmp")
+        tmp.write_text(
             json.dumps({"position": self._position.model_dump()}, ensure_ascii=False),
             encoding="utf-8",
         )
+        tmp.replace(STATE_FILE)
 
     @property
     def position(self) -> Position:
         return self._position
 
-    def apply_buy(self, code: str, qty: int, price: float):
-        p = self._position
-        total_cost = p.avg_cost * p.qty + price * qty
-        p.qty += qty
-        p.avg_cost = total_cost / p.qty if p.qty > 0 else 0.0
-        p.code = code
-        self._update_pnl(price)
-        self._save()
+    async def apply_buy(self, code: str, qty: int, price: float):
+        async with self._lock:
+            p = self._position
+            total_cost = p.avg_cost * p.qty + price * qty
+            p.qty += qty
+            p.avg_cost = total_cost / p.qty if p.qty > 0 else 0.0
+            p.code = code
+            self._update_pnl(price)
+            self._save()
 
-    def apply_sell(self, qty: int, price: float):
-        p = self._position
-        p.qty = max(0, p.qty - qty)
-        if p.qty == 0:
-            p.avg_cost = 0.0
-            p.code = ""
-        self._update_pnl(price)
-        self._save()
+    async def apply_sell(self, qty: int, price: float):
+        async with self._lock:
+            p = self._position
+            if p.qty > 0 and qty > p.qty:
+                raise ValueError(f"Cannot sell {qty} shares; only {p.qty} held")
+            p.qty = max(0, p.qty - qty)
+            if p.qty == 0:
+                p.avg_cost = 0.0
+                p.code = ""
+            self._update_pnl(price)
+            self._save()
 
-    def update_price(self, price: float):
-        self._update_pnl(price)
+    async def update_price(self, price: float):
+        async with self._lock:
+            self._update_pnl(price)
 
     def _update_pnl(self, price: float):
         p = self._position
