@@ -10,6 +10,8 @@ class RiskGuard:
     def __init__(self, settings: RiskSettings, start_time: datetime):
         self._settings = settings
         self._start_time = start_time
+        self._order_date = start_time.date()
+        self._daily_order_count = 0
 
     @property
     def settings(self) -> RiskSettings:
@@ -17,6 +19,23 @@ class RiskGuard:
 
     def update_settings(self, settings: RiskSettings):
         self._settings = settings
+
+    @property
+    def daily_order_count(self) -> int:
+        return self._daily_order_count
+
+    def _reset_daily_order_count_if_needed(self, now: datetime):
+        if self._order_date != now.date():
+            self._order_date = now.date()
+            self._daily_order_count = 0
+
+    def record_order(self, decision: TradeDecision, now: datetime):
+        self._reset_daily_order_count_if_needed(now)
+        if decision.action in {"buy", "sell"} and decision.qty > 0:
+            self._daily_order_count += 1
+
+    def _holding_slots_used(self, position: Position) -> int:
+        return 1 if position.qty > 0 else 0
 
     def apply(
         self,
@@ -26,6 +45,7 @@ class RiskGuard:
         now: datetime,
     ) -> TradeDecision:
         s = self._settings
+        self._reset_daily_order_count_if_needed(now)
 
         # 1. ウォームアップ期間
         if (now - self._start_time).total_seconds() < WARMUP_SECONDS:
@@ -49,7 +69,22 @@ class RiskGuard:
         if decision.action == "hold":
             return decision
 
+        if self._daily_order_count >= s.effective_max_daily_orders:
+            return TradeDecision(action="hold", qty=0, reason="日次発注上限に到達")
+
         if decision.action == "buy":
+            if not (s.effective_price_min <= price <= s.effective_price_max):
+                return TradeDecision(
+                    action="hold",
+                    qty=0,
+                    reason=(
+                        f"価格帯外 ({s.effective_price_min}-{s.effective_price_max}円)"
+                    ),
+                )
+
+            if self._holding_slots_used(position) >= s.effective_max_concurrent_positions:
+                return TradeDecision(action="hold", qty=0, reason="同時保有上限に到達")
+
             # 4. 買い数量上限
             qty = min(decision.qty, s.max_qty_per_order)
             # 5. 金額上限（単価上限まで数量を削減。1株でも超過するなら全拒否）

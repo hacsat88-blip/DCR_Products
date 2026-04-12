@@ -67,6 +67,44 @@ def test_price_request_empty_ohlc():
         )
 
 
+def test_price_request_defaults_to_execution_rakuten_feed():
+    req = PriceRequest(
+        code="7203",
+        price=320.0,
+        volume=12000,
+        ohlc=[OHLCBar(o=315, h=325, l=310, c=320)],
+        timestamp=datetime.now(),
+    )
+    assert req.feed_role == "execution"
+    assert req.feed_source == "rakuten_rss"
+
+
+def test_price_request_reference_feed_defaults_to_jquants_light():
+    req = PriceRequest(
+        code="7203",
+        price=320.0,
+        volume=12000,
+        ohlc=[OHLCBar(o=315, h=325, l=310, c=320)],
+        timestamp=datetime.now(),
+        feed_role="reference",
+    )
+    assert req.feed_role == "reference"
+    assert req.feed_source == "jquants_light"
+
+
+def test_price_request_rejects_execution_reference_mismatch():
+    with pytest.raises(ValidationError):
+        PriceRequest(
+            code="7203",
+            price=320.0,
+            volume=12000,
+            ohlc=[OHLCBar(o=315, h=325, l=310, c=320)],
+            timestamp=datetime.now(),
+            feed_role="reference",
+            feed_source="rakuten_rss",
+        )
+
+
 def test_trade_decision_valid():
     d = TradeDecision(action="buy", qty=100, reason="テスト")
     assert d.order_type == "成行"
@@ -88,6 +126,33 @@ def test_risk_settings_defaults():
     assert s.stop_loss_pct == 3.0
     assert s.max_qty_per_order == 100
     assert s.poll_interval_sec == 5
+    assert s.trading_mode == "conservative"
+    assert s.available_cash < 300_000
+    assert s.execution_feed == "rakuten_rss"
+    assert s.reference_feed == "jquants_light"
+    assert s.prioritize_manual_price_band is True
+    assert s.manual_price_min == 100
+    assert s.manual_price_max == 500
+    assert s.suggested_price_min == 100
+    assert s.suggested_price_max == 290
+    assert s.effective_price_min == 100
+    assert s.effective_price_max == 500
+    assert s.effective_max_daily_orders == 3
+    assert s.effective_max_concurrent_positions == 1
+
+
+def test_risk_settings_auto_suggests_band_from_cash_when_manual_priority_disabled():
+    s = RiskSettings(
+        trading_mode="balanced",
+        available_cash=240_000,
+        prioritize_manual_price_band=False,
+    )
+    assert s.suggested_price_min == 100
+    assert s.suggested_price_max == 300
+    assert s.effective_price_min == 100
+    assert s.effective_price_max == 300
+    assert s.effective_max_daily_orders == 5
+    assert s.effective_max_concurrent_positions == 2
 
 
 def test_risk_settings_zero_limit():
