@@ -33,19 +33,19 @@ def long_position():
 
 def test_hold_during_warmup(empty_position):
     guard = RiskGuard(settings=SETTINGS, start_time=datetime.now())
-    result = guard.apply(BUY, empty_position, 2500.0, datetime.now())
+    result = guard.apply(BUY, empty_position, 250.0, datetime.now())
     assert result.action == "hold"
     assert "ウォームアップ" in result.reason
 
 
 def test_hold_after_hours(guard, empty_position):
-    result = guard.apply(BUY, empty_position, 2500.0, AFTER_HOURS)
+    result = guard.apply(BUY, empty_position, 250.0, AFTER_HOURS)
     assert result.action == "hold"
     assert "市場時間外" in result.reason
 
 
 def test_buy_allowed_in_market_hours(guard, empty_position):
-    result = guard.apply(BUY, empty_position, 2500.0, MARKET_TIME)
+    result = guard.apply(BUY, empty_position, 250.0, MARKET_TIME)
     assert result.action == "buy"
 
 
@@ -70,6 +70,7 @@ def test_qty_capped_to_max(guard, empty_position):
 
 def test_buy_blocked_when_price_exceeds_limit(guard, empty_position):
     # 200,000円 × 1株 = 200,000円 > limit 100,000円（1株すら購入不可）
+    guard.update_settings(RiskSettings(limit_per_order=100_000, manual_price_max=300_000))
     result = guard.apply(BUY, empty_position, 200_000.0, MARKET_TIME)
     assert result.action == "hold"
     assert "上限" in result.reason
@@ -84,6 +85,42 @@ def test_buy_qty_adjusted_to_fit_limit(guard, empty_position):
     assert result.qty * 500.0 <= SETTINGS.limit_per_order
 
 
+def test_buy_blocked_when_price_outside_effective_band(guard, empty_position):
+    result = guard.apply(BUY, empty_position, 550.0, MARKET_TIME)
+    assert result.action == "hold"
+    assert "価格帯" in result.reason
+
+
+def test_buy_uses_auto_price_band_when_manual_priority_disabled(empty_position):
+    settings = RiskSettings(
+        trading_mode="conservative",
+        available_cash=290_000,
+        prioritize_manual_price_band=False,
+    )
+    start = AFTER_HOURS - timedelta(seconds=WARMUP_SECONDS + 1)
+    guard = RiskGuard(settings=settings, start_time=start)
+    result = guard.apply(BUY, empty_position, 450.0, MARKET_TIME)
+    assert result.action == "hold"
+    assert "価格帯" in result.reason
+
+
+def test_buy_blocked_when_daily_order_limit_reached(empty_position):
+    settings = RiskSettings(max_daily_orders=1)
+    start = AFTER_HOURS - timedelta(seconds=WARMUP_SECONDS + 1)
+    guard = RiskGuard(settings=settings, start_time=start)
+    guard.record_order(TradeDecision(action="buy", qty=10, reason="1回目"), MARKET_TIME)
+    result = guard.apply(BUY, empty_position, 300.0, MARKET_TIME)
+    assert result.action == "hold"
+    assert "日次発注上限" in result.reason
+
+
+def test_buy_blocked_when_max_concurrent_positions_reached(guard, long_position):
+    guard.update_settings(RiskSettings(max_concurrent_positions=1))
+    result = guard.apply(BUY, long_position, 300.0, MARKET_TIME)
+    assert result.action == "hold"
+    assert "同時保有" in result.reason
+
+
 def test_update_settings(guard):
     new_settings = RiskSettings(limit_per_order=200_000, stop_loss_pct=5.0, max_qty_per_order=200)
     guard.update_settings(new_settings)
@@ -94,7 +131,7 @@ def test_market_hours_boundary_am_close(guard, empty_position):
     # 11:30:00 は AM クローズ時刻 → 市場時間外扱い
     t = time(11, 30, 0)
     now = datetime.combine(MARKET_TIME.date(), t)
-    result = guard.apply(BUY, empty_position, 2500.0, now)
+    result = guard.apply(BUY, empty_position, 250.0, now)
     assert result.action == "hold"
     assert "市場時間外" in result.reason
 
@@ -103,7 +140,7 @@ def test_market_hours_boundary_pm_close(guard, empty_position):
     # 15:30:00 は PM クローズ時刻 → 市場時間外扱い
     t = time(15, 30, 0)
     now = datetime.combine(MARKET_TIME.date(), t)
-    result = guard.apply(BUY, empty_position, 2500.0, now)
+    result = guard.apply(BUY, empty_position, 250.0, now)
     assert result.action == "hold"
     assert "市場時間外" in result.reason
 

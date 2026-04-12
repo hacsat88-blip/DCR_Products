@@ -1,6 +1,6 @@
 from datetime import datetime
 from typing import Callable, Awaitable
-from fastapi import APIRouter
+from fastapi import APIRouter, HTTPException
 from server.models import PriceRequest, TradeDecision
 from server.engine.ai_trader import AITrader
 from server.engine.gemini_trader import GeminiTrader
@@ -17,8 +17,34 @@ def make_price_router(
 ) -> APIRouter:
     r = APIRouter()
 
+    async def _broadcast_decision(req: PriceRequest, decision: TradeDecision):
+        await broadcast(
+            price={
+                "code": req.code,
+                "current": req.price,
+                "volume": req.volume,
+                "feed_role": req.feed_role,
+                "feed_source": req.feed_source,
+            },
+            action={
+                "action": decision.action,
+                "qty": decision.qty,
+                "reason": decision.reason,
+                "at": datetime.now().strftime("%H:%M:%S"),
+            },
+        )
+
     @r.post("/api/price", response_model=TradeDecision)
     async def receive_price(req: PriceRequest):
+        if req.feed_role == "reference":
+            decision = TradeDecision(
+                action="hold",
+                qty=0,
+                reason=f"参照フィード受信 ({req.feed_source})",
+            )
+            await _broadcast_decision(req, decision)
+            return decision
+
         await pos_mgr.update_price(req.price)
         position = pos_mgr.position
         mode = guard.settings.ai_mode
@@ -51,22 +77,15 @@ def make_price_router(
 
         if decision.action == "buy":
             await pos_mgr.apply_buy(req.code, decision.qty, req.price)
+            guard.record_order(decision, req.timestamp)
         elif decision.action == "sell":
             try:
                 await pos_mgr.apply_sell(decision.qty, req.price)
             except ValueError as e:
-                from fastapi import HTTPException
                 raise HTTPException(status_code=400, detail=str(e))
+            guard.record_order(decision, req.timestamp)
 
-        await broadcast(
-            price={"code": req.code, "current": req.price, "volume": req.volume},
-            action={
-                "action": decision.action,
-                "qty": decision.qty,
-                "reason": decision.reason,
-                "at": datetime.now().strftime("%H:%M:%S"),
-            },
-        )
+        await _broadcast_decision(req, decision)
         return decision
 
     return r
