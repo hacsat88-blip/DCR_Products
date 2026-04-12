@@ -146,4 +146,14 @@ describe("RiskSettingsAccordion", () => {
     await screen.findByText("settings update failed");
     expect(screen.getByLabelText("available_cash")).toHaveValue(310000);
   });
+
+  test("disables form actions when initial GET fails", async () => {
+    fetchMock.mockResolvedValueOnce(jsonResponse({ detail: "failed" }, 500));
+
+    render(createElement(RiskSettingsAccordion));
+    openAccordion();
+
+    await screen.findByText("settings fetch failed");
+    expect(screen.getByRole("button", { name: "保存" })).toBeDisabled();
+  });
 });

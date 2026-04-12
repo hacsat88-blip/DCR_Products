@@ -404,7 +404,14 @@ export function RiskSettingsAccordion(): JSX.Element {
               </div>
             </fieldset>
           ) : (
-            <p className="settings-muted-copy">{loading ? "settings loading" : "settings unavailable"}</p>
+            <>
+              <p className="settings-muted-copy">{loading ? "settings loading" : "settings unavailable"}</p>
+              <div className="settings-actions">
+                <button type="submit" className="settings-save-button" disabled>
+                  保存
+                </button>
+              </div>
+            </>
           )}
         </form>
       ) : null}
