@@ -11,6 +11,11 @@ vi.mock("@/hooks/useTraderSocket", () => ({
   useTraderSocket: (): TraderViewModel => useTraderSocketMock()
 }));
 
+vi.mock("@/components/RiskSettingsAccordion", () => ({
+  RiskSettingsAccordion: (): ReturnType<typeof createElement> =>
+    createElement("div", { children: "settings-panel-stub" })
+}));
+
 function buildEvent(overrides: Partial<TraderEventSnapshot> = {}): TraderEventSnapshot {
   return {
     action: "none",
