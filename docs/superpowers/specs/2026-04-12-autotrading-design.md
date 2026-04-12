@@ -27,7 +27,7 @@
   ├─ リスクガード適用
   ↓ 発注指示をレスポンスで返却
 [Excel VBA]
-  └─ RSS 発注関数で実際に発注
+  └─ 現在の source drop は RSS 発注スタブを記録（実発注 wiring は後続）
 [Python FastAPI サーバー :8000]
   ↓ WebSocket (/ws)
 [Next.js ダッシュボード :3000]
@@ -51,7 +51,7 @@ Product/
 ├── autotrader-ui/     # SP-3: Next.js ダッシュボード
 ```
 
-Excel ワークブックはリポジトリルートの `autotrader.xlsm` として配置する（Git 管理は任意）。
+Excel ワークブックはリポジトリルートの `autotrader.xlsm` として配置する（Git 管理は任意）。Git では `Product/autotrader-vba/` に text source を置き、workbook へ import する。
 
 ---
 
@@ -96,7 +96,7 @@ POST /api/price
   "code": "1234",
   "price": 2500,
   "volume": 12000,
-  "ohlc": [{"o":2490,"h":2510,"l":2485,"c":2500,"v":50000}, ...],  // 直近20本
+  "ohlc": [{"o":2490,"h":2510,"l":2485,"c":2500,"v":50000}, ...],  // 直近5本
   "timestamp": "2026-04-12T10:30:00"
 }
 
@@ -178,17 +178,17 @@ autotrader.xlsm
 ### 動作フロー
 
 ```
-1. [起動] Workbook_Open → タイマー開始（5秒間隔）
+1. [起動] Workbook_Open でブックを開く → Control シートから START を押してタイマー開始（5秒間隔）
 
-2. [価格取得] RSS 関数で現在値・出来高を取得。OHLC は VBA 側でメモリ上に最大20本分を蓄積する
+2. [価格取得] RSS 関数で現在値・出来高を取得。OHLC は VBA 側で最大20本分を保持しつつ、API には直近5本を送る
    （起動直後は蓄積本数が少ないため、Python サーバーのウォームアップ期間中は発注しない）
-   例: =RssMarket("1234", "現在値")
+  例: =RSS|'1234.T'!'現在値'
 
 3. [Python へ POST] /api/price へ JSON 送信（MSXML2.ServerXMLHTTP.6.0 使用）
 
 4. [レスポンス解析]
-   action = "buy"  → RSS 現物買い発注
-   action = "sell" → RSS 現物売り発注
+  action = "buy"  → 現在の source drop では BUY_STUB を記録（実発注は未接続）
+  action = "sell" → 現在の source drop では SELL_STUB を記録（実発注は未接続）
    action = "hold" → 何もしない
   reference_status / reference_price / warning_message は表示とログにのみ使う
 
