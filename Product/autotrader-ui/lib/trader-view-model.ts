@@ -12,7 +12,7 @@ import type {
   TraderViewModel
 } from "@/types/trader";
 
-const AI_MODES: AISelectionMode[] = ["gemini", "hybrid"];
+const AI_MODES: AISelectionMode[] = ["gemini"];
 const FEED_ROLES: FeedRole[] = ["execution", "reference"];
 const FEED_SOURCES: FeedSource[] = ["rakuten_rss", "jquants_light", "jquants_free"];
 const RAW_ACTIONS: RawTraderAction[] = ["buy", "sell", "hold", "none"];
@@ -32,6 +32,29 @@ function isNullableNumber(value: unknown): value is number | null {
 
 function isOneOf<T extends string>(value: unknown, candidates: T[]): value is T {
   return typeof value === "string" && candidates.includes(value as T);
+}
+
+function isRawTraderPrice(value: unknown): value is RawTraderPayload["price"] {
+  return (
+    isRecord(value) &&
+    typeof value.code === "string" &&
+    isFiniteNumber(value.current) &&
+    isFiniteNumber(value.volume) &&
+    isOneOf(value.feed_role, FEED_ROLES) &&
+    isOneOf(value.feed_source, FEED_SOURCES)
+  );
+}
+
+function isRawTraderActionPayload(value: unknown): value is RawTraderPayload["last_action"] {
+  return (
+    isRecord(value) &&
+    isOneOf(value.action, RAW_ACTIONS) &&
+    isFiniteNumber(value.qty) &&
+    typeof value.reason === "string" &&
+    typeof value.at === "string" &&
+    isOneOf(value.feed_role, FEED_ROLES) &&
+    isOneOf(value.feed_source, FEED_SOURCES)
+  );
 }
 
 function isRawTraderRiskSnapshot(value: unknown): value is RawTraderRiskSnapshot {
@@ -68,24 +91,16 @@ export function isRawTraderPayload(value: unknown): value is RawTraderPayload {
     return false;
   }
 
-  if (!isRecord(value.price) || !isRecord(value.position) || !isRecord(value.last_action)) {
+  if (!isRawTraderPrice(value.price) || !isRecord(value.position) || !isRawTraderActionPayload(value.last_action)) {
     return false;
   }
 
   return (
-    typeof value.price.code === "string" &&
-    isFiniteNumber(value.price.current) &&
-    isFiniteNumber(value.price.volume) &&
-    isOneOf(value.price.feed_role, FEED_ROLES) &&
-    isOneOf(value.price.feed_source, FEED_SOURCES) &&
+    (value.reference_price === null || isRawTraderPrice(value.reference_price)) &&
     isFiniteNumber(value.position.qty) &&
     isFiniteNumber(value.position.avg_cost) &&
     isFiniteNumber(value.position.pnl) &&
     isFiniteNumber(value.position.pnl_pct) &&
-    isOneOf(value.last_action.action, RAW_ACTIONS) &&
-    isFiniteNumber(value.last_action.qty) &&
-    typeof value.last_action.reason === "string" &&
-    typeof value.last_action.at === "string" &&
     isRawTraderRiskSnapshot(value.risk)
   );
 }
@@ -100,9 +115,29 @@ function toEventSnapshot(raw: RawTraderPayload): TraderEventSnapshot {
     qty: raw.last_action.qty,
     reason: raw.last_action.reason,
     at: raw.last_action.at,
-    feedRole: raw.price.feed_role,
-    feedSource: raw.price.feed_source
+    feedRole: raw.last_action.feed_role,
+    feedSource: raw.last_action.feed_source
   };
+}
+
+function toPriceSnapshot(raw: RawTraderPayload["price"]): TraderViewModel["latestPrice"] {
+  return {
+    code: raw.code,
+    current: raw.current,
+    volume: raw.volume,
+    feedRole: raw.feed_role,
+    feedSource: raw.feed_source
+  };
+}
+
+function isExecutionPlaceholder(price: RawTraderPayload["price"]): boolean {
+  return (
+    price.code === "-" &&
+    price.current === 0 &&
+    price.volume === 0 &&
+    price.feed_role === "execution" &&
+    price.feed_source === "rakuten_rss"
+  );
 }
 
 export function createInitialTraderState(
@@ -112,6 +147,13 @@ export function createInitialTraderState(
     connectionState,
     lastUpdatedAt: null,
     latestPrice: {
+      code: null,
+      current: null,
+      volume: null,
+      feedRole: null,
+      feedSource: null
+    },
+    referencePrice: {
       code: null,
       current: null,
       volume: null,
@@ -157,17 +199,18 @@ export function reduceTraderState(
     latestEvent.action === "buy" || latestEvent.action === "sell"
       ? trimHistory([...current.orderHistory, latestEvent])
       : current.orderHistory;
+  const latestPrice = isExecutionPlaceholder(raw.price)
+    ? current.latestPrice
+    : toPriceSnapshot(raw.price);
+  const referencePrice = raw.reference_price
+    ? toPriceSnapshot(raw.reference_price)
+    : current.referencePrice;
 
   return {
     connectionState: "connected",
     lastUpdatedAt: raw.ts,
-    latestPrice: {
-      code: raw.price.code,
-      current: raw.price.current,
-      volume: raw.price.volume,
-      feedRole: raw.price.feed_role,
-      feedSource: raw.price.feed_source
-    },
+    latestPrice,
+    referencePrice,
     positionSnapshot: {
       qty: raw.position.qty,
       avgCost: raw.position.avg_cost,

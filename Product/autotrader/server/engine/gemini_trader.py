@@ -28,7 +28,15 @@ _SYSTEM_PROMPT = """あなたは日本株の短期トレーダーです。
 
 class GeminiTrader:
     def __init__(self):
-        self._client = genai.Client(api_key=os.environ["GOOGLE_API_KEY"])
+        self._client: genai.Client | None = None
+
+    def _get_client(self) -> genai.Client:
+        if self._client is None:
+            api_key = os.environ.get("GOOGLE_API_KEY", "").strip()
+            if not api_key:
+                raise RuntimeError("GOOGLE_API_KEY not set")
+            self._client = genai.Client(api_key=api_key)
+        return self._client
 
     def decide(
         self,
@@ -45,7 +53,7 @@ class GeminiTrader:
             f"リスク設定: 1発注上限 {settings.limit_per_order}円 / "
             f"損切りライン {settings.stop_loss_pct}% / 最大数量 {settings.max_qty_per_order}株"
         )
-        response = self._client.models.generate_content(
+        response = self._get_client().models.generate_content(
             model=GEMINI_MODEL,
             contents=user_prompt,
             config=types.GenerateContentConfig(

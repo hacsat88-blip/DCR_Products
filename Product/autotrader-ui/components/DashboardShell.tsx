@@ -17,7 +17,11 @@ export function DashboardShell({ state }: DashboardShellProps): JSX.Element {
       <StatusHeader connectionState={state.connectionState} lastUpdatedAt={state.lastUpdatedAt} />
 
       <section className="dashboard-top-grid">
-        <PricePanel price={state.latestPrice} connectionState={state.connectionState} />
+        <PricePanel
+          executionPrice={state.latestPrice}
+          referencePrice={state.referencePrice}
+          connectionState={state.connectionState}
+        />
         <PositionPanel position={state.positionSnapshot} />
         <LatestActionCard event={state.latestEvent} />
       </section>

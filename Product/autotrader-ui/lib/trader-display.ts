@@ -14,8 +14,7 @@ const ACTION_LABELS: Record<RawTraderAction, string> = {
 };
 
 const AI_MODE_LABELS: Record<AISelectionMode, string> = {
-  gemini: "Gemini",
-  hybrid: "ハイブリッド"
+  gemini: "Gemini"
 };
 
 const TRADE_MODE_LABELS: Record<TradeMode, string> = {

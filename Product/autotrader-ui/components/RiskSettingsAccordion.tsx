@@ -29,7 +29,7 @@ interface RiskSettingsDraft {
   effective_max_concurrent_positions: number;
 }
 
-const AI_MODE_OPTIONS: AISelectionMode[] = ["gemini", "hybrid"];
+const AI_MODE_OPTIONS: AISelectionMode[] = ["gemini"];
 const TRADE_MODE_OPTIONS: TradeMode[] = ["conservative", "balanced", "aggressive"];
 const FIELD_LABELS = {
   limit_per_order: "1回あたり上限金額",
@@ -347,7 +347,7 @@ export function RiskSettingsAccordion(): JSX.Element {
                   <select
                     aria-label={getFieldLabel("ai_mode")}
                     value={draft.ai_mode}
-                    disabled={formDisabled}
+                    disabled={true}
                     onChange={(event) => updateDraft("ai_mode", event.target.value)}
                   >
                     {AI_MODE_OPTIONS.map((option) => (

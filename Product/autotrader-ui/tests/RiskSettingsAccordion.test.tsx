@@ -69,8 +69,9 @@ describe("RiskSettingsAccordion", () => {
     expect(screen.getByText("J-Quants Light")).toBeInTheDocument();
 
     const aiMode = screen.getByLabelText("AI モード") as HTMLSelectElement;
-    expect(Array.from(aiMode.options).map((option) => option.value)).toEqual(["gemini", "hybrid"]);
-    expect(Array.from(aiMode.options).map((option) => option.text)).toEqual(["Gemini", "ハイブリッド"]);
+    expect(Array.from(aiMode.options).map((option) => option.value)).toEqual(["gemini"]);
+    expect(Array.from(aiMode.options).map((option) => option.text)).toEqual(["Gemini"]);
+    expect(aiMode).toBeDisabled();
 
     const tradeMode = screen.getByLabelText("売買モード") as HTMLSelectElement;
     expect(Array.from(tradeMode.options).map((option) => option.value)).toEqual([

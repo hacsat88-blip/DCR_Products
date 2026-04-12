@@ -12,17 +12,29 @@ def make_ws_router(
 ) -> tuple[APIRouter, Callable]:
     r = APIRouter()
     _clients: list[WebSocket] = []
-    _last_price: dict = {"code": "-", "current": 0.0, "volume": 0}
+    _last_execution_price: dict = {
+        "code": "-",
+        "current": 0.0,
+        "volume": 0,
+        "feed_role": "execution",
+        "feed_source": "rakuten_rss",
+    }
+    _last_reference_price: dict | None = None
     _last_action: dict = {"action": "none", "qty": 0, "reason": "起動中", "at": ""}
 
     async def broadcast(price: dict, action: dict) -> None:
-        _last_price.update(price)
+        nonlocal _last_reference_price
+        if price.get("feed_role") == "reference":
+            _last_reference_price = price.copy()
+        else:
+            _last_execution_price.update(price)
         _last_action.update(action)
         pos = pos_mgr.position
         payload = {
             "type": "state_update",
             "ts": datetime.now().isoformat(),
-            "price": _last_price.copy(),
+            "price": _last_execution_price.copy(),
+            "reference_price": None if _last_reference_price is None else _last_reference_price.copy(),
             "position": {
                 "qty": pos.qty,
                 "avg_cost": pos.avg_cost,

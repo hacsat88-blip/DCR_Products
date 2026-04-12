@@ -18,7 +18,6 @@ describe("trader-display", () => {
 
   test("maps AI and trading modes to localized labels", () => {
     expect(getAiModeLabel("gemini")).toBe("Gemini");
-    expect(getAiModeLabel("hybrid")).toBe("ハイブリッド");
     expect(getTradeModeLabel("conservative")).toBe("慎重");
     expect(getTradeModeLabel("balanced")).toBe("標準");
     expect(getTradeModeLabel("aggressive")).toBe("積極");

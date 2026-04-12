@@ -10,8 +10,9 @@ import { reduceTraderState } from "@/lib/trader-view-model";
 import { useTraderSocket } from "@/hooks/useTraderSocket";
 import type { RawTraderPayload } from "@/types/trader";
 
-type PayloadOverrides = Partial<Omit<RawTraderPayload, "price" | "position" | "last_action" | "risk">> & {
+type PayloadOverrides = Partial<Omit<RawTraderPayload, "price" | "reference_price" | "position" | "last_action" | "risk">> & {
   price?: Partial<RawTraderPayload["price"]>;
+  reference_price?: Partial<NonNullable<RawTraderPayload["reference_price"]>> | null;
   position?: Partial<RawTraderPayload["position"]>;
   last_action?: Partial<RawTraderPayload["last_action"]>;
   risk?: Partial<RawTraderPayload["risk"]>;
@@ -43,6 +44,7 @@ const BASE_RISK: RawTraderPayload["risk"] = {
 function buildPayload(overrides: PayloadOverrides = {}): RawTraderPayload {
   const {
     price,
+    reference_price,
     position,
     last_action,
     risk,
@@ -60,6 +62,17 @@ function buildPayload(overrides: PayloadOverrides = {}): RawTraderPayload {
       feed_source: "rakuten_rss",
       ...price
     },
+    reference_price:
+      reference_price === undefined || reference_price === null
+        ? null
+        : {
+            code: "7203",
+            current: 251,
+            volume: 10500,
+            feed_role: "reference",
+            feed_source: "jquants_light",
+            ...reference_price
+          },
     position: {
       qty: 0,
       avg_cost: 0,
@@ -72,6 +85,8 @@ function buildPayload(overrides: PayloadOverrides = {}): RawTraderPayload {
       qty: 10,
       reason: "初回買い",
       at: "10:30:05",
+      feed_role: "execution",
+      feed_source: "rakuten_rss",
       ...last_action
     },
     risk: {
@@ -122,13 +137,23 @@ describe("reduceTraderState", () => {
   test("reference hold stays in ai log but not in order history", () => {
     const next = reduceTraderState(undefined, buildPayload({
       price: {
+        current: 250,
+        volume: 10000,
+        feed_role: "execution",
+        feed_source: "rakuten_rss"
+      },
+      reference_price: {
+        current: 251,
+        volume: 10500,
         feed_role: "reference",
         feed_source: "jquants_free"
       },
       last_action: {
         action: "hold",
         qty: 0,
-        reason: "参照フィード受信"
+        reason: "J-Quants 参照更新",
+        feed_role: "reference",
+        feed_source: "jquants_free"
       },
       risk: {
         reference_feed: "jquants_free"
@@ -138,6 +163,8 @@ describe("reduceTraderState", () => {
     expect(next.aiEventHistory).toHaveLength(1);
     expect(next.orderHistory).toHaveLength(0);
     expect(next.latestEvent.feedRole).toBe("reference");
+    expect(next.latestPrice.feedRole).toBe("execution");
+    expect(next.referencePrice.feedRole).toBe("reference");
   });
 
   test("rejects malformed payloads and preserves previous state", () => {

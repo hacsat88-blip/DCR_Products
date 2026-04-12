@@ -3,7 +3,7 @@ from datetime import datetime
 from pydantic import BaseModel, Field, computed_field, field_validator, model_validator
 
 TradeMode = Literal["conservative", "balanced", "aggressive"]
-AISelectionMode = Literal["gemini", "hybrid"]
+AISelectionMode = Literal["gemini"]
 FeedRole = Literal["execution", "reference"]
 FeedSource = Literal["rakuten_rss", "jquants_light", "jquants_free"]
 

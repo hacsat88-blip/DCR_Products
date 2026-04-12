@@ -39,6 +39,13 @@ function buildState(overrides: Partial<TraderViewModel> = {}): TraderViewModel {
       feedRole: null,
       feedSource: null
     },
+    referencePrice: {
+      code: null,
+      current: null,
+      volume: null,
+      feedRole: null,
+      feedSource: null
+    },
     positionSnapshot: {
       qty: null,
       avgCost: null,
@@ -140,13 +147,20 @@ describe("HomePage dashboard shell", () => {
           code: "7203",
           current: 251,
           volume: 10500,
+          feedRole: "execution",
+          feedSource: "rakuten_rss"
+        },
+        referencePrice: {
+          code: "7203",
+          current: 251,
+          volume: 10500,
           feedRole: "reference",
           feedSource: "jquants_free"
         },
         latestEvent: buildEvent({
           action: "hold",
           qty: 0,
-          reason: "参照フィード受信",
+          reason: "J-Quants 参照更新",
           at: "10:31:00",
           feedRole: "reference",
           feedSource: "jquants_free"
@@ -155,7 +169,7 @@ describe("HomePage dashboard shell", () => {
           buildEvent({
             action: "hold",
             qty: 0,
-            reason: "参照フィード受信",
+            reason: "J-Quants 参照更新",
             at: "10:31:00",
             feedRole: "reference",
             feedSource: "jquants_free"
@@ -167,8 +181,10 @@ describe("HomePage dashboard shell", () => {
 
     render(createElement(HomePage));
 
+    expect(screen.getByText("執行 / 楽天RSS")).toBeInTheDocument();
+    expect(screen.getByText("参照価格 ¥251.00")).toBeInTheDocument();
     expect(screen.getByText("参照 / J-Quants Free")).toBeInTheDocument();
-    expect(screen.getByText("参照フィード受信")).toBeInTheDocument();
+    expect(screen.getByText("J-Quants 参照更新")).toBeInTheDocument();
     expect(screen.getByText(/^見送り$/)).toBeInTheDocument();
     expect(screen.getByText("注文イベントなし")).toBeInTheDocument();
   });

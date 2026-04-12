@@ -126,6 +126,7 @@ def test_risk_settings_defaults():
     assert s.stop_loss_pct == 3.0
     assert s.max_qty_per_order == 100
     assert s.poll_interval_sec == 5
+    assert s.ai_mode == "gemini"
     assert s.trading_mode == "conservative"
     assert s.available_cash < 300_000
     assert s.execution_feed == "rakuten_rss"
@@ -163,6 +164,11 @@ def test_risk_settings_zero_limit():
 def test_risk_settings_zero_stop_loss():
     with pytest.raises(ValidationError):
         RiskSettings(stop_loss_pct=0)
+
+
+def test_risk_settings_rejects_non_gemini_ai_mode():
+    with pytest.raises(ValidationError):
+        RiskSettings(ai_mode="hybrid")
 
 
 def test_position_defaults():

@@ -1,4 +1,4 @@
-export type AISelectionMode = "gemini" | "hybrid";
+export type AISelectionMode = "gemini";
 export type TradeMode = "conservative" | "balanced" | "aggressive";
 export type FeedRole = "execution" | "reference";
 export type FeedSource = "rakuten_rss" | "jquants_light" | "jquants_free";
@@ -24,6 +24,8 @@ export interface RawTraderActionPayload {
   qty: number;
   reason: string;
   at: string;
+  feed_role: FeedRole;
+  feed_source: FeedSource;
 }
 
 export interface RawTraderRiskSnapshot {
@@ -55,6 +57,7 @@ export interface RawTraderPayload {
   type: "state_update";
   ts: string;
   price: RawTraderPrice;
+  reference_price: RawTraderPrice | null;
   position: RawTraderPosition;
   last_action: RawTraderActionPayload;
   risk: RawTraderRiskSnapshot;
@@ -90,6 +93,7 @@ export interface TraderViewModel {
   connectionState: ConnectionState;
   lastUpdatedAt: string | null;
   latestPrice: TraderPriceSnapshot;
+  referencePrice: TraderPriceSnapshot;
   positionSnapshot: TraderPositionSnapshot;
   latestEvent: TraderEventSnapshot;
   aiEventHistory: TraderEventSnapshot[];

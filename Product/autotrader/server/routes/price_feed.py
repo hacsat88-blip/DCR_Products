@@ -1,8 +1,7 @@
 from datetime import datetime
 from typing import Callable, Awaitable
 from fastapi import APIRouter, HTTPException
-from server.models import PriceRequest, TradeDecision
-from server.engine.ai_trader import AITrader
+from server.models import FeedSource, PriceRequest, TradeDecision
 from server.engine.gemini_trader import GeminiTrader
 from server.engine.risk_guard import RiskGuard
 from server.engine.position import PositionManager
@@ -10,10 +9,10 @@ from server.engine.position import PositionManager
 
 def make_price_router(
     gemini_ai: GeminiTrader,
-    claude_ai: AITrader,
     guard: RiskGuard,
     pos_mgr: PositionManager,
     broadcast: Callable[..., Awaitable[None]],
+    schedule_reference_publish: Callable[[str, FeedSource], None] | None = None,
 ) -> APIRouter:
     r = APIRouter()
 
@@ -31,6 +30,8 @@ def make_price_router(
                 "qty": decision.qty,
                 "reason": decision.reason,
                 "at": datetime.now().strftime("%H:%M:%S"),
+                "feed_role": req.feed_role,
+                "feed_source": req.feed_source,
             },
         )
 
@@ -47,31 +48,7 @@ def make_price_router(
 
         await pos_mgr.update_price(req.price)
         position = pos_mgr.position
-        mode = guard.settings.ai_mode
-
-        if mode == "hybrid":
-            gemini_raw = gemini_ai.decide_safe(req, position, guard.settings)
-            claude_raw = claude_ai.decide_safe(req, position, guard.settings)
-            if gemini_raw.action == claude_raw.action:
-                raw = TradeDecision(
-                    action=gemini_raw.action,
-                    qty=min(gemini_raw.qty, claude_raw.qty),
-                    reason=(
-                        f"合意: Gemini={gemini_raw.reason[:20]}"
-                        f" / Claude={claude_raw.reason[:20]}"
-                    ),
-                )
-            else:
-                raw = TradeDecision(
-                    action="hold",
-                    qty=0,
-                    reason=(
-                        f"AI不一致"
-                        f"(Gemini:{gemini_raw.action}/Claude:{claude_raw.action})"
-                    ),
-                )
-        else:  # "gemini"
-            raw = gemini_ai.decide_safe(req, position, guard.settings)
+        raw = gemini_ai.decide_safe(req, position, guard.settings)
 
         decision = guard.apply(raw, position, req.price, req.timestamp)
 
@@ -86,6 +63,8 @@ def make_price_router(
             guard.record_order(decision, req.timestamp)
 
         await _broadcast_decision(req, decision)
+        if schedule_reference_publish is not None:
+            schedule_reference_publish(req.code, guard.settings.reference_feed)
         return decision
 
     return r

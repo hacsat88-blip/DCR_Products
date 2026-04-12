@@ -75,9 +75,60 @@ def test_broadcast_sends_state_update_payload(tmp_path, monkeypatch):
     assert payload["type"] == "state_update"
     assert payload["price"]["feed_role"] == "execution"
     assert payload["price"]["feed_source"] == "rakuten_rss"
+    assert payload["reference_price"] is None
     assert payload["last_action"]["action"] == "buy"
     assert payload["position"]["qty"] == 10
     assert payload["risk"]["execution_feed"] == "rakuten_rss"
+
+
+def test_broadcast_keeps_execution_price_when_reference_updates(tmp_path, monkeypatch):
+    pos_mgr, guard = _make_components(tmp_path, monkeypatch)
+    _, broadcast = make_ws_router(pos_mgr, guard)
+    clients = inspect.getclosurevars(broadcast).nonlocals["_clients"]
+    fake_ws = FakeWebSocket()
+    clients.append(fake_ws)
+
+    asyncio.run(
+        broadcast(
+            price={
+                "code": "7203",
+                "current": 250.0,
+                "volume": 10000,
+                "feed_role": "execution",
+                "feed_source": "rakuten_rss",
+            },
+            action={
+                "action": "buy",
+                "qty": 10,
+                "reason": "初回買い",
+                "at": "10:00:00",
+            },
+        )
+    )
+    asyncio.run(
+        broadcast(
+            price={
+                "code": "7203",
+                "current": 251.5,
+                "volume": 12000,
+                "feed_role": "reference",
+                "feed_source": "jquants_free",
+            },
+            action={
+                "action": "hold",
+                "qty": 0,
+                "reason": "J-Quants 参照更新",
+                "at": "10:00:01",
+            },
+        )
+    )
+
+    payload = json.loads(fake_ws.messages[-1])
+    assert payload["price"]["feed_role"] == "execution"
+    assert payload["price"]["current"] == 250.0
+    assert payload["reference_price"]["feed_role"] == "reference"
+    assert payload["reference_price"]["feed_source"] == "jquants_free"
+    assert payload["last_action"]["reason"] == "J-Quants 参照更新"
 
 
 def test_broadcast_removes_dead_clients(tmp_path, monkeypatch):

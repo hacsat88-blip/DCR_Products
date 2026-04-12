@@ -29,9 +29,17 @@ def setup(tmp_path, monkeypatch):
     return pos_mgr, guard, broadcast
 
 
-def _make_app(gemini_ai, claude_ai, guard, pos_mgr, broadcast):
+def _make_app(gemini_ai, guard, pos_mgr, broadcast, schedule_reference_publish=None):
     app = FastAPI()
-    app.include_router(make_price_router(gemini_ai, claude_ai, guard, pos_mgr, broadcast))
+    app.include_router(
+        make_price_router(
+            gemini_ai,
+            guard,
+            pos_mgr,
+            broadcast,
+            schedule_reference_publish=schedule_reference_publish,
+        )
+    )
     return TestClient(app)
 
 
@@ -41,29 +49,30 @@ def test_price_feed_returns_hold_by_default(setup):
     pos_mgr, guard, broadcast = setup
     mock_gemini = MagicMock()
     mock_gemini.decide_safe.return_value = TradeDecision(action="hold", qty=0, reason="様子見")
-    mock_claude = MagicMock()
+    schedule_reference_publish = MagicMock()
 
-    tc = _make_app(mock_gemini, mock_claude, guard, pos_mgr, broadcast)
+    tc = _make_app(mock_gemini, guard, pos_mgr, broadcast, schedule_reference_publish)
     res = tc.post("/api/price", json=PRICE_PAYLOAD)
     broadcast.assert_called_once()
     assert res.status_code == 200
     assert res.json()["action"] == "hold"
-    mock_claude.decide_safe.assert_not_called()  # gemini モードは Claude を呼ばない
+    schedule_reference_publish.assert_called_once_with("7203", "jquants_light")
 
 
 def test_price_feed_buy_updates_position(setup):
     pos_mgr, guard, broadcast = setup
     mock_gemini = MagicMock()
     mock_gemini.decide_safe.return_value = TradeDecision(action="buy", qty=10, reason="強い")
-    mock_claude = MagicMock()
+    schedule_reference_publish = MagicMock()
 
-    tc = _make_app(mock_gemini, mock_claude, guard, pos_mgr, broadcast)
+    tc = _make_app(mock_gemini, guard, pos_mgr, broadcast, schedule_reference_publish)
     # 10株 × 250円 = 2,500 < limit 100,000 → allow
     res = tc.post("/api/price", json=PRICE_PAYLOAD)
     broadcast.assert_called_once()
     assert res.status_code == 200
     assert res.json()["action"] == "buy"
     assert pos_mgr.position.qty == 10
+    schedule_reference_publish.assert_called_once_with("7203", "jquants_light")
 
 
 def test_price_feed_risk_guard_blocks_excessive_buy(setup):
@@ -71,9 +80,9 @@ def test_price_feed_risk_guard_blocks_excessive_buy(setup):
     mock_gemini = MagicMock()
     # 250円 × 500株 = 125,000 > limit 100,000 → qty が 400 に縮小
     mock_gemini.decide_safe.return_value = TradeDecision(action="buy", qty=500, reason="過剰")
-    mock_claude = MagicMock()
+    schedule_reference_publish = MagicMock()
 
-    tc = _make_app(mock_gemini, mock_claude, guard, pos_mgr, broadcast)
+    tc = _make_app(mock_gemini, guard, pos_mgr, broadcast, schedule_reference_publish)
     res = tc.post("/api/price", json=PRICE_PAYLOAD)
     broadcast.assert_called_once()
     assert res.status_code == 200
@@ -81,14 +90,15 @@ def test_price_feed_risk_guard_blocks_excessive_buy(setup):
     assert data["action"] in ("buy", "hold")
     if data["action"] == "buy":
         assert data["qty"] * PRICE_PAYLOAD["price"] <= guard.settings.limit_per_order
+    schedule_reference_publish.assert_called_once_with("7203", "jquants_light")
 
 
 def test_price_feed_reference_feed_skips_ai_and_execution(setup):
     pos_mgr, guard, broadcast = setup
     mock_gemini = MagicMock()
-    mock_claude = MagicMock()
+    schedule_reference_publish = MagicMock()
 
-    tc = _make_app(mock_gemini, mock_claude, guard, pos_mgr, broadcast)
+    tc = _make_app(mock_gemini, guard, pos_mgr, broadcast, schedule_reference_publish)
     res = tc.post(
         "/api/price",
         json={
@@ -102,7 +112,7 @@ def test_price_feed_reference_feed_skips_ai_and_execution(setup):
     assert res.json()["action"] == "hold"
     assert "参照フィード" in res.json()["reason"]
     mock_gemini.decide_safe.assert_not_called()
-    mock_claude.decide_safe.assert_not_called()
+    schedule_reference_publish.assert_not_called()
     assert pos_mgr.position.qty == 0
 
 
@@ -114,9 +124,9 @@ def test_price_feed_records_orders_against_daily_limit(setup):
         TradeDecision(action="buy", qty=10, reason="初回買い"),
         TradeDecision(action="sell", qty=10, reason="利益確定"),
     ]
-    mock_claude = MagicMock()
+    schedule_reference_publish = MagicMock()
 
-    tc = _make_app(mock_gemini, mock_claude, guard, pos_mgr, broadcast)
+    tc = _make_app(mock_gemini, guard, pos_mgr, broadcast, schedule_reference_publish)
     first = tc.post("/api/price", json=PRICE_PAYLOAD)
     second = tc.post(
         "/api/price",
@@ -131,56 +141,4 @@ def test_price_feed_records_orders_against_daily_limit(setup):
     assert second.status_code == 200
     assert second.json()["action"] == "hold"
     assert "日次発注上限" in second.json()["reason"]
-
-
-# --- hybrid モード（コンセンサス） ---
-
-def test_price_feed_hybrid_both_agree_executes(setup):
-    pos_mgr, guard, broadcast = setup
-    guard.update_settings(RiskSettings(ai_mode="hybrid"))
-    mock_gemini = MagicMock()
-    mock_gemini.decide_safe.return_value = TradeDecision(action="buy", qty=10, reason="Gemini強い")
-    mock_claude = MagicMock()
-    mock_claude.decide_safe.return_value = TradeDecision(action="buy", qty=8, reason="Claude強い")
-
-    tc = _make_app(mock_gemini, mock_claude, guard, pos_mgr, broadcast)
-    res = tc.post("/api/price", json=PRICE_PAYLOAD)
-    broadcast.assert_called_once()
-    assert res.status_code == 200
-    data = res.json()
-    assert data["action"] == "buy"
-    assert data["qty"] == 8  # min(10, 8) = 8（保守的な数量）
-    assert "合意" in data["reason"]
-
-
-def test_price_feed_hybrid_disagreement_holds(setup):
-    pos_mgr, guard, broadcast = setup
-    guard.update_settings(RiskSettings(ai_mode="hybrid"))
-    mock_gemini = MagicMock()
-    mock_gemini.decide_safe.return_value = TradeDecision(action="buy", qty=10, reason="Gemini強気")
-    mock_claude = MagicMock()
-    mock_claude.decide_safe.return_value = TradeDecision(action="hold", qty=0, reason="Claude様子見")
-
-    tc = _make_app(mock_gemini, mock_claude, guard, pos_mgr, broadcast)
-    res = tc.post("/api/price", json=PRICE_PAYLOAD)
-    broadcast.assert_called_once()
-    assert res.status_code == 200
-    data = res.json()
-    assert data["action"] == "hold"
-    assert "AI不一致" in data["reason"]
-    assert pos_mgr.position.qty == 0  # 発注されていない
-
-
-def test_price_feed_hybrid_both_hold(setup):
-    pos_mgr, guard, broadcast = setup
-    guard.update_settings(RiskSettings(ai_mode="hybrid"))
-    mock_gemini = MagicMock()
-    mock_gemini.decide_safe.return_value = TradeDecision(action="hold", qty=0, reason="Gemini様子見")
-    mock_claude = MagicMock()
-    mock_claude.decide_safe.return_value = TradeDecision(action="hold", qty=0, reason="Claude様子見")
-
-    tc = _make_app(mock_gemini, mock_claude, guard, pos_mgr, broadcast)
-    res = tc.post("/api/price", json=PRICE_PAYLOAD)
-    assert res.status_code == 200
-    assert res.json()["action"] == "hold"
-    assert "合意" in res.json()["reason"]
+    assert schedule_reference_publish.call_count == 2
