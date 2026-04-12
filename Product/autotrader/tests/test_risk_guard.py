@@ -17,7 +17,7 @@ AFTER_HOURS = datetime(2026, 4, 12, 8, 0, 0)   # 市場前
 
 @pytest.fixture
 def guard():
-    start = datetime.now() - timedelta(seconds=WARMUP_SECONDS + 1)
+    start = AFTER_HOURS - timedelta(seconds=WARMUP_SECONDS + 1)
     return RiskGuard(settings=SETTINGS, start_time=start)
 
 
