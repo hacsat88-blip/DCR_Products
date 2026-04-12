@@ -3,6 +3,7 @@ import { LatestActionCard } from "@/components/LatestActionCard";
 import { OrderHistory } from "@/components/OrderHistory";
 import { PositionPanel } from "@/components/PositionPanel";
 import { PricePanel } from "@/components/PricePanel";
+import { RiskSettingsAccordion } from "@/components/RiskSettingsAccordion";
 import { StatusHeader } from "@/components/StatusHeader";
 import type { TraderViewModel } from "@/types/trader";
 
@@ -24,6 +25,10 @@ export function DashboardShell({ state }: DashboardShellProps): JSX.Element {
       <section className="dashboard-bottom-grid">
         <AiLogPanel events={state.aiEventHistory} />
         <OrderHistory events={state.orderHistory} />
+      </section>
+
+      <section className="dashboard-settings-grid">
+        <RiskSettingsAccordion />
       </section>
     </main>
   );

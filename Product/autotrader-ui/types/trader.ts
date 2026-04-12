@@ -49,6 +49,8 @@ export interface RawTraderRiskSnapshot {
   effective_max_concurrent_positions: number;
 }
 
+export type RiskSettingsResponse = RawTraderRiskSnapshot;
+
 export interface RawTraderPayload {
   type: "state_update";
   ts: string;
