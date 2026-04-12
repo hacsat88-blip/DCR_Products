@@ -52,3 +52,4 @@ class RiskSettings(BaseModel):
     stop_loss_pct: float = Field(default=3.0, gt=0)
     max_qty_per_order: int = Field(default=100, gt=0)
     poll_interval_sec: int = Field(default=5, gt=0)
+    ai_mode: Literal["gemini", "hybrid"] = "gemini"
