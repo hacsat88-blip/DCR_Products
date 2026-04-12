@@ -7,6 +7,19 @@ interface StatusHeaderProps {
   lastUpdatedAt: string | null;
 }
 
+function formatConnectionState(value: ConnectionState): string {
+  switch (value) {
+    case "connected":
+      return "接続中";
+    case "reconnecting":
+      return "再接続中";
+    case "stale":
+      return "停滞";
+    default:
+      return "初回待機";
+  }
+}
+
 function formatUpdatedAt(value: string | null): string {
   if (!value) {
     return "最終更新 未取得";
@@ -19,12 +32,14 @@ export function StatusHeader({ connectionState, lastUpdatedAt }: StatusHeaderPro
   return (
     <header className="dashboard-header panel">
       <div>
-        <p className="panel-eyebrow">Monitor Console</p>
-        <h1>AutoTrader Dashboard</h1>
+        <p className="panel-eyebrow">監視コンソール</p>
+        <h1>AutoTrader ダッシュボード</h1>
       </div>
 
       <div className="status-stack">
-        <span className={clsx("status-pill", `status-pill--${connectionState}`)}>{connectionState}</span>
+        <span className={clsx("status-pill", `status-pill--${connectionState}`)}>
+          {formatConnectionState(connectionState)}
+        </span>
         <p className="status-updated-at">{formatUpdatedAt(lastUpdatedAt)}</p>
       </div>
     </header>

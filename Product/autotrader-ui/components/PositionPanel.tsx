@@ -31,7 +31,7 @@ function formatPercent(value: number | null): string {
 export function PositionPanel({ position }: PositionPanelProps): JSX.Element {
   return (
     <section className="panel metric-panel">
-      <p className="panel-eyebrow">Position</p>
+      <p className="panel-eyebrow">ポジション</p>
       <h2>保有状況</h2>
       <dl className="metric-grid metric-grid--two-columns">
         <div>

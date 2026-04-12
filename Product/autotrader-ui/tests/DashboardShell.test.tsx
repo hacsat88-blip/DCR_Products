@@ -63,8 +63,9 @@ describe("HomePage dashboard shell", () => {
 
     render(createElement(HomePage));
 
-    expect(screen.getByRole("heading", { name: "AutoTrader Dashboard" })).toBeInTheDocument();
-    expect(screen.getByText("waiting-first-tick")).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: "AutoTrader ダッシュボード" })).toBeInTheDocument();
+    expect(screen.getAllByText("初回待機")).toHaveLength(2);
+    expect(screen.getByText("監視コンソール")).toBeInTheDocument();
     expect(screen.getByText("ティック待機中")).toBeInTheDocument();
     expect(screen.getAllByText("未取得").length).toBeGreaterThanOrEqual(1);
     expect(screen.getByText("初回データ待機")).toBeInTheDocument();
@@ -121,7 +122,7 @@ describe("HomePage dashboard shell", () => {
 
     render(createElement(HomePage));
 
-    expect(screen.getByText("execution / rakuten_rss")).toBeInTheDocument();
+  expect(screen.getByText("執行 / rakuten_rss")).toBeInTheDocument();
     expect(screen.getByText("7203")).toBeInTheDocument();
     expect(screen.getByText("100株")).toBeInTheDocument();
     expect(screen.getByText("初回買い")).toBeInTheDocument();

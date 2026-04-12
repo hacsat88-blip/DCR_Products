@@ -30,6 +30,26 @@ interface RiskSettingsDraft {
 
 const AI_MODE_OPTIONS: AISelectionMode[] = ["gemini", "hybrid"];
 const TRADE_MODE_OPTIONS: TradeMode[] = ["conservative", "balanced", "aggressive"];
+const FIELD_LABELS = {
+  limit_per_order: "1回あたり上限金額",
+  stop_loss_pct: "損切り率 (%)",
+  max_qty_per_order: "1回あたり最大数量",
+  poll_interval_sec: "送信間隔 (秒)",
+  available_cash: "利用可能現金",
+  ai_mode: "AI モード",
+  trading_mode: "売買モード",
+  prioritize_manual_price_band: "手動価格帯を優先",
+  manual_price_min: "手動価格帯 下限",
+  manual_price_max: "手動価格帯 上限",
+  max_daily_orders: "1日あたり最大注文数",
+  max_concurrent_positions: "同時保有上限",
+  execution_feed: "執行フィード",
+  reference_feed: "参照フィード"
+} as const;
+
+function getFieldLabel(key: keyof typeof FIELD_LABELS): string {
+  return FIELD_LABELS[key];
+}
 
 function toDraft(settings: RiskSettingsResponse): RiskSettingsDraft {
   return {
@@ -112,11 +132,13 @@ interface NumberFieldProps {
 }
 
 function NumberField({ label, draft, disabled, onChange }: NumberFieldProps): JSX.Element {
+  const labelText = getFieldLabel(label);
+
   return (
     <label className="settings-field">
-      <span>{label}</span>
+      <span>{labelText}</span>
       <input
-        aria-label={label}
+        aria-label={labelText}
         type="number"
         value={draft[label]}
         disabled={disabled}
@@ -142,6 +164,7 @@ function NullableOverrideField({
   onModeChange
 }: NullableOverrideFieldProps): JSX.Element {
   const modeField = field === "max_daily_orders" ? "maxDailyOrdersMode" : "maxConcurrentPositionsMode";
+  const fieldLabel = getFieldLabel(field);
   const effectiveValue =
     field === "max_daily_orders"
       ? draft.effective_max_daily_orders
@@ -151,33 +174,33 @@ function NullableOverrideField({
   return (
     <div className="settings-field settings-field--override">
       <div className="settings-field__header">
-        <span>{field}</span>
+        <span>{fieldLabel}</span>
         <span className="settings-effective-value">実効値 {effectiveValue}</span>
       </div>
       <div className="settings-toggle-row">
         <button
           type="button"
-          aria-label={`${field} Auto`}
+          aria-label={`${fieldLabel} 自動`}
           className="settings-toggle"
           disabled={disabled}
           data-active={isAuto}
           onClick={() => onModeChange(modeField, "auto")}
         >
-          Auto
+          自動
         </button>
         <button
           type="button"
-          aria-label={`${field} Manual`}
+          aria-label={`${fieldLabel} 手動`}
           className="settings-toggle"
           disabled={disabled}
           data-active={!isAuto}
           onClick={() => onModeChange(modeField, "manual")}
         >
-          Manual
+          手動
         </button>
       </div>
       <input
-        aria-label={field}
+        aria-label={fieldLabel}
         type="number"
         value={draft[field]}
         disabled={disabled || isAuto}
@@ -211,7 +234,7 @@ export function RiskSettingsAccordion(): JSX.Element {
         setLoadError(null);
       } catch (error) {
         if (!cancelled) {
-          setLoadError(error instanceof Error ? error.message : "settings fetch failed");
+          setLoadError(error instanceof Error ? error.message : "設定の取得に失敗しました");
         }
       } finally {
         if (!cancelled) {
@@ -255,7 +278,7 @@ export function RiskSettingsAccordion(): JSX.Element {
       setCanonical(nextSettings);
       setDraft(toDraft(nextSettings));
     } catch (error) {
-      setSaveError(error instanceof Error ? error.message : "settings update failed");
+      setSaveError(error instanceof Error ? error.message : "設定の更新に失敗しました");
     } finally {
       setSaving(false);
     }
@@ -267,8 +290,8 @@ export function RiskSettingsAccordion(): JSX.Element {
     <section className="panel settings-panel">
       <div className="panel-heading-row">
         <div>
-          <p className="panel-eyebrow">Settings Proxy</p>
-          <h2>Risk Settings</h2>
+          <p className="panel-eyebrow">設定プロキシ</p>
+          <h2>リスク設定</h2>
         </div>
         <button
           type="button"
@@ -276,7 +299,7 @@ export function RiskSettingsAccordion(): JSX.Element {
           aria-expanded={open}
           onClick={() => setOpen((current) => !current)}
         >
-          Risk Settings
+          リスク設定
         </button>
       </div>
 
@@ -319,9 +342,9 @@ export function RiskSettingsAccordion(): JSX.Element {
                   onChange={updateDraft}
                 />
                 <label className="settings-field">
-                  <span>ai_mode</span>
+                  <span>{getFieldLabel("ai_mode")}</span>
                   <select
-                    aria-label="ai_mode"
+                    aria-label={getFieldLabel("ai_mode")}
                     value={draft.ai_mode}
                     disabled={formDisabled}
                     onChange={(event) => updateDraft("ai_mode", event.target.value)}
@@ -334,9 +357,9 @@ export function RiskSettingsAccordion(): JSX.Element {
                   </select>
                 </label>
                 <label className="settings-field">
-                  <span>trading_mode</span>
+                  <span>{getFieldLabel("trading_mode")}</span>
                   <select
-                    aria-label="trading_mode"
+                    aria-label={getFieldLabel("trading_mode")}
                     value={draft.trading_mode}
                     disabled={formDisabled}
                     onChange={(event) => updateDraft("trading_mode", event.target.value)}
@@ -349,9 +372,9 @@ export function RiskSettingsAccordion(): JSX.Element {
                   </select>
                 </label>
                 <label className="settings-field settings-field--checkbox">
-                  <span>prioritize_manual_price_band</span>
+                  <span>{getFieldLabel("prioritize_manual_price_band")}</span>
                   <input
-                    aria-label="prioritize_manual_price_band"
+                    aria-label={getFieldLabel("prioritize_manual_price_band")}
                     type="checkbox"
                     checked={draft.prioritize_manual_price_band}
                     disabled={formDisabled}
@@ -388,11 +411,11 @@ export function RiskSettingsAccordion(): JSX.Element {
 
               <div className="settings-feed-grid">
                 <div className="settings-readonly-row">
-                  <span>execution_feed</span>
+                  <span>{getFieldLabel("execution_feed")}</span>
                   <strong>{draft.execution_feed}</strong>
                 </div>
                 <div className="settings-readonly-row">
-                  <span>reference_feed</span>
+                  <span>{getFieldLabel("reference_feed")}</span>
                   <strong>{draft.reference_feed}</strong>
                 </div>
               </div>
@@ -405,7 +428,7 @@ export function RiskSettingsAccordion(): JSX.Element {
             </fieldset>
           ) : (
             <>
-              <p className="settings-muted-copy">{loading ? "settings loading" : "settings unavailable"}</p>
+              <p className="settings-muted-copy">{loading ? "設定を読み込み中" : "設定を利用できません"}</p>
               <div className="settings-actions">
                 <button type="submit" className="settings-save-button" disabled>
                   保存

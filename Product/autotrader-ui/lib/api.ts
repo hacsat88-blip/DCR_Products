@@ -6,7 +6,7 @@ export async function fetchSettings(): Promise<RiskSettingsResponse> {
   });
 
   if (!response.ok) {
-    throw new Error("settings fetch failed");
+    throw new Error("設定の取得に失敗しました");
   }
 
   return (await response.json()) as RiskSettingsResponse;
@@ -22,7 +22,7 @@ export async function updateSettings(payload: RiskSettingsResponse): Promise<Ris
   });
 
   if (!response.ok) {
-    throw new Error("settings update failed");
+    throw new Error("設定の更新に失敗しました");
   }
 
   return (await response.json()) as RiskSettingsResponse;
