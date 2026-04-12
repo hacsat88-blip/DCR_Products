@@ -23,12 +23,13 @@
 [MarketSpeed II RSS（Excel）]
   ↓ 5秒ごとに株価 POST
 [Python FastAPI サーバー :8000]
-  ├─ Gemini API で売買判断
+  ├─ Gemini API で売買判断（live only）
   ├─ リスクガード適用
   ↓ 発注指示をレスポンスで返却
 [Excel VBA]
   └─ 現在の source drop は RSS 発注スタブを記録（実発注 wiring は後続）
 [Python FastAPI サーバー :8000]
+  ├─ deterministic backtest runner（LLM key 不要）
   ↓ WebSocket (/ws)
 [Next.js ダッシュボード :3000]
   └─ リアルタイム表示（株価・AI思考ログ・P&L）
@@ -96,14 +97,19 @@ POST /api/price
   "code": "1234",
   "price": 2500,
   "volume": 12000,
+  "bid": 2498,
+  "ask": 2500,
+  "news_halt": false,
+  "news_note": null,
   "ohlc": [{"o":2490,"h":2510,"l":2485,"c":2500,"v":50000}, ...],  // 直近5本
   "timestamp": "2026-04-12T10:30:00"
 }
 
 処理:
 1. risk_guard: 既存ポジション・上限金額・損切りラインを確認
-2. gemini_trader: Gemini API へ判断を依頼
-3. risk_guard: AI の判断を二重チェック（上限超過なら hold へ上書き）
+2. trade_setup: 直近5本から intraday の値幅・出来高倍率・参照乖離を算出
+3. gemini_trader: Gemini API へ判断を依頼
+4. risk_guard: AI の判断を二重チェック（薄商い、参照乖離過大、板スプレッド過大、寄り付き直後、ニュース停止、日次損失超過、引け前新規停止なら hold へ上書き）
 4. position: 発注後のポジション状態を更新
 
 レスポンス:
@@ -127,10 +133,19 @@ POST /api/price
 
 ```python
 # risk_guard.py が適用するルール（優先順位順）
-1. 損切りライン超過 → 強制 "sell"（AI 判断より優先）
-2. 1発注の金額上限超過（price × qty > limit）→ qty を上限以内に縮小 or "hold"
-3. 市場時間外（09:00〜11:30, 12:30〜15:30 以外）→ "hold"
-4. Python サーバー起動から 30 秒未満（ウォームアップ）→ "hold"
+1. Python サーバー起動から 30 秒未満（ウォームアップ）→ "hold"
+2. 市場時間外（09:00〜11:30, 12:30〜15:30 以外）→ "hold"
+3. 引け前 `flat_before_close_minutes` 以内で保有あり → 強制 "sell"
+4. 損切りライン超過 → 強制 "sell"（AI 判断より優先）
+5. 日次実現損失が `max_daily_loss_yen` を超過 → 新規 "buy" を停止
+6. `max_consecutive_losses` 連敗到達 or 損失後クールダウン中 → 新規 "buy" を停止
+7. 直近5本の値幅が `min_five_bar_range_pct` 未満 → 新規 "buy" を停止
+8. 直近バー出来高倍率が `min_last_bar_volume_ratio` 未満 → 新規 "buy" を停止
+9. execution/reference 乖離が `max_reference_gap_pct` 超過 → 追いかけ "buy" を停止
+10. 板スプレッドが `max_spread_bps` 超過 → 新規 "buy" を停止
+11. 寄り付きから `skip_open_minutes` 分以内 → 新規 "buy" を停止
+12. `news_halt = true` → 新規 "buy" を停止
+13. 1発注の金額上限超過（price × qty > limit）→ qty を上限以内に縮小 or "hold"
 ```
 
 ### リスク設定のデフォルト値
@@ -141,6 +156,15 @@ POST /api/price
 | `stop_loss_pct` | 3.0% | 損切りライン（平均取得単価からの下落率） |
 | `max_qty_per_order` | 100株 | 1回の最大発注数量 |
 | `poll_interval_sec` | 5 | VBA からの送信間隔（秒） |
+| `max_daily_loss_yen` | 15,000円 | 当日実現損失がこの金額を超えたら新規建て停止 |
+| `max_consecutive_losses` | 2 | 連敗回数の上限 |
+| `cooldown_minutes_after_loss` | 15 | 損失クローズ後に新規建てを止める時間 |
+| `min_five_bar_range_pct` | 0.8% | 直近5本の値幅がこの閾値未満なら薄商いとみなす |
+| `min_last_bar_volume_ratio` | 1.2 | 直近バー出来高 / 5本平均出来高 の下限 |
+| `max_reference_gap_pct` | 4.0% | execution と reference の許容乖離上限 |
+| `flat_before_close_minutes` | 10 | 引け前の強制手仕舞い開始時刻 |
+| `max_spread_bps` | 20.0 | 板スプレッドの許容上限 |
+| `skip_open_minutes` | 5 | 寄り付き直後の新規停止時間 |
 
 ### WebSocket ペイロード（毎受信後に配信）
 
@@ -152,9 +176,16 @@ POST /api/price
   "reference_price": { "code": "1234", "current": 2515, "volume": 11800, "feed_role": "reference", "feed_source": "jquants_light" },
   "position": { "qty": 100, "avg_cost": 2480, "pnl": 2000, "pnl_pct": 0.81 },
   "last_action": { "action": "buy", "qty": 100, "reason": "RSI過売り圏からの反転", "at": "10:30:05", "feed_role": "execution", "feed_source": "rakuten_rss" },
-  "risk": { "limit_per_order": 100000, "stop_loss_pct": 3.0 }
+  "risk": { "limit_per_order": 100000, "stop_loss_pct": 3.0, "max_spread_bps": 20.0, "skip_open_minutes": 5 },
+  "risk_runtime": { "daily_order_count": 1, "daily_realized_pnl": -1200, "consecutive_loss_count": 1, "cooldown_remaining_sec": 180, "entry_blocked": true, "entry_block_reason": "損失後クールダウン中" }
 }
 ```
+
+### Backtest Runner
+
+- `python -m server.backtest_runner bars.csv` で deterministic な検証が可能
+- backtest は `RuleBasedTrader + RiskGuard` を使い、`GOOGLE_API_KEY` を必要としない
+- live 判断だけが `GOOGLE_API_KEY` 必須
 
 ---
 

@@ -3,6 +3,8 @@ import inspect
 import json
 from datetime import datetime, timedelta
 
+from server.models import TradeDecision
+
 from fastapi import FastAPI
 from fastapi.testclient import TestClient
 
@@ -79,6 +81,9 @@ def test_broadcast_sends_state_update_payload(tmp_path, monkeypatch):
     assert payload["last_action"]["action"] == "buy"
     assert payload["position"]["qty"] == 10
     assert payload["risk"]["execution_feed"] == "rakuten_rss"
+    assert payload["risk_runtime"]["daily_order_count"] == 0
+    assert payload["risk_runtime"]["daily_realized_pnl"] == 0.0
+    assert payload["risk_runtime"]["cooldown_remaining_sec"] == 0
 
 
 def test_broadcast_keeps_execution_price_when_reference_updates(tmp_path, monkeypatch):
@@ -146,3 +151,40 @@ def test_broadcast_removes_dead_clients(tmp_path, monkeypatch):
     )
 
     assert broken_ws not in clients
+
+
+def test_broadcast_includes_runtime_risk_after_loss(tmp_path, monkeypatch):
+    pos_mgr, guard = _make_components(tmp_path, monkeypatch)
+    _, broadcast = make_ws_router(pos_mgr, guard)
+    clients = inspect.getclosurevars(broadcast).nonlocals["_clients"]
+    fake_ws = FakeWebSocket()
+    clients.append(fake_ws)
+
+    guard.record_order(
+        TradeDecision(action="sell", qty=10, reason="損切り"),
+        datetime.now(),
+        realized_pnl=-500.0,
+    )
+
+    asyncio.run(
+        broadcast(
+            price={
+                "code": "7203",
+                "current": 250.0,
+                "volume": 10000,
+                "feed_role": "execution",
+                "feed_source": "rakuten_rss",
+            },
+            action={
+                "action": "hold",
+                "qty": 0,
+                "reason": "停止中",
+                "at": "10:00:00",
+            },
+        )
+    )
+
+    payload = json.loads(fake_ws.messages[0])
+    assert payload["risk_runtime"]["daily_realized_pnl"] == -500.0
+    assert payload["risk_runtime"]["consecutive_loss_count"] == 1
+    assert payload["risk_runtime"]["cooldown_remaining_sec"] >= 0

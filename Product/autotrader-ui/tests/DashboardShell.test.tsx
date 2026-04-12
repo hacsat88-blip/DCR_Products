@@ -56,6 +56,7 @@ function buildState(overrides: Partial<TraderViewModel> = {}): TraderViewModel {
     aiEventHistory: [],
     orderHistory: [],
     riskSnapshot: null,
+    riskRuntimeSnapshot: null,
     ...overrides
   };
 }
@@ -123,7 +124,15 @@ describe("HomePage dashboard shell", () => {
             feedRole: "execution",
             feedSource: "rakuten_rss"
           })
-        ]
+        ],
+        riskRuntimeSnapshot: {
+          dailyOrderCount: 1,
+          dailyRealizedPnl: 0,
+          consecutiveLossCount: 0,
+          cooldownRemainingSec: 0,
+          entryBlocked: false,
+          entryBlockReason: null
+        }
       })
     );
 
@@ -136,6 +145,8 @@ describe("HomePage dashboard shell", () => {
     expect(screen.getAllByText(/^買い$/)).toHaveLength(2);
     expect(screen.getByText("楽天RSS")).toBeInTheDocument();
     expect(screen.getByText("10:30:05 / 100株 / 楽天RSS")).toBeInTheDocument();
+    expect(screen.getByText("当日実現損益")).toBeInTheDocument();
+    expect(screen.getByText("¥0.00")).toBeInTheDocument();
   });
 
   test("shows reference latest event but keeps hold out of order history", () => {

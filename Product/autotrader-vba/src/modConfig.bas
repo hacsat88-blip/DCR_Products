@@ -21,12 +21,23 @@ Public Const COL_PRICE As Long = 2
 Public Const COL_VOLUME As Long = 3
 Public Const COL_DATE As Long = 4
 Public Const COL_TIME As Long = 5
+Public Const COL_BID As Long = 6
+Public Const COL_ASK As Long = 7
+
+Public Const CONTROL_ROW_SERVER_URL As Long = 1
+Public Const CONTROL_ROW_POLL_INTERVAL As Long = 2
+Public Const CONTROL_ROW_STATUS As Long = 3
+Public Const CONTROL_ROW_REFERENCE_STATUS As Long = 5
+Public Const CONTROL_ROW_REFERENCE_AS_OF As Long = 6
+Public Const CONTROL_ROW_WARNING As Long = 7
+Public Const CONTROL_ROW_NEWS_HALT As Long = 8
+Public Const CONTROL_ROW_NEWS_NOTE As Long = 9
 
 Public Const LOG_MAX_ROWS As Long = 200
 
 Public Function RuntimeApiBaseUrl() As String
     Dim configured As String
-    configured = Trim$(CStr(ThisWorkbook.Sheets(SH_CONTROL).Cells(1, 2).Value))
+    configured = Trim$(CStr(ThisWorkbook.Sheets(SH_CONTROL).Cells(CONTROL_ROW_SERVER_URL, 2).Value))
     If configured = "" Then
         RuntimeApiBaseUrl = API_BASE_URL
     Else
@@ -40,11 +51,21 @@ End Function
 
 Public Function RuntimePollIntervalSeconds() As Long
     Dim configured As Variant
-    configured = ThisWorkbook.Sheets(SH_CONTROL).Cells(2, 2).Value
+    configured = ThisWorkbook.Sheets(SH_CONTROL).Cells(CONTROL_ROW_POLL_INTERVAL, 2).Value
     If IsNumeric(configured) Then
         RuntimePollIntervalSeconds = CLng(configured)
         If RuntimePollIntervalSeconds <= 0 Then RuntimePollIntervalSeconds = POLL_INTERVAL
     Else
         RuntimePollIntervalSeconds = POLL_INTERVAL
     End If
+End Function
+
+Public Function RuntimeNewsHaltEnabled() As Boolean
+    Dim rawValue As String
+    rawValue = LCase$(Trim$(CStr(ThisWorkbook.Sheets(SH_CONTROL).Cells(CONTROL_ROW_NEWS_HALT, 2).Value)))
+    RuntimeNewsHaltEnabled = (rawValue = "true" Or rawValue = "1" Or rawValue = "yes" Or rawValue = "on")
+End Function
+
+Public Function RuntimeNewsNote() As String
+    RuntimeNewsNote = Trim$(CStr(ThisWorkbook.Sheets(SH_CONTROL).Cells(CONTROL_ROW_NEWS_NOTE, 2).Value))
 End Function

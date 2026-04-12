@@ -44,6 +44,10 @@ class PriceRequest(BaseModel):
     code: str
     price: float
     volume: int
+    bid: float | None = None
+    ask: float | None = None
+    news_halt: bool = False
+    news_note: str | None = None
     ohlc: list[OHLCBar] = Field(min_length=1)
     timestamp: datetime
     feed_role: FeedRole = "execution"
@@ -54,6 +58,13 @@ class PriceRequest(BaseModel):
     def price_must_be_positive(cls, v: float) -> float:
         if v <= 0:
             raise ValueError(f"price must be positive, got {v}")
+        return v
+
+    @field_validator("bid", "ask")
+    @classmethod
+    def quote_must_be_positive_when_present(cls, v: float | None) -> float | None:
+        if v is not None and v <= 0:
+            raise ValueError(f"quote must be positive, got {v}")
         return v
 
     @model_validator(mode="after")
@@ -71,6 +82,9 @@ class PriceRequest(BaseModel):
             "jquants_free",
         }:
             raise ValueError("reference feed must use J-Quants Light or Free")
+
+        if self.bid is not None and self.ask is not None and self.ask < self.bid:
+            raise ValueError("ask must be >= bid")
 
         return self
 
@@ -117,6 +131,15 @@ class RiskSettings(BaseModel):
     manual_price_max: int = Field(default=500, gt=0)
     max_daily_orders: int | None = Field(default=None, gt=0)
     max_concurrent_positions: int | None = Field(default=None, gt=0)
+    max_daily_loss_yen: int = Field(default=15_000, gt=0)
+    max_consecutive_losses: int = Field(default=2, gt=0)
+    cooldown_minutes_after_loss: int = Field(default=15, ge=0)
+    min_five_bar_range_pct: float = Field(default=0.8, ge=0)
+    min_last_bar_volume_ratio: float = Field(default=1.2, ge=0)
+    max_reference_gap_pct: float = Field(default=4.0, gt=0)
+    flat_before_close_minutes: int = Field(default=10, ge=1, le=60)
+    max_spread_bps: float = Field(default=20.0, gt=0)
+    skip_open_minutes: int = Field(default=5, ge=0, le=60)
 
     @model_validator(mode="after")
     def validate_manual_band(self) -> "RiskSettings":
@@ -162,3 +185,12 @@ class RiskSettings(BaseModel):
         if self.max_concurrent_positions is not None:
             return self.max_concurrent_positions
         return _MODE_MAX_CONCURRENT_POSITIONS[self.trading_mode]
+
+
+class RiskRuntimeSnapshot(BaseModel):
+    daily_order_count: int = Field(default=0, ge=0)
+    daily_realized_pnl: float = 0.0
+    consecutive_loss_count: int = Field(default=0, ge=0)
+    cooldown_remaining_sec: int = Field(default=0, ge=0)
+    entry_blocked: bool = False
+    entry_block_reason: str | None = None

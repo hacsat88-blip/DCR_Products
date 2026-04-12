@@ -16,6 +16,7 @@ type PayloadOverrides = Partial<Omit<RawTraderPayload, "price" | "reference_pric
   position?: Partial<RawTraderPayload["position"]>;
   last_action?: Partial<RawTraderPayload["last_action"]>;
   risk?: Partial<RawTraderPayload["risk"]>;
+  risk_runtime?: Partial<RawTraderPayload["risk_runtime"]>;
 };
 
 const BASE_RISK: RawTraderPayload["risk"] = {
@@ -33,12 +34,30 @@ const BASE_RISK: RawTraderPayload["risk"] = {
   manual_price_max: 500,
   max_daily_orders: null,
   max_concurrent_positions: null,
+  max_daily_loss_yen: 15000,
+  max_consecutive_losses: 2,
+  cooldown_minutes_after_loss: 15,
+  min_five_bar_range_pct: 0.8,
+  min_last_bar_volume_ratio: 1.2,
+  max_reference_gap_pct: 4,
+  flat_before_close_minutes: 10,
+  max_spread_bps: 20,
+  skip_open_minutes: 5,
   suggested_price_min: 100,
   suggested_price_max: 290,
   effective_price_min: 100,
   effective_price_max: 500,
   effective_max_daily_orders: 3,
   effective_max_concurrent_positions: 1
+};
+
+const BASE_RISK_RUNTIME: RawTraderPayload["risk_runtime"] = {
+  daily_order_count: 0,
+  daily_realized_pnl: 0,
+  consecutive_loss_count: 0,
+  cooldown_remaining_sec: 0,
+  entry_blocked: false,
+  entry_block_reason: null
 };
 
 function buildPayload(overrides: PayloadOverrides = {}): RawTraderPayload {
@@ -48,6 +67,7 @@ function buildPayload(overrides: PayloadOverrides = {}): RawTraderPayload {
     position,
     last_action,
     risk,
+    risk_runtime,
     ...restOverrides
   } = overrides;
 
@@ -92,6 +112,10 @@ function buildPayload(overrides: PayloadOverrides = {}): RawTraderPayload {
     risk: {
       ...BASE_RISK,
       ...risk
+    },
+    risk_runtime: {
+      ...BASE_RISK_RUNTIME,
+      ...risk_runtime
     },
     ...restOverrides
   };
@@ -195,6 +219,23 @@ describe("reduceTraderState", () => {
     expect(state.orderHistory).toHaveLength(MAX_EVENT_HISTORY);
     expect(state.aiEventHistory[0]?.reason).toBe("decision-6");
     expect(state.orderHistory.at(-1)?.reason).toBe(`decision-${MAX_EVENT_HISTORY + 5}`);
+  });
+
+  test("keeps runtime risk snapshot from payload", () => {
+    const next = reduceTraderState(undefined, buildPayload({
+      risk_runtime: {
+        daily_realized_pnl: -1200,
+        consecutive_loss_count: 2,
+        cooldown_remaining_sec: 180,
+        entry_blocked: true,
+        entry_block_reason: "損失後クールダウン中"
+      }
+    }));
+
+    expect(next.riskRuntimeSnapshot?.dailyRealizedPnl).toBe(-1200);
+    expect(next.riskRuntimeSnapshot?.consecutiveLossCount).toBe(2);
+    expect(next.riskRuntimeSnapshot?.cooldownRemainingSec).toBe(180);
+    expect(next.riskRuntimeSnapshot?.entryBlocked).toBe(true);
   });
 });
 

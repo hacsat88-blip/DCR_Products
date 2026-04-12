@@ -34,9 +34,13 @@ Public Sub OnTick()
     Dim code As String
     Dim price As Double
     Dim volume As Long
+    Dim bid As Variant
+    Dim ask As Variant
     Dim tickDate As Date
     Dim tickTime As Date
     Dim ts As Date
+    Dim newsHalt As Boolean
+    Dim newsNote As String
 
     code = ResolveMarketCode(ws)
     If code = "" Then GoTo ScheduleAndExit
@@ -51,8 +55,12 @@ Public Sub OnTick()
 
     price = CDbl(ws.Cells(MARKET_ROW, COL_PRICE).Value)
     volume = CLng(ws.Cells(MARKET_ROW, COL_VOLUME).Value)
+    bid = ReadOptionalMarketNumber(ws, COL_BID)
+    ask = ReadOptionalMarketNumber(ws, COL_ASK)
     tickDate = CDate(ws.Cells(MARKET_ROW, COL_DATE).Value)
     tickTime = CDate(ws.Cells(MARKET_ROW, COL_TIME).Value)
+    newsHalt = RuntimeNewsHaltEnabled()
+    newsNote = RuntimeNewsNote()
 
     ts = DateSerial(Year(tickDate), Month(tickDate), Day(tickDate)) + _
         TimeSerial(Hour(tickTime), Minute(tickTime), Second(tickTime))
@@ -75,7 +83,7 @@ Public Sub OnTick()
     Dim actionCode As Long
 
     actionCode = modHTTP.PostPrice( _
-        code, price, volume, ohlcJson, ts, qty, reason, _
+        code, price, volume, bid, ask, newsHalt, newsNote, ohlcJson, ts, qty, reason, _
         referenceStatus, referencePrice, referenceAsOf, referenceGapPct, warningCode, warningMessage)
 
     WriteControlAdvisory referenceStatus, referenceAsOf, warningMessage
@@ -98,20 +106,20 @@ Private Sub ScheduleNext()
 End Sub
 
 Private Sub SetStatus(ByVal status As String)
-    ThisWorkbook.Sheets(SH_CONTROL).Cells(3, 2).Value = status
+    ThisWorkbook.Sheets(SH_CONTROL).Cells(CONTROL_ROW_STATUS, 2).Value = status
 End Sub
 
 Private Sub WriteControlAdvisory(ByVal referenceStatus As String, ByVal referenceAsOf As String, ByVal warningMessage As String)
     Dim ctrlWs As Worksheet
     Set ctrlWs = ThisWorkbook.Sheets(SH_CONTROL)
 
-    ctrlWs.Cells(5, 2).Value = referenceStatus
+    ctrlWs.Cells(CONTROL_ROW_REFERENCE_STATUS, 2).Value = referenceStatus
     If referenceAsOf = "" Then
-        ctrlWs.Cells(6, 2).Value = "-"
+        ctrlWs.Cells(CONTROL_ROW_REFERENCE_AS_OF, 2).Value = "-"
     Else
-        ctrlWs.Cells(6, 2).Value = referenceAsOf
+        ctrlWs.Cells(CONTROL_ROW_REFERENCE_AS_OF, 2).Value = referenceAsOf
     End If
-    ctrlWs.Cells(7, 2).Value = warningMessage
+    ctrlWs.Cells(CONTROL_ROW_WARNING, 2).Value = warningMessage
 End Sub
 
 Private Sub WriteTickLog(ByVal code As String, ByVal price As Double, ByVal actionCode As Long, ByVal qty As Long, ByVal reason As String, ByVal referenceStatus As String, ByVal referencePrice As Variant, ByVal referenceAsOf As String, ByVal referenceGapPct As Variant, ByVal warningCode As String, ByVal warningMessage As String)
@@ -197,4 +205,14 @@ Private Function ResolveMarketCode(ByVal ws As Worksheet) As String
     End If
 
     ResolveMarketCode = Trim$(CStr(ws.Cells(MARKET_ROW, COL_CODE).Value))
+End Function
+
+Private Function ReadOptionalMarketNumber(ByVal ws As Worksheet, ByVal columnIndex As Long) As Variant
+    Dim rawValue As Variant
+    rawValue = ws.Cells(MARKET_ROW, columnIndex).Value
+    If IsNumeric(rawValue) Then
+        ReadOptionalMarketNumber = CDbl(rawValue)
+    Else
+        ReadOptionalMarketNumber = Empty
+    End If
 End Function

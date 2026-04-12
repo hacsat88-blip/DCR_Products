@@ -7,6 +7,7 @@ import type {
   RawTraderAction,
   RawTraderPayload,
   RawTraderRiskSnapshot,
+  RawTraderRiskRuntimeSnapshot,
   TradeMode,
   TraderEventSnapshot,
   TraderViewModel
@@ -77,12 +78,33 @@ function isRawTraderRiskSnapshot(value: unknown): value is RawTraderRiskSnapshot
     isFiniteNumber(value.manual_price_max) &&
     isNullableNumber(value.max_daily_orders) &&
     isNullableNumber(value.max_concurrent_positions) &&
+    isFiniteNumber(value.max_daily_loss_yen) &&
+    isFiniteNumber(value.max_consecutive_losses) &&
+    isFiniteNumber(value.cooldown_minutes_after_loss) &&
+    isFiniteNumber(value.min_five_bar_range_pct) &&
+    isFiniteNumber(value.min_last_bar_volume_ratio) &&
+    isFiniteNumber(value.max_reference_gap_pct) &&
+    isFiniteNumber(value.flat_before_close_minutes) &&
+    isFiniteNumber(value.max_spread_bps) &&
+    isFiniteNumber(value.skip_open_minutes) &&
     isFiniteNumber(value.suggested_price_min) &&
     isFiniteNumber(value.suggested_price_max) &&
     isFiniteNumber(value.effective_price_min) &&
     isFiniteNumber(value.effective_price_max) &&
     isFiniteNumber(value.effective_max_daily_orders) &&
     isFiniteNumber(value.effective_max_concurrent_positions)
+  );
+}
+
+function isRawTraderRiskRuntimeSnapshot(value: unknown): value is RawTraderRiskRuntimeSnapshot {
+  return (
+    isRecord(value) &&
+    isFiniteNumber(value.daily_order_count) &&
+    isFiniteNumber(value.daily_realized_pnl) &&
+    isFiniteNumber(value.consecutive_loss_count) &&
+    isFiniteNumber(value.cooldown_remaining_sec) &&
+    typeof value.entry_blocked === "boolean" &&
+    (value.entry_block_reason === null || typeof value.entry_block_reason === "string")
   );
 }
 
@@ -101,7 +123,8 @@ export function isRawTraderPayload(value: unknown): value is RawTraderPayload {
     isFiniteNumber(value.position.avg_cost) &&
     isFiniteNumber(value.position.pnl) &&
     isFiniteNumber(value.position.pnl_pct) &&
-    isRawTraderRiskSnapshot(value.risk)
+    isRawTraderRiskSnapshot(value.risk) &&
+    isRawTraderRiskRuntimeSnapshot(value.risk_runtime)
   );
 }
 
@@ -127,6 +150,19 @@ function toPriceSnapshot(raw: RawTraderPayload["price"]): TraderViewModel["lates
     volume: raw.volume,
     feedRole: raw.feed_role,
     feedSource: raw.feed_source
+  };
+}
+
+function toRiskRuntimeSnapshot(
+  raw: RawTraderPayload["risk_runtime"]
+): NonNullable<TraderViewModel["riskRuntimeSnapshot"]> {
+  return {
+    dailyOrderCount: raw.daily_order_count,
+    dailyRealizedPnl: raw.daily_realized_pnl,
+    consecutiveLossCount: raw.consecutive_loss_count,
+    cooldownRemainingSec: raw.cooldown_remaining_sec,
+    entryBlocked: raw.entry_blocked,
+    entryBlockReason: raw.entry_block_reason
   };
 }
 
@@ -176,7 +212,8 @@ export function createInitialTraderState(
     },
     aiEventHistory: [],
     orderHistory: [],
-    riskSnapshot: null
+    riskSnapshot: null,
+    riskRuntimeSnapshot: null
   };
 }
 
@@ -220,6 +257,7 @@ export function reduceTraderState(
     latestEvent,
     aiEventHistory,
     orderHistory,
-    riskSnapshot: raw.risk
+    riskSnapshot: raw.risk,
+    riskRuntimeSnapshot: toRiskRuntimeSnapshot(raw.risk_runtime)
   };
 }

@@ -4,6 +4,10 @@ Option Explicit
 Public Function PostPrice(ByVal code As String, _
                           ByVal price As Double, _
                           ByVal volume As Long, _
+                          ByVal bid As Variant, _
+                          ByVal ask As Variant, _
+                          ByVal newsHalt As Boolean, _
+                          ByVal newsNote As String, _
                           ByVal ohlcJson As String, _
                           ByVal tickTime As Date, _
                           ByRef qty As Long, _
@@ -32,7 +36,7 @@ Public Function PostPrice(ByVal code As String, _
     http.setRequestHeader "Content-Type", "application/json"
     http.setRequestHeader "Accept", "application/json"
     http.setTimeouts HTTP_TIMEOUT, HTTP_TIMEOUT, HTTP_TIMEOUT, HTTP_TIMEOUT
-    http.send BuildRequestJson(code, price, volume, ohlcJson, tickTime)
+    http.send BuildRequestJson(code, price, volume, bid, ask, newsHalt, newsNote, ohlcJson, tickTime)
     On Error GoTo 0
 
     If http.Status <> 200 Then
@@ -67,7 +71,7 @@ HttpError:
     PostPrice = 0
 End Function
 
-Private Function BuildRequestJson(ByVal code As String, ByVal price As Double, ByVal volume As Long, ByVal ohlcJson As String, ByVal tickTime As Date) As String
+Private Function BuildRequestJson(ByVal code As String, ByVal price As Double, ByVal volume As Long, ByVal bid As Variant, ByVal ask As Variant, ByVal newsHalt As Boolean, ByVal newsNote As String, ByVal ohlcJson As String, ByVal tickTime As Date) As String
     Dim isoTimestamp As String
     isoTimestamp = Format$(tickTime, "yyyy-mm-dd") & "T" & Format$(tickTime, "hh:nn:ss")
 
@@ -75,6 +79,10 @@ Private Function BuildRequestJson(ByVal code As String, ByVal price As Double, B
         """code"":""" & EscapeJson(code) & """," & _
         """price"":" & JsonNumber(price) & "," & _
         """volume"":" & CStr(volume) & "," & _
+    """bid""":" & JsonOptionalNumber(bid) & "," & _
+    """ask""":" & JsonOptionalNumber(ask) & "," & _
+    """news_halt""":" & JsonBoolean(newsHalt) & "," & _
+    """news_note""":" & JsonStringOrNull(newsNote) & "," & _
         """ohlc"":" & ohlcJson & "," & _
         """timestamp"":""" & isoTimestamp & """" & _
         "}"
@@ -193,4 +201,32 @@ End Function
 
 Private Function JsonNumber(ByVal value As Double) As String
     JsonNumber = Replace$(Format$(Round(value, 3), "0.###"), ",", ".")
+End Function
+
+Private Function JsonOptionalNumber(ByVal value As Variant) As String
+    If IsEmpty(value) Then
+        JsonOptionalNumber = "null"
+        Exit Function
+    End If
+    If Not IsNumeric(value) Then
+        JsonOptionalNumber = "null"
+        Exit Function
+    End If
+    JsonOptionalNumber = JsonNumber(CDbl(value))
+End Function
+
+Private Function JsonBoolean(ByVal value As Boolean) As String
+    If value Then
+        JsonBoolean = "true"
+    Else
+        JsonBoolean = "false"
+    End If
+End Function
+
+Private Function JsonStringOrNull(ByVal value As String) As String
+    If Trim$(value) = "" Then
+        JsonStringOrNull = "null"
+    Else
+        JsonStringOrNull = """" & EscapeJson(value) & """"
+    End If
 End Function

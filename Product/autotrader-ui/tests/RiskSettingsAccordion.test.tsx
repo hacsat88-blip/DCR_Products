@@ -22,6 +22,15 @@ const BASE_SETTINGS: RiskSettingsResponse = {
   manual_price_max: 500,
   max_daily_orders: null,
   max_concurrent_positions: null,
+  max_daily_loss_yen: 15000,
+  max_consecutive_losses: 2,
+  cooldown_minutes_after_loss: 15,
+  min_five_bar_range_pct: 0.8,
+  min_last_bar_volume_ratio: 1.2,
+  max_reference_gap_pct: 4,
+  flat_before_close_minutes: 10,
+  max_spread_bps: 20,
+  skip_open_minutes: 5,
   suggested_price_min: 100,
   suggested_price_max: 290,
   effective_price_min: 100,
@@ -63,6 +72,15 @@ describe("RiskSettingsAccordion", () => {
     expect(screen.getByLabelText("利用可能現金")).toHaveValue(290000);
     expect(screen.getByLabelText("手動価格帯 下限")).toHaveValue(100);
     expect(screen.getByLabelText("手動価格帯 上限")).toHaveValue(500);
+    expect(screen.getByLabelText("日次損失上限 (円)")).toHaveValue(15000);
+    expect(screen.getByLabelText("最大連敗数")).toHaveValue(2);
+    expect(screen.getByLabelText("損失後クールダウン (分)")).toHaveValue(15);
+    expect(screen.getByLabelText("最小5本レンジ (%)")).toHaveValue(0.8);
+    expect(screen.getByLabelText("直近出来高倍率")).toHaveValue(1.2);
+    expect(screen.getByLabelText("参照乖離上限 (%)")).toHaveValue(4);
+    expect(screen.getByLabelText("引け前手仕舞い (分前)")).toHaveValue(10);
+    expect(screen.getByLabelText("最大スプレッド (bps)")).toHaveValue(20);
+    expect(screen.getByLabelText("寄り付き停止 (分)")).toHaveValue(5);
     expect(screen.getByText("執行フィード")).toBeInTheDocument();
     expect(screen.getByText("楽天RSS")).toBeInTheDocument();
     expect(screen.getByText("参照フィード")).toBeInTheDocument();
@@ -110,6 +128,15 @@ describe("RiskSettingsAccordion", () => {
     expect(payload.ai_mode).toBe("gemini");
     expect(payload.execution_feed).toBe("rakuten_rss");
     expect(payload.reference_feed).toBe("jquants_light");
+    expect(payload.max_daily_loss_yen).toBe(15000);
+    expect(payload.max_consecutive_losses).toBe(2);
+    expect(payload.cooldown_minutes_after_loss).toBe(15);
+    expect(payload.min_five_bar_range_pct).toBe(0.8);
+    expect(payload.min_last_bar_volume_ratio).toBe(1.2);
+    expect(payload.max_reference_gap_pct).toBe(4);
+    expect(payload.flat_before_close_minutes).toBe(10);
+    expect(payload.max_spread_bps).toBe(20);
+    expect(payload.skip_open_minutes).toBe(5);
   });
 
   test("auto mode sends null for nullable overrides", async () => {

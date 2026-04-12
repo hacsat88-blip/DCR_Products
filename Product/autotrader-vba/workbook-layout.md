@@ -27,6 +27,10 @@ runtime workbook path は repo root の autotrader.xlsm を想定します。
 | B6 | - |
 | A7 | Warning |
 | B7 | |
+| A8 | News Halt |
+| B8 | FALSE |
+| A9 | News Note |
+| B9 | |
 
 ## Market Sheet
 
@@ -37,11 +41,15 @@ runtime workbook path は repo root の autotrader.xlsm を想定します。
 | C1 | Volume |
 | D1 | Date |
 | E1 | Time |
+| F1 | Bid |
+| G1 | Ask |
 | A2 | 7203 (auto-synced mirror; manual smoke fallback) |
 | B2 | =RSS\|'7203.T'!'現在値' |
 | C2 | =RSS\|'7203.T'!'出来高' |
 | D2 | =RSS\|'7203.T'!'日付' |
 | E2 | =RSS\|'7203.T'!'時刻' |
+| F2 | =RSS\|'7203.T'!'買気配' |
+| G2 | =RSS\|'7203.T'!'売気配' |
 
 Excel に入力するときは Markdown table の escape backslash を外して使います。
 
@@ -50,10 +58,14 @@ B2: =RSS|'7203.T'!'現在値'
 C2: =RSS|'7203.T'!'出来高'
 D2: =RSS|'7203.T'!'日付'
 E2: =RSS|'7203.T'!'時刻'
+F2: =RSS|'7203.T'!'買気配'
+G2: =RSS|'7203.T'!'売気配'
 ```
 
 - backend へ送る code は B2 の live RSS formula から解決し、B2 が RSS formula でない manual smoke 時だけ A2 を fallback として使います。
 - RSS mode では modTimer が A2 を live formula の code へ同期します。symbol を切り替えるときは B2:E2 の RSS formula を更新します。
+- `F2/G2` が空欄でも送信は継続し、その場合 backend の spread filter は適用されません。
+- `Control!B8/B9` は手動のニュース停止トグルです。`B8=TRUE` の間は backend が新規建てを停止します。
 
 ## OHLC_Data Sheet
 
@@ -85,4 +97,4 @@ E2: =RSS|'7203.T'!'時刻'
 
 ## Named Range
 
-- RSS_TICK = Market!A2:E2
+- RSS_TICK = Market!A2:G2

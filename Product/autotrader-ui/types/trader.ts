@@ -43,6 +43,15 @@ export interface RawTraderRiskSnapshot {
   manual_price_max: number;
   max_daily_orders: number | null;
   max_concurrent_positions: number | null;
+  max_daily_loss_yen: number;
+  max_consecutive_losses: number;
+  cooldown_minutes_after_loss: number;
+  min_five_bar_range_pct: number;
+  min_last_bar_volume_ratio: number;
+  max_reference_gap_pct: number;
+  flat_before_close_minutes: number;
+  max_spread_bps: number;
+  skip_open_minutes: number;
   suggested_price_min: number;
   suggested_price_max: number;
   effective_price_min: number;
@@ -53,6 +62,15 @@ export interface RawTraderRiskSnapshot {
 
 export type RiskSettingsResponse = RawTraderRiskSnapshot;
 
+export interface RawTraderRiskRuntimeSnapshot {
+  daily_order_count: number;
+  daily_realized_pnl: number;
+  consecutive_loss_count: number;
+  cooldown_remaining_sec: number;
+  entry_blocked: boolean;
+  entry_block_reason: string | null;
+}
+
 export interface RawTraderPayload {
   type: "state_update";
   ts: string;
@@ -61,6 +79,7 @@ export interface RawTraderPayload {
   position: RawTraderPosition;
   last_action: RawTraderActionPayload;
   risk: RawTraderRiskSnapshot;
+  risk_runtime: RawTraderRiskRuntimeSnapshot;
 }
 
 export type ConnectionState = "waiting-first-tick" | "connected" | "reconnecting" | "stale";
@@ -89,6 +108,15 @@ export interface TraderEventSnapshot {
   feedSource: FeedSource | null;
 }
 
+export interface TraderRiskRuntimeSnapshot {
+  dailyOrderCount: number;
+  dailyRealizedPnl: number;
+  consecutiveLossCount: number;
+  cooldownRemainingSec: number;
+  entryBlocked: boolean;
+  entryBlockReason: string | null;
+}
+
 export interface TraderViewModel {
   connectionState: ConnectionState;
   lastUpdatedAt: string | null;
@@ -99,4 +127,5 @@ export interface TraderViewModel {
   aiEventHistory: TraderEventSnapshot[];
   orderHistory: TraderEventSnapshot[];
   riskSnapshot: RawTraderRiskSnapshot | null;
+  riskRuntimeSnapshot: TraderRiskRuntimeSnapshot | null;
 }

@@ -5,6 +5,7 @@ from server.models import FeedSource, PriceFeedResponse, PriceRequest, TradeDeci
 from server.engine.gemini_trader import GeminiTrader
 from server.engine.risk_guard import RiskGuard
 from server.engine.position import PositionManager
+from server.engine.trade_setup import build_trade_setup
 
 
 def make_price_router(
@@ -148,19 +149,25 @@ def make_price_router(
 
         await pos_mgr.update_price(req.price)
         position = pos_mgr.position
-        raw = gemini_ai.decide_safe(req, position, guard.settings)
+        setup = build_trade_setup(req, reference_snapshot)
+        raw = gemini_ai.decide_safe(req, position, guard.settings, setup=setup)
 
-        decision = guard.apply(raw, position, req.price, req.timestamp)
+        decision = guard.apply(raw, position, req.price, req.timestamp, setup=setup)
 
         if decision.action == "buy":
             await pos_mgr.apply_buy(req.code, decision.qty, req.price)
             guard.record_order(decision, req.timestamp)
         elif decision.action == "sell":
+            realized_pnl = (
+                (req.price - position.avg_cost) * decision.qty
+                if position.avg_cost > 0
+                else 0.0
+            )
             try:
                 await pos_mgr.apply_sell(decision.qty, req.price)
             except ValueError as e:
                 raise HTTPException(status_code=400, detail=str(e))
-            guard.record_order(decision, req.timestamp)
+            guard.record_order(decision, req.timestamp, realized_pnl=realized_pnl)
 
         await _broadcast_decision(req, decision)
         if schedule_reference_publish is not None:

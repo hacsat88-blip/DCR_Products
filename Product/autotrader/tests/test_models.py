@@ -92,6 +92,38 @@ def test_price_request_reference_feed_defaults_to_jquants_light():
     assert req.feed_source == "jquants_light"
 
 
+def test_price_request_accepts_optional_bid_ask_and_news_halt():
+    req = PriceRequest(
+        code="7203",
+        price=320.0,
+        volume=12000,
+        bid=319.8,
+        ask=320.2,
+        news_halt=True,
+        news_note="決算速報",
+        ohlc=[OHLCBar(o=315, h=325, l=310, c=320)],
+        timestamp=datetime.now(),
+    )
+
+    assert req.bid == 319.8
+    assert req.ask == 320.2
+    assert req.news_halt is True
+    assert req.news_note == "決算速報"
+
+
+def test_price_request_rejects_ask_lower_than_bid():
+    with pytest.raises(ValidationError):
+        PriceRequest(
+            code="7203",
+            price=320.0,
+            volume=12000,
+            bid=320.5,
+            ask=320.2,
+            ohlc=[OHLCBar(o=315, h=325, l=310, c=320)],
+            timestamp=datetime.now(),
+        )
+
+
 def test_price_request_rejects_execution_reference_mismatch():
     with pytest.raises(ValidationError):
         PriceRequest(
@@ -161,6 +193,8 @@ def test_risk_settings_defaults():
     assert s.effective_price_max == 500
     assert s.effective_max_daily_orders == 3
     assert s.effective_max_concurrent_positions == 1
+    assert s.max_spread_bps == 20.0
+    assert s.skip_open_minutes == 5
 
 
 def test_risk_settings_auto_suggests_band_from_cash_when_manual_priority_disabled():

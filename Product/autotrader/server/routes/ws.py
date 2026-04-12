@@ -24,6 +24,7 @@ def make_ws_router(
 
     async def broadcast(price: dict, action: dict) -> None:
         nonlocal _last_reference_price
+        now = datetime.now()
         if price.get("feed_role") == "reference":
             _last_reference_price = price.copy()
         else:
@@ -32,7 +33,7 @@ def make_ws_router(
         pos = pos_mgr.position
         payload = {
             "type": "state_update",
-            "ts": datetime.now().isoformat(),
+            "ts": now.isoformat(),
             "price": _last_execution_price.copy(),
             "reference_price": None if _last_reference_price is None else _last_reference_price.copy(),
             "position": {
@@ -43,6 +44,7 @@ def make_ws_router(
             },
             "last_action": _last_action.copy(),
             "risk": guard.settings.model_dump(),
+            "risk_runtime": guard.runtime_snapshot(now).model_dump(),
         }
         dead: list[WebSocket] = []
         for ws in _clients:

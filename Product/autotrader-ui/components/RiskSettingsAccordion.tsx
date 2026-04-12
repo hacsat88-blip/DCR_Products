@@ -23,6 +23,15 @@ interface RiskSettingsDraft {
   manual_price_max: string;
   max_daily_orders: string;
   max_concurrent_positions: string;
+  max_daily_loss_yen: string;
+  max_consecutive_losses: string;
+  cooldown_minutes_after_loss: string;
+  min_five_bar_range_pct: string;
+  min_last_bar_volume_ratio: string;
+  max_reference_gap_pct: string;
+  flat_before_close_minutes: string;
+  max_spread_bps: string;
+  skip_open_minutes: string;
   maxDailyOrdersMode: OverrideMode;
   maxConcurrentPositionsMode: OverrideMode;
   effective_max_daily_orders: number;
@@ -44,6 +53,15 @@ const FIELD_LABELS = {
   manual_price_max: "手動価格帯 上限",
   max_daily_orders: "1日あたり最大注文数",
   max_concurrent_positions: "同時保有上限",
+  max_daily_loss_yen: "日次損失上限 (円)",
+  max_consecutive_losses: "最大連敗数",
+  cooldown_minutes_after_loss: "損失後クールダウン (分)",
+  min_five_bar_range_pct: "最小5本レンジ (%)",
+  min_last_bar_volume_ratio: "直近出来高倍率",
+  max_reference_gap_pct: "参照乖離上限 (%)",
+  flat_before_close_minutes: "引け前手仕舞い (分前)",
+  max_spread_bps: "最大スプレッド (bps)",
+  skip_open_minutes: "寄り付き停止 (分)",
   execution_feed: "執行フィード",
   reference_feed: "参照フィード"
 } as const;
@@ -70,6 +88,15 @@ function toDraft(settings: RiskSettingsResponse): RiskSettingsDraft {
     max_concurrent_positions: String(
       settings.max_concurrent_positions ?? settings.effective_max_concurrent_positions
     ),
+    max_daily_loss_yen: String(settings.max_daily_loss_yen),
+    max_consecutive_losses: String(settings.max_consecutive_losses),
+    cooldown_minutes_after_loss: String(settings.cooldown_minutes_after_loss),
+    min_five_bar_range_pct: String(settings.min_five_bar_range_pct),
+    min_last_bar_volume_ratio: String(settings.min_last_bar_volume_ratio),
+    max_reference_gap_pct: String(settings.max_reference_gap_pct),
+    flat_before_close_minutes: String(settings.flat_before_close_minutes),
+    max_spread_bps: String(settings.max_spread_bps),
+    skip_open_minutes: String(settings.skip_open_minutes),
     maxDailyOrdersMode: settings.max_daily_orders === null ? "auto" : "manual",
     maxConcurrentPositionsMode: settings.max_concurrent_positions === null ? "auto" : "manual",
     effective_max_daily_orders: settings.effective_max_daily_orders,
@@ -82,9 +109,19 @@ function parsePositiveInteger(value: string, fallback: number): number {
   return Number.isFinite(parsed) && parsed > 0 ? parsed : fallback;
 }
 
+function parseNonNegativeInteger(value: string, fallback: number): number {
+  const parsed = Number.parseInt(value, 10);
+  return Number.isFinite(parsed) && parsed >= 0 ? parsed : fallback;
+}
+
 function parsePositiveFloat(value: string, fallback: number): number {
   const parsed = Number.parseFloat(value);
   return Number.isFinite(parsed) && parsed > 0 ? parsed : fallback;
+}
+
+function parseNonNegativeFloat(value: string, fallback: number): number {
+  const parsed = Number.parseFloat(value);
+  return Number.isFinite(parsed) && parsed >= 0 ? parsed : fallback;
 }
 
 function toPayload(canonical: RiskSettingsResponse, draft: RiskSettingsDraft): RiskSettingsResponse {
@@ -112,7 +149,40 @@ function toPayload(canonical: RiskSettingsResponse, draft: RiskSettingsDraft): R
         : parsePositiveInteger(
             draft.max_concurrent_positions,
             canonical.effective_max_concurrent_positions
-          )
+          ),
+    max_daily_loss_yen: parsePositiveInteger(
+      draft.max_daily_loss_yen,
+      canonical.max_daily_loss_yen
+    ),
+    max_consecutive_losses: parsePositiveInteger(
+      draft.max_consecutive_losses,
+      canonical.max_consecutive_losses
+    ),
+    cooldown_minutes_after_loss: parseNonNegativeInteger(
+      draft.cooldown_minutes_after_loss,
+      canonical.cooldown_minutes_after_loss
+    ),
+    min_five_bar_range_pct: parseNonNegativeFloat(
+      draft.min_five_bar_range_pct,
+      canonical.min_five_bar_range_pct
+    ),
+    min_last_bar_volume_ratio: parseNonNegativeFloat(
+      draft.min_last_bar_volume_ratio,
+      canonical.min_last_bar_volume_ratio
+    ),
+    max_reference_gap_pct: parsePositiveFloat(
+      draft.max_reference_gap_pct,
+      canonical.max_reference_gap_pct
+    ),
+    flat_before_close_minutes: parsePositiveInteger(
+      draft.flat_before_close_minutes,
+      canonical.flat_before_close_minutes
+    ),
+    max_spread_bps: parsePositiveFloat(draft.max_spread_bps, canonical.max_spread_bps),
+    skip_open_minutes: parseNonNegativeInteger(
+      draft.skip_open_minutes,
+      canonical.skip_open_minutes
+    )
   };
 }
 
@@ -126,6 +196,15 @@ interface NumberFieldProps {
     | "available_cash"
     | "manual_price_min"
     | "manual_price_max"
+    | "max_daily_loss_yen"
+    | "max_consecutive_losses"
+    | "cooldown_minutes_after_loss"
+    | "min_five_bar_range_pct"
+    | "min_last_bar_volume_ratio"
+    | "max_reference_gap_pct"
+    | "flat_before_close_minutes"
+    | "max_spread_bps"
+    | "skip_open_minutes"
   >;
   draft: RiskSettingsDraft;
   disabled: boolean;
@@ -390,6 +469,60 @@ export function RiskSettingsAccordion(): JSX.Element {
                 />
                 <NumberField
                   label="manual_price_max"
+                  draft={draft}
+                  disabled={formDisabled}
+                  onChange={updateDraft}
+                />
+                <NumberField
+                  label="max_daily_loss_yen"
+                  draft={draft}
+                  disabled={formDisabled}
+                  onChange={updateDraft}
+                />
+                <NumberField
+                  label="max_consecutive_losses"
+                  draft={draft}
+                  disabled={formDisabled}
+                  onChange={updateDraft}
+                />
+                <NumberField
+                  label="cooldown_minutes_after_loss"
+                  draft={draft}
+                  disabled={formDisabled}
+                  onChange={updateDraft}
+                />
+                <NumberField
+                  label="min_five_bar_range_pct"
+                  draft={draft}
+                  disabled={formDisabled}
+                  onChange={updateDraft}
+                />
+                <NumberField
+                  label="min_last_bar_volume_ratio"
+                  draft={draft}
+                  disabled={formDisabled}
+                  onChange={updateDraft}
+                />
+                <NumberField
+                  label="max_reference_gap_pct"
+                  draft={draft}
+                  disabled={formDisabled}
+                  onChange={updateDraft}
+                />
+                <NumberField
+                  label="flat_before_close_minutes"
+                  draft={draft}
+                  disabled={formDisabled}
+                  onChange={updateDraft}
+                />
+                <NumberField
+                  label="max_spread_bps"
+                  draft={draft}
+                  disabled={formDisabled}
+                  onChange={updateDraft}
+                />
+                <NumberField
+                  label="skip_open_minutes"
                   draft={draft}
                   disabled={formDisabled}
                   onChange={updateDraft}

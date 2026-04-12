@@ -29,6 +29,15 @@ def test_get_settings_returns_defaults(client):
     assert data["trading_mode"] == "conservative"
     assert data["execution_feed"] == "rakuten_rss"
     assert data["reference_feed"] == "jquants_light"
+    assert data["max_daily_loss_yen"] == 15_000
+    assert data["max_consecutive_losses"] == 2
+    assert data["cooldown_minutes_after_loss"] == 15
+    assert data["min_five_bar_range_pct"] == 0.8
+    assert data["min_last_bar_volume_ratio"] == 1.2
+    assert data["max_reference_gap_pct"] == 4.0
+    assert data["flat_before_close_minutes"] == 10
+    assert data["max_spread_bps"] == 20.0
+    assert data["skip_open_minutes"] == 5
 
 
 def test_put_settings_updates_values(client):
@@ -46,6 +55,15 @@ def test_put_settings_updates_values(client):
         "manual_price_max": 500,
         "max_daily_orders": 4,
         "max_concurrent_positions": 2,
+        "max_daily_loss_yen": 12_000,
+        "max_consecutive_losses": 3,
+        "cooldown_minutes_after_loss": 20,
+        "min_five_bar_range_pct": 1.1,
+        "min_last_bar_volume_ratio": 1.4,
+        "max_reference_gap_pct": 3.5,
+        "flat_before_close_minutes": 12,
+        "max_spread_bps": 18.0,
+        "skip_open_minutes": 7,
         "execution_feed": "rakuten_rss",
         "reference_feed": "jquants_free",
     })
@@ -57,3 +75,12 @@ def test_put_settings_updates_values(client):
     assert guard.settings.available_cash == 240_000
     assert guard.settings.max_daily_orders == 4
     assert guard.settings.max_concurrent_positions == 2
+    assert guard.settings.max_daily_loss_yen == 12_000
+    assert guard.settings.max_consecutive_losses == 3
+    assert guard.settings.cooldown_minutes_after_loss == 20
+    assert guard.settings.min_five_bar_range_pct == 1.1
+    assert guard.settings.min_last_bar_volume_ratio == 1.4
+    assert guard.settings.max_reference_gap_pct == 3.5
+    assert guard.settings.flat_before_close_minutes == 12
+    assert guard.settings.max_spread_bps == 18.0
+    assert guard.settings.skip_open_minutes == 7

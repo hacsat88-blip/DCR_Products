@@ -12,7 +12,13 @@ PRICE_PAYLOAD = {
     "code": "7203",
     "price": 250.0,
     "volume": 10000,
-    "ohlc": [{"o": 249, "h": 251, "l": 248, "c": 250, "v": 1000}],
+    "ohlc": [
+        {"o": 249.0, "h": 249.4, "l": 248.7, "c": 249.1, "v": 700},
+        {"o": 249.1, "h": 249.7, "l": 249.0, "c": 249.5, "v": 800},
+        {"o": 249.5, "h": 250.1, "l": 249.3, "c": 249.8, "v": 900},
+        {"o": 249.8, "h": 250.4, "l": 249.6, "c": 250.0, "v": 1000},
+        {"o": 250.0, "h": 250.8, "l": 249.9, "c": 250.5, "v": 1500},
+    ],
     "timestamp": "2026-04-12T10:00:00",
 }
 
@@ -231,7 +237,7 @@ def test_price_feed_records_orders_against_daily_limit(setup):
     mock_gemini = MagicMock()
     mock_gemini.decide_safe.side_effect = [
         TradeDecision(action="buy", qty=10, reason="初回買い"),
-        TradeDecision(action="sell", qty=10, reason="利益確定"),
+        TradeDecision(action="buy", qty=10, reason="再エントリー"),
     ]
     schedule_reference_publish = MagicMock()
 
@@ -258,3 +264,67 @@ def test_price_feed_records_orders_against_daily_limit(setup):
     assert second.json()["action"] == "hold"
     assert "日次発注上限" in second.json()["reason"]
     assert schedule_reference_publish.call_count == 2
+
+
+def test_price_feed_blocks_buy_when_intraday_setup_is_too_thin(setup):
+    pos_mgr, guard, broadcast = setup
+    mock_gemini = MagicMock()
+    mock_gemini.decide_safe.return_value = TradeDecision(action="buy", qty=10, reason="上抜け")
+    schedule_reference_publish = MagicMock()
+
+    tc = _make_app(
+        mock_gemini,
+        guard,
+        pos_mgr,
+        broadcast,
+        None,
+        schedule_reference_publish,
+    )
+    res = tc.post(
+        "/api/price",
+        json={
+            **PRICE_PAYLOAD,
+            "price": 250.0,
+            "ohlc": [
+                {"o": 249.8, "h": 250.1, "l": 249.7, "c": 250.0, "v": 1000},
+                {"o": 249.9, "h": 250.2, "l": 249.8, "c": 250.0, "v": 1000},
+                {"o": 249.9, "h": 250.1, "l": 249.8, "c": 250.0, "v": 1000},
+                {"o": 249.8, "h": 250.2, "l": 249.8, "c": 250.0, "v": 1000},
+                {"o": 249.9, "h": 250.1, "l": 249.8, "c": 250.0, "v": 900},
+            ],
+        },
+    )
+
+    assert res.status_code == 200
+    assert res.json()["action"] == "hold"
+    assert "値幅" in res.json()["reason"] or "出来高" in res.json()["reason"]
+
+
+def test_price_feed_blocks_buy_when_news_halt_is_enabled(setup):
+    pos_mgr, guard, broadcast = setup
+    mock_gemini = MagicMock()
+    mock_gemini.decide_safe.return_value = TradeDecision(action="buy", qty=10, reason="上抜け")
+    schedule_reference_publish = MagicMock()
+
+    tc = _make_app(
+        mock_gemini,
+        guard,
+        pos_mgr,
+        broadcast,
+        None,
+        schedule_reference_publish,
+    )
+    res = tc.post(
+        "/api/price",
+        json={
+            **PRICE_PAYLOAD,
+            "bid": 249.9,
+            "ask": 250.1,
+            "news_halt": True,
+            "news_note": "決算速報",
+        },
+    )
+
+    assert res.status_code == 200
+    assert res.json()["action"] == "hold"
+    assert "ニュース" in res.json()["reason"]
