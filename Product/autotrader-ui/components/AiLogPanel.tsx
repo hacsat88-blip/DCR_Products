@@ -1,3 +1,4 @@
+import { getFeedRoleLabel } from "@/lib/trader-display";
 import type { TraderEventSnapshot } from "@/types/trader";
 
 interface AiLogPanelProps {
@@ -18,7 +19,7 @@ export function AiLogPanel({ events }: AiLogPanelProps): JSX.Element {
         <ul className="history-list">
           {events.map((event, index) => (
             <li key={`${event.at}-${event.action}-${index}`} className="history-row">
-              <span className="history-row__meta">{event.feedRole ?? "-"}</span>
+              <span className="history-row__meta">{getFeedRoleLabel(event.feedRole) ?? "-"}</span>
               <span className="history-row__body">{`${event.at || "--:--:--"} / ${event.reason}`}</span>
             </li>
           ))}

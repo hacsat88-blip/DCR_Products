@@ -1,3 +1,4 @@
+import { getActionLabel, getFeedSourceLabel } from "@/lib/trader-display";
 import type { TraderEventSnapshot } from "@/types/trader";
 
 interface OrderHistoryProps {
@@ -18,8 +19,8 @@ export function OrderHistory({ events }: OrderHistoryProps): JSX.Element {
         <ul className="history-list">
           {events.map((event, index) => (
             <li key={`${event.at}-${event.action}-${index}`} className="history-row">
-              <span className="history-row__meta">{event.action}</span>
-              <span className="history-row__body">{`${event.at || "--:--:--"} / ${event.qty}株 / ${event.feedSource ?? "-"}`}</span>
+              <span className="history-row__meta">{getActionLabel(event.action)}</span>
+              <span className="history-row__body">{`${event.at || "--:--:--"} / ${event.qty}株 / ${getFeedSourceLabel(event.feedSource) ?? "-"}`}</span>
             </li>
           ))}
         </ul>

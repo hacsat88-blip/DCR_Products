@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 
 import { fetchSettings, updateSettings } from "@/lib/api";
+import { getAiModeLabel, getFeedSourceLabel, getTradeModeLabel } from "@/lib/trader-display";
 import type { AISelectionMode, RiskSettingsResponse, TradeMode } from "@/types/trader";
 
 type OverrideMode = "auto" | "manual";
@@ -351,7 +352,7 @@ export function RiskSettingsAccordion(): JSX.Element {
                   >
                     {AI_MODE_OPTIONS.map((option) => (
                       <option key={option} value={option}>
-                        {option}
+                        {getAiModeLabel(option)}
                       </option>
                     ))}
                   </select>
@@ -366,7 +367,7 @@ export function RiskSettingsAccordion(): JSX.Element {
                   >
                     {TRADE_MODE_OPTIONS.map((option) => (
                       <option key={option} value={option}>
-                        {option}
+                        {getTradeModeLabel(option)}
                       </option>
                     ))}
                   </select>
@@ -412,11 +413,11 @@ export function RiskSettingsAccordion(): JSX.Element {
               <div className="settings-feed-grid">
                 <div className="settings-readonly-row">
                   <span>{getFieldLabel("execution_feed")}</span>
-                  <strong>{draft.execution_feed}</strong>
+                  <strong>{getFeedSourceLabel(draft.execution_feed)}</strong>
                 </div>
                 <div className="settings-readonly-row">
                   <span>{getFieldLabel("reference_feed")}</span>
-                  <strong>{draft.reference_feed}</strong>
+                  <strong>{getFeedSourceLabel(draft.reference_feed)}</strong>
                 </div>
               </div>
 

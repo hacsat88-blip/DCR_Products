@@ -64,12 +64,21 @@ describe("RiskSettingsAccordion", () => {
     expect(screen.getByLabelText("手動価格帯 下限")).toHaveValue(100);
     expect(screen.getByLabelText("手動価格帯 上限")).toHaveValue(500);
     expect(screen.getByText("執行フィード")).toBeInTheDocument();
-    expect(screen.getByText("rakuten_rss")).toBeInTheDocument();
+    expect(screen.getByText("楽天RSS")).toBeInTheDocument();
     expect(screen.getByText("参照フィード")).toBeInTheDocument();
-    expect(screen.getByText("jquants_light")).toBeInTheDocument();
+    expect(screen.getByText("J-Quants Light")).toBeInTheDocument();
 
     const aiMode = screen.getByLabelText("AI モード") as HTMLSelectElement;
     expect(Array.from(aiMode.options).map((option) => option.value)).toEqual(["gemini", "hybrid"]);
+    expect(Array.from(aiMode.options).map((option) => option.text)).toEqual(["Gemini", "ハイブリッド"]);
+
+    const tradeMode = screen.getByLabelText("売買モード") as HTMLSelectElement;
+    expect(Array.from(tradeMode.options).map((option) => option.value)).toEqual([
+      "conservative",
+      "balanced",
+      "aggressive"
+    ]);
+    expect(Array.from(tradeMode.options).map((option) => option.text)).toEqual(["慎重", "標準", "積極"]);
 
     expect(screen.getAllByText("自動")).toHaveLength(2);
     expect(screen.getByText("実効値 3")).toBeInTheDocument();
