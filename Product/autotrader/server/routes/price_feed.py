@@ -115,10 +115,12 @@ def make_price_router(
                 "feed_role": req.feed_role,
                 "feed_source": req.feed_source,
             },
+            event_timestamp=req.timestamp,
         )
 
     @r.post("/api/price", response_model=PriceFeedResponse)
     async def receive_price(req: PriceRequest):
+        guard.sync_time(req.timestamp)
         if req.feed_role == "reference":
             decision = TradeDecision(
                 action="hold",

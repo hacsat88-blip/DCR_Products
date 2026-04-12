@@ -28,16 +28,15 @@ class RiskGuard:
     def daily_order_count(self) -> int:
         return self._daily_order_count
 
+    def sync_time(self, now: datetime) -> None:
+        self._reset_daily_state_if_needed(now)
+
     def runtime_snapshot(self, now: datetime | None = None) -> RiskRuntimeSnapshot:
         current = now or datetime.now()
-        self._reset_daily_state_if_needed(current)
 
         cooldown_remaining = 0
-        if self._cooldown_until is not None:
-            if current >= self._cooldown_until:
-                self._cooldown_until = None
-            else:
-                cooldown_remaining = int((self._cooldown_until - current).total_seconds())
+        if self._cooldown_until is not None and current < self._cooldown_until:
+            cooldown_remaining = int((self._cooldown_until - current).total_seconds())
 
         entry_block_reason = None
         if self._daily_realized_pnl <= -self._settings.max_daily_loss_yen:
@@ -177,9 +176,9 @@ class RiskGuard:
                 return TradeDecision(action="hold", qty=0, reason="寄り付き直後は新規停止")
             if setup.spread_bps is not None and setup.spread_bps > s.max_spread_bps:
                 return TradeDecision(action="hold", qty=0, reason="スプレッドが広く見送り")
-            if setup.five_bar_range_pct < s.min_five_bar_range_pct:
+            if setup.has_full_history and setup.five_bar_range_pct < s.min_five_bar_range_pct:
                 return TradeDecision(action="hold", qty=0, reason="値幅不足で見送り")
-            if setup.last_bar_volume_ratio < s.min_last_bar_volume_ratio:
+            if setup.has_full_history and setup.last_bar_volume_ratio < s.min_last_bar_volume_ratio:
                 return TradeDecision(action="hold", qty=0, reason="出来高不足で見送り")
             if (
                 setup.reference_gap_pct is not None

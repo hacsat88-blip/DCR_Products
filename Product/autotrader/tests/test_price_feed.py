@@ -328,3 +328,32 @@ def test_price_feed_blocks_buy_when_news_halt_is_enabled(setup):
     assert res.status_code == 200
     assert res.json()["action"] == "hold"
     assert "ニュース" in res.json()["reason"]
+
+
+def test_price_feed_allows_buy_when_only_one_bar_is_available(setup):
+    pos_mgr, guard, broadcast = setup
+    mock_gemini = MagicMock()
+    mock_gemini.decide_safe.return_value = TradeDecision(action="buy", qty=10, reason="初動")
+    schedule_reference_publish = MagicMock()
+
+    tc = _make_app(
+        mock_gemini,
+        guard,
+        pos_mgr,
+        broadcast,
+        None,
+        schedule_reference_publish,
+    )
+    res = tc.post(
+        "/api/price",
+        json={
+            **PRICE_PAYLOAD,
+            "ohlc": [
+                {"o": 249.8, "h": 250.2, "l": 249.7, "c": 250.0, "v": 1000},
+            ],
+        },
+    )
+
+    assert res.status_code == 200
+    assert res.json()["action"] == "buy"
+    assert res.json()["qty"] == 10

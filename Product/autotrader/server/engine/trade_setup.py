@@ -21,6 +21,7 @@ class TradeSetup:
     minutes_from_session_open: int
     news_halt: bool
     news_note: str | None
+    has_full_history: bool = True
 
 
 def _minutes_from_session_open(timestamp: datetime) -> int:
@@ -79,4 +80,5 @@ def build_trade_setup(
         minutes_from_session_open=_minutes_from_session_open(req.timestamp),
         news_halt=req.news_halt,
         news_note=req.news_note,
+        has_full_history=len(bars) >= 5,
     )

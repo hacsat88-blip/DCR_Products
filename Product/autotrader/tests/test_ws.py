@@ -188,3 +188,42 @@ def test_broadcast_includes_runtime_risk_after_loss(tmp_path, monkeypatch):
     assert payload["risk_runtime"]["daily_realized_pnl"] == -500.0
     assert payload["risk_runtime"]["consecutive_loss_count"] == 1
     assert payload["risk_runtime"]["cooldown_remaining_sec"] >= 0
+
+
+def test_broadcast_uses_event_timestamp_for_runtime_snapshot(tmp_path, monkeypatch):
+    pos_mgr, guard = _make_components(tmp_path, monkeypatch)
+    _, broadcast = make_ws_router(pos_mgr, guard)
+    clients = inspect.getclosurevars(broadcast).nonlocals["_clients"]
+    fake_ws = FakeWebSocket()
+    clients.append(fake_ws)
+
+    event_time = datetime(2026, 4, 12, 10, 0, 0)
+    guard.record_order(
+        TradeDecision(action="sell", qty=10, reason="損切り"),
+        event_time,
+        realized_pnl=-500.0,
+    )
+
+    asyncio.run(
+        broadcast(
+            price={
+                "code": "7203",
+                "current": 250.0,
+                "volume": 10000,
+                "feed_role": "execution",
+                "feed_source": "rakuten_rss",
+            },
+            action={
+                "action": "hold",
+                "qty": 0,
+                "reason": "停止中",
+                "at": "10:00:00",
+            },
+            event_timestamp=event_time,
+        )
+    )
+
+    payload = json.loads(fake_ws.messages[0])
+    assert payload["ts"] == event_time.isoformat()
+    assert payload["risk_runtime"]["daily_realized_pnl"] == -500.0
+    assert payload["risk_runtime"]["consecutive_loss_count"] == 1

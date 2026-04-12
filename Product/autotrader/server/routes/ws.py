@@ -22,9 +22,13 @@ def make_ws_router(
     _last_reference_price: dict | None = None
     _last_action: dict = {"action": "none", "qty": 0, "reason": "起動中", "at": ""}
 
-    async def broadcast(price: dict, action: dict) -> None:
+    async def broadcast(
+        price: dict,
+        action: dict,
+        event_timestamp: datetime | None = None,
+    ) -> None:
         nonlocal _last_reference_price
-        now = datetime.now()
+        now = event_timestamp or datetime.now()
         if price.get("feed_role") == "reference":
             _last_reference_price = price.copy()
         else:

@@ -204,6 +204,8 @@ Private Function JsonNumber(ByVal value As Double) As String
 End Function
 
 Private Function JsonOptionalNumber(ByVal value As Variant) As String
+    Dim parsedValue As Double
+
     If IsEmpty(value) Then
         JsonOptionalNumber = "null"
         Exit Function
@@ -212,7 +214,12 @@ Private Function JsonOptionalNumber(ByVal value As Variant) As String
         JsonOptionalNumber = "null"
         Exit Function
     End If
-    JsonOptionalNumber = JsonNumber(CDbl(value))
+    parsedValue = CDbl(value)
+    If parsedValue <= 0 Then
+        JsonOptionalNumber = "null"
+        Exit Function
+    End If
+    JsonOptionalNumber = JsonNumber(parsedValue)
 End Function
 
 Private Function JsonBoolean(ByVal value As Boolean) As String
