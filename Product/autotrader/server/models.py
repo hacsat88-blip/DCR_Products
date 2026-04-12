@@ -6,6 +6,8 @@ TradeMode = Literal["conservative", "balanced", "aggressive"]
 AISelectionMode = Literal["gemini"]
 FeedRole = Literal["execution", "reference"]
 FeedSource = Literal["rakuten_rss", "jquants_light", "jquants_free"]
+ReferenceStatus = Literal["ok", "missing", "stale"]
+ReferenceWarningCode = Literal["reference_missing", "reference_stale"]
 
 _MODE_PRICE_DIVISORS: dict[TradeMode, int] = {
     "conservative": 1000,
@@ -78,6 +80,18 @@ class TradeDecision(BaseModel):
     qty: int = Field(ge=0)
     order_type: str = "成行"
     reason: str
+
+
+class PriceFeedResponse(TradeDecision):
+    reference_status: ReferenceStatus = "missing"
+    reference_price: float | None = None
+    reference_volume: int | None = None
+    reference_source: FeedSource | None = None
+    reference_as_of: str | None = None
+    reference_age_days: int | None = Field(default=None, ge=0)
+    reference_gap_pct: float | None = None
+    warning_code: ReferenceWarningCode | None = None
+    warning_message: str | None = None
 
 
 class Position(BaseModel):

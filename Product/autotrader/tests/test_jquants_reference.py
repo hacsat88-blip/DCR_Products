@@ -30,6 +30,7 @@ def test_fetch_snapshot_returns_reference_quote(monkeypatch):
         "code": "7203",
         "current": 251.5,
         "volume": 12000,
+        "as_of": "2026-04-11",
         "feed_role": "reference",
         "feed_source": "jquants_light",
     }
@@ -71,4 +72,31 @@ def test_publish_reference_broadcasts_hold_event(monkeypatch):
 
     assert captured[0]["price"]["feed_role"] == "reference"
     assert captured[0]["price"]["feed_source"] == "jquants_free"
+    assert captured[0]["price"]["as_of"] == "2026-04-11"
     assert captured[0]["action"]["action"] == "hold"
+
+
+def test_peek_snapshot_returns_last_known_reference_after_fetch(monkeypatch):
+    monkeypatch.setenv("JQUANTS_API_KEY", "test-key")
+
+    async def handler(_: httpx.Request) -> httpx.Response:
+        return httpx.Response(
+            200,
+            json={
+                "daily_quotes": [
+                    {"Date": "20260411", "AdjC": 251.5, "AdjVo": 12000},
+                ]
+            },
+        )
+
+    service = JQuantsReferenceService(
+        transport=httpx.MockTransport(handler),
+        cache_ttl_seconds=1,
+    )
+
+    asyncio.run(service.fetch_snapshot("7203", "jquants_light"))
+    snapshot = service.peek_snapshot("7203", "jquants_light")
+
+    assert snapshot is not None
+    assert snapshot["as_of"] == "2026-04-11"
+    assert snapshot["current"] == 251.5

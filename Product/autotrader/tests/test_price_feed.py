@@ -16,6 +16,15 @@ PRICE_PAYLOAD = {
     "timestamp": "2026-04-12T10:00:00",
 }
 
+REFERENCE_SNAPSHOT = {
+    "code": "7203",
+    "current": 251.5,
+    "volume": 12000,
+    "as_of": "2026-04-11",
+    "feed_role": "reference",
+    "feed_source": "jquants_light",
+}
+
 
 @pytest.fixture
 def setup(tmp_path, monkeypatch):
@@ -29,7 +38,14 @@ def setup(tmp_path, monkeypatch):
     return pos_mgr, guard, broadcast
 
 
-def _make_app(gemini_ai, guard, pos_mgr, broadcast, schedule_reference_publish=None):
+def _make_app(
+    gemini_ai,
+    guard,
+    pos_mgr,
+    broadcast,
+    get_reference_snapshot=None,
+    schedule_reference_publish=None,
+):
     app = FastAPI()
     app.include_router(
         make_price_router(
@@ -37,6 +53,7 @@ def _make_app(gemini_ai, guard, pos_mgr, broadcast, schedule_reference_publish=N
             guard,
             pos_mgr,
             broadcast,
+            get_reference_snapshot=get_reference_snapshot,
             schedule_reference_publish=schedule_reference_publish,
         )
     )
@@ -51,12 +68,81 @@ def test_price_feed_returns_hold_by_default(setup):
     mock_gemini.decide_safe.return_value = TradeDecision(action="hold", qty=0, reason="様子見")
     schedule_reference_publish = MagicMock()
 
-    tc = _make_app(mock_gemini, guard, pos_mgr, broadcast, schedule_reference_publish)
+    tc = _make_app(
+        mock_gemini,
+        guard,
+        pos_mgr,
+        broadcast,
+        None,
+        schedule_reference_publish,
+    )
     res = tc.post("/api/price", json=PRICE_PAYLOAD)
     broadcast.assert_called_once()
     assert res.status_code == 200
     assert res.json()["action"] == "hold"
+    assert res.json()["reference_status"] == "missing"
+    assert res.json()["warning_code"] == "reference_missing"
     schedule_reference_publish.assert_called_once_with("7203", "jquants_light")
+
+
+def test_price_feed_returns_cached_reference_advisory(setup):
+    pos_mgr, guard, broadcast = setup
+    mock_gemini = MagicMock()
+    mock_gemini.decide_safe.return_value = TradeDecision(action="hold", qty=0, reason="様子見")
+    schedule_reference_publish = MagicMock()
+    get_reference_snapshot = MagicMock(return_value=REFERENCE_SNAPSHOT)
+
+    tc = _make_app(
+        mock_gemini,
+        guard,
+        pos_mgr,
+        broadcast,
+        get_reference_snapshot,
+        schedule_reference_publish,
+    )
+    res = tc.post("/api/price", json=PRICE_PAYLOAD)
+
+    assert res.status_code == 200
+    data = res.json()
+    assert data["reference_status"] == "ok"
+    assert data["reference_price"] == 251.5
+    assert data["reference_source"] == "jquants_light"
+    assert data["reference_as_of"] == "2026-04-11"
+    assert data["reference_age_days"] == 1
+    assert data["reference_gap_pct"] == pytest.approx(-0.596, abs=0.001)
+    assert data["warning_code"] is None
+    assert data["warning_message"] is None
+    get_reference_snapshot.assert_called_once_with("7203", "jquants_light")
+
+
+def test_price_feed_marks_old_reference_as_soft_warning(setup):
+    pos_mgr, guard, broadcast = setup
+    mock_gemini = MagicMock()
+    mock_gemini.decide_safe.return_value = TradeDecision(action="hold", qty=0, reason="様子見")
+    schedule_reference_publish = MagicMock()
+    get_reference_snapshot = MagicMock(
+        return_value={
+            **REFERENCE_SNAPSHOT,
+            "as_of": "2026-04-01",
+        }
+    )
+
+    tc = _make_app(
+        mock_gemini,
+        guard,
+        pos_mgr,
+        broadcast,
+        get_reference_snapshot,
+        schedule_reference_publish,
+    )
+    res = tc.post("/api/price", json=PRICE_PAYLOAD)
+
+    assert res.status_code == 200
+    data = res.json()
+    assert data["reference_status"] == "stale"
+    assert data["reference_age_days"] == 11
+    assert data["warning_code"] == "reference_stale"
+    assert "execution only" in data["warning_message"]
 
 
 def test_price_feed_buy_updates_position(setup):
@@ -65,7 +151,14 @@ def test_price_feed_buy_updates_position(setup):
     mock_gemini.decide_safe.return_value = TradeDecision(action="buy", qty=10, reason="強い")
     schedule_reference_publish = MagicMock()
 
-    tc = _make_app(mock_gemini, guard, pos_mgr, broadcast, schedule_reference_publish)
+    tc = _make_app(
+        mock_gemini,
+        guard,
+        pos_mgr,
+        broadcast,
+        None,
+        schedule_reference_publish,
+    )
     # 10株 × 250円 = 2,500 < limit 100,000 → allow
     res = tc.post("/api/price", json=PRICE_PAYLOAD)
     broadcast.assert_called_once()
@@ -82,7 +175,14 @@ def test_price_feed_risk_guard_blocks_excessive_buy(setup):
     mock_gemini.decide_safe.return_value = TradeDecision(action="buy", qty=500, reason="過剰")
     schedule_reference_publish = MagicMock()
 
-    tc = _make_app(mock_gemini, guard, pos_mgr, broadcast, schedule_reference_publish)
+    tc = _make_app(
+        mock_gemini,
+        guard,
+        pos_mgr,
+        broadcast,
+        None,
+        schedule_reference_publish,
+    )
     res = tc.post("/api/price", json=PRICE_PAYLOAD)
     broadcast.assert_called_once()
     assert res.status_code == 200
@@ -98,7 +198,14 @@ def test_price_feed_reference_feed_skips_ai_and_execution(setup):
     mock_gemini = MagicMock()
     schedule_reference_publish = MagicMock()
 
-    tc = _make_app(mock_gemini, guard, pos_mgr, broadcast, schedule_reference_publish)
+    tc = _make_app(
+        mock_gemini,
+        guard,
+        pos_mgr,
+        broadcast,
+        None,
+        schedule_reference_publish,
+    )
     res = tc.post(
         "/api/price",
         json={
@@ -111,6 +218,8 @@ def test_price_feed_reference_feed_skips_ai_and_execution(setup):
     assert res.status_code == 200
     assert res.json()["action"] == "hold"
     assert "参照フィード" in res.json()["reason"]
+    assert res.json()["reference_status"] == "ok"
+    assert res.json()["reference_price"] == PRICE_PAYLOAD["price"]
     mock_gemini.decide_safe.assert_not_called()
     schedule_reference_publish.assert_not_called()
     assert pos_mgr.position.qty == 0
@@ -126,7 +235,14 @@ def test_price_feed_records_orders_against_daily_limit(setup):
     ]
     schedule_reference_publish = MagicMock()
 
-    tc = _make_app(mock_gemini, guard, pos_mgr, broadcast, schedule_reference_publish)
+    tc = _make_app(
+        mock_gemini,
+        guard,
+        pos_mgr,
+        broadcast,
+        None,
+        schedule_reference_publish,
+    )
     first = tc.post("/api/price", json=PRICE_PAYLOAD)
     second = tc.post(
         "/api/price",

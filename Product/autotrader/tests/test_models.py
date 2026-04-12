@@ -2,7 +2,7 @@ import pytest
 from datetime import datetime
 from pydantic import ValidationError
 from server.models import (
-    OHLCBar, PriceRequest, TradeDecision, Position, RiskSettings
+    OHLCBar, PriceFeedResponse, PriceRequest, TradeDecision, Position, RiskSettings
 )
 
 
@@ -118,6 +118,27 @@ def test_trade_decision_invalid_action():
 def test_trade_decision_negative_qty():
     with pytest.raises(ValidationError):
         TradeDecision(action="buy", qty=-1, reason="テスト")
+
+
+def test_price_feed_response_accepts_reference_advisory_fields():
+    response = PriceFeedResponse(
+        action="hold",
+        qty=0,
+        reason="様子見",
+        reference_status="stale",
+        reference_price=251.5,
+        reference_volume=12000,
+        reference_source="jquants_light",
+        reference_as_of="2026-04-01",
+        reference_age_days=11,
+        reference_gap_pct=-0.596,
+        warning_code="reference_stale",
+        warning_message="J-Quants reference stale (11 days); execution onlyで継続",
+    )
+
+    assert response.reference_status == "stale"
+    assert response.reference_source == "jquants_light"
+    assert response.warning_code == "reference_stale"
 
 
 def test_risk_settings_defaults():

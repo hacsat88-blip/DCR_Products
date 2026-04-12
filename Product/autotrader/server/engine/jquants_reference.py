@@ -1,6 +1,6 @@
 import logging
 import os
-from datetime import datetime, timedelta
+from datetime import date, datetime, timedelta
 from time import monotonic
 from typing import Awaitable, Callable
 
@@ -25,6 +25,7 @@ class JQuantsReferenceService:
         self._timeout_seconds = timeout_seconds
         self._cache_ttl_seconds = cache_ttl_seconds
         self._cache: dict[tuple[str, FeedSource], tuple[float, dict[str, object]]] = {}
+        self._last_snapshot: dict[tuple[str, FeedSource], dict[str, object]] = {}
 
     def _get_api_key(self) -> str | None:
         api_key = os.environ.get("JQUANTS_API_KEY", "").strip()
@@ -41,10 +42,37 @@ class JQuantsReferenceService:
         return payload.copy()
 
     def _set_cached(self, code: str, feed_source: FeedSource, payload: dict[str, object]) -> None:
+        snapshot = payload.copy()
         self._cache[(code, feed_source)] = (
             monotonic() + self._cache_ttl_seconds,
-            payload.copy(),
+            snapshot,
         )
+        self._last_snapshot[(code, feed_source)] = snapshot.copy()
+
+    def peek_snapshot(self, code: str, feed_source: FeedSource) -> dict[str, object] | None:
+        snapshot = self._last_snapshot.get((code, feed_source))
+        if snapshot is None:
+            return None
+        return snapshot.copy()
+
+    def _normalize_as_of(self, raw_value: object) -> str | None:
+        if isinstance(raw_value, datetime):
+            return raw_value.date().isoformat()
+        if isinstance(raw_value, date):
+            return raw_value.isoformat()
+        if not isinstance(raw_value, str):
+            return None
+
+        normalized = raw_value.strip()
+        if not normalized:
+            return None
+
+        for pattern in ("%Y-%m-%d", "%Y%m%d"):
+            try:
+                return datetime.strptime(normalized, pattern).date().isoformat()
+            except ValueError:
+                continue
+        return None
 
     def _code_candidates(self, code: str) -> list[str]:
         normalized = code.strip()
@@ -83,6 +111,9 @@ class JQuantsReferenceService:
                 "code": code,
                 "current": parsed_current,
                 "volume": parsed_volume,
+                "as_of": self._normalize_as_of(
+                    row.get("Date") or row.get("date") or row.get("TradeDate")
+                ),
                 "feed_role": "reference",
                 "feed_source": feed_source,
             }

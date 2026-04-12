@@ -2,11 +2,11 @@
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
-**Goal:** Excel VBA が MarketSpeed II RSS から株価をリアルタイム取得し、5秒ごとに FastAPI サーバーへ POST して売買判断を受け取り、必要に応じて発注する。
+**Goal:** Excel VBA が MarketSpeed II RSS から株価をリアルタイム取得し、5秒ごとに FastAPI サーバーへ POST して売買判断と reference advisory を受け取り、必要に応じて発注する。
 
-**Architecture:** MarketSpeed II RSS の DDE フォーミュラを Market シートに配置してリアルタイム価格を取得 → VBA タイマーが5秒ごとに起動 → OHLC バーを分足で蓄積 → `MSXML2.XMLHTTP60` で `POST /api/price` → レスポンスの `action` に応じて発注 or スキップ → Log シートに記録。JSON は外部ライブラリなしで文字列連結で組み立て、レスポンスは `InStr`/`Mid` で必要フィールドだけ抜く。
+**Architecture:** MarketSpeed II RSS の DDE フォーミュラを Market シートに配置してリアルタイム価格を取得 → VBA タイマーが5秒ごとに起動 → OHLC バーを分足で蓄積 → `MSXML2.ServerXMLHTTP.6.0` で `POST /api/price` → レスポンスの `action` を正本として発注 or スキップ → 同時に `reference_status` / `reference_price` / `warning_message` を表示・ログへ残す。JSON は外部ライブラリなしで文字列連結で組み立て、レスポンスは `InStr`/`Mid` で必要フィールドだけ抜く。
 
-**Tech Stack:** Excel VBA (Excel 2016+), MSXML2.XMLHTTP60, MarketSpeed II RSS, Windows API タイマー
+**Tech Stack:** Excel VBA (Excel 2016+), MSXML2.ServerXMLHTTP.6.0, MarketSpeed II RSS, Windows API タイマー
 
 ---
 
@@ -31,8 +31,31 @@
 
 **レスポンス:**
 ```json
-{"action": "buy", "qty": 100, "order_type": "成行", "reason": "RSI過売り"}
+{
+    "action": "buy",
+    "qty": 100,
+    "order_type": "成行",
+    "reason": "RSI過売り",
+    "reference_status": "ok",
+    "reference_price": 251.5,
+    "reference_volume": 12000,
+    "reference_source": "jquants_light",
+    "reference_as_of": "2026-04-11",
+    "reference_age_days": 1,
+    "reference_gap_pct": -0.596,
+    "warning_code": null,
+    "warning_message": null
+}
 ```
+
+## Reference advisory policy
+
+- `action` / `qty` / `reason` が発注の正本。VBA は reference advisory を使って最終 action を上書きしない。
+- `reference_status = missing` または `stale` は soft warning であり、発注停止条件ではない。
+- `warning_message` は Control シート表示と Log シート記録に使う。
+- Control シートには `reference_status` / `reference_as_of` / `warning_message` を表示する。
+- Log シートには `code` / `price` / `action` / `qty` / `reason` / `reference_status` / `reference_price` / `reference_as_of` / `reference_gap_pct` / `warning_code` / `warning_message` を残す。
+- 詳細仕様は [docs/dcr/specs/2026-04-12-autotrader-sp2-reference-advisory-design.md](docs/dcr/specs/2026-04-12-autotrader-sp2-reference-advisory-design.md) を正本とする。
 
 ---
 
@@ -42,13 +65,13 @@ MarketSpeed II RSS のインストール後、以下のセルにフォーミュ�
 
 | セル | 内容 | 役割 |
 |------|------|------|
-| `B2` | 銘柄コード（文字列）例: `"7203"` | 手入力 |
-| `C2` | `=RSS\|'7203.T'!'現在値'` | 現在値 |
-| `D2` | `=RSS\|'7203.T'!'出来高'` | 累積出来高 |
-| `E2` | `=RSS\|'7203.T'!'日付'` | RSS 日付 |
-| `F2` | `=RSS\|'7203.T'!'時刻'` | RSS 時刻 |
+| `A2` | 銘柄コード（文字列）例: `"7203"` | 手入力 |
+| `B2` | `=RSS\|'7203.T'!'現在値'` | 現在値 |
+| `C2` | `=RSS\|'7203.T'!'出来高'` | 累積出来高 |
+| `D2` | `=RSS\|'7203.T'!'日付'` | RSS 日付 |
+| `E2` | `=RSS\|'7203.T'!'時刻'` | RSS 時刻 |
 
-VBA は `B2:F2` を名前付き範囲 `RSS_TICK` として参照する。
+VBA は `A2:E2` を名前付き範囲 `RSS_TICK` として参照する。
 
 ---
 
@@ -57,10 +80,10 @@ VBA は `B2:F2` を名前付き範囲 `RSS_TICK` として参照する。
 | ファイル/モジュール | 役割 |
 |--------------------|------|
 | `autotrader.xlsm` | Excelワークブック本体 |
-| Sheet: `Control` | URL設定・銘柄コード・ON/OFFスイッチ |
+| Sheet: `Control` | URL設定・銘柄コード・ON/OFFスイッチ・reference warning 表示 |
 | Sheet: `Market` | RSS フォーミュラでリアルタイム価格表示 |
 | Sheet: `OHLC_Data` | 分足 OHLC バー蓄積（最新20本） |
-| Sheet: `Log` | API送受信ログ（最新200行） |
+| Sheet: `Log` | API送受信ログと reference advisory 記録（最新200行） |
 | VBA: `modConfig` | 定数定義（URL、タイムアウト、バー数） |
 | VBA: `modOHLC` | 分足バー管理・OHLC更新・シート書き込み |
 | VBA: `modHTTP` | POST /api/price・JSON組み立て・レスポンス解析 |
@@ -104,6 +127,12 @@ Excel のシートタブを右クリック →「挿入」を繰り返し、以�
 | `B3` | `STOPPED` | 実行状態表示 |
 | `A4` | `銘柄コード` | ラベル |
 | `B4` | `7203` | 例: トヨタ |
+| `A5` | `Reference Status` | ラベル |
+| `B5` | `missing` | 参照状態表示 |
+| `A6` | `Reference As Of` | ラベル |
+| `B6` | `-` | 参照基準日表示 |
+| `A7` | `Warning` | ラベル |
+| `B7` | `` | advisory 表示 |
 
 - [ ] **Step 4: Market シートに列ヘッダーを設定する**
 
@@ -139,9 +168,9 @@ Excel のシートタブを右クリック →「挿入」を繰り返し、以�
 
 `Log` シートの1行目に以下を設定する:
 
-| A | B | C | D | E |
-|---|---|---|---|---|
-| `timestamp` | `price` | `action` | `qty` | `reason` |
+| A | B | C | D | E | F | G | H | I | J | K | L |
+|---|---|---|---|---|---|---|---|---|---|---|---|
+| `timestamp` | `code` | `price` | `action` | `qty` | `reason` | `reference_status` | `reference_price` | `reference_as_of` | `reference_gap_pct` | `warning_code` | `warning_message` |
 
 - [ ] **Step 7: VBA エディタを開く**
 
@@ -174,7 +203,7 @@ Option Explicit
 ' ─── サーバー接続設定 ───────────────────────────
 Public Const API_BASE_URL  As String = "http://127.0.0.1:8000"
 Public Const API_PRICE_URL As String = API_BASE_URL & "/api/price"
-Public Const HTTP_TIMEOUT  As Long = 10000   ' ミリ秒
+Public Const HTTP_TIMEOUT  As Long = 3000    ' ミリ秒
 
 ' ─── タイマー設定 ──────────────────────────────
 Public Const POLL_INTERVAL As Double = 5     ' 秒
@@ -240,8 +269,10 @@ Private m_BarMinute As Integer   ' 現在バーの「分」(-1 = 未初期化)
 Private m_Open      As Double
 Private m_High      As Double
 Private m_Low       As Double
+Private m_Close     As Double
 Private m_BarVol    As Long      ' バー内累積出来高（前回取得からの差分）
 Private m_PrevVol   As Long      ' 前回取得時の累積出来高
+Private m_BarTime   As Date      ' 現在バーの開始時刻（秒は常に00）
 
 ' ────────────────────────────────────────────
 ' Public: 現在の RSS ティックでバーを更新する。
@@ -252,25 +283,34 @@ Public Sub UpdateBar(price As Double, totalVolume As Long, tickTime As Date)
     currentMin = Minute(tickTime)
 
     Dim volDelta As Long
-    volDelta = totalVolume - m_PrevVol
-    If volDelta < 0 Then volDelta = 0    ' 日またぎリセット対策
-    m_PrevVol = totalVolume
+    If m_BarMinute = -1 Then
+        volDelta = 0
+        m_PrevVol = totalVolume
+    Else
+        volDelta = totalVolume - m_PrevVol
+        If volDelta < 0 Then volDelta = 0    ' 日またぎリセット対策
+        m_PrevVol = totalVolume
+    End If
 
     If m_BarMinute = -1 Or currentMin <> m_BarMinute Then
         ' ── 新しいバー開始 ──
         If m_BarMinute <> -1 Then
             ' 完成したバーをシートに保存
-            Call SaveBar(tickTime)
+            Call SaveBar
         End If
         m_BarMinute = currentMin
+        m_BarTime = DateSerial(Year(tickTime), Month(tickTime), Day(tickTime)) + _
+                    TimeSerial(Hour(tickTime), Minute(tickTime), 0)
         m_Open = price
         m_High = price
         m_Low = price
+        m_Close = price
         m_BarVol = volDelta
     Else
         ' ── バー更新 ──
         If price > m_High Then m_High = price
         If price < m_Low  Then m_Low = price
+        m_Close = price
         m_BarVol = m_BarVol + volDelta
     End If
 End Sub
@@ -324,12 +364,10 @@ Public Function BuildOHLCJson(currentPrice As Double) As String
     Else
         curOpen = m_Open
         curHigh = m_High
-        If currentPrice > curHigh Then curHigh = currentPrice
         curLow = m_Low
-        If currentPrice < curLow Then curLow = currentPrice
     End If
     If jsonArr <> "" Then jsonArr = jsonArr & ","
-    jsonArr = jsonArr & OHLCBarJson(curOpen, curHigh, curLow, currentPrice, m_BarVol)
+    jsonArr = jsonArr & OHLCBarJson(curOpen, curHigh, curLow, IIf(m_BarMinute = -1, currentPrice, m_Close), m_BarVol)
 
     BuildOHLCJson = "[" & jsonArr & "]"
 End Function
@@ -339,9 +377,11 @@ End Function
 ' ────────────────────────────────────────────
 Public Sub ResetBar()
     m_BarMinute = -1
+    m_BarTime = 0
     m_Open = 0
     m_High = 0
     m_Low = 0
+    m_Close = 0
     m_BarVol = 0
     m_PrevVol = 0
 End Sub
@@ -349,18 +389,18 @@ End Sub
 ' ────────────────────────────────────────────
 ' Private: 完成バーを OHLC_Data シートに書き込む
 ' ────────────────────────────────────────────
-Private Sub SaveBar(barTime As Date)
+Private Sub SaveBar()
     Dim ws As Worksheet
     Set ws = ThisWorkbook.Sheets(SH_OHLC)
 
     Dim nextRow As Long
     nextRow = ws.Cells(ws.Rows.Count, 1).End(xlUp).Row + 1
 
-    ws.Cells(nextRow, 1).Value = Format(barTime, "yyyy-mm-dd hh:mm:00")
+    ws.Cells(nextRow, 1).Value = Format(m_BarTime, "yyyy-mm-dd hh:mm:00")
     ws.Cells(nextRow, 2).Value = m_Open
     ws.Cells(nextRow, 3).Value = m_High
     ws.Cells(nextRow, 4).Value = m_Low
-    ws.Cells(nextRow, 5).Value = m_Open   ' close = 最後の値 = 次バー開始前の値（簡略化）
+    ws.Cells(nextRow, 5).Value = m_Close
     ws.Cells(nextRow, 6).Value = m_BarVol
 
     ' 古いバーを削除（MAX_OHLC_BARS 超過分）
@@ -411,7 +451,9 @@ git commit -m "feat(sp2): add modOHLC for minute-bar OHLC management"
 **Files:**
 - Create: VBA モジュール `modHTTP`
 
-**役割:** `PriceRequest` JSON を組み立てて POST し、`TradeDecision` レスポンスを解析する。
+**役割:** `PriceRequest` JSON を組み立てて POST し、`TradeDecision` + reference advisory レスポンスを解析する。
+
+`PostPrice` は `action` / `qty` / `reason` に加え、`reference_status` / `reference_price` / `reference_as_of` / `reference_gap_pct` / `warning_code` / `warning_message` を ByRef で返す。warning は表示とログにのみ使い、発注可否は action を正本とする。
 
 - [ ] **Step 1: modHTTP を挿入する**
 
@@ -427,7 +469,7 @@ Option Explicit
 '
 ' 戻り値の Long は action コード:
 '   1 = buy, -1 = sell, 0 = hold
-' qty と reason は参照引数で返す。
+' qty / reason / reference advisory は参照引数で返す。
 ' ────────────────────────────────────────────
 Public Function PostPrice(code As String, _
                           price As Double, _
@@ -435,22 +477,34 @@ Public Function PostPrice(code As String, _
                           ohlcJson As String, _
                           tickTime As Date, _
                           ByRef qty As Long, _
-                          ByRef reason As String) As Long
+                          ByRef reason As String, _
+                          ByRef referenceStatus As String, _
+                          ByRef referencePrice As Variant, _
+                          ByRef referenceAsOf As String, _
+                          ByRef referenceGapPct As Variant, _
+                          ByRef warningCode As String, _
+                          ByRef warningMessage As String) As Long
     PostPrice = 0   ' デフォルト hold
     qty = 0
     reason = ""
+    referenceStatus = "missing"
+    referencePrice = Empty
+    referenceAsOf = ""
+    referenceGapPct = Empty
+    warningCode = ""
+    warningMessage = ""
 
     Dim body As String
     body = BuildRequestJson(code, price, volume, ohlcJson, tickTime)
 
     Dim http As Object
-    Set http = CreateObject("MSXML2.XMLHTTP60")
+    Set http = CreateObject("MSXML2.ServerXMLHTTP.6.0")
     http.Open "POST", API_PRICE_URL, False
     http.setRequestHeader "Content-Type", "application/json"
     http.setRequestHeader "Accept", "application/json"
     http.setTimeouts HTTP_TIMEOUT, HTTP_TIMEOUT, HTTP_TIMEOUT, HTTP_TIMEOUT
-
     On Error GoTo HttpError
+
     http.send body
     On Error GoTo 0
 
@@ -467,6 +521,12 @@ Public Function PostPrice(code As String, _
     action = ExtractJsonString(respText, "action")
     qty = CLng(ExtractJsonNumber(respText, "qty"))
     reason = ExtractJsonString(respText, "reason")
+    referenceStatus = ExtractJsonString(respText, "reference_status")
+    referencePrice = ExtractJsonOptionalNumber(respText, "reference_price")
+    referenceAsOf = ExtractJsonString(respText, "reference_as_of")
+    referenceGapPct = ExtractJsonOptionalNumber(respText, "reference_gap_pct")
+    warningCode = ExtractJsonString(respText, "warning_code")
+    warningMessage = ExtractJsonString(respText, "warning_message")
 
     Select Case LCase(action)
         Case "buy":  PostPrice = 1
@@ -552,6 +612,20 @@ Private Function ExtractJsonNumber(json As String, key As String) As String
     If endPos = 0 Then endPos = Len(json) + 1
     ExtractJsonNumber = Trim(Mid(json, pos, endPos - pos))
 End Function
+
+' ────────────────────────────────────────────
+' Private: JSON 文字列から指定キーの nullable 数値を取り出す
+' null または未検出なら Empty を返す
+' ────────────────────────────────────────────
+Private Function ExtractJsonOptionalNumber(json As String, key As String) As Variant
+    Dim rawValue As String
+    rawValue = ExtractJsonNumber(json, key)
+    If LCase$(rawValue) = "null" Or rawValue = "" Then
+        ExtractJsonOptionalNumber = Empty
+        Exit Function
+    End If
+    ExtractJsonOptionalNumber = CDbl(rawValue)
+End Function
 ```
 
 - [ ] **Step 3: 手動テスト（FastAPI サーバーを起動した状態で実行）**
@@ -567,9 +641,11 @@ VBA イミディエイトウィンドウで:
 
 ```vba
 Dim qty As Long, reason As String
+Dim referenceStatus As String, referenceAsOf As String, warningCode As String, warningMessage As String
+Dim referencePrice As Variant, referenceGapPct As Variant
 Dim action As Long
-action = modHTTP.PostPrice("7203", 2500, 100000, "[{""o"":2490.0,""h"":2510.0,""l"":2485.0,""c"":2500.0,""v"":50000}]", Now, qty, reason)
-? action & " qty=" & qty & " reason=" & reason
+action = modHTTP.PostPrice("7203", 2500, 100000, "[{""o"":2490.0,""h"":2510.0,""l"":2485.0,""c"":2500.0,""v"":50000}]", Now, qty, reason, referenceStatus, referencePrice, referenceAsOf, referenceGapPct, warningCode, warningMessage)
+? action & " qty=" & qty & " reason=" & reason & " refStatus=" & referenceStatus & " warning=" & warningMessage
 ```
 
 期待出力: `0 qty=0 reason=...`（ウォームアップ中またはhold）
@@ -658,9 +734,16 @@ Private Sub WriteOrderLog(orderType As String, code As String, _
 
     ws.Cells(nextRow, 1).Value = Format(Now, "hh:mm:ss")
     ws.Cells(nextRow, 2).Value = code
-    ws.Cells(nextRow, 3).Value = orderType
-    ws.Cells(nextRow, 4).Value = qty
-    ws.Cells(nextRow, 5).Value = reason
+    ws.Cells(nextRow, 3).Value = ""
+    ws.Cells(nextRow, 4).Value = orderType
+    ws.Cells(nextRow, 5).Value = qty
+    ws.Cells(nextRow, 6).Value = reason
+    ws.Cells(nextRow, 7).Value = ""
+    ws.Cells(nextRow, 8).Value = ""
+    ws.Cells(nextRow, 9).Value = ""
+    ws.Cells(nextRow, 10).Value = ""
+    ws.Cells(nextRow, 11).Value = ""
+    ws.Cells(nextRow, 12).Value = "executed via modOrder"
 
     ' 200行超えたら古い行を削除
     Do While nextRow - 1 > 200
@@ -773,8 +856,23 @@ Public Sub OnTick()
     ' API 送信
     Dim qty As Long
     Dim reason As String
+    Dim referenceStatus As String
+    Dim referenceAsOf As String
+    Dim warningCode As String
+    Dim warningMessage As String
+    Dim referencePrice As Variant
+    Dim referenceGapPct As Variant
     Dim actionCode As Long
-    actionCode = modHTTP.PostPrice(code, price, volume, ohlcJson, ts, qty, reason)
+    actionCode = modHTTP.PostPrice( _
+        code, price, volume, ohlcJson, ts, qty, reason, _
+        referenceStatus, referencePrice, referenceAsOf, referenceGapPct, warningCode, warningMessage)
+
+    ' Control シートに最新 advisory を表示
+    Dim ctrlWs As Worksheet
+    Set ctrlWs = ThisWorkbook.Sheets(SH_CONTROL)
+    ctrlWs.Cells(5, 2).Value = referenceStatus
+    ctrlWs.Cells(6, 2).Value = IIf(referenceAsOf = "", "-", referenceAsOf)
+    ctrlWs.Cells(7, 2).Value = warningMessage
 
     ' Log シートに記録
     Dim logWs As Worksheet
@@ -782,16 +880,23 @@ Public Sub OnTick()
     Dim nextRow As Long
     nextRow = logWs.Cells(logWs.Rows.Count, 1).End(xlUp).Row + 1
     logWs.Cells(nextRow, 1).Value = Format(Now, "hh:mm:ss")
-    logWs.Cells(nextRow, 2).Value = price
+    logWs.Cells(nextRow, 2).Value = code
+    logWs.Cells(nextRow, 3).Value = price
     Dim actionStr As String
     Select Case actionCode
         Case 1:  actionStr = "buy"
         Case -1: actionStr = "sell"
         Case Else: actionStr = "hold"
     End Select
-    logWs.Cells(nextRow, 3).Value = actionStr
-    logWs.Cells(nextRow, 4).Value = qty
-    logWs.Cells(nextRow, 5).Value = Left(reason, 60)
+    logWs.Cells(nextRow, 4).Value = actionStr
+    logWs.Cells(nextRow, 5).Value = qty
+    logWs.Cells(nextRow, 6).Value = Left(reason, 60)
+    logWs.Cells(nextRow, 7).Value = referenceStatus
+    If Not IsEmpty(referencePrice) Then logWs.Cells(nextRow, 8).Value = referencePrice
+    logWs.Cells(nextRow, 9).Value = referenceAsOf
+    If Not IsEmpty(referenceGapPct) Then logWs.Cells(nextRow, 10).Value = referenceGapPct
+    logWs.Cells(nextRow, 11).Value = warningCode
+    logWs.Cells(nextRow, 12).Value = warningMessage
     ' 200行超えたら古い行を削除
     Do While nextRow - 1 > 200
         logWs.Rows(2).Delete
@@ -834,10 +939,17 @@ Private Sub WriteErrorLog(msg As String)
     Dim nextRow As Long
     nextRow = ws.Cells(ws.Rows.Count, 1).End(xlUp).Row + 1
     ws.Cells(nextRow, 1).Value = Format(Now, "hh:mm:ss")
-    ws.Cells(nextRow, 2).Value = 0
-    ws.Cells(nextRow, 3).Value = "ERROR"
-    ws.Cells(nextRow, 4).Value = 0
-    ws.Cells(nextRow, 5).Value = Left(msg, 60)
+    ws.Cells(nextRow, 2).Value = ""
+    ws.Cells(nextRow, 3).Value = ""
+    ws.Cells(nextRow, 4).Value = "error"
+    ws.Cells(nextRow, 5).Value = 0
+    ws.Cells(nextRow, 6).Value = Left(msg, 60)
+    ws.Cells(nextRow, 7).Value = ""
+    ws.Cells(nextRow, 8).Value = ""
+    ws.Cells(nextRow, 9).Value = ""
+    ws.Cells(nextRow, 10).Value = ""
+    ws.Cells(nextRow, 11).Value = "client_error"
+    ws.Cells(nextRow, 12).Value = Left(msg, 120)
 End Sub
 ```
 
@@ -859,9 +971,9 @@ End Sub
 
 期待する Log シート最終行（例）:
 
-| timestamp | price | action | qty | reason |
-|-----------|-------|--------|-----|--------|
-| `10:05:30` | `2500` | `hold` | `0` | `ウォームアップ中 ...` |
+| timestamp | code | price | action | qty | reason | reference_status | reference_price | reference_as_of | reference_gap_pct | warning_code | warning_message |
+|-----------|------|-------|--------|-----|--------|------------------|-----------------|-----------------|-------------------|--------------|-----------------|
+| `10:05:30` | `7203` | `2500` | `hold` | `0` | `ウォームアップ中 ...` | `missing` |  |  |  | `reference_missing` | `reference snapshot is not available yet` |
 
 5. `⏹ STOP` ボタンをクリック → Control シートの `B3` が `STOPPED` になることを確認
 

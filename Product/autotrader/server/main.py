@@ -46,6 +46,7 @@ app.include_router(
         _guard,
         _pos_mgr,
         _broadcast,
+        get_reference_snapshot=_reference_service.peek_snapshot,
         schedule_reference_publish=_schedule_reference_publish,
     )
 )
