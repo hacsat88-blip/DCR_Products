@@ -3,7 +3,7 @@ import type { Metadata } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "AutoTrader Dashboard",
+  title: "AutoTrader ダッシュボード",
   description: "AutoTrader の監視中心 Next.js ダッシュボード"
 };
 

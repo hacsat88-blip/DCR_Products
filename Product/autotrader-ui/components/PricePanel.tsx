@@ -34,13 +34,25 @@ function formatConnectionState(value: ConnectionState): string {
   }
 }
 
+function formatFeedRole(value: TraderPriceSnapshot["feedRole"]): string | null {
+  switch (value) {
+    case "execution":
+      return "執行";
+    case "reference":
+      return "参照";
+    default:
+      return null;
+  }
+}
+
 export function PricePanel({ price, connectionState }: PricePanelProps): JSX.Element {
+  const feedRoleLabel = formatFeedRole(price.feedRole);
   const feedLabel =
-    price.feedRole && price.feedSource ? `${price.feedRole} / ${price.feedSource}` : "feed 未取得";
+    feedRoleLabel && price.feedSource ? `${feedRoleLabel} / ${price.feedSource}` : "フィード未取得";
 
   return (
     <section className="panel metric-panel">
-      <p className="panel-eyebrow">Price Feed</p>
+      <p className="panel-eyebrow">価格フィード</p>
       <div className="panel-heading-row">
         <h2>現在値</h2>
         <span className="panel-code">{price.code ?? "----"}</span>

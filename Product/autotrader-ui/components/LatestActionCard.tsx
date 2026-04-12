@@ -23,7 +23,7 @@ export function LatestActionCard({ event }: LatestActionCardProps): JSX.Element 
 
   return (
     <section className="panel metric-panel">
-      <p className="panel-eyebrow">Latest Event</p>
+      <p className="panel-eyebrow">判断結果</p>
       <div className="panel-heading-row">
         <h2>最新イベント</h2>
         {feedBadge ? (
@@ -33,7 +33,7 @@ export function LatestActionCard({ event }: LatestActionCardProps): JSX.Element 
       <p className="event-reason">{event.reason}</p>
       <dl className="metric-grid metric-grid--two-columns">
         <div>
-          <dt>action</dt>
+          <dt>判定</dt>
           <dd>{event.action}</dd>
         </div>
         <div>
@@ -45,7 +45,7 @@ export function LatestActionCard({ event }: LatestActionCardProps): JSX.Element 
           <dd>{event.at || "--:--:--"}</dd>
         </div>
         <div>
-          <dt>source</dt>
+          <dt>ソース</dt>
           <dd>{event.feedSource ?? "未取得"}</dd>
         </div>
       </dl>
