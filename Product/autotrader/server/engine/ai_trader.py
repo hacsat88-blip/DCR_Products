@@ -23,7 +23,12 @@ _SYSTEM_PROMPT = """あなたは日本株の短期トレーダーです。
 
 class AITrader:
     def __init__(self):
-        self._client = anthropic.Anthropic(api_key=os.environ["ANTHROPIC_API_KEY"])
+        self._client: anthropic.Anthropic | None = None
+
+    def _get_client(self) -> anthropic.Anthropic:
+        if self._client is None:
+            self._client = anthropic.Anthropic(api_key=os.environ["ANTHROPIC_API_KEY"])
+        return self._client
 
     def decide(
         self,
@@ -40,7 +45,7 @@ class AITrader:
             f"リスク設定: 1発注上限 {settings.limit_per_order}円 / "
             f"損切りライン {settings.stop_loss_pct}% / 最大数量 {settings.max_qty_per_order}株"
         )
-        response = self._client.messages.create(
+        response = self._get_client().messages.create(
             model="claude-sonnet-4-6",
             max_tokens=200,
             system=_SYSTEM_PROMPT,
