@@ -1,10 +1,165 @@
+import { createElement } from "react";
 import { render, screen } from "@testing-library/react";
+import { afterEach, describe, expect, test, vi } from "vitest";
 
 import HomePage from "@/app/page";
+import type { TraderEventSnapshot, TraderViewModel } from "@/types/trader";
 
-test("shows waiting status before first tick", () => {
-  render(<HomePage />);
+const useTraderSocketMock = vi.fn<() => TraderViewModel>();
 
-  expect(screen.getByText("AutoTrader Dashboard")).toBeInTheDocument();
-  expect(screen.getByText("waiting-first-tick")).toBeInTheDocument();
+vi.mock("@/hooks/useTraderSocket", () => ({
+  useTraderSocket: (): TraderViewModel => useTraderSocketMock()
+}));
+
+function buildEvent(overrides: Partial<TraderEventSnapshot> = {}): TraderEventSnapshot {
+  return {
+    action: "none",
+    qty: 0,
+    reason: "起動中",
+    at: "",
+    feedRole: null,
+    feedSource: null,
+    ...overrides
+  };
+}
+
+function buildState(overrides: Partial<TraderViewModel> = {}): TraderViewModel {
+  return {
+    connectionState: "waiting-first-tick",
+    lastUpdatedAt: null,
+    latestPrice: {
+      code: null,
+      current: null,
+      volume: null,
+      feedRole: null,
+      feedSource: null
+    },
+    positionSnapshot: {
+      qty: null,
+      avgCost: null,
+      pnl: null,
+      pnlPct: null
+    },
+    latestEvent: buildEvent({ reason: "初回データ待機" }),
+    aiEventHistory: [],
+    orderHistory: [],
+    riskSnapshot: null,
+    ...overrides
+  };
+}
+
+afterEach(() => {
+  useTraderSocketMock.mockReset();
+});
+
+describe("HomePage dashboard shell", () => {
+  test("shows waiting-first-tick empty state", () => {
+    useTraderSocketMock.mockReturnValue(buildState());
+
+    render(createElement(HomePage));
+
+    expect(screen.getByRole("heading", { name: "AutoTrader Dashboard" })).toBeInTheDocument();
+    expect(screen.getByText("waiting-first-tick")).toBeInTheDocument();
+    expect(screen.getByText("ティック待機中")).toBeInTheDocument();
+    expect(screen.getAllByText("未取得").length).toBeGreaterThanOrEqual(1);
+    expect(screen.getByText("初回データ待機")).toBeInTheDocument();
+  });
+
+  test("shows execution feed and latest execution event", () => {
+    useTraderSocketMock.mockReturnValue(
+      buildState({
+        connectionState: "connected",
+        lastUpdatedAt: "2026-04-12T10:30:05",
+        latestPrice: {
+          code: "7203",
+          current: 250,
+          volume: 10000,
+          feedRole: "execution",
+          feedSource: "rakuten_rss"
+        },
+        positionSnapshot: {
+          qty: 100,
+          avgCost: 248,
+          pnl: 200,
+          pnlPct: 0.81
+        },
+        latestEvent: buildEvent({
+          action: "buy",
+          qty: 100,
+          reason: "初回買い",
+          at: "10:30:05",
+          feedRole: "execution",
+          feedSource: "rakuten_rss"
+        }),
+        aiEventHistory: [
+          buildEvent({
+            action: "buy",
+            qty: 100,
+            reason: "初回買い",
+            at: "10:30:05",
+            feedRole: "execution",
+            feedSource: "rakuten_rss"
+          })
+        ],
+        orderHistory: [
+          buildEvent({
+            action: "buy",
+            qty: 100,
+            reason: "初回買い",
+            at: "10:30:05",
+            feedRole: "execution",
+            feedSource: "rakuten_rss"
+          })
+        ]
+      })
+    );
+
+    render(createElement(HomePage));
+
+    expect(screen.getByText("execution / rakuten_rss")).toBeInTheDocument();
+    expect(screen.getByText("7203")).toBeInTheDocument();
+    expect(screen.getByText("100株")).toBeInTheDocument();
+    expect(screen.getByText("初回買い")).toBeInTheDocument();
+  });
+
+  test("shows reference latest event but keeps hold out of order history", () => {
+    useTraderSocketMock.mockReturnValue(
+      buildState({
+        connectionState: "connected",
+        lastUpdatedAt: "2026-04-12T10:31:00",
+        latestPrice: {
+          code: "7203",
+          current: 251,
+          volume: 10500,
+          feedRole: "reference",
+          feedSource: "jquants_free"
+        },
+        latestEvent: buildEvent({
+          action: "hold",
+          qty: 0,
+          reason: "参照フィード受信",
+          at: "10:31:00",
+          feedRole: "reference",
+          feedSource: "jquants_free"
+        }),
+        aiEventHistory: [
+          buildEvent({
+            action: "hold",
+            qty: 0,
+            reason: "参照フィード受信",
+            at: "10:31:00",
+            feedRole: "reference",
+            feedSource: "jquants_free"
+          })
+        ],
+        orderHistory: []
+      })
+    );
+
+    render(createElement(HomePage));
+
+    expect(screen.getByText("参照")).toBeInTheDocument();
+    expect(screen.getByText("参照フィード受信")).toBeInTheDocument();
+    expect(screen.getByText("注文イベントなし")).toBeInTheDocument();
+  });
 });
