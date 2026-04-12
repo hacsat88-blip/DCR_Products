@@ -122,10 +122,13 @@ describe("HomePage dashboard shell", () => {
 
     render(createElement(HomePage));
 
-  expect(screen.getByText("執行 / rakuten_rss")).toBeInTheDocument();
+    expect(screen.getByText("執行 / 楽天RSS")).toBeInTheDocument();
     expect(screen.getByText("7203")).toBeInTheDocument();
     expect(screen.getByText("100株")).toBeInTheDocument();
     expect(screen.getByText("初回買い")).toBeInTheDocument();
+    expect(screen.getAllByText(/^買い$/)).toHaveLength(2);
+    expect(screen.getByText("楽天RSS")).toBeInTheDocument();
+    expect(screen.getByText("10:30:05 / 100株 / 楽天RSS")).toBeInTheDocument();
   });
 
   test("shows reference latest event but keeps hold out of order history", () => {
@@ -164,8 +167,9 @@ describe("HomePage dashboard shell", () => {
 
     render(createElement(HomePage));
 
-    expect(screen.getByText("参照")).toBeInTheDocument();
+    expect(screen.getByText("参照 / J-Quants Free")).toBeInTheDocument();
     expect(screen.getByText("参照フィード受信")).toBeInTheDocument();
+    expect(screen.getByText(/^見送り$/)).toBeInTheDocument();
     expect(screen.getByText("注文イベントなし")).toBeInTheDocument();
   });
 });

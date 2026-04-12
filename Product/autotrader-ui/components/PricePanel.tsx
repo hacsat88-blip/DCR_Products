@@ -1,3 +1,4 @@
+import { getFeedRoleLabel, getFeedSourceLabel } from "@/lib/trader-display";
 import type { ConnectionState, TraderPriceSnapshot } from "@/types/trader";
 
 interface PricePanelProps {
@@ -34,21 +35,11 @@ function formatConnectionState(value: ConnectionState): string {
   }
 }
 
-function formatFeedRole(value: TraderPriceSnapshot["feedRole"]): string | null {
-  switch (value) {
-    case "execution":
-      return "執行";
-    case "reference":
-      return "参照";
-    default:
-      return null;
-  }
-}
-
 export function PricePanel({ price, connectionState }: PricePanelProps): JSX.Element {
-  const feedRoleLabel = formatFeedRole(price.feedRole);
+  const feedRoleLabel = getFeedRoleLabel(price.feedRole);
+  const feedSourceLabel = getFeedSourceLabel(price.feedSource);
   const feedLabel =
-    feedRoleLabel && price.feedSource ? `${feedRoleLabel} / ${price.feedSource}` : "フィード未取得";
+    feedRoleLabel && feedSourceLabel ? `${feedRoleLabel} / ${feedSourceLabel}` : "フィード未取得";
 
   return (
     <section className="panel metric-panel">

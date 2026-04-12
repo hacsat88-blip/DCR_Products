@@ -1,5 +1,6 @@
 import clsx from "clsx";
 
+import { getActionLabel, getFeedSourceLabel } from "@/lib/trader-display";
 import type { TraderEventSnapshot } from "@/types/trader";
 
 interface LatestActionCardProps {
@@ -34,7 +35,7 @@ export function LatestActionCard({ event }: LatestActionCardProps): JSX.Element 
       <dl className="metric-grid metric-grid--two-columns">
         <div>
           <dt>判定</dt>
-          <dd>{event.action}</dd>
+          <dd>{getActionLabel(event.action)}</dd>
         </div>
         <div>
           <dt>数量</dt>
@@ -46,7 +47,7 @@ export function LatestActionCard({ event }: LatestActionCardProps): JSX.Element 
         </div>
         <div>
           <dt>ソース</dt>
-          <dd>{event.feedSource ?? "未取得"}</dd>
+          <dd>{getFeedSourceLabel(event.feedSource) ?? "未取得"}</dd>
         </div>
       </dl>
     </section>
