@@ -17,7 +17,9 @@ Public Function PostPrice(ByVal code As String, _
                           ByRef referenceAsOf As String, _
                           ByRef referenceGapPct As Variant, _
                           ByRef warningCode As String, _
-                          ByRef warningMessage As String) As Long
+                          ByRef warningMessage As String, _
+                          ByRef requestSucceeded As Boolean, _
+                          ByRef responseStatus As Long) As Long
     PostPrice = 0
     qty = 0
     reason = ""
@@ -27,6 +29,8 @@ Public Function PostPrice(ByVal code As String, _
     referenceGapPct = Empty
     warningCode = ""
     warningMessage = ""
+    requestSucceeded = False
+    responseStatus = 0
 
     Dim http As Object
     Set http = CreateObject("MSXML2.ServerXMLHTTP.6.0")
@@ -38,6 +42,7 @@ Public Function PostPrice(ByVal code As String, _
     http.setTimeouts HTTP_TIMEOUT, HTTP_TIMEOUT, HTTP_TIMEOUT, HTTP_TIMEOUT
     http.send BuildRequestJson(code, price, volume, bid, ask, newsHalt, newsNote, ohlcJson, tickTime)
     On Error GoTo 0
+    responseStatus = http.Status
 
     If http.Status <> 200 Then
         reason = "HTTP " & CStr(http.Status) & ": " & Left$(http.responseText, 120)
@@ -55,6 +60,7 @@ Public Function PostPrice(ByVal code As String, _
     referenceGapPct = ExtractJsonOptionalNumber(respText, "reference_gap_pct")
     warningCode = ExtractJsonString(respText, "warning_code")
     warningMessage = ExtractJsonString(respText, "warning_message")
+    requestSucceeded = True
 
     Select Case LCase$(ExtractJsonString(respText, "action"))
         Case "buy"
@@ -79,10 +85,10 @@ Private Function BuildRequestJson(ByVal code As String, ByVal price As Double, B
         """code"":""" & EscapeJson(code) & """," & _
         """price"":" & JsonNumber(price) & "," & _
         """volume"":" & CStr(volume) & "," & _
-    """bid""":" & JsonOptionalNumber(bid) & "," & _
-    """ask""":" & JsonOptionalNumber(ask) & "," & _
-    """news_halt""":" & JsonBoolean(newsHalt) & "," & _
-    """news_note""":" & JsonStringOrNull(newsNote) & "," & _
+        """bid"":" & JsonOptionalNumber(bid) & "," & _
+        """ask"":" & JsonOptionalNumber(ask) & "," & _
+        """news_halt"":" & JsonBoolean(newsHalt) & "," & _
+        """news_note"":" & JsonStringOrNull(newsNote) & "," & _
         """ohlc"":" & ohlcJson & "," & _
         """timestamp"":""" & isoTimestamp & """" & _
         "}"
@@ -200,7 +206,17 @@ Private Function SkipWhitespace(ByVal source As String, ByVal startPos As Long) 
 End Function
 
 Private Function JsonNumber(ByVal value As Double) As String
-    JsonNumber = Replace$(Format$(Round(value, 3), "0.###"), ",", ".")
+    Dim formatted As String
+    formatted = Replace$(Format$(Round(value, 3), "0.000"), ",", ".")
+
+    Do While Right$(formatted, 1) = "0"
+        formatted = Left$(formatted, Len(formatted) - 1)
+    Loop
+    If Right$(formatted, 1) = "." Then
+        formatted = Left$(formatted, Len(formatted) - 1)
+    End If
+
+    JsonNumber = formatted
 End Function
 
 Private Function JsonOptionalNumber(ByVal value As Variant) As String

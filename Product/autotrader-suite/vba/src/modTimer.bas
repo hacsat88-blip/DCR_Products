@@ -10,6 +10,7 @@ Public Sub StartTimer()
     m_Running = True
     modOHLC.ResetForCodeChange
     m_LastCode = ""
+    InitializeOperationalSurface
     SetStatus "RUNNING"
     ScheduleNext
 End Sub
@@ -81,12 +82,20 @@ Public Sub OnTick()
     Dim referencePrice As Variant
     Dim referenceGapPct As Variant
     Dim actionCode As Long
+    Dim requestSucceeded As Boolean
+    Dim responseStatus As Long
 
     actionCode = modHTTP.PostPrice( _
         code, price, volume, bid, ask, newsHalt, newsNote, ohlcJson, ts, qty, reason, _
-        referenceStatus, referencePrice, referenceAsOf, referenceGapPct, warningCode, warningMessage)
+        referenceStatus, referencePrice, referenceAsOf, referenceGapPct, warningCode, warningMessage, _
+        requestSucceeded, responseStatus)
 
     WriteControlAdvisory referenceStatus, referenceAsOf, warningMessage
+    If requestSucceeded Then
+        WriteOperationalSuccess ts, actionCode
+    Else
+        WriteOperationalError reason
+    End If
     WriteTickLog code, price, actionCode, qty, reason, referenceStatus, referencePrice, referenceAsOf, referenceGapPct, warningCode, warningMessage
     modOrder.ExecuteOrder actionCode, code, qty, reason
 
@@ -95,8 +104,29 @@ ScheduleAndExit:
     Exit Sub
 
 TickError:
+    WriteOperationalError "OnTick error: " & Err.Description
     WriteErrorLog "OnTick error: " & Err.Description
     ScheduleNext
+End Sub
+
+Public Sub InitializeOperationalSurface()
+    Dim ctrlWs As Worksheet
+    Set ctrlWs = ThisWorkbook.Sheets(SH_CONTROL)
+
+    ctrlWs.Cells(CONTROL_ROW_RUN_MODE, 1).Value = "Run Mode"
+    ctrlWs.Cells(CONTROL_ROW_RUN_MODE, 2).Value = "paper"
+    ctrlWs.Cells(CONTROL_ROW_ORDER_MODE, 1).Value = "Order Mode"
+    ctrlWs.Cells(CONTROL_ROW_ORDER_MODE, 2).Value = "stub only"
+    ctrlWs.Cells(CONTROL_ROW_AUTO_START, 1).Value = "Auto Start"
+    If Trim$(CStr(ctrlWs.Cells(CONTROL_ROW_AUTO_START, 2).Value)) = "" Then
+        ctrlWs.Cells(CONTROL_ROW_AUTO_START, 2).Value = "FALSE"
+    End If
+    ctrlWs.Cells(CONTROL_ROW_LAST_TICK_AT, 1).Value = "Last Tick At"
+    ctrlWs.Cells(CONTROL_ROW_LAST_TICK_AT, 2).Value = "-"
+    ctrlWs.Cells(CONTROL_ROW_LAST_ACTION, 1).Value = "Last Action"
+    ctrlWs.Cells(CONTROL_ROW_LAST_ACTION, 2).Value = "hold"
+    ctrlWs.Cells(CONTROL_ROW_LAST_ERROR, 1).Value = "Last Error"
+    ctrlWs.Cells(CONTROL_ROW_LAST_ERROR, 2).Value = "-"
 End Sub
 
 Private Sub ScheduleNext()
@@ -107,6 +137,18 @@ End Sub
 
 Private Sub SetStatus(ByVal status As String)
     ThisWorkbook.Sheets(SH_CONTROL).Cells(CONTROL_ROW_STATUS, 2).Value = status
+End Sub
+
+Private Sub WriteOperationalSuccess(ByVal tickTimestamp As Date, ByVal actionCode As Long)
+    Dim ctrlWs As Worksheet
+    Set ctrlWs = ThisWorkbook.Sheets(SH_CONTROL)
+
+    ctrlWs.Cells(CONTROL_ROW_LAST_TICK_AT, 2).Value = Format$(tickTimestamp, "yyyy-mm-dd hh:nn:ss")
+    ctrlWs.Cells(CONTROL_ROW_LAST_ACTION, 2).Value = ActionLabel(actionCode)
+End Sub
+
+Private Sub WriteOperationalError(ByVal message As String)
+    ThisWorkbook.Sheets(SH_CONTROL).Cells(CONTROL_ROW_LAST_ERROR, 2).Value = Left$(message, 120)
 End Sub
 
 Private Sub WriteControlAdvisory(ByVal referenceStatus As String, ByVal referenceAsOf As String, ByVal warningMessage As String)

@@ -10,8 +10,10 @@ Attribute VB_Exposed = True
 Option Explicit
 
 Private Sub Workbook_Open()
-    ' Uncomment if you want the timer to auto-start on open.
-    ' modTimer.StartTimer
+  modTimer.InitializeOperationalSurface
+  If RuntimeAutoStartEnabled() Then
+    modTimer.StartTimer
+  End If
 End Sub
 
 Private Sub Workbook_BeforeClose(Cancel As Boolean)

@@ -32,6 +32,12 @@ Public Const CONTROL_ROW_REFERENCE_AS_OF As Long = 6
 Public Const CONTROL_ROW_WARNING As Long = 7
 Public Const CONTROL_ROW_NEWS_HALT As Long = 8
 Public Const CONTROL_ROW_NEWS_NOTE As Long = 9
+Public Const CONTROL_ROW_RUN_MODE As Long = 10
+Public Const CONTROL_ROW_ORDER_MODE As Long = 11
+Public Const CONTROL_ROW_AUTO_START As Long = 12
+Public Const CONTROL_ROW_LAST_TICK_AT As Long = 13
+Public Const CONTROL_ROW_LAST_ACTION As Long = 14
+Public Const CONTROL_ROW_LAST_ERROR As Long = 15
 
 Public Const LOG_MAX_ROWS As Long = 200
 
@@ -68,4 +74,10 @@ End Function
 
 Public Function RuntimeNewsNote() As String
     RuntimeNewsNote = Trim$(CStr(ThisWorkbook.Sheets(SH_CONTROL).Cells(CONTROL_ROW_NEWS_NOTE, 2).Value))
+End Function
+
+Public Function RuntimeAutoStartEnabled() As Boolean
+    Dim rawValue As String
+    rawValue = LCase$(Trim$(CStr(ThisWorkbook.Sheets(SH_CONTROL).Cells(CONTROL_ROW_AUTO_START, 2).Value)))
+    RuntimeAutoStartEnabled = (rawValue = "true" Or rawValue = "1" Or rawValue = "yes" Or rawValue = "on")
 End Function

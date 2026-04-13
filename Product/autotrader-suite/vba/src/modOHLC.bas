@@ -148,7 +148,17 @@ Private Function OHLCBarJson(ByVal openPrice As Double, ByVal highPrice As Doubl
 End Function
 
 Private Function JsonNumber(ByVal value As Double) As String
-    JsonNumber = Replace$(Format$(Round(value, 3), "0.###"), ",", ".")
+    Dim formatted As String
+    formatted = Replace$(Format$(Round(value, 3), "0.000"), ",", ".")
+
+    Do While Right$(formatted, 1) = "0"
+        formatted = Left$(formatted, Len(formatted) - 1)
+    Loop
+    If Right$(formatted, 1) = "." Then
+        formatted = Left$(formatted, Len(formatted) - 1)
+    End If
+
+    JsonNumber = formatted
 End Function
 
 Private Sub TrimRows(ByVal ws As Worksheet, ByVal maxDataRows As Long)

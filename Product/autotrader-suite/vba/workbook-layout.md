@@ -2,6 +2,8 @@
 
 runtime workbook path は repo root の autotrader.xlsm を想定します。
 
+まず `powershell -ExecutionPolicy Bypass -File ./Product/autotrader-suite/vba/new-autotrader-workbook.ps1` を実行すると、以下の scaffold を自動生成できます。Excel の VBA project access が無効な場合は workbook 保存までは成功し、VBA import だけ warning になります。script の既定値は manual smoke seed で、MarketSpeed II RSS を使う環境では `-UseRssFormulas` を付けて live formula を入れます。
+
 ## Sheets
 
 1. Control
@@ -14,7 +16,7 @@ runtime workbook path は repo root の autotrader.xlsm を想定します。
 | Cell | Value |
 | --- | --- |
 | A1 | Server URL |
-| B1 | http://127.0.0.1:8000 |
+| B1 | `http://127.0.0.1:8000` |
 | A2 | Poll Interval (sec) |
 | B2 | 5 |
 | A3 | Status |
@@ -31,6 +33,18 @@ runtime workbook path は repo root の autotrader.xlsm を想定します。
 | B8 | FALSE |
 | A9 | News Note |
 | B9 | |
+| A10 | Run Mode |
+| B10 | paper |
+| A11 | Order Mode |
+| B11 | stub only |
+| A12 | Auto Start |
+| B12 | FALSE |
+| A13 | Last Tick At |
+| B13 | - |
+| A14 | Last Action |
+| B14 | hold |
+| A15 | Last Error |
+| B15 | - |
 
 ## Market Sheet
 
@@ -66,6 +80,10 @@ G2: =RSS|'7203.T'!'売気配'
 - RSS mode では modTimer が A2 を live formula の code へ同期します。symbol を切り替えるときは B2:E2 の RSS formula を更新します。
 - `F2/G2` が空欄でも送信は継続し、その場合 backend の spread filter は適用されません。
 - `Control!B8/B9` は手動のニュース停止トグルです。`B8=TRUE` の間は backend が新規建てを停止します。
+- `Control!B12` は workbook open 時の auto-start トグルです。`TRUE` のときだけ `Workbook_Open` で timer を開始します。
+- `Control!B13` は `/api/price` が 200 で返った tick の request timestamp を表示します。
+- `Control!B14` は直近の backend action を表示します。
+- `Control!B15` は直近 client/server error を保持し、成功 tick では消えません。
 
 ## OHLC_Data Sheet
 
@@ -98,3 +116,4 @@ G2: =RSS|'7203.T'!'売気配'
 ## Named Range
 
 - RSS_TICK = Market!A2:G2
+
