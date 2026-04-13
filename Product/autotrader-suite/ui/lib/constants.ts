@@ -3,4 +3,5 @@ export const DEFAULT_SERVER_BASE_URL =
 
 export const SOCKET_STALE_MS = 15_000;
 export const SOCKET_RECONNECT_MS = 5_000;
+export const HEALTH_POLL_MS = 10_000;
 export const MAX_EVENT_HISTORY = 50;

@@ -6,7 +6,7 @@
 
 1. `.env.local.example` を `.env.local` として複製します。
 2. `NEXT_PUBLIC_AUTOTRADER_SERVER_BASE_URL` を backend URL に合わせます。
-3. backend を `Product/autotrader` で起動します。前提は SP-1 backend が `127.0.0.1:8000` で応答することです。
+3. backend を `Product/autotrader-suite/backend` で起動します。前提は SP-1 backend が `127.0.0.1:8000` で応答することです。
 4. frontend をこのディレクトリで起動します。
 
 ## コマンド
@@ -32,3 +32,4 @@
 - Dashboard shell の waiting / execution / reference 表示
 - trader socket reducer と reconnect / stale 挙動
 - settings GET / PUT / Auto-Manual override / draft 保持
+

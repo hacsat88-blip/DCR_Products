@@ -158,6 +158,17 @@ body {
   color: var(--text-secondary);
 }
 
+.status-mode,
+.status-health,
+.ops-warning {
+  margin: 8px 0 0;
+  color: var(--text-secondary);
+}
+
+.ops-warning {
+  color: var(--accent-warm);
+}
+
 .metric-panel,
 .history-panel {
   padding: 18px 20px 20px;

@@ -3,6 +3,8 @@ export type TradeMode = "conservative" | "balanced" | "aggressive";
 export type FeedRole = "execution" | "reference";
 export type FeedSource = "rakuten_rss" | "jquants_light" | "jquants_free";
 export type RawTraderAction = "buy" | "sell" | "hold" | "none";
+export type HealthStatus = "healthy" | "degraded";
+export type HealthReadiness = "ready" | "degraded";
 
 export interface RawTraderPrice {
   code: string;
@@ -82,7 +84,20 @@ export interface RawTraderPayload {
   risk_runtime: RawTraderRiskRuntimeSnapshot;
 }
 
+export interface RawTraderHealthPayload {
+  status: HealthStatus;
+  mode: "paper";
+  order_mode: "stub_only";
+  server_time: string;
+  last_price_tick_at: string | null;
+  last_price_code: string | null;
+  ai_status: HealthReadiness;
+  reference_status: HealthReadiness;
+  last_warning: string | null;
+}
+
 export type ConnectionState = "waiting-first-tick" | "connected" | "reconnecting" | "stale";
+export type TraderHealthFetchState = "loading" | "ready" | "unreachable";
 
 export interface TraderPriceSnapshot {
   code: string | null;
@@ -115,6 +130,23 @@ export interface TraderRiskRuntimeSnapshot {
   cooldownRemainingSec: number;
   entryBlocked: boolean;
   entryBlockReason: string | null;
+}
+
+export interface TraderHealthSnapshot {
+  status: HealthStatus;
+  mode: "paper";
+  orderMode: "stub_only";
+  serverTime: string;
+  lastPriceTickAt: string | null;
+  lastPriceCode: string | null;
+  aiStatus: HealthReadiness;
+  referenceStatus: HealthReadiness;
+  lastWarning: string | null;
+}
+
+export interface TraderHealthViewModel {
+  fetchState: TraderHealthFetchState;
+  snapshot: TraderHealthSnapshot | null;
 }
 
 export interface TraderViewModel {

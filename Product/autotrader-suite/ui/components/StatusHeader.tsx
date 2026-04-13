@@ -1,10 +1,11 @@
 import clsx from "clsx";
 
-import type { ConnectionState } from "@/types/trader";
+import type { ConnectionState, TraderHealthViewModel } from "@/types/trader";
 
 interface StatusHeaderProps {
   connectionState: ConnectionState;
   lastUpdatedAt: string | null;
+  health: TraderHealthViewModel;
 }
 
 function formatConnectionState(value: ConnectionState): string {
@@ -28,18 +29,42 @@ function formatUpdatedAt(value: string | null): string {
   return `最終更新 ${value}`;
 }
 
-export function StatusHeader({ connectionState, lastUpdatedAt }: StatusHeaderProps): JSX.Element {
+function formatHealthLine(connectionState: ConnectionState, health: TraderHealthViewModel): string {
+  if (health.fetchState === "unreachable") {
+    return "backend 応答なし";
+  }
+  if (connectionState === "stale") {
+    return "価格更新が停滞";
+  }
+  if (health.snapshot?.aiStatus === "degraded") {
+    return "AI判断が劣化中";
+  }
+  if (health.snapshot?.lastWarning != null) {
+    return "参照価格なしで継続";
+  }
+  if (health.snapshot?.referenceStatus === "degraded") {
+    return "参照価格なしで継続";
+  }
+  if (health.fetchState === "ready") {
+    return "server 正常";
+  }
+  return "backend 状態確認中";
+}
+
+export function StatusHeader({ connectionState, lastUpdatedAt, health }: StatusHeaderProps): JSX.Element {
   return (
     <header className="dashboard-header panel">
       <div>
         <p className="panel-eyebrow">監視コンソール</p>
         <h1>AutoTrader ダッシュボード</h1>
+        <p className="status-mode">紙運用 / 実発注なし</p>
       </div>
 
       <div className="status-stack">
         <span className={clsx("status-pill", `status-pill--${connectionState}`)}>
           {formatConnectionState(connectionState)}
         </span>
+        <p className="status-health">{formatHealthLine(connectionState, health)}</p>
         <p className="status-updated-at">{formatUpdatedAt(lastUpdatedAt)}</p>
       </div>
     </header>

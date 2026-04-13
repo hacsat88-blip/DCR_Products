@@ -3,12 +3,17 @@ import { render, screen } from "@testing-library/react";
 import { afterEach, describe, expect, test, vi } from "vitest";
 
 import HomePage from "@/app/page";
-import type { TraderEventSnapshot, TraderViewModel } from "@/types/trader";
+import type { TraderEventSnapshot, TraderHealthViewModel, TraderViewModel } from "@/types/trader";
 
 const useTraderSocketMock = vi.fn<() => TraderViewModel>();
+const useTraderHealthMock = vi.fn<() => TraderHealthViewModel>();
 
 vi.mock("@/hooks/useTraderSocket", () => ({
   useTraderSocket: (): TraderViewModel => useTraderSocketMock()
+}));
+
+vi.mock("@/hooks/useTraderHealth", () => ({
+  useTraderHealth: (): TraderHealthViewModel => useTraderHealthMock()
 }));
 
 vi.mock("@/components/RiskSettingsAccordion", () => ({
@@ -61,19 +66,55 @@ function buildState(overrides: Partial<TraderViewModel> = {}): TraderViewModel {
   };
 }
 
+function buildHealth(overrides: Partial<TraderHealthViewModel> = {}): TraderHealthViewModel {
+  return {
+    fetchState: "loading",
+    snapshot: null,
+    ...overrides
+  };
+}
+
 afterEach(() => {
   useTraderSocketMock.mockReset();
+  useTraderHealthMock.mockReset();
 });
 
 describe("HomePage dashboard shell", () => {
+  test("shows backend loading copy before health snapshot arrives", () => {
+    useTraderSocketMock.mockReturnValue(buildState());
+    useTraderHealthMock.mockReturnValue(buildHealth());
+
+    render(createElement(HomePage));
+
+    expect(screen.getAllByText("backend 状態確認中").length).toBeGreaterThan(0);
+  });
+
   test("shows waiting-first-tick empty state", () => {
     useTraderSocketMock.mockReturnValue(buildState());
+    useTraderHealthMock.mockReturnValue(
+      buildHealth({
+        fetchState: "ready",
+        snapshot: {
+          status: "healthy",
+          mode: "paper",
+          orderMode: "stub_only",
+          serverTime: "2026-04-13T10:30:05",
+          lastPriceTickAt: null,
+          lastPriceCode: null,
+          aiStatus: "ready",
+          referenceStatus: "ready",
+          lastWarning: null
+        }
+      })
+    );
 
     render(createElement(HomePage));
 
     expect(screen.getByRole("heading", { name: "AutoTrader ダッシュボード" })).toBeInTheDocument();
     expect(screen.getAllByText("初回待機")).toHaveLength(2);
     expect(screen.getByText("監視コンソール")).toBeInTheDocument();
+    expect(screen.getAllByText("紙運用 / 実発注なし").length).toBeGreaterThan(0);
+    expect(screen.getAllByText("server 正常").length).toBeGreaterThan(0);
     expect(screen.getByText("ティック待機中")).toBeInTheDocument();
     expect(screen.getAllByText("未取得").length).toBeGreaterThanOrEqual(1);
     expect(screen.getByText("初回データ待機")).toBeInTheDocument();
@@ -135,6 +176,22 @@ describe("HomePage dashboard shell", () => {
         }
       })
     );
+    useTraderHealthMock.mockReturnValue(
+      buildHealth({
+        fetchState: "ready",
+        snapshot: {
+          status: "healthy",
+          mode: "paper",
+          orderMode: "stub_only",
+          serverTime: "2026-04-13T10:30:05",
+          lastPriceTickAt: "2026-04-13T10:30:00",
+          lastPriceCode: "7203",
+          aiStatus: "ready",
+          referenceStatus: "ready",
+          lastWarning: null
+        }
+      })
+    );
 
     render(createElement(HomePage));
 
@@ -189,6 +246,22 @@ describe("HomePage dashboard shell", () => {
         orderHistory: []
       })
     );
+    useTraderHealthMock.mockReturnValue(
+      buildHealth({
+        fetchState: "ready",
+        snapshot: {
+          status: "degraded",
+          mode: "paper",
+          orderMode: "stub_only",
+          serverTime: "2026-04-13T10:31:00",
+          lastPriceTickAt: "2026-04-13T10:31:00",
+          lastPriceCode: "7203",
+          aiStatus: "ready",
+          referenceStatus: "degraded",
+          lastWarning: "J-Quants reference missing; execution onlyで継続"
+        }
+      })
+    );
 
     render(createElement(HomePage));
 
@@ -198,5 +271,92 @@ describe("HomePage dashboard shell", () => {
     expect(screen.getByText("J-Quants 参照更新")).toBeInTheDocument();
     expect(screen.getByText(/^見送り$/)).toBeInTheDocument();
     expect(screen.getByText("注文イベントなし")).toBeInTheDocument();
+    expect(screen.getAllByText("参照価格なしで継続").length).toBeGreaterThan(0);
+  });
+
+  test("shows reference missing warning even when health stays ready", () => {
+    useTraderSocketMock.mockReturnValue(buildState({ connectionState: "connected" }));
+    useTraderHealthMock.mockReturnValue(
+      buildHealth({
+        fetchState: "ready",
+        snapshot: {
+          status: "healthy",
+          mode: "paper",
+          orderMode: "stub_only",
+          serverTime: "2026-04-13T10:31:30",
+          lastPriceTickAt: "2026-04-13T10:31:00",
+          lastPriceCode: "7203",
+          aiStatus: "ready",
+          referenceStatus: "ready",
+          lastWarning: "J-Quants reference missing; execution onlyで継続"
+        }
+      })
+    );
+
+    render(createElement(HomePage));
+
+    expect(screen.getAllByText("参照価格なしで継続").length).toBeGreaterThan(0);
+  });
+
+  test("shows stale tick warning while backend remains reachable", () => {
+    useTraderSocketMock.mockReturnValue(
+      buildState({
+        connectionState: "stale",
+        lastUpdatedAt: "2026-04-12T10:31:00"
+      })
+    );
+    useTraderHealthMock.mockReturnValue(
+      buildHealth({
+        fetchState: "ready",
+        snapshot: {
+          status: "healthy",
+          mode: "paper",
+          orderMode: "stub_only",
+          serverTime: "2026-04-13T10:31:30",
+          lastPriceTickAt: "2026-04-13T10:31:00",
+          lastPriceCode: "7203",
+          aiStatus: "ready",
+          referenceStatus: "ready",
+          lastWarning: null
+        }
+      })
+    );
+
+    render(createElement(HomePage));
+
+    expect(screen.getAllByText("価格更新が停滞").length).toBeGreaterThan(0);
+  });
+
+  test("shows backend unreachable warning", () => {
+    useTraderSocketMock.mockReturnValue(buildState({ connectionState: "reconnecting" }));
+    useTraderHealthMock.mockReturnValue(buildHealth({ fetchState: "unreachable" }));
+
+    render(createElement(HomePage));
+
+    expect(screen.getAllByText("backend 応答なし").length).toBeGreaterThan(0);
+  });
+
+  test("shows ai degraded warning", () => {
+    useTraderSocketMock.mockReturnValue(buildState({ connectionState: "connected" }));
+    useTraderHealthMock.mockReturnValue(
+      buildHealth({
+        fetchState: "ready",
+        snapshot: {
+          status: "degraded",
+          mode: "paper",
+          orderMode: "stub_only",
+          serverTime: "2026-04-13T10:31:30",
+          lastPriceTickAt: "2026-04-13T10:31:00",
+          lastPriceCode: "7203",
+          aiStatus: "degraded",
+          referenceStatus: "ready",
+          lastWarning: "AI判断エラー: GOOGLE_API_KEY not set"
+        }
+      })
+    );
+
+    render(createElement(HomePage));
+
+    expect(screen.getAllByText("AI判断が劣化中").length).toBeGreaterThan(0);
   });
 });
