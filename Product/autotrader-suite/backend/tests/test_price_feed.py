@@ -5,6 +5,7 @@ from fastapi.testclient import TestClient
 from fastapi import FastAPI
 from server.models import RiskSettings, TradeDecision
 from server.engine.position import PositionManager
+from server.engine.paper_ops import PaperOpsState
 from server.engine.risk_guard import RiskGuard
 from server.routes.price_feed import make_price_router
 
@@ -51,6 +52,8 @@ def _make_app(
     broadcast,
     get_reference_snapshot=None,
     schedule_reference_publish=None,
+    paper_ops_state=None,
+    reference_ready_provider=None,
 ):
     app = FastAPI()
     app.include_router(
@@ -61,6 +64,8 @@ def _make_app(
             broadcast,
             get_reference_snapshot=get_reference_snapshot,
             schedule_reference_publish=schedule_reference_publish,
+            paper_ops_state=paper_ops_state,
+            reference_ready_provider=reference_ready_provider,
         )
     )
     return TestClient(app)
@@ -149,6 +154,92 @@ def test_price_feed_marks_old_reference_as_soft_warning(setup):
     assert data["reference_age_days"] == 11
     assert data["warning_code"] == "reference_stale"
     assert "execution only" in data["warning_message"]
+
+
+def test_price_feed_marks_paper_ops_reference_degraded_on_stale_snapshot(setup):
+    pos_mgr, guard, broadcast = setup
+    mock_gemini = MagicMock()
+    mock_gemini.decide_safe.return_value = TradeDecision(action="hold", qty=0, reason="様子見")
+    paper_ops_state = PaperOpsState(ai_ready=True, reference_ready=True)
+    get_reference_snapshot = MagicMock(
+        return_value={
+            **REFERENCE_SNAPSHOT,
+            "as_of": "2026-04-01",
+        }
+    )
+
+    tc = _make_app(
+        mock_gemini,
+        guard,
+        pos_mgr,
+        broadcast,
+        get_reference_snapshot,
+        MagicMock(),
+        paper_ops_state,
+        lambda: True,
+    )
+    response = tc.post("/api/price", json=PRICE_PAYLOAD)
+
+    assert response.status_code == 200
+    snapshot = paper_ops_state.snapshot(datetime(2026, 4, 13, 10, 30, 5))
+    assert snapshot.reference_status == "degraded"
+    assert snapshot.last_warning == "J-Quants reference stale (11 days); execution onlyで継続"
+
+
+def test_price_feed_updates_paper_ops_health_on_execution_tick(setup):
+    pos_mgr, guard, broadcast = setup
+    mock_gemini = MagicMock()
+    mock_gemini.decide_safe.return_value = TradeDecision(action="hold", qty=0, reason="様子見")
+    paper_ops_state = PaperOpsState(ai_ready=True, reference_ready=True)
+
+    tc = _make_app(
+        mock_gemini,
+        guard,
+        pos_mgr,
+        broadcast,
+        None,
+        MagicMock(),
+        paper_ops_state,
+        lambda: True,
+    )
+    response = tc.post("/api/price", json=PRICE_PAYLOAD)
+
+    assert response.status_code == 200
+    snapshot = paper_ops_state.snapshot(datetime(2026, 4, 13, 10, 30, 5))
+    assert snapshot.last_price_tick_at == datetime(2026, 4, 12, 10, 0, 0)
+    assert snapshot.last_price_code == "7203"
+    assert snapshot.ai_status == "ready"
+    assert snapshot.reference_status == "ready"
+    assert snapshot.last_warning == "J-Quants reference missing; execution onlyで継続"
+
+
+def test_price_feed_marks_ai_status_degraded_after_ai_error(setup):
+    pos_mgr, guard, broadcast = setup
+    mock_gemini = MagicMock()
+    mock_gemini.decide_safe.return_value = TradeDecision(
+        action="hold",
+        qty=0,
+        reason="AI判断エラー: GOOGLE_API_KEY not set",
+    )
+    paper_ops_state = PaperOpsState(ai_ready=True, reference_ready=True)
+
+    tc = _make_app(
+        mock_gemini,
+        guard,
+        pos_mgr,
+        broadcast,
+        MagicMock(return_value=REFERENCE_SNAPSHOT),
+        MagicMock(),
+        paper_ops_state,
+        lambda: True,
+    )
+    response = tc.post("/api/price", json=PRICE_PAYLOAD)
+
+    assert response.status_code == 200
+    snapshot = paper_ops_state.snapshot(datetime(2026, 4, 13, 10, 30, 5))
+    assert snapshot.ai_status == "degraded"
+    assert snapshot.reference_status == "ready"
+    assert snapshot.last_warning == "AI判断エラー: GOOGLE_API_KEY not set"
 
 
 def test_price_feed_buy_updates_position(setup):

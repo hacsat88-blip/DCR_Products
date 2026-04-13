@@ -3,6 +3,7 @@ from typing import Callable, Awaitable
 from fastapi import APIRouter, HTTPException
 from server.models import FeedSource, PriceFeedResponse, PriceRequest, TradeDecision
 from server.engine.gemini_trader import GeminiTrader
+from server.engine.paper_ops import PaperOpsState
 from server.engine.risk_guard import RiskGuard
 from server.engine.position import PositionManager
 from server.engine.trade_setup import build_trade_setup
@@ -15,6 +16,8 @@ def make_price_router(
     broadcast: Callable[..., Awaitable[None]],
     get_reference_snapshot: Callable[[str, FeedSource], dict[str, object] | None] | None = None,
     schedule_reference_publish: Callable[[str, FeedSource], None] | None = None,
+    paper_ops_state: PaperOpsState | None = None,
+    reference_ready_provider: Callable[[], bool] | None = None,
 ) -> APIRouter:
     r = APIRouter()
 
@@ -98,6 +101,9 @@ def make_price_router(
             **reference_advisory,
         )
 
+    def _is_ai_degraded(decision: TradeDecision) -> bool:
+        return decision.reason.startswith("AI判断エラー:")
+
     async def _broadcast_decision(req: PriceRequest, decision: TradeDecision):
         await broadcast(
             price={
@@ -174,7 +180,7 @@ def make_price_router(
         await _broadcast_decision(req, decision)
         if schedule_reference_publish is not None:
             schedule_reference_publish(req.code, guard.settings.reference_feed)
-        return _make_response(
+        response = _make_response(
             decision,
             _build_reference_advisory(
                 req.price,
@@ -183,5 +189,24 @@ def make_price_router(
                 reference_snapshot,
             ),
         )
+        if paper_ops_state is not None:
+            provider_reference_ready = (
+                reference_ready_provider()
+                if reference_ready_provider is not None
+                else response.reference_status == "ok"
+            )
+            reference_ready = provider_reference_ready and response.reference_status != "stale"
+            paper_ops_state.record_execution_result(
+                timestamp=req.timestamp,
+                code=req.code,
+                ai_ready=not _is_ai_degraded(raw),
+                reference_ready=reference_ready,
+                warning_message=(
+                    raw.reason
+                    if _is_ai_degraded(raw)
+                    else response.warning_message
+                ),
+            )
+        return response
 
     return r

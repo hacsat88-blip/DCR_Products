@@ -38,6 +38,9 @@ class GeminiTrader:
     def __init__(self):
         self._client: genai.Client | None = None
 
+    def is_configured(self) -> bool:
+        return bool(os.environ.get("GOOGLE_API_KEY", "").strip())
+
     def _get_client(self) -> genai.Client:
         if self._client is None:
             api_key = os.environ.get("GOOGLE_API_KEY", "").strip()

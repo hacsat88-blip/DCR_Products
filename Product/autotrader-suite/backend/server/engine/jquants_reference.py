@@ -26,6 +26,13 @@ class JQuantsReferenceService:
         self._cache_ttl_seconds = cache_ttl_seconds
         self._cache: dict[tuple[str, FeedSource], tuple[float, dict[str, object]]] = {}
         self._last_snapshot: dict[tuple[str, FeedSource], dict[str, object]] = {}
+        self._runtime_ready = self.is_configured()
+
+    def is_configured(self) -> bool:
+        return self._get_api_key() is not None
+
+    def runtime_ready(self) -> bool:
+        return self._runtime_ready
 
     def _get_api_key(self) -> str | None:
         api_key = os.environ.get("JQUANTS_API_KEY", "").strip()
@@ -130,6 +137,7 @@ class JQuantsReferenceService:
 
         api_key = self._get_api_key()
         if api_key is None:
+            self._runtime_ready = False
             return None
 
         to_date = datetime.now().date()
@@ -153,6 +161,7 @@ class JQuantsReferenceService:
                     )
                 except httpx.HTTPError:
                     _logger.exception("J-Quants reference fetch failed")
+                    self._runtime_ready = False
                     return None
 
                 if response.status_code != 200:
@@ -167,8 +176,10 @@ class JQuantsReferenceService:
                 snapshot = self._build_snapshot(response.json(), code, feed_source)
                 if snapshot is not None:
                     self._set_cached(code, feed_source, snapshot)
+                    self._runtime_ready = True
                     return snapshot
 
+        self._runtime_ready = False
         return None
 
     async def publish_reference(

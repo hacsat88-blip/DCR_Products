@@ -8,6 +8,8 @@ FeedRole = Literal["execution", "reference"]
 FeedSource = Literal["rakuten_rss", "jquants_light", "jquants_free"]
 ReferenceStatus = Literal["ok", "missing", "stale"]
 ReferenceWarningCode = Literal["reference_missing", "reference_stale"]
+PaperOpsStatus = Literal["healthy", "degraded"]
+PaperOpsReadiness = Literal["ready", "degraded"]
 
 _MODE_PRICE_DIVISORS: dict[TradeMode, int] = {
     "conservative": 1000,
@@ -194,3 +196,15 @@ class RiskRuntimeSnapshot(BaseModel):
     cooldown_remaining_sec: int = Field(default=0, ge=0)
     entry_blocked: bool = False
     entry_block_reason: str | None = None
+
+
+class PaperOpsHealth(BaseModel):
+    status: PaperOpsStatus
+    mode: Literal["paper"] = "paper"
+    order_mode: Literal["stub_only"] = "stub_only"
+    server_time: datetime
+    last_price_tick_at: datetime | None = None
+    last_price_code: str | None = None
+    ai_status: PaperOpsReadiness
+    reference_status: PaperOpsReadiness
+    last_warning: str | None = None

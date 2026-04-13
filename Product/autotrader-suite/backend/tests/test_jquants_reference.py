@@ -43,6 +43,15 @@ def test_fetch_snapshot_returns_none_when_api_key_missing(monkeypatch):
     snapshot = asyncio.run(service.fetch_snapshot("7203", "jquants_light"))
 
     assert snapshot is None
+    assert service.runtime_ready() is False
+
+
+def test_runtime_ready_starts_true_when_api_key_exists(monkeypatch):
+    monkeypatch.setenv("JQUANTS_API_KEY", "test-key")
+
+    service = JQuantsReferenceService(cache_ttl_seconds=60)
+
+    assert service.runtime_ready() is True
 
 
 def test_publish_reference_broadcasts_hold_event(monkeypatch):
@@ -100,3 +109,35 @@ def test_peek_snapshot_returns_last_known_reference_after_fetch(monkeypatch):
     assert snapshot is not None
     assert snapshot["as_of"] == "2026-04-11"
     assert snapshot["current"] == 251.5
+
+
+def test_runtime_ready_turns_degraded_after_later_fetch_failure(monkeypatch):
+    monkeypatch.setenv("JQUANTS_API_KEY", "test-key")
+
+    call_count = 0
+
+    async def handler(_: httpx.Request) -> httpx.Response:
+        nonlocal call_count
+        call_count += 1
+        if call_count == 1:
+            return httpx.Response(
+                200,
+                json={
+                    "daily_quotes": [
+                        {"Date": "20260411", "AdjC": 251.5, "AdjVo": 12000},
+                    ]
+                },
+            )
+        raise httpx.ConnectError("network down")
+
+    service = JQuantsReferenceService(
+        transport=httpx.MockTransport(handler),
+        cache_ttl_seconds=60,
+    )
+
+    first = asyncio.run(service.fetch_snapshot("7203", "jquants_light"))
+    second = asyncio.run(service.fetch_snapshot("6758", "jquants_light"))
+
+    assert first is not None
+    assert second is None
+    assert service.runtime_ready() is False
