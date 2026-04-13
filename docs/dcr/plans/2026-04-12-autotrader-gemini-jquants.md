@@ -13,17 +13,17 @@
 ### Task 1: Gemini only backend contract
 
 **Files:**
-- Modify: Product/autotrader/server/models.py
-- Modify: Product/autotrader/server/main.py
-- Modify: Product/autotrader/server/routes/price_feed.py
-- Modify: Product/autotrader/server/engine/gemini_trader.py
-- Modify: Product/autotrader/tests/test_price_feed.py
-- Modify: Product/autotrader/tests/test_main.py
-- Delete: Product/autotrader/server/engine/ai_trader.py
-- Delete: Product/autotrader/tests/test_ai_trader.py
-- Modify: Product/autotrader/requirements.txt
-- Modify: Product/autotrader/requirements-lock.txt
-- Modify: Product/autotrader/.env.example
+- Modify: Product/autotrader-suite/backend/server/models.py
+- Modify: Product/autotrader-suite/backend/server/main.py
+- Modify: Product/autotrader-suite/backend/server/routes/price_feed.py
+- Modify: Product/autotrader-suite/backend/server/engine/gemini_trader.py
+- Modify: Product/autotrader-suite/backend/tests/test_price_feed.py
+- Modify: Product/autotrader-suite/backend/tests/test_main.py
+- Delete: Product/autotrader-suite/backend/server/engine/ai_trader.py
+- Delete: Product/autotrader-suite/backend/tests/test_ai_trader.py
+- Modify: Product/autotrader-suite/backend/requirements.txt
+- Modify: Product/autotrader-suite/backend/requirements-lock.txt
+- Modify: Product/autotrader-suite/backend/.env.example
 
 - [ ] Step 1: 失敗する backend 契約テストを追加し、hybrid が通らないことと import が API key なしで成立することを固定する
 - [ ] Step 2: 追加したテストだけを実行し、失敗を確認する
@@ -34,12 +34,12 @@
 ### Task 2: J-Quants reference service and WS payload
 
 **Files:**
-- Create: Product/autotrader/server/engine/jquants_reference.py
-- Modify: Product/autotrader/server/routes/price_feed.py
-- Modify: Product/autotrader/server/routes/ws.py
-- Modify: Product/autotrader/server/models.py
-- Create: Product/autotrader/tests/test_jquants_reference.py
-- Modify: Product/autotrader/tests/test_price_feed.py
+- Create: Product/autotrader-suite/backend/server/engine/jquants_reference.py
+- Modify: Product/autotrader-suite/backend/server/routes/price_feed.py
+- Modify: Product/autotrader-suite/backend/server/routes/ws.py
+- Modify: Product/autotrader-suite/backend/server/models.py
+- Create: Product/autotrader-suite/backend/tests/test_jquants_reference.py
+- Modify: Product/autotrader-suite/backend/tests/test_price_feed.py
 
 - [ ] Step 1: J-Quants reference 取得の失敗系と成功系テストを書く
 - [ ] Step 2: 参照取得後に execution 価格を維持したまま reference snapshot を payload に積む router テストを書く
@@ -50,14 +50,14 @@
 ### Task 3: Dashboard execution/reference split
 
 **Files:**
-- Modify: Product/autotrader-ui/types/trader.ts
-- Modify: Product/autotrader-ui/lib/trader-view-model.ts
-- Modify: Product/autotrader-ui/components/PricePanel.tsx
-- Modify: Product/autotrader-ui/components/DashboardShell.tsx
-- Modify: Product/autotrader-ui/components/RiskSettingsAccordion.tsx
-- Modify: Product/autotrader-ui/tests/useTraderSocket.test.ts
-- Modify: Product/autotrader-ui/tests/DashboardShell.test.tsx
-- Modify: Product/autotrader-ui/tests/RiskSettingsAccordion.test.tsx
+- Modify: Product/autotrader-suite/ui/types/trader.ts
+- Modify: Product/autotrader-suite/ui/lib/trader-view-model.ts
+- Modify: Product/autotrader-suite/ui/components/PricePanel.tsx
+- Modify: Product/autotrader-suite/ui/components/DashboardShell.tsx
+- Modify: Product/autotrader-suite/ui/components/RiskSettingsAccordion.tsx
+- Modify: Product/autotrader-suite/ui/tests/useTraderSocket.test.ts
+- Modify: Product/autotrader-suite/ui/tests/DashboardShell.test.tsx
+- Modify: Product/autotrader-suite/ui/tests/RiskSettingsAccordion.test.tsx
 
 - [ ] Step 1: reference snapshot を含む payload 契約の失敗テストと UI 表示テストを書く
 - [ ] Step 2: ai_mode を Gemini 固定にそろえるテストへ更新し、失敗を確認する
@@ -70,8 +70,8 @@
 **Files:**
 - Modify: docs 変更が必要なら関連設計/計画ファイル
 
-- [ ] Step 1: Product/autotrader の対象 pytest を実行する
-- [ ] Step 2: Product/autotrader-ui の対象 Vitest を実行する
-- [ ] Step 3: Product/autotrader-ui の build を実行する
+- [ ] Step 1: Product/autotrader-suite/backend の対象 pytest を実行する
+- [ ] Step 2: Product/autotrader-suite/ui の対象 Vitest を実行する
+- [ ] Step 3: Product/autotrader-suite/ui の build を実行する
 - [ ] Step 4: ルートの validate.ps1 を実行する
 - [ ] Step 5: 変更点と残リスクを整理する

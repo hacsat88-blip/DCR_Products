@@ -13,11 +13,11 @@
 ### Task 1: Extend Market Request And Runtime Snapshot
 
 **Files:**
-- Modify: `Product/autotrader/server/models.py`
-- Modify: `Product/autotrader/server/engine/risk_guard.py`
-- Modify: `Product/autotrader/server/routes/ws.py`
-- Modify: `Product/autotrader/tests/test_models.py`
-- Modify: `Product/autotrader/tests/test_ws.py`
+- Modify: `Product/autotrader-suite/backend/server/models.py`
+- Modify: `Product/autotrader-suite/backend/server/engine/risk_guard.py`
+- Modify: `Product/autotrader-suite/backend/server/routes/ws.py`
+- Modify: `Product/autotrader-suite/backend/tests/test_models.py`
+- Modify: `Product/autotrader-suite/backend/tests/test_ws.py`
 
 - [x] Add optional bid/ask/news halt fields to request contract and runtime snapshot fields for daily realized pnl, consecutive losses, cooldown, and entry block reason.
 - [x] Write/adjust failing tests for model validation and websocket payload.
@@ -27,11 +27,11 @@
 ### Task 2: Add Deterministic Backtest Path
 
 **Files:**
-- Create: `Product/autotrader/server/engine/rule_based_trader.py`
-- Create: `Product/autotrader/server/engine/backtest.py`
-- Create: `Product/autotrader/server/backtest_runner.py`
-- Create: `Product/autotrader/tests/test_rule_based_trader.py`
-- Create: `Product/autotrader/tests/test_backtest.py`
+- Create: `Product/autotrader-suite/backend/server/engine/rule_based_trader.py`
+- Create: `Product/autotrader-suite/backend/server/engine/backtest.py`
+- Create: `Product/autotrader-suite/backend/server/backtest_runner.py`
+- Create: `Product/autotrader-suite/backend/tests/test_rule_based_trader.py`
+- Create: `Product/autotrader-suite/backend/tests/test_backtest.py`
 
 - [x] Write failing tests for breakout/exit behavior and summary metrics.
 - [x] Implement rule-based trader using TradeSetup metrics.
@@ -42,16 +42,16 @@
 ### Task 3: Add Spread/Open/News Filters End-To-End
 
 **Files:**
-- Modify: `Product/autotrader/server/engine/trade_setup.py`
-- Modify: `Product/autotrader/server/engine/risk_guard.py`
-- Modify: `Product/autotrader/server/routes/price_feed.py`
-- Modify: `Product/autotrader/tests/test_trade_setup.py`
-- Modify: `Product/autotrader/tests/test_risk_guard.py`
-- Modify: `Product/autotrader/tests/test_price_feed.py`
-- Modify: `Product/autotrader-vba/src/modConfig.bas`
-- Modify: `Product/autotrader-vba/src/modHTTP.bas`
-- Modify: `Product/autotrader-vba/src/modTimer.bas`
-- Modify: `Product/autotrader-vba/workbook-layout.md`
+- Modify: `Product/autotrader-suite/backend/server/engine/trade_setup.py`
+- Modify: `Product/autotrader-suite/backend/server/engine/risk_guard.py`
+- Modify: `Product/autotrader-suite/backend/server/routes/price_feed.py`
+- Modify: `Product/autotrader-suite/backend/tests/test_trade_setup.py`
+- Modify: `Product/autotrader-suite/backend/tests/test_risk_guard.py`
+- Modify: `Product/autotrader-suite/backend/tests/test_price_feed.py`
+- Modify: `Product/autotrader-suite/vba/src/modConfig.bas`
+- Modify: `Product/autotrader-suite/vba/src/modHTTP.bas`
+- Modify: `Product/autotrader-suite/vba/src/modTimer.bas`
+- Modify: `Product/autotrader-suite/vba/workbook-layout.md`
 
 - [x] Add failing tests for skip-open, max spread, and news halt buy blocking.
 - [x] Implement spread/open/news setup derivation and guard rules.
@@ -62,12 +62,12 @@
 ### Task 4: Expose Runtime Risk Metrics In Dashboard
 
 **Files:**
-- Modify: `Product/autotrader-ui/types/trader.ts`
-- Modify: `Product/autotrader-ui/lib/trader-view-model.ts`
-- Create: `Product/autotrader-ui/components/RiskRuntimePanel.tsx`
-- Modify: `Product/autotrader-ui/components/DashboardShell.tsx`
-- Modify: `Product/autotrader-ui/tests/useTraderSocket.test.ts`
-- Modify: `Product/autotrader-ui/tests/DashboardShell.test.tsx`
+- Modify: `Product/autotrader-suite/ui/types/trader.ts`
+- Modify: `Product/autotrader-suite/ui/lib/trader-view-model.ts`
+- Create: `Product/autotrader-suite/ui/components/RiskRuntimePanel.tsx`
+- Modify: `Product/autotrader-suite/ui/components/DashboardShell.tsx`
+- Modify: `Product/autotrader-suite/ui/tests/useTraderSocket.test.ts`
+- Modify: `Product/autotrader-suite/ui/tests/DashboardShell.test.tsx`
 
 - [x] Write failing UI tests for runtime risk metrics rendering and payload parsing.
 - [x] Implement runtime risk panel and wire it into dashboard shell.
@@ -77,7 +77,7 @@
 
 **Files:**
 - Modify: `docs/superpowers/specs/2026-04-12-autotrading-design.md`
-- Modify: `Product/autotrader/.env.example`
+- Modify: `Product/autotrader-suite/backend/.env.example`
 
 - [x] Update docs to state that live Gemini needs `GOOGLE_API_KEY`, while backtest does not.
 - [x] Run `pytest` for touched backend suites.
