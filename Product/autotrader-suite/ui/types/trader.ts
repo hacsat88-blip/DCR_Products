@@ -2,6 +2,8 @@ export type AISelectionMode = "gemini";
 export type TradeMode = "conservative" | "balanced" | "aggressive";
 export type FeedRole = "execution" | "reference";
 export type FeedSource = "rakuten_rss" | "jquants_light" | "jquants_free";
+export type RunMode = "paper" | "live";
+export type OrderExecutionMode = "stub_only" | "broker_auto";
 export type RawTraderAction = "buy" | "sell" | "hold" | "none";
 export type HealthStatus = "healthy" | "degraded";
 export type HealthReadiness = "ready" | "degraded";
@@ -86,8 +88,9 @@ export interface RawTraderPayload {
 
 export interface RawTraderHealthPayload {
   status: HealthStatus;
-  mode: "paper";
-  order_mode: "stub_only";
+  mode: RunMode;
+  order_mode: OrderExecutionMode;
+  live_armed?: boolean;
   server_time: string;
   last_price_tick_at: string | null;
   last_price_code: string | null;
@@ -134,8 +137,9 @@ export interface TraderRiskRuntimeSnapshot {
 
 export interface TraderHealthSnapshot {
   status: HealthStatus;
-  mode: "paper";
-  orderMode: "stub_only";
+  mode: RunMode;
+  orderMode: OrderExecutionMode;
+  liveArmed: boolean;
   serverTime: string;
   lastPriceTickAt: string | null;
   lastPriceCode: string | null;

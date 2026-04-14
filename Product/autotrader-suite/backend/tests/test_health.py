@@ -24,6 +24,7 @@ def test_health_reports_degraded_when_api_keys_missing(monkeypatch):
     data = response.json()
     assert data["mode"] == "paper"
     assert data["order_mode"] == "stub_only"
+    assert data["live_armed"] is False
     assert data["status"] == "degraded"
     assert data["ai_status"] == "degraded"
     assert data["reference_status"] == "degraded"
@@ -49,6 +50,9 @@ def test_health_reports_tick_and_warning_state(monkeypatch):
     assert response.status_code == 200
     data = response.json()
     assert data["status"] == "degraded"
+    assert data["mode"] == "paper"
+    assert data["order_mode"] == "stub_only"
+    assert data["live_armed"] is False
     assert data["ai_status"] == "ready"
     assert data["reference_status"] == "degraded"
     assert data["last_price_tick_at"] == "2026-04-13T10:30:00"

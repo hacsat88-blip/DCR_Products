@@ -8,20 +8,23 @@ from dotenv import load_dotenv
 load_dotenv()
 
 from server.models import RiskSettings
+from server.engine.alert_notifier import AlertNotifier
 from server.engine.gemini_trader import GeminiTrader
-from server.engine.jquants_reference import JQuantsReferenceService
+from server.engine.jquants_reference import JQuantsReferenceService, snapshot_runtime_ready
 from server.engine.paper_ops import PaperOpsState
 from server.engine.risk_guard import RiskGuard
 from server.engine.position import PositionManager
+from server.engine.settings_store import load_settings
 from server.routes.health import make_health_router
 from server.routes.price_feed import make_price_router
 from server.routes.settings import make_settings_router
 from server.routes.ws import make_ws_router
 
 _pos_mgr = PositionManager()
-_guard = RiskGuard(settings=RiskSettings(), start_time=datetime.now())
+_guard = RiskGuard(settings=load_settings(), start_time=datetime.now())
 _gemini_ai = GeminiTrader()
 _reference_service = JQuantsReferenceService()
+_alert_notifier = AlertNotifier()
 _paper_ops_state = PaperOpsState(
     ai_ready=_gemini_ai.is_configured(),
     reference_ready=_reference_service.is_configured(),
@@ -32,7 +35,13 @@ _ws_router, _broadcast = make_ws_router(_pos_mgr, _guard)
 def _schedule_reference_publish(code: str, feed_source: str) -> None:
     async def _publish() -> None:
         await _reference_service.publish_reference(code, feed_source, _broadcast)
-        _paper_ops_state.set_reference_ready(_reference_service.runtime_ready())
+        _paper_ops_state.set_reference_ready(
+            _reference_service.runtime_ready()
+            and snapshot_runtime_ready(
+                _reference_service.peek_snapshot(code, feed_source),
+                datetime.now(),
+            )
+        )
 
     asyncio.create_task(_publish())
 
@@ -60,6 +69,7 @@ app.include_router(
         schedule_reference_publish=_schedule_reference_publish,
         paper_ops_state=_paper_ops_state,
         reference_ready_provider=_reference_service.runtime_ready,
+        send_alert=_alert_notifier.notify,
     )
 )
 app.include_router(make_health_router(_paper_ops_state))

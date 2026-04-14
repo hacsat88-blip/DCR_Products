@@ -9,6 +9,44 @@ import httpx
 from server.models import FeedSource
 
 _logger = logging.getLogger(__name__)
+REFERENCE_STALE_AFTER_DAYS = 5
+
+
+def parse_reference_as_of(raw_value: object) -> date | None:
+    if isinstance(raw_value, datetime):
+        return raw_value.date()
+    if isinstance(raw_value, date):
+        return raw_value
+    if not isinstance(raw_value, str):
+        return None
+
+    normalized = raw_value.strip()
+    if not normalized:
+        return None
+
+    for pattern in ("%Y-%m-%d", "%Y%m%d"):
+        try:
+            return datetime.strptime(normalized, pattern).date()
+        except ValueError:
+            continue
+    return None
+
+
+def compute_reference_age_days(raw_value: object, timestamp: datetime) -> int | None:
+    parsed_as_of = parse_reference_as_of(raw_value)
+    if parsed_as_of is None:
+        return None
+    return max(0, (timestamp.date() - parsed_as_of).days)
+
+
+def snapshot_runtime_ready(
+    snapshot: dict[str, object] | None,
+    timestamp: datetime,
+) -> bool:
+    if snapshot is None:
+        return False
+    reference_age_days = compute_reference_age_days(snapshot.get("as_of"), timestamp)
+    return reference_age_days is None or reference_age_days <= REFERENCE_STALE_AFTER_DAYS
 
 
 class JQuantsReferenceService:
@@ -63,23 +101,10 @@ class JQuantsReferenceService:
         return snapshot.copy()
 
     def _normalize_as_of(self, raw_value: object) -> str | None:
-        if isinstance(raw_value, datetime):
-            return raw_value.date().isoformat()
-        if isinstance(raw_value, date):
-            return raw_value.isoformat()
-        if not isinstance(raw_value, str):
+        parsed_as_of = parse_reference_as_of(raw_value)
+        if parsed_as_of is None:
             return None
-
-        normalized = raw_value.strip()
-        if not normalized:
-            return None
-
-        for pattern in ("%Y-%m-%d", "%Y%m%d"):
-            try:
-                return datetime.strptime(normalized, pattern).date().isoformat()
-            except ValueError:
-                continue
-        return None
+        return parsed_as_of.isoformat()
 
     def _code_candidates(self, code: str) -> list[str]:
         normalized = code.strip()

@@ -98,6 +98,7 @@ describe("HomePage dashboard shell", () => {
           status: "healthy",
           mode: "paper",
           orderMode: "stub_only",
+          liveArmed: false,
           serverTime: "2026-04-13T10:30:05",
           lastPriceTickAt: null,
           lastPriceCode: null,
@@ -183,6 +184,7 @@ describe("HomePage dashboard shell", () => {
           status: "healthy",
           mode: "paper",
           orderMode: "stub_only",
+          liveArmed: false,
           serverTime: "2026-04-13T10:30:05",
           lastPriceTickAt: "2026-04-13T10:30:00",
           lastPriceCode: "7203",
@@ -253,6 +255,7 @@ describe("HomePage dashboard shell", () => {
           status: "degraded",
           mode: "paper",
           orderMode: "stub_only",
+          liveArmed: false,
           serverTime: "2026-04-13T10:31:00",
           lastPriceTickAt: "2026-04-13T10:31:00",
           lastPriceCode: "7203",
@@ -283,6 +286,7 @@ describe("HomePage dashboard shell", () => {
           status: "healthy",
           mode: "paper",
           orderMode: "stub_only",
+          liveArmed: false,
           serverTime: "2026-04-13T10:31:30",
           lastPriceTickAt: "2026-04-13T10:31:00",
           lastPriceCode: "7203",
@@ -296,6 +300,33 @@ describe("HomePage dashboard shell", () => {
     render(createElement(HomePage));
 
     expect(screen.getAllByText("参照価格なしで継続").length).toBeGreaterThan(0);
+  });
+
+  test("shows stale reference warning while health is degraded", () => {
+    useTraderSocketMock.mockReturnValue(buildState({ connectionState: "connected" }));
+    useTraderHealthMock.mockReturnValue(
+      buildHealth({
+        fetchState: "ready",
+        snapshot: {
+          status: "degraded",
+          mode: "paper",
+          orderMode: "stub_only",
+          liveArmed: false,
+          serverTime: "2026-04-13T10:31:30",
+          lastPriceTickAt: "2026-04-13T10:31:00",
+          lastPriceCode: "7203",
+          aiStatus: "ready",
+          referenceStatus: "degraded",
+          lastWarning: "J-Quants reference stale (11 days); execution onlyで継続"
+        }
+      })
+    );
+
+    render(createElement(HomePage));
+
+    expect(screen.getAllByText("参照価格なしで継続").length).toBeGreaterThan(0);
+    expect(screen.getByText("J-Quants reference stale (11 days); execution onlyで継続")).toBeInTheDocument();
+    expect(screen.getByText("degraded")).toBeInTheDocument();
   });
 
   test("shows stale tick warning while backend remains reachable", () => {
@@ -312,6 +343,7 @@ describe("HomePage dashboard shell", () => {
           status: "healthy",
           mode: "paper",
           orderMode: "stub_only",
+          liveArmed: false,
           serverTime: "2026-04-13T10:31:30",
           lastPriceTickAt: "2026-04-13T10:31:00",
           lastPriceCode: "7203",
@@ -345,6 +377,7 @@ describe("HomePage dashboard shell", () => {
           status: "degraded",
           mode: "paper",
           orderMode: "stub_only",
+          liveArmed: false,
           serverTime: "2026-04-13T10:31:30",
           lastPriceTickAt: "2026-04-13T10:31:00",
           lastPriceCode: "7203",
@@ -358,5 +391,33 @@ describe("HomePage dashboard shell", () => {
     render(createElement(HomePage));
 
     expect(screen.getAllByText("AI判断が劣化中").length).toBeGreaterThan(0);
+  });
+
+  test("shows live armed status when broker auto is active", () => {
+    useTraderSocketMock.mockReturnValue(buildState({ connectionState: "connected" }));
+    useTraderHealthMock.mockReturnValue(
+      buildHealth({
+        fetchState: "ready",
+        snapshot: {
+          status: "healthy",
+          mode: "live",
+          orderMode: "broker_auto",
+          liveArmed: true,
+          serverTime: "2026-04-13T10:31:30",
+          lastPriceTickAt: "2026-04-13T10:31:00",
+          lastPriceCode: "7203",
+          aiStatus: "ready",
+          referenceStatus: "ready",
+          lastWarning: null
+        }
+      })
+    );
+
+    render(createElement(HomePage));
+
+    expect(screen.getAllByText("live 設定 / 自動発注arm済み").length).toBeGreaterThan(0);
+    expect(screen.getByText("live 発注条件成立")).toBeInTheDocument();
+    expect(screen.getByText("broker auto / armed")).toBeInTheDocument();
+    expect(screen.getByText("有効")).toBeInTheDocument();
   });
 });

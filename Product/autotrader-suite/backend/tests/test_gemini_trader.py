@@ -6,7 +6,12 @@ from server.models import PriceRequest, Position, RiskSettings, OHLCBar
 
 os.environ.setdefault("GOOGLE_API_KEY", "test-dummy-key")
 
-from server.engine.gemini_trader import GeminiTrader
+from server.engine.gemini_trader import (
+    GEMINI_HTTP_RETRY_ATTEMPTS,
+    GEMINI_HTTP_TIMEOUT_MS,
+    GEMINI_MODEL,
+    GeminiTrader,
+)
 
 PRICE_REQ = PriceRequest(
     code="7203",
@@ -37,6 +42,12 @@ def test_decide_returns_buy(mock_client_cls):
     assert result.action == "buy"
     assert result.qty == 100
     assert result.reason == "RSI過売り圏"
+    config = mock_client.models.generate_content.call_args.kwargs["config"]
+    assert mock_client.models.generate_content.call_args.kwargs["model"] == GEMINI_MODEL
+    assert GEMINI_MODEL == "gemini-2.5-flash"
+    assert config.http_options.timeout == GEMINI_HTTP_TIMEOUT_MS
+    assert config.http_options.timeout >= 10_000
+    assert config.http_options.retry_options.attempts == GEMINI_HTTP_RETRY_ATTEMPTS
 
 
 @patch("server.engine.gemini_trader.genai.Client")

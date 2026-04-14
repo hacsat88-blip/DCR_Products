@@ -114,6 +114,33 @@ def test_buy_qty_adjusted_to_fit_limit(guard, empty_position):
     assert result.qty * 500.0 <= SETTINGS.limit_per_order
 
 
+def test_buy_qty_adjusted_to_fit_actual_available_cash(guard, empty_position):
+    decision = TradeDecision(action="buy", qty=100, reason="余力確認")
+    result = guard.apply(
+        decision,
+        empty_position,
+        500.0,
+        MARKET_TIME,
+        available_cash_actual=25_000,
+    )
+
+    assert result.action == "buy"
+    assert result.qty == 50
+
+
+def test_buy_blocked_when_actual_available_cash_is_zero(guard, empty_position):
+    result = guard.apply(
+        BUY,
+        empty_position,
+        250.0,
+        MARKET_TIME,
+        available_cash_actual=0,
+    )
+
+    assert result.action == "hold"
+    assert "実口座余力" in result.reason
+
+
 def test_buy_blocked_when_price_outside_effective_band(guard, empty_position):
     result = guard.apply(BUY, empty_position, 550.0, MARKET_TIME)
     assert result.action == "hold"

@@ -6,6 +6,8 @@ TradeMode = Literal["conservative", "balanced", "aggressive"]
 AISelectionMode = Literal["gemini"]
 FeedRole = Literal["execution", "reference"]
 FeedSource = Literal["rakuten_rss", "jquants_light", "jquants_free"]
+RunMode = Literal["paper", "live"]
+OrderExecutionMode = Literal["stub_only", "broker_auto"]
 ReferenceStatus = Literal["ok", "missing", "stale"]
 ReferenceWarningCode = Literal["reference_missing", "reference_stale"]
 PaperOpsStatus = Literal["healthy", "degraded"]
@@ -28,6 +30,18 @@ _MODE_MAX_CONCURRENT_POSITIONS: dict[TradeMode, int] = {
 }
 
 
+def _normalize_client_execution_flags(
+    run_mode: RunMode,
+    order_mode: OrderExecutionMode,
+    live_armed: bool,
+) -> tuple[RunMode, OrderExecutionMode, bool]:
+    if run_mode != "live":
+        return "paper", "stub_only", False
+    if order_mode != "broker_auto":
+        return "live", "stub_only", False
+    return "live", "broker_auto", live_armed
+
+
 class OHLCBar(BaseModel):
     o: float
     h: float
@@ -46,6 +60,7 @@ class PriceRequest(BaseModel):
     code: str
     price: float
     volume: int
+    available_cash_actual: int | None = Field(default=None, ge=0)
     bid: float | None = None
     ask: float | None = None
     news_halt: bool = False
@@ -54,6 +69,9 @@ class PriceRequest(BaseModel):
     timestamp: datetime
     feed_role: FeedRole = "execution"
     feed_source: FeedSource | None = None
+    client_run_mode: RunMode = "paper"
+    client_order_mode: OrderExecutionMode = "stub_only"
+    client_live_armed: bool = False
 
     @field_validator("price")
     @classmethod
@@ -88,6 +106,16 @@ class PriceRequest(BaseModel):
         if self.bid is not None and self.ask is not None and self.ask < self.bid:
             raise ValueError("ask must be >= bid")
 
+        (
+            self.client_run_mode,
+            self.client_order_mode,
+            self.client_live_armed,
+        ) = _normalize_client_execution_flags(
+            self.client_run_mode,
+            self.client_order_mode,
+            self.client_live_armed,
+        )
+
         return self
 
 
@@ -96,6 +124,42 @@ class TradeDecision(BaseModel):
     qty: int = Field(ge=0)
     order_type: str = "成行"
     reason: str
+
+
+class ExecutionResultRequest(BaseModel):
+    code: str
+    action: Literal["buy", "sell"]
+    qty: int = Field(gt=0)
+    price: float = Field(gt=0)
+    volume: int = Field(default=0, ge=0)
+    order_type: str = "成行"
+    reason: str
+    timestamp: datetime
+    success: bool = True
+    error_message: str | None = None
+    client_run_mode: RunMode = "paper"
+    client_order_mode: OrderExecutionMode = "stub_only"
+    client_live_armed: bool = False
+    pending_execution_id: str | None = None
+    feed_source: Literal["rakuten_rss"] = "rakuten_rss"
+
+    @model_validator(mode="after")
+    def normalize_runtime_flags(self) -> "ExecutionResultRequest":
+        (
+            self.client_run_mode,
+            self.client_order_mode,
+            self.client_live_armed,
+        ) = _normalize_client_execution_flags(
+            self.client_run_mode,
+            self.client_order_mode,
+            self.client_live_armed,
+        )
+        if self.client_run_mode == "live" and self.client_order_mode == "broker_auto":
+            if not self.pending_execution_id or not self.pending_execution_id.strip():
+                raise ValueError("pending_execution_id is required in live broker mode")
+        if not self.success and not self.error_message:
+            self.error_message = "broker order failed"
+        return self
 
 
 class PriceFeedResponse(TradeDecision):
@@ -108,6 +172,7 @@ class PriceFeedResponse(TradeDecision):
     reference_gap_pct: float | None = None
     warning_code: ReferenceWarningCode | None = None
     warning_message: str | None = None
+    pending_execution_id: str | None = None
 
 
 class Position(BaseModel):
@@ -200,8 +265,9 @@ class RiskRuntimeSnapshot(BaseModel):
 
 class PaperOpsHealth(BaseModel):
     status: PaperOpsStatus
-    mode: Literal["paper"] = "paper"
-    order_mode: Literal["stub_only"] = "stub_only"
+    mode: RunMode = "paper"
+    order_mode: OrderExecutionMode = "stub_only"
+    live_armed: bool = False
     server_time: datetime
     last_price_tick_at: datetime | None = None
     last_price_code: str | None = None

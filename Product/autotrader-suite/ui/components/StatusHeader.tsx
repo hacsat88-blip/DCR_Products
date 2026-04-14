@@ -51,13 +51,24 @@ function formatHealthLine(connectionState: ConnectionState, health: TraderHealth
   return "backend 状態確認中";
 }
 
+function formatModeLine(health: TraderHealthViewModel): string {
+  if (health.snapshot?.mode === "live") {
+    if (health.snapshot.orderMode === "broker_auto") {
+      return health.snapshot.liveArmed ? "live 設定 / 自動発注arm済み" : "live 設定 / armed 待ち";
+    }
+    return "live 設定 / 発注停止";
+  }
+
+  return "紙運用 / 実発注なし";
+}
+
 export function StatusHeader({ connectionState, lastUpdatedAt, health }: StatusHeaderProps): JSX.Element {
   return (
     <header className="dashboard-header panel">
       <div>
         <p className="panel-eyebrow">監視コンソール</p>
         <h1>AutoTrader ダッシュボード</h1>
-        <p className="status-mode">紙運用 / 実発注なし</p>
+        <p className="status-mode">{formatModeLine(health)}</p>
       </div>
 
       <div className="status-stack">

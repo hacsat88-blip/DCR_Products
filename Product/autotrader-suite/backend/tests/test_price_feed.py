@@ -54,6 +54,7 @@ def _make_app(
     schedule_reference_publish=None,
     paper_ops_state=None,
     reference_ready_provider=None,
+    send_alert=None,
 ):
     app = FastAPI()
     app.include_router(
@@ -66,6 +67,7 @@ def _make_app(
             schedule_reference_publish=schedule_reference_publish,
             paper_ops_state=paper_ops_state,
             reference_ready_provider=reference_ready_provider,
+            send_alert=send_alert,
         )
     )
     return TestClient(app)
@@ -156,6 +158,45 @@ def test_price_feed_marks_old_reference_as_soft_warning(setup):
     assert "execution only" in data["warning_message"]
 
 
+def test_price_feed_alerts_once_when_reference_becomes_degraded(setup):
+    pos_mgr, guard, broadcast = setup
+    mock_gemini = MagicMock()
+    mock_gemini.decide_safe.return_value = TradeDecision(action="hold", qty=0, reason="様子見")
+    send_alert = AsyncMock()
+    get_reference_snapshot = MagicMock(
+        return_value={
+            **REFERENCE_SNAPSHOT,
+            "as_of": "2026-04-01",
+        }
+    )
+
+    tc = _make_app(
+        mock_gemini,
+        guard,
+        pos_mgr,
+        broadcast,
+        get_reference_snapshot,
+        MagicMock(),
+        PaperOpsState(ai_ready=True, reference_ready=True),
+        lambda: True,
+        send_alert,
+    )
+
+    first = tc.post("/api/price", json=PRICE_PAYLOAD)
+    second = tc.post(
+        "/api/price",
+        json={
+            **PRICE_PAYLOAD,
+            "timestamp": "2026-04-12T10:01:00",
+        },
+    )
+
+    assert first.status_code == 200
+    assert second.status_code == 200
+    assert send_alert.await_count == 1
+    assert "Reference degraded" in send_alert.await_args_list[0].args[0]
+
+
 def test_price_feed_marks_paper_ops_reference_degraded_on_stale_snapshot(setup):
     pos_mgr, guard, broadcast = setup
     mock_gemini = MagicMock()
@@ -208,9 +249,286 @@ def test_price_feed_updates_paper_ops_health_on_execution_tick(setup):
     snapshot = paper_ops_state.snapshot(datetime(2026, 4, 13, 10, 30, 5))
     assert snapshot.last_price_tick_at == datetime(2026, 4, 12, 10, 0, 0)
     assert snapshot.last_price_code == "7203"
+    assert snapshot.mode == "paper"
+    assert snapshot.order_mode == "stub_only"
+    assert snapshot.live_armed is False
     assert snapshot.ai_status == "ready"
     assert snapshot.reference_status == "ready"
     assert snapshot.last_warning == "J-Quants reference missing; execution onlyで継続"
+
+
+def test_price_feed_propagates_live_execution_mode_to_health(setup):
+    pos_mgr, guard, broadcast = setup
+    mock_gemini = MagicMock()
+    mock_gemini.decide_safe.return_value = TradeDecision(action="hold", qty=0, reason="様子見")
+    paper_ops_state = PaperOpsState(ai_ready=True, reference_ready=True)
+
+    tc = _make_app(
+        mock_gemini,
+        guard,
+        pos_mgr,
+        broadcast,
+        MagicMock(return_value=REFERENCE_SNAPSHOT),
+        MagicMock(),
+        paper_ops_state,
+        lambda: True,
+    )
+    response = tc.post(
+        "/api/price",
+        json={
+            **PRICE_PAYLOAD,
+            "client_run_mode": "live",
+            "client_order_mode": "broker_auto",
+            "client_live_armed": True,
+        },
+    )
+
+    assert response.status_code == 200
+    snapshot = paper_ops_state.snapshot(datetime(2026, 4, 13, 10, 30, 5))
+    assert snapshot.mode == "live"
+    assert snapshot.order_mode == "broker_auto"
+    assert snapshot.live_armed is True
+
+
+def test_price_feed_live_broker_mode_defers_position_until_execution_confirmation(setup):
+    pos_mgr, guard, broadcast = setup
+    mock_gemini = MagicMock()
+    mock_gemini.decide_safe.return_value = TradeDecision(action="buy", qty=10, reason="強い")
+
+    tc = _make_app(
+        mock_gemini,
+        guard,
+        pos_mgr,
+        broadcast,
+        MagicMock(return_value=REFERENCE_SNAPSHOT),
+        MagicMock(),
+        PaperOpsState(ai_ready=True, reference_ready=True),
+        lambda: True,
+    )
+    response = tc.post(
+        "/api/price",
+        json={
+            **PRICE_PAYLOAD,
+            "client_run_mode": "live",
+            "client_order_mode": "broker_auto",
+            "client_live_armed": True,
+        },
+    )
+
+    assert response.status_code == 200
+    assert response.json()["action"] == "buy"
+    assert response.json()["pending_execution_id"]
+    assert pos_mgr.position.qty == 0
+    assert guard.daily_order_count == 0
+    assert broadcast.await_args.kwargs["action"]["action"] == "hold"
+    assert "live 発注待ち" in broadcast.await_args.kwargs["action"]["reason"]
+
+
+def test_execution_result_applies_live_buy_after_broker_confirmation(setup):
+    pos_mgr, guard, broadcast = setup
+    mock_gemini = MagicMock()
+    paper_ops_state = PaperOpsState(ai_ready=True, reference_ready=True)
+    send_alert = AsyncMock()
+
+    tc = _make_app(
+        mock_gemini,
+        guard,
+        pos_mgr,
+        broadcast,
+        MagicMock(return_value=REFERENCE_SNAPSHOT),
+        MagicMock(),
+        paper_ops_state,
+        lambda: True,
+        send_alert,
+    )
+    mock_gemini.decide_safe.return_value = TradeDecision(action="buy", qty=10, reason="強い")
+    price_response = tc.post(
+        "/api/price",
+        json={
+            **PRICE_PAYLOAD,
+            "client_run_mode": "live",
+            "client_order_mode": "broker_auto",
+            "client_live_armed": True,
+        },
+    )
+    pending_execution_id = price_response.json()["pending_execution_id"]
+
+    response = tc.post(
+        "/api/execution-result",
+        json={
+            "code": "7203",
+            "action": "buy",
+            "qty": 10,
+            "price": 250.0,
+            "volume": 10000,
+            "order_type": "成行",
+            "reason": "強い",
+            "timestamp": "2026-04-12T10:00:00",
+            "success": True,
+            "client_run_mode": "live",
+            "client_order_mode": "broker_auto",
+            "client_live_armed": True,
+            "pending_execution_id": pending_execution_id,
+        },
+    )
+
+    assert response.status_code == 200
+    assert response.json() == {"status": "recorded", "applied": True}
+    assert pos_mgr.position.qty == 10
+    assert guard.daily_order_count == 1
+    send_alert.assert_awaited_once()
+    snapshot = paper_ops_state.snapshot(datetime(2026, 4, 13, 10, 30, 5))
+    assert snapshot.mode == "live"
+    assert snapshot.order_mode == "broker_auto"
+    assert snapshot.live_armed is True
+
+
+def test_execution_result_rejects_missing_pending_execution_id_in_live_broker_mode(setup):
+    pos_mgr, guard, broadcast = setup
+    mock_gemini = MagicMock()
+
+    tc = _make_app(
+        mock_gemini,
+        guard,
+        pos_mgr,
+        broadcast,
+        MagicMock(return_value=REFERENCE_SNAPSHOT),
+        MagicMock(),
+        PaperOpsState(ai_ready=True, reference_ready=True),
+        lambda: True,
+    )
+
+    response = tc.post(
+        "/api/execution-result",
+        json={
+            "code": "7203",
+            "action": "buy",
+            "qty": 10,
+            "price": 250.0,
+            "volume": 10000,
+            "order_type": "成行",
+            "reason": "強い",
+            "timestamp": "2026-04-12T10:00:00",
+            "success": True,
+            "client_run_mode": "live",
+            "client_order_mode": "broker_auto",
+            "client_live_armed": True,
+        },
+    )
+
+    assert response.status_code == 422
+
+
+def test_execution_result_is_idempotent_for_duplicate_pending_execution_id(setup):
+    pos_mgr, guard, broadcast = setup
+    mock_gemini = MagicMock()
+
+    tc = _make_app(
+        mock_gemini,
+        guard,
+        pos_mgr,
+        broadcast,
+        MagicMock(return_value=REFERENCE_SNAPSHOT),
+        MagicMock(),
+        PaperOpsState(ai_ready=True, reference_ready=True),
+        lambda: True,
+    )
+    mock_gemini.decide_safe.return_value = TradeDecision(action="buy", qty=10, reason="強い")
+    price_response = tc.post(
+        "/api/price",
+        json={
+            **PRICE_PAYLOAD,
+            "client_run_mode": "live",
+            "client_order_mode": "broker_auto",
+            "client_live_armed": True,
+        },
+    )
+    pending_execution_id = price_response.json()["pending_execution_id"]
+
+    payload = {
+        "code": "7203",
+        "action": "buy",
+        "qty": 10,
+        "price": 250.0,
+        "volume": 10000,
+        "order_type": "成行",
+        "reason": "強い",
+        "timestamp": "2026-04-12T10:00:00",
+        "success": True,
+        "client_run_mode": "live",
+        "client_order_mode": "broker_auto",
+        "client_live_armed": True,
+        "pending_execution_id": pending_execution_id,
+    }
+
+    first = tc.post("/api/execution-result", json=payload)
+    second = tc.post("/api/execution-result", json=payload)
+
+    assert first.status_code == 200
+    assert first.json() == {"status": "recorded", "applied": True}
+    assert second.status_code == 200
+    assert second.json() == {"status": "duplicate", "applied": False}
+    assert pos_mgr.position.qty == 10
+    assert guard.daily_order_count == 1
+
+
+def test_execution_result_keeps_position_unchanged_on_broker_failure(setup):
+    pos_mgr, guard, broadcast = setup
+    mock_gemini = MagicMock()
+    paper_ops_state = PaperOpsState(ai_ready=True, reference_ready=True)
+    send_alert = AsyncMock()
+
+    tc = _make_app(
+        mock_gemini,
+        guard,
+        pos_mgr,
+        broadcast,
+        MagicMock(return_value=REFERENCE_SNAPSHOT),
+        MagicMock(),
+        paper_ops_state,
+        lambda: True,
+        send_alert,
+    )
+    mock_gemini.decide_safe.return_value = TradeDecision(action="buy", qty=10, reason="強い")
+    price_response = tc.post(
+        "/api/price",
+        json={
+            **PRICE_PAYLOAD,
+            "client_run_mode": "live",
+            "client_order_mode": "broker_auto",
+            "client_live_armed": True,
+        },
+    )
+    pending_execution_id = price_response.json()["pending_execution_id"]
+
+    response = tc.post(
+        "/api/execution-result",
+        json={
+            "code": "7203",
+            "action": "buy",
+            "qty": 10,
+            "price": 250.0,
+            "volume": 10000,
+            "order_type": "成行",
+            "reason": "強い",
+            "timestamp": "2026-04-12T10:00:00",
+            "success": False,
+            "error_message": "broker order failed: login required",
+            "client_run_mode": "live",
+            "client_order_mode": "broker_auto",
+            "client_live_armed": False,
+            "pending_execution_id": pending_execution_id,
+        },
+    )
+
+    assert response.status_code == 200
+    assert response.json() == {"status": "recorded", "applied": False}
+    assert pos_mgr.position.qty == 0
+    assert guard.daily_order_count == 0
+    send_alert.assert_awaited_once()
+    snapshot = paper_ops_state.snapshot(datetime(2026, 4, 13, 10, 30, 5))
+    assert snapshot.last_warning == "broker order failed: login required"
+    assert snapshot.live_armed is False
 
 
 def test_price_feed_marks_ai_status_degraded_after_ai_error(setup):
@@ -240,6 +558,82 @@ def test_price_feed_marks_ai_status_degraded_after_ai_error(setup):
     assert snapshot.ai_status == "degraded"
     assert snapshot.reference_status == "ready"
     assert snapshot.last_warning == "AI判断エラー: GOOGLE_API_KEY not set"
+
+
+def test_price_feed_alerts_once_when_ai_becomes_degraded(setup):
+    pos_mgr, guard, broadcast = setup
+    mock_gemini = MagicMock()
+    mock_gemini.decide_safe.return_value = TradeDecision(
+        action="hold",
+        qty=0,
+        reason="AI判断エラー: GOOGLE_API_KEY not set",
+    )
+    send_alert = AsyncMock()
+
+    tc = _make_app(
+        mock_gemini,
+        guard,
+        pos_mgr,
+        broadcast,
+        MagicMock(return_value=REFERENCE_SNAPSHOT),
+        MagicMock(),
+        PaperOpsState(ai_ready=True, reference_ready=True),
+        lambda: True,
+        send_alert,
+    )
+
+    first = tc.post("/api/price", json=PRICE_PAYLOAD)
+    second = tc.post(
+        "/api/price",
+        json={
+            **PRICE_PAYLOAD,
+            "timestamp": "2026-04-12T10:01:00",
+        },
+    )
+
+    assert first.status_code == 200
+    assert second.status_code == 200
+    assert send_alert.await_count == 1
+    assert "AI degraded" in send_alert.await_args_list[0].args[0]
+
+
+def test_price_feed_alerts_once_when_runtime_entry_becomes_blocked(setup):
+    pos_mgr, guard, broadcast = setup
+    guard.update_settings(RiskSettings(max_daily_loss_yen=100))
+    guard.record_order(
+        TradeDecision(action="sell", qty=10, reason="損失"),
+        datetime(2026, 4, 12, 9, 59, 0),
+        realized_pnl=-150,
+    )
+    mock_gemini = MagicMock()
+    mock_gemini.decide_safe.return_value = TradeDecision(action="hold", qty=0, reason="様子見")
+    send_alert = AsyncMock()
+
+    tc = _make_app(
+        mock_gemini,
+        guard,
+        pos_mgr,
+        broadcast,
+        MagicMock(return_value=REFERENCE_SNAPSHOT),
+        MagicMock(),
+        PaperOpsState(ai_ready=True, reference_ready=True),
+        lambda: True,
+        send_alert,
+    )
+
+    first = tc.post("/api/price", json=PRICE_PAYLOAD)
+    second = tc.post(
+        "/api/price",
+        json={
+            **PRICE_PAYLOAD,
+            "timestamp": "2026-04-12T10:01:00",
+        },
+    )
+
+    assert first.status_code == 200
+    assert second.status_code == 200
+    assert send_alert.await_count == 1
+    assert "Risk blocked" in send_alert.await_args_list[0].args[0]
 
 
 def test_price_feed_buy_updates_position(setup):

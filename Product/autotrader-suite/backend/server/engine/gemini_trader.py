@@ -14,7 +14,9 @@ if TYPE_CHECKING:
 
 _logger = logging.getLogger(__name__)
 
-GEMINI_MODEL = "gemini-3.1-flash-lite-preview"
+GEMINI_MODEL = "gemini-2.5-flash"
+GEMINI_HTTP_TIMEOUT_MS = 10_000
+GEMINI_HTTP_RETRY_ATTEMPTS = 1
 
 _SYSTEM_PROMPT = """あなたは日本株の短期トレーダーです。
 与えられた株価データと現在のポジション情報をもとに、
@@ -37,6 +39,14 @@ _SYSTEM_PROMPT = """あなたは日本株の短期トレーダーです。
 class GeminiTrader:
     def __init__(self):
         self._client: genai.Client | None = None
+
+    def _request_http_options(self) -> types.HttpOptions:
+        return types.HttpOptions(
+            timeout=GEMINI_HTTP_TIMEOUT_MS,
+            retry_options=types.HttpRetryOptions(
+                attempts=GEMINI_HTTP_RETRY_ATTEMPTS,
+            ),
+        )
 
     def is_configured(self) -> bool:
         return bool(os.environ.get("GOOGLE_API_KEY", "").strip())
@@ -86,6 +96,7 @@ class GeminiTrader:
             model=GEMINI_MODEL,
             contents=user_prompt,
             config=types.GenerateContentConfig(
+                http_options=self._request_http_options(),
                 system_instruction=_SYSTEM_PROMPT,
             ),
         )
