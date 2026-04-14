@@ -2,11 +2,11 @@
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
-**Goal:** Excel VBA が MarketSpeed II RSS から株価をリアルタイム取得し、5秒ごとに FastAPI サーバーへ POST して売買判断を受け取り、必要に応じて発注する。
+**Goal:** Excel VBA が MarketSpeed II RSS から株価をリアルタイム取得し、5秒ごとに FastAPI サーバーへ POST して売買判断と reference advisory を受け取り、stub log を通して order wiring 境界まで固める。
 
-**Architecture:** MarketSpeed II RSS の DDE フォーミュラを Market シートに配置してリアルタイム価格を取得 → VBA タイマーが5秒ごとに起動 → OHLC バーを分足で蓄積 → `MSXML2.XMLHTTP60` で `POST /api/price` → レスポンスの `action` に応じて発注 or スキップ → Log シートに記録。JSON は外部ライブラリなしで文字列連結で組み立て、レスポンスは `InStr`/`Mid` で必要フィールドだけ抜く。
+**Architecture:** MarketSpeed II RSS の DDE フォーミュラを Market シートに配置してリアルタイム価格を取得 → VBA タイマーが5秒ごとに起動 → OHLC バーを分足で蓄積 → `MSXML2.ServerXMLHTTP.6.0` で `POST /api/price` → レスポンスの `action` を正本として stub order log or skip を行う → 同時に `reference_status` / `reference_price` / `warning_message` を表示・ログへ残す。code は live RSS formula を優先して解決し、A2 は manual smoke fallback に留める。JSON は外部ライブラリなしで文字列連結で組み立て、レスポンスは `InStr`/`Mid` で必要フィールドだけ抜く。
 
-**Tech Stack:** Excel VBA (Excel 2016+), MSXML2.XMLHTTP60, MarketSpeed II RSS, Windows API タイマー
+**Tech Stack:** Excel VBA (Excel 2016+), MSXML2.ServerXMLHTTP.6.0, MarketSpeed II RSS, Windows API タイマー
 
 ---
 
@@ -31,24 +31,64 @@
 
 **レスポンス:**
 ```json
-{"action": "buy", "qty": 100, "order_type": "成行", "reason": "RSI過売り"}
+{
+    "action": "buy",
+    "qty": 100,
+    "order_type": "成行",
+    "reason": "RSI過売り",
+    "reference_status": "ok",
+    "reference_price": 251.5,
+    "reference_volume": 12000,
+    "reference_source": "jquants_light",
+    "reference_as_of": "2026-04-11",
+    "reference_age_days": 1,
+    "reference_gap_pct": -0.596,
+    "warning_code": null,
+    "warning_message": null
+}
 ```
+
+## Reference advisory policy
+
+- `action` / `qty` / `reason` が発注の正本。VBA は reference advisory を使って最終 action を上書きしない。
+- `reference_status = missing` または `stale` は soft warning であり、発注停止条件ではない。
+- `warning_message` は Control シート表示と Log シート記録に使う。
+- Control シートには `reference_status` / `reference_as_of` / `warning_message` を表示する。
+- Log シートには `code` / `price` / `action` / `qty` / `reason` / `reference_status` / `reference_price` / `reference_as_of` / `reference_gap_pct` / `warning_code` / `warning_message` を残す。
+- 詳細仕様は [docs/dcr/specs/2026-04-12-autotrader-sp2-reference-advisory-design.md](docs/dcr/specs/2026-04-12-autotrader-sp2-reference-advisory-design.md) を正本とする。
 
 ---
 
 ## Market シートの RSS フォーミュラ配置
 
-MarketSpeed II RSS のインストール後、以下のセルにフォーミュラを設定する（ユーザーが手動で行う）。
+repo root の `autotrader.xlsm` は `Product/autotrader-suite/vba/new-autotrader-workbook.ps1` で scaffold を生成する。script の既定値は manual smoke 用の安全な Market seed で、MarketSpeed II RSS を使う場合だけ `-UseRssFormulas` を付けて live RSS formula を入れる。
+
+MarketSpeed II RSS のインストール後、以下のセルにフォーミュラを設定する（ユーザーが手動で行うか、generator の `-UseRssFormulas` を使う）。
 
 | セル | 内容 | 役割 |
 |------|------|------|
-| `B2` | 銘柄コード（文字列）例: `"7203"` | 手入力 |
-| `C2` | `=RSS\|'7203.T'!'現在値'` | 現在値 |
-| `D2` | `=RSS\|'7203.T'!'出来高'` | 累積出来高 |
-| `E2` | `=RSS\|'7203.T'!'日付'` | RSS 日付 |
-| `F2` | `=RSS\|'7203.T'!'時刻'` | RSS 時刻 |
+| `A2` | 銘柄コード（文字列）例: `"7203"` | 手入力 |
+| `B2` | `=RSS\|'7203.T'!'現在値'` | 現在値 |
+| `C2` | `=RSS\|'7203.T'!'出来高'` | 累積出来高 |
+| `D2` | `=RSS\|'7203.T'!'日付'` | RSS 日付 |
+| `E2` | `=RSS\|'7203.T'!'時刻'` | RSS 時刻 |
+| `F2` | `=RSS\|'7203.T'!'買気配'` | 買気配 |
+| `G2` | `=RSS\|'7203.T'!'売気配'` | 売気配 |
 
-VBA は `B2:F2` を名前付き範囲 `RSS_TICK` として参照する。
+VBA は `A2:G2` を名前付き範囲 `RSS_TICK` として参照する。
+
+backend へ送る code は B2 の live RSS formula から優先的に解決し、A2 は manual smoke 用 fallback に留める。symbol を切り替えるときは B2:G2 の RSS formula をまとめて更新する。
+
+Excel に入力するときは Markdown table 上の escape backslash を外し、実際には次の式を使う。
+
+```text
+B2: =RSS|'7203.T'!'現在値'
+C2: =RSS|'7203.T'!'出来高'
+D2: =RSS|'7203.T'!'日付'
+E2: =RSS|'7203.T'!'時刻'
+F2: =RSS|'7203.T'!'買気配'
+G2: =RSS|'7203.T'!'売気配'
+```
 
 ---
 
@@ -56,11 +96,13 @@ VBA は `B2:F2` を名前付き範囲 `RSS_TICK` として参照する。
 
 | ファイル/モジュール | 役割 |
 |--------------------|------|
-| `autotrader.xlsm` | Excelワークブック本体 |
-| Sheet: `Control` | URL設定・銘柄コード・ON/OFFスイッチ |
-| Sheet: `Market` | RSS フォーミュラでリアルタイム価格表示 |
+| `autotrader.xlsm` | repo root にローカル生成する runtime workbook |
+| `Product/autotrader-suite/vba/new-autotrader-workbook.ps1` | workbook scaffold generator |
+| `Product/autotrader-suite/vba/` | Git 管理する VBA text source と workbook scaffold guide |
+| Sheet: `Control` | URL設定・状態表示・reference warning・paper ops 表示 |
+| Sheet: `Market` | RSS フォーミュラでリアルタイム価格・板情報表示 |
 | Sheet: `OHLC_Data` | 分足 OHLC バー蓄積（最新20本） |
-| Sheet: `Log` | API送受信ログ（最新200行） |
+| Sheet: `Log` | API送受信ログと reference advisory 記録（最新200行） |
 | VBA: `modConfig` | 定数定義（URL、タイムアウト、バー数） |
 | VBA: `modOHLC` | 分足バー管理・OHLC更新・シート書き込み |
 | VBA: `modHTTP` | POST /api/price・JSON組み立て・レスポンス解析 |
@@ -69,19 +111,26 @@ VBA は `B2:F2` を名前付き範囲 `RSS_TICK` として参照する。
 
 ---
 
-## Task 1: ワークブックとシートの初期化
+## Task 1: ワークブック scaffold の生成
 
 **Files:**
-- Create: `autotrader.xlsm`（手動で作成し、以下のマクロを `ThisWorkbook` モジュールに記述）
+- Create locally: `autotrader.xlsm`（`Product/autotrader-suite/vba/new-autotrader-workbook.ps1` で生成。binary workbook は Git の正本にしない）
 
-- [ ] **Step 1: autotrader.xlsm を作成する**
+- [ ] **Step 1: generator で autotrader.xlsm を作成する**
 
-Excel を起動し、新しいブックを `autotrader.xlsm`（マクロ有効ブック）として  
-`C:\Users\hacsa\Desktop\サトシ開発\` に保存する。
+repo root で以下を実行する。
 
-- [ ] **Step 2: シートを4枚作成し名前を付ける**
+```powershell
+powershell -ExecutionPolicy Bypass -File ./Product/autotrader-suite/vba/new-autotrader-workbook.ps1
+```
 
-Excel のシートタブを右クリック →「挿入」を繰り返し、以下の4シートを作成する:
+- [ ] **Step 2: VBA import warning が出た場合だけ trust access を有効化して再実行する**
+
+Excel の「VBA プロジェクト オブジェクト モデルへのアクセスを信頼する」が無効だと、workbook 保存は成功し、VBA import だけ warning になる。warning が出た場合だけ Excel 設定を有効化して script を再実行する。
+
+- [ ] **Step 3: 生成された workbook scaffold を確認する**
+
+`autotrader.xlsm` を開き、以下を確認する:
 
 | シート名 | 用途 |
 |---------|------|
@@ -90,69 +139,27 @@ Excel のシートタブを右クリック →「挿入」を繰り返し、以�
 | `OHLC_Data` | OHLCバー蓄積 |
 | `Log` | API通信ログ |
 
-- [ ] **Step 3: Control シートにラベルと設定値を入力する**
+- `RSS_TICK` named range が `Market!A2:G2` を指すこと
+- `Control!B10/B11/B12/B13/B14/B15` が `paper / stub only / FALSE / - / hold / -` で初期化されていること
 
-`Control` シートを開き、以下のセルに値を入力する:
+- [ ] **Step 4: 必要なら button を手動で割り当てる**
 
-| セル | 値 | 意味 |
-|------|----|------|
-| `A1` | `Server URL` | ラベル |
-| `B1` | `http://127.0.0.1:8000` | 接続先 |
-| `A2` | `Poll Interval (sec)` | ラベル |
-| `B2` | `5` | ポーリング間隔 |
-| `A3` | `Status` | ラベル |
-| `B3` | `STOPPED` | 実行状態表示 |
-| `A4` | `銘柄コード` | ラベル |
-| `B4` | `7203` | 例: トヨタ |
+既定では `Alt+F8` から `modTimer.StartTimer` / `modTimer.StopTimer` を実行できる。UI ボタンが必要な場合だけ `Control` シートに Start / Stop button を配置して `modTimer.StartTimer` / `modTimer.StopTimer` を割り当てる。
 
-- [ ] **Step 4: Market シートに列ヘッダーを設定する**
+- [ ] **Step 5: live RSS が必要なときだけ Market formula を入れる**
 
-`Market` シートを開き、以下のヘッダーを設定する:
+MarketSpeed II RSS を使う環境では、以下のどちらかで `Market!B2:G2` を live RSS formula にする。
 
-| セル | 値 |
-|------|----|
-| `A1` | `銘柄コード` |
-| `B1` | `現在値` |
-| `C1` | `出来高` |
-| `D1` | `日付` |
-| `E1` | `時刻` |
+1. `powershell -ExecutionPolicy Bypass -File ./Product/autotrader-suite/vba/new-autotrader-workbook.ps1 -Force -UseRssFormulas`
+2. `workbook-layout.md` に従って `B2:G2` を手動更新する
 
-2行目（`A2:E2`）は後でユーザーが RSS フォーミュラを設定する。暫定として手動入力値を置く:
+script の既定 seed は manual smoke 用なので、`-UseRssFormulas` を付けない限り `B2=2500`、`C2=100000`、`D2=TODAY()`、`E2=NOW()`、`F2/G2=空欄` のままになる。
 
-| セル | 暫定値 |
-|------|--------|
-| `A2` | `7203` |
-| `B2` | `2500` |
-| `C2` | `100000` |
-| `D2` | `=TODAY()` |
-| `E2` | `=NOW()` |
-
-- [ ] **Step 5: OHLC_Data シートにヘッダーを設定する**
-
-`OHLC_Data` シートの1行目に以下を設定する:
-
-| A | B | C | D | E | F |
-|---|---|---|---|---|---|
-| `bar_time` | `open` | `high` | `low` | `close` | `volume` |
-
-- [ ] **Step 6: Log シートにヘッダーを設定する**
-
-`Log` シートの1行目に以下を設定する:
-
-| A | B | C | D | E |
-|---|---|---|---|---|
-| `timestamp` | `price` | `action` | `qty` | `reason` |
-
-- [ ] **Step 7: VBA エディタを開く**
-
-`Alt + F11` で VBA エディタを開く。左のプロジェクトウィンドウに  
-`VBAProject (autotrader.xlsm)` が表示されていることを確認する。
-
-- [ ] **Step 8: Commit**
+- [ ] **Step 6: Commit**
 
 ```bash
-git add autotrader.xlsm
-git commit -m "feat(sp2): add Excel workbook scaffold with 4 sheets"
+git add Product/autotrader-suite/vba/new-autotrader-workbook.ps1 Product/autotrader-suite/vba/README.md Product/autotrader-suite/vba/workbook-layout.md
+git commit -m "feat(sp2): automate Excel workbook scaffold generation"
 ```
 
 ---
@@ -174,7 +181,7 @@ Option Explicit
 ' ─── サーバー接続設定 ───────────────────────────
 Public Const API_BASE_URL  As String = "http://127.0.0.1:8000"
 Public Const API_PRICE_URL As String = API_BASE_URL & "/api/price"
-Public Const HTTP_TIMEOUT  As Long = 10000   ' ミリ秒
+Public Const HTTP_TIMEOUT  As Long = 3000    ' ミリ秒
 
 ' ─── タイマー設定 ──────────────────────────────
 Public Const POLL_INTERVAL As Double = 5     ' 秒
@@ -197,6 +204,33 @@ Public Const COL_PRICE     As Long = 2    ' B
 Public Const COL_VOLUME    As Long = 3    ' C
 Public Const COL_DATE      As Long = 4    ' D
 Public Const COL_TIME      As Long = 5    ' E
+
+Public Const LOG_MAX_ROWS  As Long = 200
+
+Public Function RuntimeApiBaseUrl() As String
+    Dim configured As String
+    configured = Trim$(CStr(ThisWorkbook.Sheets(SH_CONTROL).Cells(1, 2).Value))
+    If configured = "" Then
+        RuntimeApiBaseUrl = API_BASE_URL
+    Else
+        RuntimeApiBaseUrl = configured
+    End If
+End Function
+
+Public Function RuntimeApiPriceUrl() As String
+    RuntimeApiPriceUrl = RuntimeApiBaseUrl() & "/api/price"
+End Function
+
+Public Function RuntimePollIntervalSeconds() As Long
+    Dim configured As Variant
+    configured = ThisWorkbook.Sheets(SH_CONTROL).Cells(2, 2).Value
+    If IsNumeric(configured) Then
+        RuntimePollIntervalSeconds = CLng(configured)
+        If RuntimePollIntervalSeconds <= 0 Then RuntimePollIntervalSeconds = POLL_INTERVAL
+    Else
+        RuntimePollIntervalSeconds = POLL_INTERVAL
+    End If
+End Function
 ```
 
 - [ ] **Step 3: 動作確認（手動）**
@@ -212,7 +246,7 @@ VBA エディタの「イミディエイト」ウィンドウ（`Ctrl+G`）に�
 - [ ] **Step 4: Commit**
 
 ```bash
-git add autotrader.xlsm
+git add Product/autotrader-suite/vba/src/modConfig.bas
 git commit -m "feat(sp2): add modConfig with URL and sheet constants"
 ```
 
@@ -240,37 +274,48 @@ Private m_BarMinute As Integer   ' 現在バーの「分」(-1 = 未初期化)
 Private m_Open      As Double
 Private m_High      As Double
 Private m_Low       As Double
+Private m_Close     As Double
 Private m_BarVol    As Long      ' バー内累積出来高（前回取得からの差分）
 Private m_PrevVol   As Long      ' 前回取得時の累積出来高
+Private m_BarTime   As Date      ' 現在バーの開始時刻（秒は常に00）
 
 ' ────────────────────────────────────────────
 ' Public: 現在の RSS ティックでバーを更新する。
 ' 呼び出し元のタイマーから毎 POLL_INTERVAL 秒呼ぶ。
 ' ────────────────────────────────────────────
 Public Sub UpdateBar(price As Double, totalVolume As Long, tickTime As Date)
-    Dim currentMin As Integer
-    currentMin = Minute(tickTime)
+    Dim barTime As Date
+    barTime = DateSerial(Year(tickTime), Month(tickTime), Day(tickTime)) + _
+              TimeSerial(Hour(tickTime), Minute(tickTime), 0)
 
     Dim volDelta As Long
-    volDelta = totalVolume - m_PrevVol
-    If volDelta < 0 Then volDelta = 0    ' 日またぎリセット対策
-    m_PrevVol = totalVolume
+    If m_BarMinute = -1 Then
+        volDelta = 0
+        m_PrevVol = totalVolume
+    Else
+        volDelta = totalVolume - m_PrevVol
+        If volDelta < 0 Then volDelta = 0    ' 日またぎリセット対策
+        m_PrevVol = totalVolume
+    End If
 
-    If m_BarMinute = -1 Or currentMin <> m_BarMinute Then
+    If m_BarMinute = -1 Or barTime <> m_BarTime Then
         ' ── 新しいバー開始 ──
         If m_BarMinute <> -1 Then
             ' 完成したバーをシートに保存
-            Call SaveBar(tickTime)
+            Call SaveBar
         End If
-        m_BarMinute = currentMin
+        m_BarMinute = Minute(tickTime)
+        m_BarTime = barTime
         m_Open = price
         m_High = price
         m_Low = price
+        m_Close = price
         m_BarVol = volDelta
     Else
         ' ── バー更新 ──
         If price > m_High Then m_High = price
         If price < m_Low  Then m_Low = price
+        m_Close = price
         m_BarVol = m_BarVol + volDelta
     End If
 End Sub
@@ -324,12 +369,10 @@ Public Function BuildOHLCJson(currentPrice As Double) As String
     Else
         curOpen = m_Open
         curHigh = m_High
-        If currentPrice > curHigh Then curHigh = currentPrice
         curLow = m_Low
-        If currentPrice < curLow Then curLow = currentPrice
     End If
     If jsonArr <> "" Then jsonArr = jsonArr & ","
-    jsonArr = jsonArr & OHLCBarJson(curOpen, curHigh, curLow, currentPrice, m_BarVol)
+    jsonArr = jsonArr & OHLCBarJson(curOpen, curHigh, curLow, IIf(m_BarMinute = -1, currentPrice, m_Close), m_BarVol)
 
     BuildOHLCJson = "[" & jsonArr & "]"
 End Function
@@ -339,28 +382,43 @@ End Function
 ' ────────────────────────────────────────────
 Public Sub ResetBar()
     m_BarMinute = -1
+    m_BarTime = 0
     m_Open = 0
     m_High = 0
     m_Low = 0
+    m_Close = 0
     m_BarVol = 0
     m_PrevVol = 0
+End Sub
+
+Public Sub ResetForCodeChange()
+    ResetBar
+
+    Dim ws As Worksheet
+    Set ws = ThisWorkbook.Sheets(SH_OHLC)
+
+    Dim lastRow As Long
+    lastRow = ws.Cells(ws.Rows.Count, 1).End(xlUp).Row
+    If lastRow >= 2 Then
+        ws.Rows("2:" & CStr(lastRow)).ClearContents
+    End If
 End Sub
 
 ' ────────────────────────────────────────────
 ' Private: 完成バーを OHLC_Data シートに書き込む
 ' ────────────────────────────────────────────
-Private Sub SaveBar(barTime As Date)
+Private Sub SaveBar()
     Dim ws As Worksheet
     Set ws = ThisWorkbook.Sheets(SH_OHLC)
 
     Dim nextRow As Long
     nextRow = ws.Cells(ws.Rows.Count, 1).End(xlUp).Row + 1
 
-    ws.Cells(nextRow, 1).Value = Format(barTime, "yyyy-mm-dd hh:mm:00")
+    ws.Cells(nextRow, 1).Value = Format(m_BarTime, "yyyy-mm-dd hh:mm:00")
     ws.Cells(nextRow, 2).Value = m_Open
     ws.Cells(nextRow, 3).Value = m_High
     ws.Cells(nextRow, 4).Value = m_Low
-    ws.Cells(nextRow, 5).Value = m_Open   ' close = 最後の値 = 次バー開始前の値（簡略化）
+    ws.Cells(nextRow, 5).Value = m_Close
     ws.Cells(nextRow, 6).Value = m_BarVol
 
     ' 古いバーを削除（MAX_OHLC_BARS 超過分）
@@ -400,7 +458,7 @@ modOHLC.UpdateBar 2500, 100000, Now
 - [ ] **Step 4: Commit**
 
 ```bash
-git add autotrader.xlsm
+git add Product/autotrader-suite/vba/src/modOHLC.bas
 git commit -m "feat(sp2): add modOHLC for minute-bar OHLC management"
 ```
 
@@ -411,7 +469,9 @@ git commit -m "feat(sp2): add modOHLC for minute-bar OHLC management"
 **Files:**
 - Create: VBA モジュール `modHTTP`
 
-**役割:** `PriceRequest` JSON を組み立てて POST し、`TradeDecision` レスポンスを解析する。
+**役割:** `PriceRequest` JSON を組み立てて POST し、`TradeDecision` + reference advisory レスポンスを解析する。
+
+`PostPrice` は `action` / `qty` / `reason` に加え、`reference_status` / `reference_price` / `reference_as_of` / `reference_gap_pct` / `warning_code` / `warning_message` を ByRef で返す。warning は表示とログにのみ使い、発注可否は action を正本とする。
 
 - [ ] **Step 1: modHTTP を挿入する**
 
@@ -427,7 +487,7 @@ Option Explicit
 '
 ' 戻り値の Long は action コード:
 '   1 = buy, -1 = sell, 0 = hold
-' qty と reason は参照引数で返す。
+' qty / reason / reference advisory は参照引数で返す。
 ' ────────────────────────────────────────────
 Public Function PostPrice(code As String, _
                           price As Double, _
@@ -435,22 +495,34 @@ Public Function PostPrice(code As String, _
                           ohlcJson As String, _
                           tickTime As Date, _
                           ByRef qty As Long, _
-                          ByRef reason As String) As Long
+                          ByRef reason As String, _
+                          ByRef referenceStatus As String, _
+                          ByRef referencePrice As Variant, _
+                          ByRef referenceAsOf As String, _
+                          ByRef referenceGapPct As Variant, _
+                          ByRef warningCode As String, _
+                          ByRef warningMessage As String) As Long
     PostPrice = 0   ' デフォルト hold
     qty = 0
     reason = ""
+    referenceStatus = "missing"
+    referencePrice = Empty
+    referenceAsOf = ""
+    referenceGapPct = Empty
+    warningCode = ""
+    warningMessage = ""
 
     Dim body As String
     body = BuildRequestJson(code, price, volume, ohlcJson, tickTime)
 
     Dim http As Object
-    Set http = CreateObject("MSXML2.XMLHTTP60")
-    http.Open "POST", API_PRICE_URL, False
+    Set http = CreateObject("MSXML2.ServerXMLHTTP.6.0")
+    http.Open "POST", RuntimeApiPriceUrl(), False
     http.setRequestHeader "Content-Type", "application/json"
     http.setRequestHeader "Accept", "application/json"
     http.setTimeouts HTTP_TIMEOUT, HTTP_TIMEOUT, HTTP_TIMEOUT, HTTP_TIMEOUT
-
     On Error GoTo HttpError
+
     http.send body
     On Error GoTo 0
 
@@ -465,8 +537,14 @@ Public Function PostPrice(code As String, _
 
     Dim action As String
     action = ExtractJsonString(respText, "action")
-    qty = CLng(ExtractJsonNumber(respText, "qty"))
+    qty = ParseJsonLong(ExtractJsonNumber(respText, "qty"))
     reason = ExtractJsonString(respText, "reason")
+    referenceStatus = ExtractJsonString(respText, "reference_status")
+    referencePrice = ExtractJsonOptionalNumber(respText, "reference_price")
+    referenceAsOf = ExtractJsonString(respText, "reference_as_of")
+    referenceGapPct = ExtractJsonOptionalNumber(respText, "reference_gap_pct")
+    warningCode = ExtractJsonString(respText, "warning_code")
+    warningMessage = ExtractJsonString(respText, "warning_message")
 
     Select Case LCase(action)
         Case "buy":  PostPrice = 1
@@ -490,11 +568,11 @@ Private Function BuildRequestJson(code As String, _
                                    tickTime As Date) As String
     ' ISO 8601 形式: "2026-04-12T10:00:05"
     Dim ts As String
-    ts = Format(tickTime, "yyyy-mm-ddThh:nn:ss")
+    ts = Format$(tickTime, "yyyy-mm-dd") & "T" & Format$(tickTime, "hh:nn:ss")
 
     BuildRequestJson = "{" & _
         """code"":""" & code & """," & _
-        """price"":" & Format(price, "0.0") & "," & _
+        """price"":" & JsonNumber(price) & "," & _
         """volume"":" & volume & "," & _
         """ohlc"":" & ohlcJson & "," & _
         """timestamp"":""" & ts & """" & _
@@ -515,13 +593,36 @@ Private Function ExtractJsonString(json As String, key As String) As String
         Exit Function
     End If
     pos = pos + Len(needle)
-    Dim endPos As Long
-    endPos = InStr(pos, json, """")
-    If endPos = 0 Then
-        ExtractJsonString = ""
-        Exit Function
-    End If
-    ExtractJsonString = Mid(json, pos, endPos - pos)
+    Dim cursor As Long
+    Dim escaped As Boolean
+    Dim currentChar As String
+    Dim result As String
+    For cursor = pos To Len(json)
+        currentChar = Mid(json, cursor, 1)
+        If escaped Then
+            Select Case currentChar
+                Case """", "\", "/"
+                    result = result & currentChar
+                Case "n"
+                    result = result & vbLf
+                Case "r"
+                    result = result & vbCr
+                Case "t"
+                    result = result & vbTab
+                Case Else
+                    result = result & currentChar
+            End Select
+            escaped = False
+        ElseIf currentChar = "\" Then
+            escaped = True
+        ElseIf currentChar = """" Then
+            ExtractJsonString = result
+            Exit Function
+        Else
+            result = result & currentChar
+        End If
+    Next cursor
+    ExtractJsonString = ""
 End Function
 
 ' ────────────────────────────────────────────
@@ -552,6 +653,32 @@ Private Function ExtractJsonNumber(json As String, key As String) As String
     If endPos = 0 Then endPos = Len(json) + 1
     ExtractJsonNumber = Trim(Mid(json, pos, endPos - pos))
 End Function
+
+' ────────────────────────────────────────────
+' Private: JSON 文字列から指定キーの nullable 数値を取り出す
+' null または未検出なら Empty を返す
+' ────────────────────────────────────────────
+Private Function ExtractJsonOptionalNumber(json As String, key As String) As Variant
+    Dim rawValue As String
+    rawValue = ExtractJsonNumber(json, key)
+    If LCase$(rawValue) = "null" Or rawValue = "" Then
+        ExtractJsonOptionalNumber = Empty
+        Exit Function
+    End If
+    ExtractJsonOptionalNumber = Val(rawValue)
+End Function
+
+Private Function ParseJsonLong(rawValue As String) As Long
+    If rawValue = "" Or LCase$(rawValue) = "null" Then
+        ParseJsonLong = 0
+        Exit Function
+    End If
+    ParseJsonLong = CLng(Val(rawValue))
+End Function
+
+Private Function JsonNumber(value As Double) As String
+    JsonNumber = Replace$(Format$(Round(value, 3), "0.###"), ",", ".")
+End Function
 ```
 
 - [ ] **Step 3: 手動テスト（FastAPI サーバーを起動した状態で実行）**
@@ -567,9 +694,11 @@ VBA イミディエイトウィンドウで:
 
 ```vba
 Dim qty As Long, reason As String
+Dim referenceStatus As String, referenceAsOf As String, warningCode As String, warningMessage As String
+Dim referencePrice As Variant, referenceGapPct As Variant
 Dim action As Long
-action = modHTTP.PostPrice("7203", 2500, 100000, "[{""o"":2490.0,""h"":2510.0,""l"":2485.0,""c"":2500.0,""v"":50000}]", Now, qty, reason)
-? action & " qty=" & qty & " reason=" & reason
+action = modHTTP.PostPrice("7203", 2500, 100000, "[{""o"":2490.0,""h"":2510.0,""l"":2485.0,""c"":2500.0,""v"":50000}]", Now, qty, reason, referenceStatus, referencePrice, referenceAsOf, referenceGapPct, warningCode, warningMessage)
+? action & " qty=" & qty & " reason=" & reason & " refStatus=" & referenceStatus & " warning=" & warningMessage
 ```
 
 期待出力: `0 qty=0 reason=...`（ウォームアップ中またはhold）
@@ -577,7 +706,7 @@ action = modHTTP.PostPrice("7203", 2500, 100000, "[{""o"":2490.0,""h"":2510.0,""
 - [ ] **Step 4: Commit**
 
 ```bash
-git add autotrader.xlsm
+git add Product/autotrader-suite/vba/src/modHTTP.bas
 git commit -m "feat(sp2): add modHTTP with JSON builder and response parser"
 ```
 
@@ -627,7 +756,7 @@ End Sub
 ' 現時点ではログ出力のみ
 ' ────────────────────────────────────────────
 Private Sub PlaceBuy(code As String, qty As Long, reason As String)
-    Call WriteOrderLog("BUY", code, qty, reason)
+    Call WriteOrderLog("BUY_STUB", code, qty, reason)
     ' [実装ポイント]
     ' Dim rss As Object
     ' Set rss = CreateObject("MarketSpeed.TradeII")   ' ← RSS COM クラス名は要確認
@@ -638,7 +767,7 @@ End Sub
 ' Private: 売り発注
 ' ────────────────────────────────────────────
 Private Sub PlaceSell(code As String, qty As Long, reason As String)
-    Call WriteOrderLog("SELL", code, qty, reason)
+    Call WriteOrderLog("SELL_STUB", code, qty, reason)
     ' [実装ポイント]
     ' Dim rss As Object
     ' Set rss = CreateObject("MarketSpeed.TradeII")
@@ -658,9 +787,16 @@ Private Sub WriteOrderLog(orderType As String, code As String, _
 
     ws.Cells(nextRow, 1).Value = Format(Now, "hh:mm:ss")
     ws.Cells(nextRow, 2).Value = code
-    ws.Cells(nextRow, 3).Value = orderType
-    ws.Cells(nextRow, 4).Value = qty
-    ws.Cells(nextRow, 5).Value = reason
+    ws.Cells(nextRow, 3).Value = ""
+    ws.Cells(nextRow, 4).Value = orderType
+    ws.Cells(nextRow, 5).Value = qty
+    ws.Cells(nextRow, 6).Value = reason
+    ws.Cells(nextRow, 7).Value = ""
+    ws.Cells(nextRow, 8).Value = ""
+    ws.Cells(nextRow, 9).Value = ""
+    ws.Cells(nextRow, 10).Value = ""
+    ws.Cells(nextRow, 11).Value = ""
+    ws.Cells(nextRow, 12).Value = "stub only; broker order not sent"
 
     ' 200行超えたら古い行を削除
     Do While nextRow - 1 > 200
@@ -683,7 +819,7 @@ Log シートの最終行に `BUY 7203 100 テスト買い` が記録される�
 - [ ] **Step 4: Commit**
 
 ```bash
-git add autotrader.xlsm
+git add Product/autotrader-suite/vba/src/modOrder.bas
 git commit -m "feat(sp2): add modOrder with buy/sell stubs and log output"
 ```
 
@@ -695,7 +831,7 @@ git commit -m "feat(sp2): add modOrder with buy/sell stubs and log output"
 - Create: VBA モジュール `modTimer`
 
 **役割:** `Application.OnTime` で `POLL_INTERVAL` 秒ごとにメインループを呼ぶ。  
-Control シートの `B3` セルを `RUNNING` / `STOPPED` で更新する。
+Control シートの `B3` セルを `RUNNING` / `STOPPED` で更新し、paper ops operator surface (`B10:B15`) も初期化・更新する。
 
 - [ ] **Step 1: modTimer を挿入する**
 
@@ -708,6 +844,7 @@ Option Explicit
 
 Private m_Running  As Boolean
 Private m_NextRun  As Date
+Private m_LastCode As String
 
 ' ────────────────────────────────────────────
 ' Public: タイマーを開始する（Control シートの Start ボタンから呼ぶ）
@@ -715,7 +852,9 @@ Private m_NextRun  As Date
 Public Sub StartTimer()
     If m_Running Then Exit Sub
     m_Running = True
-    modOHLC.ResetBar
+    modOHLC.ResetForCodeChange
+    m_LastCode = ""
+    InitializeOperationalSurface
     Call SetStatus("RUNNING")
     Call ScheduleNext
 End Sub
@@ -725,6 +864,7 @@ End Sub
 ' ────────────────────────────────────────────
 Public Sub StopTimer()
     m_Running = False
+    m_LastCode = ""
     On Error Resume Next
     Application.OnTime m_NextRun, "modTimer.OnTick", , False
     On Error GoTo 0
@@ -749,7 +889,17 @@ Public Sub OnTick()
     Dim tickDate As Date
     Dim tickTime As Date
 
-    code     = CStr(ws.Cells(MARKET_ROW, COL_CODE).Value)
+    code = ResolveMarketCode(ws)
+    If code = "" Then GoTo ScheduleAndExit
+    ws.Cells(MARKET_ROW, COL_CODE).Value = code
+
+    If m_LastCode <> "" And StrComp(m_LastCode, code, vbTextCompare) <> 0 Then
+        modOHLC.ResetForCodeChange
+        m_LastCode = code
+        GoTo ScheduleAndExit
+    End If
+    m_LastCode = code
+
     price    = CDbl(ws.Cells(MARKET_ROW, COL_PRICE).Value)
     volume   = CLng(ws.Cells(MARKET_ROW, COL_VOLUME).Value)
     tickDate = CDate(ws.Cells(MARKET_ROW, COL_DATE).Value)
@@ -773,8 +923,32 @@ Public Sub OnTick()
     ' API 送信
     Dim qty As Long
     Dim reason As String
+    Dim referenceStatus As String
+    Dim referenceAsOf As String
+    Dim warningCode As String
+    Dim warningMessage As String
+    Dim referencePrice As Variant
+    Dim referenceGapPct As Variant
     Dim actionCode As Long
-    actionCode = modHTTP.PostPrice(code, price, volume, ohlcJson, ts, qty, reason)
+    Dim requestSucceeded As Boolean
+    Dim responseStatus As Long
+    actionCode = modHTTP.PostPrice( _
+        code, price, volume, ohlcJson, ts, qty, reason, _
+        referenceStatus, referencePrice, referenceAsOf, referenceGapPct, warningCode, warningMessage, _
+        requestSucceeded, responseStatus)
+
+    ' Control シートに最新 advisory を表示
+    Dim ctrlWs As Worksheet
+    Set ctrlWs = ThisWorkbook.Sheets(SH_CONTROL)
+    ctrlWs.Cells(5, 2).Value = referenceStatus
+    ctrlWs.Cells(6, 2).Value = IIf(referenceAsOf = "", "-", referenceAsOf)
+    ctrlWs.Cells(7, 2).Value = warningMessage
+    If requestSucceeded Then
+        ctrlWs.Cells(CONTROL_ROW_LAST_TICK_AT, 2).Value = Format$(ts, "yyyy-mm-dd hh:nn:ss")
+        ctrlWs.Cells(CONTROL_ROW_LAST_ACTION, 2).Value = ActionLabel(actionCode)
+    Else
+        ctrlWs.Cells(CONTROL_ROW_LAST_ERROR, 2).Value = Left$(reason, 120)
+    End If
 
     ' Log シートに記録
     Dim logWs As Worksheet
@@ -782,16 +956,23 @@ Public Sub OnTick()
     Dim nextRow As Long
     nextRow = logWs.Cells(logWs.Rows.Count, 1).End(xlUp).Row + 1
     logWs.Cells(nextRow, 1).Value = Format(Now, "hh:mm:ss")
-    logWs.Cells(nextRow, 2).Value = price
+    logWs.Cells(nextRow, 2).Value = code
+    logWs.Cells(nextRow, 3).Value = price
     Dim actionStr As String
     Select Case actionCode
         Case 1:  actionStr = "buy"
         Case -1: actionStr = "sell"
         Case Else: actionStr = "hold"
     End Select
-    logWs.Cells(nextRow, 3).Value = actionStr
-    logWs.Cells(nextRow, 4).Value = qty
-    logWs.Cells(nextRow, 5).Value = Left(reason, 60)
+    logWs.Cells(nextRow, 4).Value = actionStr
+    logWs.Cells(nextRow, 5).Value = qty
+    logWs.Cells(nextRow, 6).Value = Left(reason, 60)
+    logWs.Cells(nextRow, 7).Value = referenceStatus
+    If Not IsEmpty(referencePrice) Then logWs.Cells(nextRow, 8).Value = referencePrice
+    logWs.Cells(nextRow, 9).Value = referenceAsOf
+    If Not IsEmpty(referenceGapPct) Then logWs.Cells(nextRow, 10).Value = referenceGapPct
+    logWs.Cells(nextRow, 11).Value = warningCode
+    logWs.Cells(nextRow, 12).Value = warningMessage
     ' 200行超えたら古い行を削除
     Do While nextRow - 1 > 200
         logWs.Rows(2).Delete
@@ -806,15 +987,33 @@ ScheduleAndExit:
     Exit Sub
 
 TickError:
+    ThisWorkbook.Sheets(SH_CONTROL).Cells(CONTROL_ROW_LAST_ERROR, 2).Value = Left$("OnTick error: " & Err.Description, 120)
     Call WriteErrorLog("OnTick error: " & Err.Description)
     Call ScheduleNext
+End Sub
+
+Public Sub InitializeOperationalSurface()
+    Dim ctrlWs As Worksheet
+    Set ctrlWs = ThisWorkbook.Sheets(SH_CONTROL)
+
+    ctrlWs.Cells(CONTROL_ROW_RUN_MODE, 1).Value = "Run Mode"
+    ctrlWs.Cells(CONTROL_ROW_RUN_MODE, 2).Value = "paper"
+    ctrlWs.Cells(CONTROL_ROW_ORDER_MODE, 1).Value = "Order Mode"
+    ctrlWs.Cells(CONTROL_ROW_ORDER_MODE, 2).Value = "stub only"
+    ctrlWs.Cells(CONTROL_ROW_AUTO_START, 1).Value = "Auto Start"
+    If Trim$(CStr(ctrlWs.Cells(CONTROL_ROW_AUTO_START, 2).Value)) = "" Then
+        ctrlWs.Cells(CONTROL_ROW_AUTO_START, 2).Value = "FALSE"
+    End If
+    ctrlWs.Cells(CONTROL_ROW_LAST_TICK_AT, 1).Value = "Last Tick At"
+    ctrlWs.Cells(CONTROL_ROW_LAST_ACTION, 1).Value = "Last Action"
+    ctrlWs.Cells(CONTROL_ROW_LAST_ERROR, 1).Value = "Last Error"
 End Sub
 
 ' ────────────────────────────────────────────
 ' Private: 次回実行をスケジュール
 ' ────────────────────────────────────────────
 Private Sub ScheduleNext()
-    m_NextRun = Now + TimeSerial(0, 0, POLL_INTERVAL)
+    m_NextRun = DateAdd("s", RuntimePollIntervalSeconds(), Now)
     Application.OnTime m_NextRun, "modTimer.OnTick"
 End Sub
 
@@ -834,14 +1033,39 @@ Private Sub WriteErrorLog(msg As String)
     Dim nextRow As Long
     nextRow = ws.Cells(ws.Rows.Count, 1).End(xlUp).Row + 1
     ws.Cells(nextRow, 1).Value = Format(Now, "hh:mm:ss")
-    ws.Cells(nextRow, 2).Value = 0
-    ws.Cells(nextRow, 3).Value = "ERROR"
-    ws.Cells(nextRow, 4).Value = 0
-    ws.Cells(nextRow, 5).Value = Left(msg, 60)
+    ws.Cells(nextRow, 2).Value = ""
+    ws.Cells(nextRow, 3).Value = ""
+    ws.Cells(nextRow, 4).Value = "error"
+    ws.Cells(nextRow, 5).Value = 0
+    ws.Cells(nextRow, 6).Value = Left(msg, 60)
+    ws.Cells(nextRow, 7).Value = ""
+    ws.Cells(nextRow, 8).Value = ""
+    ws.Cells(nextRow, 9).Value = ""
+    ws.Cells(nextRow, 10).Value = ""
+    ws.Cells(nextRow, 11).Value = "client_error"
+    ws.Cells(nextRow, 12).Value = Left(msg, 120)
 End Sub
+
+Private Function ResolveMarketCode(ws As Worksheet) As String
+    Dim priceFormula As String
+    priceFormula = CStr(ws.Cells(MARKET_ROW, COL_PRICE).Formula)
+
+    Dim quotePos As Long
+    Dim marketPos As Long
+    quotePos = InStr(1, priceFormula, "'", vbBinaryCompare)
+    If quotePos > 0 Then
+        marketPos = InStr(quotePos + 1, priceFormula, ".T", vbTextCompare)
+        If marketPos > quotePos Then
+            ResolveMarketCode = Mid$(priceFormula, quotePos + 1, marketPos - quotePos - 1)
+            Exit Function
+        End If
+    End If
+
+    ResolveMarketCode = Trim$(CStr(ws.Cells(MARKET_ROW, COL_CODE).Value))
+End Function
 ```
 
-- [ ] **Step 3: Control シートにボタンを設置する**
+- [ ] **Step 3: Control シートのボタンは必要な場合だけ設置する**
 
 1. `Control` シートを開く
 2. 「開発」タブ（表示されていない場合は「ファイル」→「オプション」→「リボンのユーザー設定」→「開発」にチェック）
@@ -854,16 +1078,17 @@ End Sub
 
 1. `uvicorn server.main:app --reload` でサーバーを起動
 2. Excel で `autotrader.xlsm` を開く
-3. Control シートの `▶ START` ボタンをクリック
-4. 5秒後に Log シートに1行追加されることを確認
+3. `Control!B12=TRUE` にして auto-start を試すか、`Alt+F8` または `▶ START` で `modTimer.StartTimer` を実行
+4. 5秒後に Log シートに1行追加されること、`Control!B13/B14` が更新されることを確認
 
 期待する Log シート最終行（例）:
 
-| timestamp | price | action | qty | reason |
-|-----------|-------|--------|-----|--------|
-| `10:05:30` | `2500` | `hold` | `0` | `ウォームアップ中 ...` |
+| timestamp | code | price | action | qty | reason | reference_status | reference_price | reference_as_of | reference_gap_pct | warning_code | warning_message |
+|-----------|------|-------|--------|-----|--------|------------------|-----------------|-----------------|-------------------|--------------|-----------------|
+| `10:05:30` | `7203` | `2500` | `hold` | `0` | `ウォームアップ中 ...` | `missing` |  |  |  | `reference_missing` | `reference snapshot is not available yet` |
 
-5. `⏹ STOP` ボタンをクリック → Control シートの `B3` が `STOPPED` になることを確認
+1. `⏹ STOP` または `Alt+F8` で `modTimer.StopTimer` を実行 → Control シートの `B3` が `STOPPED` になることを確認
+2. `/api/price` 非 200 または VBA error を意図的に起こしたとき、`Control!B15` が更新され、成功 tick では自動消去されないことを確認
 
 - [ ] **Step 5: OHLC 蓄積確認**
 
@@ -873,18 +1098,18 @@ End Sub
 - [ ] **Step 6: Commit**
 
 ```bash
-git add autotrader.xlsm
+git add Product/autotrader-suite/vba/src/modTimer.bas
 git commit -m "feat(sp2): add modTimer main loop with Application.OnTime"
 ```
 
 ---
 
-## Task 7: ThisWorkbook — 自動起動フック（任意）
+## Task 7: ThisWorkbook — config-driven open hook
 
 **Files:**
 - Modify: `ThisWorkbook` モジュール
 
-**役割:** ブックを開いたときに自動的にタイマーを開始する（オプション）。
+**役割:** ブックを開いたときに operator surface を初期化し、`Control!B12` が TRUE のときだけタイマーを自動開始する。
 
 - [ ] **Step 1: ThisWorkbook に以下を追加する**
 
@@ -892,8 +1117,10 @@ VBA エディタで `ThisWorkbook` をダブルクリックして開き、以下
 
 ```vba
 Private Sub Workbook_Open()
-    ' ブック起動時にタイマーを自動開始したい場合はコメントを外す
-    ' modTimer.StartTimer
+    modTimer.InitializeOperationalSurface
+    If RuntimeAutoStartEnabled() Then
+        modTimer.StartTimer
+    End If
 End Sub
 
 Private Sub Workbook_BeforeClose(Cancel As Boolean)
@@ -901,15 +1128,15 @@ Private Sub Workbook_BeforeClose(Cancel As Boolean)
 End Sub
 ```
 
-- [ ] **Step 2: 閉じるときの動作確認**
+- [ ] **Step 2: auto-start true/false の両方を確認する**
 
-ブックを閉じるときに `StopTimer` が呼ばれ、Control シートが `STOPPED` になることを確認する。
+`Control!B12=FALSE` では open 時に自動起動しないこと、`TRUE` では open 時に `StartTimer` が走ること、close 時にはどちらでも `StopTimer` が呼ばれて `B3=STOPPED` になることを確認する。
 
 - [ ] **Step 3: Commit**
 
 ```bash
-git add autotrader.xlsm
-git commit -m "feat(sp2): add Workbook_BeforeClose to auto-stop timer"
+git add Product/autotrader-suite/vba/src/ThisWorkbook.cls
+git commit -m "feat(sp2): make workbook open config-driven and auto-stop on close"
 ```
 
 ---
@@ -919,8 +1146,7 @@ git commit -m "feat(sp2): add Workbook_BeforeClose to auto-stop timer"
 **Files:**
 - 作業: `Market` シートの手動設定（各自の MarketSpeed II 環境で実施）
 
-MarketSpeed II RSS を実際に接続するには、`Market` シートの 2 行目に以下のフォーミュラを入力する。  
-銘柄コードの末尾には `.T`（東証）を付ける。
+MarketSpeed II RSS を実際に接続するには、`Market` シートの 2 行目に以下のフォーミュラを入力するか、generator を `-UseRssFormulas` 付きで再実行する。銘柄コードの末尾には `.T`（東証）を付ける。
 
 | セル | フォーミュラ例（トヨタ） | 意味 |
 |------|------------------------|------|
@@ -929,6 +1155,21 @@ MarketSpeed II RSS を実際に接続するには、`Market` シートの 2 行�
 | `C2` | `=RSS\|'7203.T'!'出来高'` | 累積出来高 |
 | `D2` | `=RSS\|'7203.T'!'日付'` | RSS 日付 |
 | `E2` | `=RSS\|'7203.T'!'時刻'` | RSS 時刻 |
+| `F2` | `=RSS\|'7203.T'!'買気配'` | 買気配 |
+| `G2` | `=RSS\|'7203.T'!'売気配'` | 売気配 |
+
+この source drop では A2 は表示用の mirror / manual smoke fallback であり、runtime の code は live RSS formula を優先する。generator の既定値は manual smoke seed なので、RSS 環境で使うときだけ `-UseRssFormulas` を付ける。
+
+実際に Excel に入力する式は以下のとおり（Markdown の `\` は不要）。
+
+```text
+B2: =RSS|'7203.T'!'現在値'
+C2: =RSS|'7203.T'!'出来高'
+D2: =RSS|'7203.T'!'日付'
+E2: =RSS|'7203.T'!'時刻'
+F2: =RSS|'7203.T'!'買気配'
+G2: =RSS|'7203.T'!'売気配'
+```
 
 > **注意:** MarketSpeed II が起動していないと `#N/A` が返る。  
 > VBA の `price <= 0` ガードが機能するため、`#N/A` でも OnTick はクラッシュしない  
@@ -943,7 +1184,7 @@ MarketSpeed II RSS を実際に接続するには、`Market` シートの 2 行�
 
 - [ ] **Step 2: Market シートに RSS フォーミュラを入力する**
 
-上記フォーミュラを `B2:E2` に入力する。セルに数値が表示されれば RSS 接続成功。
+上記フォーミュラを `B2:G2` に入力する。セルに数値が表示されれば RSS 接続成功。
 
 - [ ] **Step 3: 最終統合テスト**
 
@@ -968,3 +1209,4 @@ MarketSpeed II RSS を実際に接続するには、`Market` シートの 2 行�
 | 価格 <= 0 のガード | Task 6（OnTick の `If price <= 0` チェック） |
 | タイマー開始・停止 | Task 6（StartTimer/StopTimer） |
 | ブック終了時の安全停止 | Task 7（Workbook_BeforeClose） |
+

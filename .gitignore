@@ -30,6 +30,8 @@ npm-debug.log*
 
 # Runtime artifacts (not source of truth)
 **/.superpowers/
+/autotrader.xlsm
+/~$autotrader.xlsm
 
 # Ignore all .dcr directories by default (runtime/session files)
 **/.dcr/

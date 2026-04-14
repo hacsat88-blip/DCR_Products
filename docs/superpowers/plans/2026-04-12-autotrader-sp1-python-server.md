@@ -14,38 +14,38 @@
 
 | ファイル | 役割 |
 |---------|------|
-| `Product/autotrader/requirements.txt` | 依存パッケージ一覧 |
-| `Product/autotrader/.env.example` | 環境変数テンプレート |
-| `Product/autotrader/server/__init__.py` | パッケージ宣言 |
-| `Product/autotrader/server/models.py` | Pydantic データモデル全定義 |
-| `Product/autotrader/server/engine/__init__.py` | パッケージ宣言 |
-| `Product/autotrader/server/engine/position.py` | ポジション管理・state.json 永続化 |
-| `Product/autotrader/server/engine/risk_guard.py` | リスクルール適用（損切・上限・時間） |
-| `Product/autotrader/server/engine/ai_trader.py` | Claude API 呼び出し・sell/buy/hold 判断 |
-| `Product/autotrader/server/routes/__init__.py` | パッケージ宣言 |
-| `Product/autotrader/server/routes/ws.py` | WebSocket エンドポイント・broadcast 関数 |
-| `Product/autotrader/server/routes/price_feed.py` | POST /api/price ルート |
-| `Product/autotrader/server/routes/settings.py` | GET/PUT /api/settings ルート |
-| `Product/autotrader/server/main.py` | FastAPI アプリ組み立て・起動エントリ |
-| `Product/autotrader/tests/test_models.py` | モデルのバリデーションテスト |
-| `Product/autotrader/tests/test_position.py` | PositionManager の単体テスト |
-| `Product/autotrader/tests/test_risk_guard.py` | RiskGuard の単体テスト |
-| `Product/autotrader/tests/test_ai_trader.py` | AITrader の単体テスト（Claude API モック） |
-| `Product/autotrader/tests/test_price_feed.py` | POST /api/price の統合テスト |
-| `Product/autotrader/tests/test_settings.py` | GET/PUT /api/settings の統合テスト |
+| `Product/autotrader-suite/backend/requirements.txt` | 依存パッケージ一覧 |
+| `Product/autotrader-suite/backend/.env.example` | 環境変数テンプレート |
+| `Product/autotrader-suite/backend/server/__init__.py` | パッケージ宣言 |
+| `Product/autotrader-suite/backend/server/models.py` | Pydantic データモデル全定義 |
+| `Product/autotrader-suite/backend/server/engine/__init__.py` | パッケージ宣言 |
+| `Product/autotrader-suite/backend/server/engine/position.py` | ポジション管理・state.json 永続化 |
+| `Product/autotrader-suite/backend/server/engine/risk_guard.py` | リスクルール適用（損切・上限・時間） |
+| `Product/autotrader-suite/backend/server/engine/ai_trader.py` | Claude API 呼び出し・sell/buy/hold 判断 |
+| `Product/autotrader-suite/backend/server/routes/__init__.py` | パッケージ宣言 |
+| `Product/autotrader-suite/backend/server/routes/ws.py` | WebSocket エンドポイント・broadcast 関数 |
+| `Product/autotrader-suite/backend/server/routes/price_feed.py` | POST /api/price ルート |
+| `Product/autotrader-suite/backend/server/routes/settings.py` | GET/PUT /api/settings ルート |
+| `Product/autotrader-suite/backend/server/main.py` | FastAPI アプリ組み立て・起動エントリ |
+| `Product/autotrader-suite/backend/tests/test_models.py` | モデルのバリデーションテスト |
+| `Product/autotrader-suite/backend/tests/test_position.py` | PositionManager の単体テスト |
+| `Product/autotrader-suite/backend/tests/test_risk_guard.py` | RiskGuard の単体テスト |
+| `Product/autotrader-suite/backend/tests/test_ai_trader.py` | AITrader の単体テスト（Claude API モック） |
+| `Product/autotrader-suite/backend/tests/test_price_feed.py` | POST /api/price の統合テスト |
+| `Product/autotrader-suite/backend/tests/test_settings.py` | GET/PUT /api/settings の統合テスト |
 
 ---
 
 ## Task 1: プロジェクトスキャフォールド
 
 **Files:**
-- Create: `Product/autotrader/requirements.txt`
-- Create: `Product/autotrader/.env.example`
-- Create: `Product/autotrader/.gitignore`
-- Create: `Product/autotrader/server/__init__.py`
-- Create: `Product/autotrader/server/engine/__init__.py`
-- Create: `Product/autotrader/server/routes/__init__.py`
-- Create: `Product/autotrader/tests/__init__.py`
+- Create: `Product/autotrader-suite/backend/requirements.txt`
+- Create: `Product/autotrader-suite/backend/.env.example`
+- Create: `Product/autotrader-suite/backend/.gitignore`
+- Create: `Product/autotrader-suite/backend/server/__init__.py`
+- Create: `Product/autotrader-suite/backend/server/engine/__init__.py`
+- Create: `Product/autotrader-suite/backend/server/routes/__init__.py`
+- Create: `Product/autotrader-suite/backend/tests/__init__.py`
 
 - [ ] **Step 1: ディレクトリとファイルを作成する**
 
@@ -60,7 +60,7 @@ touch autotrader/tests/__init__.py
 
 - [ ] **Step 2: requirements.txt を作成する**
 
-`Product/autotrader/requirements.txt`:
+`Product/autotrader-suite/backend/requirements.txt`:
 ```
 fastapi==0.115.0
 uvicorn[standard]==0.30.6
@@ -74,14 +74,14 @@ httpx==0.27.2
 
 - [ ] **Step 3: .env.example を作成する**
 
-`Product/autotrader/.env.example`:
+`Product/autotrader-suite/backend/.env.example`:
 ```
 ANTHROPIC_API_KEY=sk-ant-your-key-here
 ```
 
 - [ ] **Step 4: .gitignore を作成する**
 
-`Product/autotrader/.gitignore`:
+`Product/autotrader-suite/backend/.gitignore`:
 ```
 .env
 state.json
@@ -112,7 +112,7 @@ copy .env.example .env
 
 ```bash
 cd "C:\Users\hacsa\Desktop\サトシ開発"
-git add Product/autotrader/
+git add Product/autotrader-suite/backend/
 git commit -m "feat(autotrader): scaffold SP-1 Python server project"
 ```
 
@@ -121,12 +121,12 @@ git commit -m "feat(autotrader): scaffold SP-1 Python server project"
 ## Task 2: Pydantic データモデル
 
 **Files:**
-- Create: `Product/autotrader/server/models.py`
-- Create: `Product/autotrader/tests/test_models.py`
+- Create: `Product/autotrader-suite/backend/server/models.py`
+- Create: `Product/autotrader-suite/backend/tests/test_models.py`
 
 - [ ] **Step 1: テストを書く**
 
-`Product/autotrader/tests/test_models.py`:
+`Product/autotrader-suite/backend/tests/test_models.py`:
 ```python
 import pytest
 from datetime import datetime
@@ -194,7 +194,7 @@ pytest tests/test_models.py -v
 
 - [ ] **Step 3: models.py を実装する**
 
-`Product/autotrader/server/models.py`:
+`Product/autotrader-suite/backend/server/models.py`:
 ```python
 from typing import Literal
 from datetime import datetime
@@ -261,7 +261,7 @@ test_models.py::test_position_defaults PASSED
 
 ```bash
 cd "C:\Users\hacsa\Desktop\サトシ開発"
-git add Product/autotrader/server/models.py Product/autotrader/tests/test_models.py
+git add Product/autotrader-suite/backend/server/models.py Product/autotrader-suite/backend/tests/test_models.py
 git commit -m "feat(autotrader): add Pydantic data models"
 ```
 
@@ -270,12 +270,12 @@ git commit -m "feat(autotrader): add Pydantic data models"
 ## Task 3: PositionManager
 
 **Files:**
-- Create: `Product/autotrader/server/engine/position.py`
-- Create: `Product/autotrader/tests/test_position.py`
+- Create: `Product/autotrader-suite/backend/server/engine/position.py`
+- Create: `Product/autotrader-suite/backend/tests/test_position.py`
 
 - [ ] **Step 1: テストを書く**
 
-`Product/autotrader/tests/test_position.py`:
+`Product/autotrader-suite/backend/tests/test_position.py`:
 ```python
 import json
 import pytest
@@ -364,7 +364,7 @@ pytest tests/test_position.py -v
 
 - [ ] **Step 3: position.py を実装する**
 
-`Product/autotrader/server/engine/position.py`:
+`Product/autotrader-suite/backend/server/engine/position.py`:
 ```python
 import json
 from pathlib import Path
@@ -439,7 +439,7 @@ pytest tests/test_position.py -v
 
 ```bash
 cd "C:\Users\hacsa\Desktop\サトシ開発"
-git add Product/autotrader/server/engine/position.py Product/autotrader/tests/test_position.py
+git add Product/autotrader-suite/backend/server/engine/position.py Product/autotrader-suite/backend/tests/test_position.py
 git commit -m "feat(autotrader): add PositionManager with state.json persistence"
 ```
 
@@ -448,12 +448,12 @@ git commit -m "feat(autotrader): add PositionManager with state.json persistence
 ## Task 4: RiskGuard
 
 **Files:**
-- Create: `Product/autotrader/server/engine/risk_guard.py`
-- Create: `Product/autotrader/tests/test_risk_guard.py`
+- Create: `Product/autotrader-suite/backend/server/engine/risk_guard.py`
+- Create: `Product/autotrader-suite/backend/tests/test_risk_guard.py`
 
 - [ ] **Step 1: テストを書く**
 
-`Product/autotrader/tests/test_risk_guard.py`:
+`Product/autotrader-suite/backend/tests/test_risk_guard.py`:
 ```python
 import pytest
 from datetime import datetime, timedelta
@@ -557,7 +557,7 @@ pytest tests/test_risk_guard.py -v
 
 - [ ] **Step 3: risk_guard.py を実装する**
 
-`Product/autotrader/server/engine/risk_guard.py`:
+`Product/autotrader-suite/backend/server/engine/risk_guard.py`:
 ```python
 from datetime import datetime, time, timedelta
 from server.models import TradeDecision, Position, RiskSettings
@@ -640,7 +640,7 @@ pytest tests/test_risk_guard.py -v
 
 ```bash
 cd "C:\Users\hacsa\Desktop\サトシ開発"
-git add Product/autotrader/server/engine/risk_guard.py Product/autotrader/tests/test_risk_guard.py
+git add Product/autotrader-suite/backend/server/engine/risk_guard.py Product/autotrader-suite/backend/tests/test_risk_guard.py
 git commit -m "feat(autotrader): add RiskGuard with stop-loss, limit, and warmup rules"
 ```
 
@@ -649,12 +649,12 @@ git commit -m "feat(autotrader): add RiskGuard with stop-loss, limit, and warmup
 ## Task 5: AITrader（Claude API モック使用）
 
 **Files:**
-- Create: `Product/autotrader/server/engine/ai_trader.py`
-- Create: `Product/autotrader/tests/test_ai_trader.py`
+- Create: `Product/autotrader-suite/backend/server/engine/ai_trader.py`
+- Create: `Product/autotrader-suite/backend/tests/test_ai_trader.py`
 
 - [ ] **Step 1: テストを書く（Claude API をモックする）**
 
-`Product/autotrader/tests/test_ai_trader.py`:
+`Product/autotrader-suite/backend/tests/test_ai_trader.py`:
 ```python
 import pytest
 from unittest.mock import MagicMock, patch
@@ -736,7 +736,7 @@ pytest tests/test_ai_trader.py -v
 
 - [ ] **Step 3: ai_trader.py を実装する**
 
-`Product/autotrader/server/engine/ai_trader.py`:
+`Product/autotrader-suite/backend/server/engine/ai_trader.py`:
 ```python
 import json
 import os
@@ -819,7 +819,7 @@ pytest tests/test_ai_trader.py -v
 
 ```bash
 cd "C:\Users\hacsa\Desktop\サトシ開発"
-git add Product/autotrader/server/engine/ai_trader.py Product/autotrader/tests/test_ai_trader.py
+git add Product/autotrader-suite/backend/server/engine/ai_trader.py Product/autotrader-suite/backend/tests/test_ai_trader.py
 git commit -m "feat(autotrader): add AITrader with Claude API integration and safe fallback"
 ```
 
@@ -828,12 +828,12 @@ git commit -m "feat(autotrader): add AITrader with Claude API integration and sa
 ## Task 6: Settings ルート
 
 **Files:**
-- Create: `Product/autotrader/server/routes/settings.py`
-- Create: `Product/autotrader/tests/test_settings.py`
+- Create: `Product/autotrader-suite/backend/server/routes/settings.py`
+- Create: `Product/autotrader-suite/backend/tests/test_settings.py`
 
 - [ ] **Step 1: テストを書く**
 
-`Product/autotrader/tests/test_settings.py`:
+`Product/autotrader-suite/backend/tests/test_settings.py`:
 ```python
 import pytest
 from datetime import datetime, timedelta
@@ -886,7 +886,7 @@ pytest tests/test_settings.py -v
 
 - [ ] **Step 3: settings.py を実装する**
 
-`Product/autotrader/server/routes/settings.py`:
+`Product/autotrader-suite/backend/server/routes/settings.py`:
 ```python
 from fastapi import APIRouter
 from server.models import RiskSettings
@@ -920,7 +920,7 @@ pytest tests/test_settings.py -v
 
 ```bash
 cd "C:\Users\hacsa\Desktop\サトシ開発"
-git add Product/autotrader/server/routes/settings.py Product/autotrader/tests/test_settings.py
+git add Product/autotrader-suite/backend/server/routes/settings.py Product/autotrader-suite/backend/tests/test_settings.py
 git commit -m "feat(autotrader): add GET/PUT /api/settings route"
 ```
 
@@ -929,13 +929,13 @@ git commit -m "feat(autotrader): add GET/PUT /api/settings route"
 ## Task 7: WebSocket ルートと broadcast
 
 **Files:**
-- Create: `Product/autotrader/server/routes/ws.py`
+- Create: `Product/autotrader-suite/backend/server/routes/ws.py`
 
 WebSocket は非同期イベント駆動のため単体テストより統合確認で検証する（Task 9 の smoke test で実施）。
 
 - [ ] **Step 1: ws.py を実装する**
 
-`Product/autotrader/server/routes/ws.py`:
+`Product/autotrader-suite/backend/server/routes/ws.py`:
 ```python
 import json
 from datetime import datetime
@@ -998,7 +998,7 @@ def make_ws_router(
 
 ```bash
 cd "C:\Users\hacsa\Desktop\サトシ開発"
-git add Product/autotrader/server/routes/ws.py
+git add Product/autotrader-suite/backend/server/routes/ws.py
 git commit -m "feat(autotrader): add WebSocket route with broadcast function"
 ```
 
@@ -1007,12 +1007,12 @@ git commit -m "feat(autotrader): add WebSocket route with broadcast function"
 ## Task 8: Price Feed ルート（全モジュールの統合点）
 
 **Files:**
-- Create: `Product/autotrader/server/routes/price_feed.py`
-- Create: `Product/autotrader/tests/test_price_feed.py`
+- Create: `Product/autotrader-suite/backend/server/routes/price_feed.py`
+- Create: `Product/autotrader-suite/backend/tests/test_price_feed.py`
 
 - [ ] **Step 1: テストを書く**
 
-`Product/autotrader/tests/test_price_feed.py`:
+`Product/autotrader-suite/backend/tests/test_price_feed.py`:
 ```python
 import pytest
 from datetime import datetime, timedelta
@@ -1110,7 +1110,7 @@ pytest tests/test_price_feed.py -v
 
 - [ ] **Step 3: price_feed.py を実装する**
 
-`Product/autotrader/server/routes/price_feed.py`:
+`Product/autotrader-suite/backend/server/routes/price_feed.py`:
 ```python
 from datetime import datetime
 from typing import Callable, Awaitable
@@ -1168,7 +1168,7 @@ pytest tests/test_price_feed.py -v
 
 ```bash
 cd "C:\Users\hacsa\Desktop\サトシ開発"
-git add Product/autotrader/server/routes/price_feed.py Product/autotrader/tests/test_price_feed.py
+git add Product/autotrader-suite/backend/server/routes/price_feed.py Product/autotrader-suite/backend/tests/test_price_feed.py
 git commit -m "feat(autotrader): add POST /api/price route integrating AI, risk guard, and position"
 ```
 
@@ -1177,12 +1177,12 @@ git commit -m "feat(autotrader): add POST /api/price route integrating AI, risk 
 ## Task 9: main.py の組み立てとスモークテスト
 
 **Files:**
-- Create: `Product/autotrader/server/main.py`
-- Create: `Product/autotrader/pytest.ini`
+- Create: `Product/autotrader-suite/backend/server/main.py`
+- Create: `Product/autotrader-suite/backend/pytest.ini`
 
 - [ ] **Step 1: pytest.ini を作成する（asyncio モード設定）**
 
-`Product/autotrader/pytest.ini`:
+`Product/autotrader-suite/backend/pytest.ini`:
 ```ini
 [pytest]
 asyncio_mode = auto
@@ -1190,7 +1190,7 @@ asyncio_mode = auto
 
 - [ ] **Step 2: main.py を実装する**
 
-`Product/autotrader/server/main.py`:
+`Product/autotrader-suite/backend/server/main.py`:
 ```python
 from datetime import datetime
 from contextlib import asynccontextmanager
@@ -1281,7 +1281,7 @@ test_price_feed.py   3 passed
 
 ```bash
 cd "C:\Users\hacsa\Desktop\サトシ開発"
-git add Product/autotrader/server/main.py Product/autotrader/pytest.ini
+git add Product/autotrader-suite/backend/server/main.py Product/autotrader-suite/backend/pytest.ini
 git commit -m "feat(autotrader): wire up FastAPI app and verify all 34 tests pass"
 ```
 
@@ -1301,3 +1301,4 @@ git commit -m "feat(autotrader): wire up FastAPI app and verify all 34 tests pas
 SP-1 完成後、以下を別プランとして作成する:
 - **SP-3 プラン**: `2026-04-12-autotrader-sp3-nextjs-dashboard.md`
 - **SP-2 プラン**: `2026-04-12-autotrader-sp2-excel-vba.md`
+

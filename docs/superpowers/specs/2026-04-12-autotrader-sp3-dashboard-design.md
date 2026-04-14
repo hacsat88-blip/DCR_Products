@@ -2,7 +2,7 @@
 
 **作成日**: 2026-04-12
 **ステータス**: design-approved
-**対象**: Product/autotrader-ui
+**対象**: Product/autotrader-suite/ui
 
 ## 1. Goal
 
@@ -33,7 +33,7 @@ SP-1 の FastAPI サーバーが配信する監視情報を、ローカル Windo
 
 ## 4. Architecture
 
-SP-3 は `Product/autotrader-ui` に独立した Next.js 14 アプリとして作る。データ取得は初期表示時の REST と、継続更新用の WebSocket に分離する。
+SP-3 は `Product/autotrader-suite/ui` に独立した Next.js 14 アプリとして作る。データ取得は初期表示時の REST と、継続更新用の WebSocket に分離する。
 
 - 初期化: `GET /api/settings` で現在の設定を取得する
 - 主系更新: `ws://127.0.0.1:8000/ws` を購読し、`state_update` を ViewModel に正規化する
@@ -68,7 +68,7 @@ SP-3 は `Product/autotrader-ui` に独立した Next.js 14 アプリとして�
 ## 6. File Structure
 
 ```text
-Product/autotrader-ui/
+Product/autotrader-suite/ui/
 ├── app/
 │   ├── page.tsx
 │   ├── layout.tsx
@@ -288,3 +288,4 @@ umbrella design の Claude-only 記述とは差分があるため、この SP-3 
 - `GET /api/settings` の初期値が UI に反映される
 - `PUT /api/settings` 成功時だけ設定表示が更新される
 - `state_update` の `feed_role` と `feed_source` が UI で判別できる
+
