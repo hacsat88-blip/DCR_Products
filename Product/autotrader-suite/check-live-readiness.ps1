@@ -79,10 +79,10 @@ function New-CheckResult {
     )
 
     return [pscustomobject]@{
-        name = $Name
-        state = $State
+        name    = $Name
+        state   = $State
         message = $Message
-        path = $Path
+        path    = $Path
     }
 }
 
@@ -101,6 +101,54 @@ function Get-OverallState {
     }
 
     return "ok"
+}
+
+function Get-EnvFileEntries {
+    param(
+        [Parameter(Mandatory = $true)]
+        [string]$Path
+    )
+
+    $entries = @{}
+
+    if (-not (Test-Path -LiteralPath $Path)) {
+        return $entries
+    }
+
+    foreach ($rawLine in Get-Content -LiteralPath $Path) {
+        $line = $rawLine.Trim()
+        if ($line -eq "" -or $line.StartsWith("#")) {
+            continue
+        }
+
+        $separatorIndex = $line.IndexOf("=")
+        if ($separatorIndex -lt 1) {
+            continue
+        }
+
+        $name = $line.Substring(0, $separatorIndex).Trim()
+        $value = $line.Substring($separatorIndex + 1).Trim()
+        if ($name -ne "") {
+            $entries[$name] = $value
+        }
+    }
+
+    return $entries
+}
+
+function Test-ConfiguredEnvValue {
+    param(
+        [Parameter(Mandatory = $true)]
+        [hashtable]$Entries,
+        [Parameter(Mandatory = $true)]
+        [string]$Name
+    )
+
+    if (-not $Entries.ContainsKey($Name)) {
+        return $false
+    }
+
+    return [string]::IsNullOrWhiteSpace([string]$Entries[$Name]) -eq $false
 }
 
 function Write-CheckLine {
@@ -138,10 +186,10 @@ if (-not $repoRoot) {
     $checks.Add((New-CheckResult -Name "repo_root" -State "blocked" -Message "Failed to resolve repository root from script location; expected deploy.ps1, Product, and docs markers" -Path $PSScriptRoot)) | Out-Null
 
     $summary = [pscustomobject]@{
-        checked_at = $checkedAt.ToString("s")
-        repo_root = $null
+        checked_at    = $checkedAt.ToString("s")
+        repo_root     = $null
         overall_state = "blocked"
-        checks = $checks
+        checks        = $checks
     }
 
     if ($JsonOnly) {
@@ -194,6 +242,21 @@ else {
 
 if (Test-Path -LiteralPath $resolvedBackendEnvPath) {
     $checks.Add((New-CheckResult -Name "backend_env" -State "ok" -Message "Backend env file is present" -Path $resolvedBackendEnvPath)) | Out-Null
+
+    $backendEnvEntries = Get-EnvFileEntries -Path $resolvedBackendEnvPath
+    if (Test-ConfiguredEnvValue -Entries $backendEnvEntries -Name "GOOGLE_API_KEY") {
+        $checks.Add((New-CheckResult -Name "backend_google_api_key" -State "ok" -Message "Backend env includes GOOGLE_API_KEY" -Path $resolvedBackendEnvPath)) | Out-Null
+    }
+    else {
+        $checks.Add((New-CheckResult -Name "backend_google_api_key" -State "blocked" -Message "Backend env is missing GOOGLE_API_KEY; AI decisions will stay degraded" -Path $resolvedBackendEnvPath)) | Out-Null
+    }
+
+    if (Test-ConfiguredEnvValue -Entries $backendEnvEntries -Name "JQUANTS_API_KEY") {
+        $checks.Add((New-CheckResult -Name "backend_jquants_api_key" -State "ok" -Message "Backend env includes JQUANTS_API_KEY" -Path $resolvedBackendEnvPath)) | Out-Null
+    }
+    else {
+        $checks.Add((New-CheckResult -Name "backend_jquants_api_key" -State "blocked" -Message "Backend env is missing JQUANTS_API_KEY; reference readiness will stay degraded" -Path $resolvedBackendEnvPath)) | Out-Null
+    }
 }
 else {
     $checks.Add((New-CheckResult -Name "backend_env" -State "warning" -Message "Backend env file is missing; verify GOOGLE_API_KEY and JQUANTS_API_KEY before live use" -Path $resolvedBackendEnvPath)) | Out-Null
@@ -208,6 +271,14 @@ else {
 
 if (Test-Path -LiteralPath $resolvedUiEnvPath) {
     $checks.Add((New-CheckResult -Name "ui_env" -State "ok" -Message "UI env file is present" -Path $resolvedUiEnvPath)) | Out-Null
+
+    $uiEnvEntries = Get-EnvFileEntries -Path $resolvedUiEnvPath
+    if (Test-ConfiguredEnvValue -Entries $uiEnvEntries -Name "NEXT_PUBLIC_AUTOTRADER_SERVER_BASE_URL") {
+        $checks.Add((New-CheckResult -Name "ui_server_base_url" -State "ok" -Message "UI env includes NEXT_PUBLIC_AUTOTRADER_SERVER_BASE_URL" -Path $resolvedUiEnvPath)) | Out-Null
+    }
+    else {
+        $checks.Add((New-CheckResult -Name "ui_server_base_url" -State "warning" -Message "UI env is missing NEXT_PUBLIC_AUTOTRADER_SERVER_BASE_URL; browser proxy and WS routing may fail" -Path $resolvedUiEnvPath)) | Out-Null
+    }
 }
 else {
     $checks.Add((New-CheckResult -Name "ui_env" -State "warning" -Message "UI env file is missing; verify NEXT_PUBLIC_AUTOTRADER_SERVER_BASE_URL before live use" -Path $resolvedUiEnvPath)) | Out-Null
@@ -238,10 +309,10 @@ else {
 
 $overallState = Get-OverallState -Checks $checks.ToArray()
 $summary = [pscustomobject]@{
-    checked_at = $checkedAt.ToString("s")
-    repo_root = $repoRoot
+    checked_at    = $checkedAt.ToString("s")
+    repo_root     = $repoRoot
     overall_state = $overallState
-    checks = $checks
+    checks        = $checks
 }
 
 if ($JsonOnly) {
