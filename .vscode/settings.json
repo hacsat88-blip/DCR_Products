@@ -7,5 +7,6 @@
   "typescript.enablePromptUseWorkspaceTsdk": false,
   "markdownlint.ignore": [
     ".cursor/rules/**/*.mdc"
-  ]
+],
+"editor.formatOnSave": true
 }

@@ -5,6 +5,7 @@ import re
 from typing import TYPE_CHECKING
 
 from google import genai
+from google.genai import errors as genai_errors
 from google.genai import types
 
 from server.models import PriceRequest, TradeDecision, Position, RiskSettings
@@ -14,9 +15,12 @@ if TYPE_CHECKING:
 
 _logger = logging.getLogger(__name__)
 
-GEMINI_MODEL = "gemini-2.5-flash"
+DEFAULT_GEMINI_MODEL = "gemini-3.1-flash-lite-preview"
+GEMINI_FALLBACK_MODEL = "gemini-2.5-flash-lite"
+GEMINI_MODEL_ENV_VAR = "AUTOTRADER_GEMINI_MODEL"
 GEMINI_HTTP_TIMEOUT_MS = 10_000
 GEMINI_HTTP_RETRY_ATTEMPTS = 1
+GEMINI_MAX_OUTPUT_TOKENS = 128
 
 _SYSTEM_PROMPT = """あなたは日本株の短期トレーダーです。
 与えられた株価データと現在のポジション情報をもとに、
@@ -40,12 +44,63 @@ class GeminiTrader:
     def __init__(self):
         self._client: genai.Client | None = None
 
+    def _get_model_name(self) -> str:
+        configured = os.environ.get(GEMINI_MODEL_ENV_VAR, "").strip()
+        if configured:
+            return configured
+        return DEFAULT_GEMINI_MODEL
+
     def _request_http_options(self) -> types.HttpOptions:
         return types.HttpOptions(
             timeout=GEMINI_HTTP_TIMEOUT_MS,
             retry_options=types.HttpRetryOptions(
                 attempts=GEMINI_HTTP_RETRY_ATTEMPTS,
             ),
+        )
+
+    def _build_generation_config(self, model_name: str) -> types.GenerateContentConfig:
+        thinking_config = None
+
+        if model_name.startswith("gemini-3"):
+            thinking_config = types.ThinkingConfig(thinking_level="low")
+        elif model_name.startswith("gemini-2.5"):
+            thinking_config = types.ThinkingConfig(thinking_budget=0)
+
+        return types.GenerateContentConfig(
+            http_options=self._request_http_options(),
+            system_instruction=_SYSTEM_PROMPT,
+            response_mime_type="application/json",
+            max_output_tokens=GEMINI_MAX_OUTPUT_TOKENS,
+            thinking_config=thinking_config,
+        )
+
+    def _generate_content(self, model_name: str, user_prompt: str):
+        return self._get_client().models.generate_content(
+            model=model_name,
+            contents=user_prompt,
+            config=self._build_generation_config(model_name),
+        )
+
+    def _should_fallback(self, error: Exception, model_name: str) -> bool:
+        if model_name == GEMINI_FALLBACK_MODEL:
+            return False
+
+        if isinstance(error, genai_errors.ServerError):
+            return getattr(error, "code", None) in {503, 504}
+
+        return isinstance(error, ValueError)
+
+    def _parse_trade_decision(self, response_text: str) -> TradeDecision:
+        text = response_text.strip()
+        match = re.search(r"\{.*\}", text, re.DOTALL)
+        if not match:
+            raise ValueError(f"No JSON object found in response: {text[:80]}")
+
+        data = json.loads(match.group())
+        return TradeDecision(
+            action=data["action"].lower(),
+            qty=data.get("qty", 0),
+            reason=data.get("reason", ""),
         )
 
     def is_configured(self) -> bool:
@@ -92,24 +147,22 @@ class GeminiTrader:
             f"損切りライン {settings.stop_loss_pct}% / 最大数量 {settings.max_qty_per_order}株"
             f"{strategy_prompt}"
         )
-        response = self._get_client().models.generate_content(
-            model=GEMINI_MODEL,
-            contents=user_prompt,
-            config=types.GenerateContentConfig(
-                http_options=self._request_http_options(),
-                system_instruction=_SYSTEM_PROMPT,
-            ),
-        )
-        text = response.text.strip()
-        match = re.search(r"\{.*\}", text, re.DOTALL)
-        if not match:
-            raise ValueError(f"No JSON object found in response: {text[:80]}")
-        data = json.loads(match.group())
-        return TradeDecision(
-            action=data["action"].lower(),
-            qty=data.get("qty", 0),
-            reason=data.get("reason", ""),
-        )
+        model_name = self._get_model_name()
+        try:
+            response = self._generate_content(model_name, user_prompt)
+            return self._parse_trade_decision(response.text)
+        except (genai_errors.ServerError, ValueError) as error:
+            if not self._should_fallback(error, model_name):
+                raise
+
+            _logger.warning(
+                "Gemini primary model %s failed (%s); retrying with %s",
+                model_name,
+                getattr(error, "code", type(error).__name__),
+                GEMINI_FALLBACK_MODEL,
+            )
+            response = self._generate_content(GEMINI_FALLBACK_MODEL, user_prompt)
+            return self._parse_trade_decision(response.text)
 
     def decide_safe(
         self,
