@@ -253,7 +253,7 @@ def test_price_feed_updates_paper_ops_health_on_execution_tick(setup):
     assert snapshot.order_mode == "stub_only"
     assert snapshot.live_armed is False
     assert snapshot.ai_status == "ready"
-    assert snapshot.reference_status == "ready"
+    assert snapshot.reference_status == "degraded"
     assert snapshot.last_warning == "J-Quants reference missing; execution onlyで継続"
 
 

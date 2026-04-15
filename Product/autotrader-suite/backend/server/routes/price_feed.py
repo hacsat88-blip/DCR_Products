@@ -290,7 +290,7 @@ def make_price_router(
                 if reference_ready_provider is not None
                 else response.reference_status == "ok"
             )
-            reference_ready = provider_reference_ready and response.reference_status != "stale"
+            reference_ready = provider_reference_ready and response.reference_status == "ok"
             paper_ops_state.record_execution_result(
                 timestamp=req.timestamp,
                 code=req.code,

@@ -10,6 +10,10 @@ def _to_readiness(ready: bool) -> PaperOpsReadiness:
     return "ready" if ready else "degraded"
 
 
+def _is_reference_warning(message: str | None) -> bool:
+    return bool(message) and message.startswith("J-Quants reference ")
+
+
 @dataclass
 class PaperOpsState:
     ai_status: PaperOpsReadiness
@@ -60,6 +64,8 @@ class PaperOpsState:
 
     def set_reference_ready(self, ready: bool) -> None:
         self.reference_status = _to_readiness(ready)
+        if ready and _is_reference_warning(self.last_warning):
+            self.last_warning = None
 
     def snapshot(self, now: datetime | None = None) -> PaperOpsHealth:
         return PaperOpsHealth(

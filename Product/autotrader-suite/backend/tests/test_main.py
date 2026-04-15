@@ -1,6 +1,7 @@
 import asyncio
 import importlib
 import sys
+from datetime import datetime
 from unittest.mock import AsyncMock
 
 from fastapi.testclient import TestClient
@@ -70,6 +71,47 @@ def test_schedule_reference_publish_keeps_stale_reference_degraded(monkeypatch, 
 
     assert publish_mock.await_count == 1
     assert main._paper_ops_state.reference_status == "degraded"
+
+
+def test_schedule_reference_publish_clears_reference_warning_on_fresh_snapshot(monkeypatch, tmp_path):
+    monkeypatch.setenv("GOOGLE_API_KEY", "test-key")
+    monkeypatch.setenv("JQUANTS_API_KEY", "test-key")
+    monkeypatch.setattr("server.engine.position.STATE_FILE", tmp_path / "state.json")
+    monkeypatch.setattr("server.engine.settings_store.SETTINGS_FILE", tmp_path / "settings.json")
+    sys.modules.pop("server.main", None)
+
+    main = importlib.import_module("server.main")
+    main._paper_ops_state.record_execution_result(
+        timestamp=datetime(2026, 4, 13, 10, 30, 0),
+        code="7203",
+        ai_ready=True,
+        reference_ready=False,
+        warning_message="J-Quants reference missing; execution onlyで継続",
+    )
+
+    publish_mock = AsyncMock(return_value=None)
+    monkeypatch.setattr(main._reference_service, "publish_reference", publish_mock)
+    monkeypatch.setattr(
+        main._reference_service,
+        "peek_snapshot",
+        lambda *_args: {"as_of": "2026-04-13"},
+    )
+    monkeypatch.setattr(main._reference_service, "runtime_ready", lambda: True)
+
+    created_coroutines = []
+
+    def fake_create_task(coroutine):
+        created_coroutines.append(coroutine)
+        return None
+
+    monkeypatch.setattr(main.asyncio, "create_task", fake_create_task)
+
+    main._schedule_reference_publish("7203", "jquants_light")
+    asyncio.run(created_coroutines[0])
+
+    assert publish_mock.await_count == 1
+    assert main._paper_ops_state.reference_status == "ready"
+    assert main._paper_ops_state.last_warning is None
 
 
 def test_main_loads_persisted_settings_on_import(monkeypatch, tmp_path):
