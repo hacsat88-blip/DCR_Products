@@ -25,6 +25,8 @@ npm-debug.log*
 # 秘密情報
 .env
 .env.*
+!Product/autotrader-suite/backend/.env.example
+!Product/autotrader-suite/ui/.env.local.example
 *.key
 *.pem
 
@@ -32,6 +34,8 @@ npm-debug.log*
 **/.superpowers/
 /autotrader.xlsm
 /~$autotrader.xlsm
+/Product/autotrader-suite/backend/state.json
+/Product/autotrader-suite/backend/settings.json
 
 # Ignore all .dcr directories by default (runtime/session files)
 **/.dcr/

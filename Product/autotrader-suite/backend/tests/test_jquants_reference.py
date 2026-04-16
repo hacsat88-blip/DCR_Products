@@ -1,8 +1,9 @@
 import asyncio
+from datetime import datetime
 
 import httpx
 
-from server.engine.jquants_reference import JQuantsReferenceService
+from server.engine.jquants_reference import JQuantsReferenceService, snapshot_runtime_ready
 
 
 def test_fetch_snapshot_returns_reference_quote(monkeypatch):
@@ -141,3 +142,12 @@ def test_runtime_ready_turns_degraded_after_later_fetch_failure(monkeypatch):
     assert first is not None
     assert second is None
     assert service.runtime_ready() is False
+
+
+def test_snapshot_runtime_ready_returns_false_for_stale_snapshot():
+    assert snapshot_runtime_ready(
+        {
+            "as_of": "2026-04-01",
+        },
+        datetime(2026, 4, 12, 10, 0, 0),
+    ) is False

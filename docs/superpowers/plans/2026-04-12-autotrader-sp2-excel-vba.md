@@ -68,27 +68,29 @@ MarketSpeed II RSS のインストール後、以下のセルにフォーミュ�
 | セル | 内容 | 役割 |
 |------|------|------|
 | `A2` | 銘柄コード（文字列）例: `"7203"` | 手入力 |
-| `B2` | `=RSS\|'7203.T'!'現在値'` | 現在値 |
-| `C2` | `=RSS\|'7203.T'!'出来高'` | 累積出来高 |
-| `D2` | `=RSS\|'7203.T'!'日付'` | RSS 日付 |
-| `E2` | `=RSS\|'7203.T'!'時刻'` | RSS 時刻 |
-| `F2` | `=RSS\|'7203.T'!'買気配'` | 買気配 |
-| `G2` | `=RSS\|'7203.T'!'売気配'` | 売気配 |
+| `B2` | `=RssMarket(A2&".T","現在値")` | 現在値 |
+| `C2` | `=RssMarket(A2&".T","出来高")` | 累積出来高 |
+| `D2` | `=RssMarket(A2&".T","現在日付")` | RSS 現在日付 |
+| `E2` | `=RssMarket(A2&".T","現在値時刻")` | RSS 現在値時刻 |
+| `F2` | `=RssMarket(A2&".T","最良買気配値")` | 最良買気配値 |
+| `G2` | `=RssMarket(A2&".T","最良売気配値")` | 最良売気配値 |
 
 VBA は `A2:G2` を名前付き範囲 `RSS_TICK` として参照する。
 
-backend へ送る code は B2 の live RSS formula から優先的に解決し、A2 は manual smoke 用 fallback に留める。symbol を切り替えるときは B2:G2 の RSS formula をまとめて更新する。
+backend へ送る code は `Market!A2` を正本として扱い、B2:G2 の `RssMarket(...)` formula は A2 を参照する。symbol を切り替えるときは A2 を更新する。
 
 Excel に入力するときは Markdown table 上の escape backslash を外し、実際には次の式を使う。
 
 ```text
-B2: =RSS|'7203.T'!'現在値'
-C2: =RSS|'7203.T'!'出来高'
-D2: =RSS|'7203.T'!'日付'
-E2: =RSS|'7203.T'!'時刻'
-F2: =RSS|'7203.T'!'買気配'
-G2: =RSS|'7203.T'!'売気配'
+B2: =RssMarket(A2&".T","現在値")
+C2: =RssMarket(A2&".T","出来高")
+D2: =RssMarket(A2&".T","現在日付")
+E2: =RssMarket(A2&".T","現在値時刻")
+F2: =RssMarket(A2&".T","最良買気配値")
+G2: =RssMarket(A2&".T","最良売気配値")
 ```
+
+初代マーケットスピード RSS の `=RSS|...` 形式は MarketSpeed II RSS と互換ではないため、そのままでは `#REF!` になります。
 
 ---
 
@@ -181,7 +183,7 @@ Option Explicit
 ' ─── サーバー接続設定 ───────────────────────────
 Public Const API_BASE_URL  As String = "http://127.0.0.1:8000"
 Public Const API_PRICE_URL As String = API_BASE_URL & "/api/price"
-Public Const HTTP_TIMEOUT  As Long = 3000    ' ミリ秒
+Public Const HTTP_TIMEOUT  As Long = 15000   ' ミリ秒
 
 ' ─── タイマー設定 ──────────────────────────────
 Public Const POLL_INTERVAL As Double = 5     ' 秒
@@ -1151,27 +1153,28 @@ MarketSpeed II RSS を実際に接続するには、`Market` シートの 2 行�
 | セル | フォーミュラ例（トヨタ） | 意味 |
 |------|------------------------|------|
 | `A2` | `7203` | 手入力（文字列） |
-| `B2` | `=RSS\|'7203.T'!'現在値'` | 現在値 |
-| `C2` | `=RSS\|'7203.T'!'出来高'` | 累積出来高 |
-| `D2` | `=RSS\|'7203.T'!'日付'` | RSS 日付 |
-| `E2` | `=RSS\|'7203.T'!'時刻'` | RSS 時刻 |
-| `F2` | `=RSS\|'7203.T'!'買気配'` | 買気配 |
-| `G2` | `=RSS\|'7203.T'!'売気配'` | 売気配 |
+| `B2` | `=RssMarket(A2&".T","現在値")` | 現在値 |
+| `C2` | `=RssMarket(A2&".T","出来高")` | 累積出来高 |
+| `D2` | `=RssMarket(A2&".T","現在日付")` | RSS 現在日付 |
+| `E2` | `=RssMarket(A2&".T","現在値時刻")` | RSS 現在値時刻 |
+| `F2` | `=RssMarket(A2&".T","最良買気配値")` | 最良買気配値 |
+| `G2` | `=RssMarket(A2&".T","最良売気配値")` | 最良売気配値 |
 
-この source drop では A2 は表示用の mirror / manual smoke fallback であり、runtime の code は live RSS formula を優先する。generator の既定値は manual smoke seed なので、RSS 環境で使うときだけ `-UseRssFormulas` を付ける。
+この source drop では A2 が symbol の正本であり、B2:G2 の `RssMarket(...)` formula が A2 を参照する。generator の既定値は manual smoke seed なので、RSS 環境で使うときだけ `-UseRssFormulas` を付ける。
 
 実際に Excel に入力する式は以下のとおり（Markdown の `\` は不要）。
 
 ```text
-B2: =RSS|'7203.T'!'現在値'
-C2: =RSS|'7203.T'!'出来高'
-D2: =RSS|'7203.T'!'日付'
-E2: =RSS|'7203.T'!'時刻'
-F2: =RSS|'7203.T'!'買気配'
-G2: =RSS|'7203.T'!'売気配'
+B2: =RssMarket(A2&".T","現在値")
+C2: =RssMarket(A2&".T","出来高")
+D2: =RssMarket(A2&".T","現在日付")
+E2: =RssMarket(A2&".T","現在値時刻")
+F2: =RssMarket(A2&".T","最良買気配値")
+G2: =RssMarket(A2&".T","最良売気配値")
 ```
 
-> **注意:** MarketSpeed II が起動していないと `#N/A` が返る。  
+> **注意:** MarketSpeed II RSS の add-in が読み込まれていない場合は `#NAME?` や `#REF!` になります。MarketSpeed II を起動したうえで XLL / XLAM を登録するか、workbook open 時の自動ロードを利用してください。  
+> MarketSpeed II が起動していないと `#N/A` や空値になる場合があります。  
 > VBA の `price <= 0` ガードが機能するため、`#N/A` でも OnTick はクラッシュしない  
 > （`CDbl("#N/A")` は `Type mismatch` エラーになるため、  
 > OnTick の `On Error GoTo TickError` がキャッチして次回まで待機する）。

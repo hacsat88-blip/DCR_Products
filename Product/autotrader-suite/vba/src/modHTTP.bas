@@ -4,13 +4,18 @@ Option Explicit
 Public Function PostPrice(ByVal code As String, _
                           ByVal price As Double, _
                           ByVal volume As Long, _
+                          ByVal availableCashActual As Variant, _
                           ByVal bid As Variant, _
                           ByVal ask As Variant, _
                           ByVal newsHalt As Boolean, _
                           ByVal newsNote As String, _
                           ByVal ohlcJson As String, _
                           ByVal tickTime As Date, _
+                          ByVal clientRunMode As String, _
+                          ByVal clientOrderMode As String, _
+                          ByVal clientLiveArmed As Boolean, _
                           ByRef qty As Long, _
+                          ByRef orderType As String, _
                           ByRef reason As String, _
                           ByRef referenceStatus As String, _
                           ByRef referencePrice As Variant, _
@@ -18,10 +23,12 @@ Public Function PostPrice(ByVal code As String, _
                           ByRef referenceGapPct As Variant, _
                           ByRef warningCode As String, _
                           ByRef warningMessage As String, _
+                          ByRef pendingExecutionId As String, _
                           ByRef requestSucceeded As Boolean, _
                           ByRef responseStatus As Long) As Long
     PostPrice = 0
     qty = 0
+    orderType = DEFAULT_ORDER_TYPE
     reason = ""
     referenceStatus = "missing"
     referencePrice = Empty
@@ -29,6 +36,7 @@ Public Function PostPrice(ByVal code As String, _
     referenceGapPct = Empty
     warningCode = ""
     warningMessage = ""
+    pendingExecutionId = ""
     requestSucceeded = False
     responseStatus = 0
 
@@ -40,7 +48,7 @@ Public Function PostPrice(ByVal code As String, _
     http.setRequestHeader "Content-Type", "application/json"
     http.setRequestHeader "Accept", "application/json"
     http.setTimeouts HTTP_TIMEOUT, HTTP_TIMEOUT, HTTP_TIMEOUT, HTTP_TIMEOUT
-    http.send BuildRequestJson(code, price, volume, bid, ask, newsHalt, newsNote, ohlcJson, tickTime)
+    http.send BuildRequestJson(code, price, volume, availableCashActual, bid, ask, newsHalt, newsNote, ohlcJson, tickTime, clientRunMode, clientOrderMode, clientLiveArmed)
     On Error GoTo 0
     responseStatus = http.Status
 
@@ -53,6 +61,8 @@ Public Function PostPrice(ByVal code As String, _
     respText = http.responseText
 
     qty = ParseJsonLong(ExtractJsonNumber(respText, "qty", "0"))
+    orderType = ExtractJsonString(respText, "order_type")
+    If Trim$(orderType) = "" Then orderType = DEFAULT_ORDER_TYPE
     reason = ExtractJsonString(respText, "reason")
     referenceStatus = ExtractJsonString(respText, "reference_status")
     referencePrice = ExtractJsonOptionalNumber(respText, "reference_price")
@@ -60,6 +70,7 @@ Public Function PostPrice(ByVal code As String, _
     referenceGapPct = ExtractJsonOptionalNumber(respText, "reference_gap_pct")
     warningCode = ExtractJsonString(respText, "warning_code")
     warningMessage = ExtractJsonString(respText, "warning_message")
+    pendingExecutionId = ExtractJsonString(respText, "pending_execution_id")
     requestSucceeded = True
 
     Select Case LCase$(ExtractJsonString(respText, "action"))
@@ -77,7 +88,47 @@ HttpError:
     PostPrice = 0
 End Function
 
-Private Function BuildRequestJson(ByVal code As String, ByVal price As Double, ByVal volume As Long, ByVal bid As Variant, ByVal ask As Variant, ByVal newsHalt As Boolean, ByVal newsNote As String, ByVal ohlcJson As String, ByVal tickTime As Date) As String
+Public Function PostExecutionResult(ByVal code As String, ByVal actionCode As Long, ByVal qty As Long, ByVal price As Double, ByVal volume As Long, ByVal orderType As String, ByVal reason As String, ByVal tickTime As Date, ByVal clientRunMode As String, ByVal clientOrderMode As String, ByVal clientLiveArmed As Boolean, ByVal pendingExecutionId As String, ByVal succeeded As Boolean, ByVal errorMessage As String, ByRef responseStatus As Long, ByRef failureReason As String) As Boolean
+    PostExecutionResult = False
+    responseStatus = 0
+    failureReason = ""
+
+    Dim actionName As String
+    Select Case actionCode
+        Case 1
+            actionName = "buy"
+        Case -1
+            actionName = "sell"
+        Case Else
+            PostExecutionResult = True
+            Exit Function
+    End Select
+
+    Dim http As Object
+    Set http = CreateObject("MSXML2.ServerXMLHTTP.6.0")
+
+    On Error GoTo HttpError
+    http.Open "POST", RuntimeApiExecutionResultUrl(), False
+    http.setRequestHeader "Content-Type", "application/json"
+    http.setRequestHeader "Accept", "application/json"
+    http.setTimeouts HTTP_TIMEOUT, HTTP_TIMEOUT, HTTP_TIMEOUT, HTTP_TIMEOUT
+    http.send BuildExecutionResultJson(code, actionName, qty, price, volume, orderType, reason, tickTime, clientRunMode, clientOrderMode, clientLiveArmed, pendingExecutionId, succeeded, errorMessage)
+    On Error GoTo 0
+
+    responseStatus = http.Status
+    If http.Status <> 200 Then
+        failureReason = "HTTP " & CStr(http.Status) & ": " & Left$(http.responseText, 120)
+        Exit Function
+    End If
+
+    PostExecutionResult = True
+    Exit Function
+
+HttpError:
+    failureReason = "HTTP error: " & Err.Description
+End Function
+
+Private Function BuildRequestJson(ByVal code As String, ByVal price As Double, ByVal volume As Long, ByVal availableCashActual As Variant, ByVal bid As Variant, ByVal ask As Variant, ByVal newsHalt As Boolean, ByVal newsNote As String, ByVal ohlcJson As String, ByVal tickTime As Date, ByVal clientRunMode As String, ByVal clientOrderMode As String, ByVal clientLiveArmed As Boolean) As String
     Dim isoTimestamp As String
     isoTimestamp = Format$(tickTime, "yyyy-mm-dd") & "T" & Format$(tickTime, "hh:nn:ss")
 
@@ -85,14 +136,41 @@ Private Function BuildRequestJson(ByVal code As String, ByVal price As Double, B
         """code"":""" & EscapeJson(code) & """," & _
         """price"":" & JsonNumber(price) & "," & _
         """volume"":" & CStr(volume) & "," & _
+            """available_cash_actual"":" & JsonOptionalNumber(availableCashActual) & "," & _
         """bid"":" & JsonOptionalNumber(bid) & "," & _
         """ask"":" & JsonOptionalNumber(ask) & "," & _
         """news_halt"":" & JsonBoolean(newsHalt) & "," & _
         """news_note"":" & JsonStringOrNull(newsNote) & "," & _
+        """client_run_mode"":""" & clientRunMode & """," & _
+        """client_order_mode"":""" & clientOrderMode & """," & _
+        """client_live_armed"":" & JsonBoolean(clientLiveArmed) & "," & _
         """ohlc"":" & ohlcJson & "," & _
         """timestamp"":""" & isoTimestamp & """" & _
         "}"
 End Function
+
+    Private Function BuildExecutionResultJson(ByVal code As String, ByVal actionName As String, ByVal qty As Long, ByVal price As Double, ByVal volume As Long, ByVal orderType As String, ByVal reason As String, ByVal tickTime As Date, ByVal clientRunMode As String, ByVal clientOrderMode As String, ByVal clientLiveArmed As Boolean, ByVal pendingExecutionId As String, ByVal succeeded As Boolean, ByVal errorMessage As String) As String
+        Dim isoTimestamp As String
+        isoTimestamp = Format$(tickTime, "yyyy-mm-dd") & "T" & Format$(tickTime, "hh:nn:ss")
+
+        BuildExecutionResultJson = "{" & _
+        """code"":""" & EscapeJson(code) & """," & _
+        """action"":""" & actionName & """," & _
+        """qty"":" & CStr(qty) & "," & _
+        """price"":" & JsonNumber(price) & "," & _
+        """volume"":" & CStr(volume) & "," & _
+        """order_type"":""" & EscapeJson(orderType) & """," & _
+        """reason"":""" & EscapeJson(reason) & """," & _
+        """timestamp"":""" & isoTimestamp & """," & _
+        """success"":" & JsonBoolean(succeeded) & "," & _
+        """error_message"":" & JsonStringOrNull(errorMessage) & "," & _
+        """client_run_mode"":""" & clientRunMode & """," & _
+        """client_order_mode"":""" & clientOrderMode & """," & _
+        """client_live_armed"":" & JsonBoolean(clientLiveArmed) & "," & _
+        """pending_execution_id"":" & JsonStringOrNull(pendingExecutionId) & "," & _
+        """feed_source"":""" & "rakuten_rss" & """" & _
+        "}"
+    End Function
 
 Private Function EscapeJson(ByVal value As String) As String
     EscapeJson = Replace$(value, "\", "\\")

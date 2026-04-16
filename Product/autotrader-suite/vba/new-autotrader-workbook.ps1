@@ -18,7 +18,7 @@
   シート scaffold のみを作成し、VBA import を行わない。
 
 .PARAMETER UseRssFormulas
-    MarketSpeed II RSS が使える環境向けに、Market!B2:G2 を live RSS formula で初期化する。
+    MarketSpeed II RSS が使える環境向けに、Market!B2:G2 を live RssMarket formula で初期化する。
     指定しない場合は manual smoke 用の安全な初期値を入れる。
 
 .PARAMETER Visible
@@ -188,6 +188,46 @@ function Get-DocumentModuleCode {
     return (($filteredLines -join "`r`n").Trim() + "`r`n")
 }
 
+function Get-ModuleCode {
+    param(
+        [Parameter(Mandatory = $true)]
+        [string]$Path
+    )
+
+    $lines = Get-Content -Path $Path -Encoding UTF8
+    $filteredLines = foreach ($line in $lines) {
+        if ($line -match '^\s*Attribute\s+') {
+            continue
+        }
+
+        $line
+    }
+
+    return (($filteredLines -join "`r`n").Trim() + "`r`n")
+}
+
+function Import-StandardModuleFromUtf8 {
+    param(
+        [Parameter(Mandatory = $true)]
+        $VbProject,
+        [Parameter(Mandatory = $true)]
+        [string]$ModulePath
+    )
+
+    $moduleName = [System.IO.Path]::GetFileNameWithoutExtension($ModulePath)
+    Remove-VbaComponentIfExists -VbProject $VbProject -Name $moduleName
+
+    $component = $VbProject.VBComponents.Add(1)
+    $component.Name = $moduleName
+
+    $moduleCode = Get-ModuleCode -Path $ModulePath
+    $codeModule = $component.CodeModule
+    if ($codeModule.CountOfLines -gt 0) {
+        $codeModule.DeleteLines(1, $codeModule.CountOfLines)
+    }
+    $codeModule.AddFromString($moduleCode)
+}
+
 function Import-VbaSources {
     param(
         [Parameter(Mandatory = $true)]
@@ -197,8 +237,7 @@ function Import-VbaSources {
     $vbProject = $Workbook.VBProject
 
     foreach ($modulePath in $ModulePaths) {
-        Remove-VbaComponentIfExists -VbProject $vbProject -Name ([System.IO.Path]::GetFileNameWithoutExtension($modulePath))
-        $null = $vbProject.VBComponents.Import($modulePath)
+        Import-StandardModuleFromUtf8 -VbProject $vbProject -ModulePath $modulePath
     }
 
     $thisWorkbookComponent = Get-VbaComponent -VbProject $vbProject -Name "ThisWorkbook"
@@ -220,7 +259,7 @@ function Set-WorkbookLayout {
         $Workbook
     )
 
-    $desiredSheetNames = @("Control", "Market", "OHLC_Data", "Log")
+    $desiredSheetNames = @("Control", "Market", "OHLC_Data", "Log", "BrokerBridge")
 
     while ($Workbook.Worksheets.Count -lt $desiredSheetNames.Count) {
         $null = $Workbook.Worksheets.Add()
@@ -238,11 +277,13 @@ function Set-WorkbookLayout {
     $marketSheet = $Workbook.Worksheets.Item("Market")
     $ohlcSheet = $Workbook.Worksheets.Item("OHLC_Data")
     $logSheet = $Workbook.Worksheets.Item("Log")
+    $bridgeSheet = $Workbook.Worksheets.Item("BrokerBridge")
 
     $controlSheet.Cells.Clear() | Out-Null
     $marketSheet.Cells.Clear() | Out-Null
     $ohlcSheet.Cells.Clear() | Out-Null
     $logSheet.Cells.Clear() | Out-Null
+    $bridgeSheet.Cells.Clear() | Out-Null
 
     $controlValues = @(
         @{ Address = "A1"; Value = "Server URL" }
@@ -275,6 +316,18 @@ function Set-WorkbookLayout {
         @{ Address = "B14"; Value = "hold" }
         @{ Address = "A15"; Value = "Last Error" }
         @{ Address = "B15"; Value = "-" }
+        @{ Address = "A16"; Value = "Live Armed" }
+        @{ Address = "B16"; Value = "FALSE" }
+        @{ Address = "A17"; Value = "Order Confirm Timeout (sec)" }
+        @{ Address = "B17"; Value = "5" }
+        @{ Address = "A18"; Value = "Broker Preflight" }
+        @{ Address = "B18"; Value = "not checked" }
+        @{ Address = "A19"; Value = "Broker Cash Actual" }
+        @{ Address = "B19"; Value = "-" }
+        @{ Address = "A20"; Value = "Broker Checked At" }
+        @{ Address = "B20"; Value = "-" }
+        @{ Address = "A21"; Value = "Broker Message" }
+        @{ Address = "B21"; Value = "-" }
     )
 
     foreach ($entry in $controlValues) {
@@ -297,12 +350,12 @@ function Set-WorkbookLayout {
 
     if ($UseRssFormulas) {
         $marketValues += @(
-            @{ Address = "B2"; Value = "=RSS|'7203.T'!'現在値'"; Formula = $true }
-            @{ Address = "C2"; Value = "=RSS|'7203.T'!'出来高'"; Formula = $true }
-            @{ Address = "D2"; Value = "=RSS|'7203.T'!'日付'"; Formula = $true }
-            @{ Address = "E2"; Value = "=RSS|'7203.T'!'時刻'"; Formula = $true }
-            @{ Address = "F2"; Value = "=RSS|'7203.T'!'買気配'"; Formula = $true }
-            @{ Address = "G2"; Value = "=RSS|'7203.T'!'売気配'"; Formula = $true }
+            @{ Address = "B2"; Value = "=RssMarket(A2&"".T"",""現在値"")"; Formula = $true }
+            @{ Address = "C2"; Value = "=RssMarket(A2&"".T"",""出来高"")"; Formula = $true }
+            @{ Address = "D2"; Value = "=RssMarket(A2&"".T"",""現在日付"")"; Formula = $true }
+            @{ Address = "E2"; Value = "=RssMarket(A2&"".T"",""現在値時刻"")"; Formula = $true }
+            @{ Address = "F2"; Value = "=RssMarket(A2&"".T"",""最良買気配値"")"; Formula = $true }
+            @{ Address = "G2"; Value = "=RssMarket(A2&"".T"",""最良売気配値"")"; Formula = $true }
         )
     }
     else {
@@ -350,6 +403,7 @@ function Set-WorkbookLayout {
     Format-HeaderRow -Worksheet $marketSheet -RangeAddress "A1:G1"
     Format-HeaderRow -Worksheet $ohlcSheet -RangeAddress "A1:F1"
     Format-HeaderRow -Worksheet $logSheet -RangeAddress "A1:L1"
+    $bridgeSheet.Visible = 2
 
     foreach ($worksheet in @($controlSheet, $marketSheet, $ohlcSheet, $logSheet)) {
         $worksheet.Columns.AutoFit() | Out-Null

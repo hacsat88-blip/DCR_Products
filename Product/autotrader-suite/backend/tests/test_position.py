@@ -1,7 +1,10 @@
 import json
 import pytest
 from pathlib import Path
+from server.engine import position as position_module
 from server.engine.position import PositionManager
+
+DEFAULT_STATE_FILE = position_module.STATE_FILE
 
 
 @pytest.fixture(autouse=True)
@@ -87,3 +90,23 @@ async def test_state_json_atomic_write(clean_state, tmp_path):
     await mgr.apply_buy("7203", qty=100, price=2500.0)
     tmp_file = tmp_path / "state.tmp"
     assert not tmp_file.exists(), ".tmp file should not remain after successful save"
+
+
+def test_load_removes_stale_tmp_file_without_overriding_saved_state(clean_state):
+    clean_state.write_text(
+        json.dumps({"position": {"code": "7203", "qty": 40, "avg_cost": 2500.0}}),
+        encoding="utf-8",
+    )
+    stale_tmp = clean_state.with_suffix(".tmp")
+    stale_tmp.write_text("stale", encoding="utf-8")
+
+    mgr = PositionManager()
+
+    assert mgr.position.code == "7203"
+    assert mgr.position.qty == 40
+    assert not stale_tmp.exists()
+
+
+def test_default_state_file_is_anchored_under_backend_root():
+    assert DEFAULT_STATE_FILE.name == "state.json"
+    assert DEFAULT_STATE_FILE.parent.name == "backend"

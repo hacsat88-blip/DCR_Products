@@ -48,7 +48,35 @@ describe("useTraderHealth", () => {
     });
 
     expect(result.current.snapshot?.mode).toBe("paper");
+    expect(result.current.snapshot?.liveArmed).toBe(false);
     expect(result.current.snapshot?.lastPriceCode).toBe("7203");
+  });
+
+  test("accepts live broker health payload when armed", async () => {
+    fetchMock.mockResolvedValueOnce(
+      jsonResponse({
+        status: "healthy",
+        mode: "live",
+        order_mode: "broker_auto",
+        live_armed: true,
+        server_time: "2026-04-13T10:30:05",
+        last_price_tick_at: "2026-04-13T10:30:00",
+        last_price_code: "7203",
+        ai_status: "ready",
+        reference_status: "ready",
+        last_warning: null
+      })
+    );
+
+    const { result } = renderHook(() => useTraderHealth());
+
+    await waitFor(() => {
+      expect(result.current.fetchState).toBe("ready");
+    });
+
+    expect(result.current.snapshot?.mode).toBe("live");
+    expect(result.current.snapshot?.orderMode).toBe("broker_auto");
+    expect(result.current.snapshot?.liveArmed).toBe(true);
   });
 
   test("marks health unreachable on proxy failure", async () => {
@@ -59,6 +87,32 @@ describe("useTraderHealth", () => {
     await waitFor(() => {
       expect(result.current.fetchState).toBe("unreachable");
     });
+  });
+
+  test("preserves degraded snapshot when reference is stale", async () => {
+    fetchMock.mockResolvedValueOnce(
+      jsonResponse({
+        status: "degraded",
+        mode: "paper",
+        order_mode: "stub_only",
+        server_time: "2026-04-13T10:30:05",
+        last_price_tick_at: "2026-04-13T10:30:00",
+        last_price_code: "7203",
+        ai_status: "ready",
+        reference_status: "degraded",
+        last_warning: "J-Quants reference stale (11 days); execution onlyで継続"
+      })
+    );
+
+    const { result } = renderHook(() => useTraderHealth());
+
+    await waitFor(() => {
+      expect(result.current.fetchState).toBe("ready");
+    });
+
+    expect(result.current.snapshot?.status).toBe("degraded");
+    expect(result.current.snapshot?.referenceStatus).toBe("degraded");
+    expect(result.current.snapshot?.lastWarning).toContain("reference stale");
   });
 
   test("polls health endpoint every 10 seconds", async () => {

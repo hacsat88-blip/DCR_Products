@@ -20,8 +20,9 @@ function isRawTraderHealthPayload(value: unknown): value is RawTraderHealthPaylo
 
   return (
     (candidate.status === "healthy" || candidate.status === "degraded") &&
-    candidate.mode === "paper" &&
-    candidate.order_mode === "stub_only" &&
+    (candidate.mode === "paper" || candidate.mode === "live") &&
+    (candidate.order_mode === "stub_only" || candidate.order_mode === "broker_auto") &&
+    (candidate.live_armed === undefined || typeof candidate.live_armed === "boolean") &&
     isString(candidate.server_time) &&
     (candidate.last_price_tick_at === null || isString(candidate.last_price_tick_at)) &&
     (candidate.last_price_code === null || isString(candidate.last_price_code)) &&
@@ -36,6 +37,7 @@ function toHealthSnapshot(raw: RawTraderHealthPayload): TraderHealthSnapshot {
     status: raw.status,
     mode: raw.mode,
     orderMode: raw.order_mode,
+    liveArmed: raw.live_armed ?? false,
     serverTime: raw.server_time,
     lastPriceTickAt: raw.last_price_tick_at,
     lastPriceCode: raw.last_price_code,

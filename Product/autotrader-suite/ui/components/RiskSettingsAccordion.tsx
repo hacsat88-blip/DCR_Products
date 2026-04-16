@@ -213,6 +213,10 @@ interface NumberFieldProps {
 
 function NumberField({ label, draft, disabled, onChange }: NumberFieldProps): JSX.Element {
   const labelText = getFieldLabel(label);
+  const helperText =
+    label === "poll_interval_sec"
+      ? "実際の送信間隔は workbook の Control!B2 が正本です。ここは backend 側設定の表示・保存用です。"
+      : null;
 
   return (
     <label className="settings-field">
@@ -224,6 +228,7 @@ function NumberField({ label, draft, disabled, onChange }: NumberFieldProps): JS
         disabled={disabled}
         onChange={(event) => onChange(label, event.target.value)}
       />
+      {helperText ? <small>{helperText}</small> : null}
     </label>
   );
 }

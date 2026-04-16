@@ -101,6 +101,7 @@ class RiskGuard:
         price: float,
         now: datetime,
         setup: TradeSetup | None = None,
+        available_cash_actual: int | None = None,
     ) -> TradeDecision:
         s = self._settings
         self._reset_daily_state_if_needed(now)
@@ -188,6 +189,15 @@ class RiskGuard:
 
         # 4. 買い数量上限
         qty = min(decision.qty, s.max_qty_per_order)
+        effective_available_cash = s.available_cash
+        if available_cash_actual is not None:
+            effective_available_cash = min(effective_available_cash, available_cash_actual)
+
+        max_qty_by_cash = int(effective_available_cash / price) if price > 0 else 0
+        qty = min(qty, max_qty_by_cash)
+        if qty <= 0:
+            return TradeDecision(action="hold", qty=0, reason="実口座余力不足")
+
         # 5. 金額上限（単価上限まで数量を削減。1株でも超過するなら全拒否）
         max_qty_by_limit = int(s.limit_per_order / price) if price > 0 else 0
         qty = min(qty, max_qty_by_limit)

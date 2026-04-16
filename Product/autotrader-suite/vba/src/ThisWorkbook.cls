@@ -11,6 +11,7 @@ Option Explicit
 
 Private Sub Workbook_Open()
   modTimer.InitializeOperationalSurface
+  modTimer.RunBrokerPreflight
   If RuntimeAutoStartEnabled() Then
     modTimer.StartTimer
   End If

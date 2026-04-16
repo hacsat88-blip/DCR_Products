@@ -202,7 +202,7 @@ autotrader.xlsm
 ├── VBA: modOrder          # RSS 発注スタブ
 ├── VBA: modTimer          # OnTime メインループ
 ├── Sheet: Control         # URL、稼働状態、reference warning、paper ops 表示
-├── Sheet: Market          # RSS 現在値・出来高・日付・時刻・bid/ask
+├── Sheet: Market          # RSS 現在値・出来高・現在日付・現在値時刻・best bid/ask
 ├── Sheet: OHLC_Data       # 確定バー保存
 └── Sheet: Log             # action と reference advisory の履歴
 ```
@@ -216,7 +216,7 @@ binary workbook は environment-specific な local artifact とし、Git の正�
 
 2. [価格取得] RSS 関数で現在値・出来高・bid/ask を取得。OHLC は VBA 側で最大20本分を保持しつつ、API には直近5本を送る
    （起動直後は蓄積本数が少ないため、Python サーバーのウォームアップ期間中は発注しない）
-  例: =RSS|'1234.T'!'現在値'
+  例: =RssMarket("1234.T","現在値")
 
   hidden Excel COM では DDE 評価が不安定なことがあるため、generator の既定値は manual smoke 用の安全 seed とし、live RSS formula は `-UseRssFormulas` を付けたときだけ入れる。
 
@@ -234,7 +234,7 @@ binary workbook は environment-specific な local artifact とし、Git の正�
 
 ### 安全装置（VBA 側）
 
-- Python サーバーへの接続タイムアウト（3秒）→ 応答なしなら発注しない
+- Python サーバーへの接続タイムアウト（15秒）→ 応答なしなら発注しない
 - `action = "hold"` のときは一切発注しない
 - `reference_status = "missing" | "stale"` は soft warning として表示・記録し、発注停止条件にはしない
 - Excel ブックを閉じるとタイマー停止 → 自動売買も即座に停止

@@ -1,9 +1,13 @@
 import asyncio
 import json
+import logging
+import os
 from pathlib import Path
 from server.models import Position
 
-STATE_FILE = Path("state.json")
+_DEFAULT_STATE_FILE = Path(__file__).resolve().parents[2] / "state.json"
+STATE_FILE = Path(os.environ.get("AUTOTRADER_STATE_FILE", _DEFAULT_STATE_FILE))
+logger = logging.getLogger(__name__)
 
 
 class PositionManager:
@@ -13,6 +17,11 @@ class PositionManager:
         self._load()
 
     def _load(self):
+        tmp_path = STATE_FILE.with_suffix(".tmp")
+        if tmp_path.exists():
+            logger.warning("Stale .tmp file detected, removing: %s", tmp_path)
+            tmp_path.unlink(missing_ok=True)
+
         if STATE_FILE.exists():
             try:
                 data = json.loads(STATE_FILE.read_text(encoding="utf-8"))

@@ -2,7 +2,7 @@ import pytest
 from datetime import datetime
 from pydantic import ValidationError
 from server.models import (
-    OHLCBar, PriceFeedResponse, PriceRequest, TradeDecision, Position, RiskSettings
+    ExecutionResultRequest, OHLCBar, PriceFeedResponse, PriceRequest, TradeDecision, Position, RiskSettings
 )
 
 
@@ -77,6 +77,107 @@ def test_price_request_defaults_to_execution_rakuten_feed():
     )
     assert req.feed_role == "execution"
     assert req.feed_source == "rakuten_rss"
+    assert req.available_cash_actual is None
+    assert req.client_run_mode == "paper"
+    assert req.client_order_mode == "stub_only"
+    assert req.client_live_armed is False
+
+
+def test_price_request_normalizes_live_armed_when_not_in_live_broker_mode():
+    req = PriceRequest(
+        code="7203",
+        price=320.0,
+        volume=12000,
+        ohlc=[OHLCBar(o=315, h=325, l=310, c=320)],
+        timestamp=datetime.now(),
+        client_run_mode="paper",
+        client_order_mode="broker_auto",
+        client_live_armed=True,
+    )
+
+    assert req.client_run_mode == "paper"
+    assert req.client_order_mode == "stub_only"
+    assert req.client_live_armed is False
+
+
+def test_price_request_accepts_live_broker_mode_when_armed():
+    req = PriceRequest(
+        code="7203",
+        price=320.0,
+        volume=12000,
+        ohlc=[OHLCBar(o=315, h=325, l=310, c=320)],
+        timestamp=datetime.now(),
+        client_run_mode="live",
+        client_order_mode="broker_auto",
+        client_live_armed=True,
+    )
+
+    assert req.client_run_mode == "live"
+    assert req.client_order_mode == "broker_auto"
+    assert req.client_live_armed is True
+
+
+def test_price_request_accepts_available_cash_actual():
+    req = PriceRequest(
+        code="7203",
+        price=320.0,
+        volume=12000,
+        available_cash_actual=25000,
+        ohlc=[OHLCBar(o=315, h=325, l=310, c=320)],
+        timestamp=datetime.now(),
+    )
+
+    assert req.available_cash_actual == 25000
+
+
+def test_execution_result_request_normalizes_non_live_mode_to_stub_only():
+    req = ExecutionResultRequest(
+        code="7203",
+        action="buy",
+        qty=100,
+        price=320.0,
+        reason="約定",
+        timestamp=datetime.now(),
+        client_run_mode="paper",
+        client_order_mode="broker_auto",
+        client_live_armed=True,
+    )
+
+    assert req.client_run_mode == "paper"
+    assert req.client_order_mode == "stub_only"
+    assert req.client_live_armed is False
+
+
+def test_execution_result_request_requires_pending_execution_id_in_live_broker_mode():
+    with pytest.raises(ValidationError):
+        ExecutionResultRequest(
+            code="7203",
+            action="buy",
+            qty=100,
+            price=320.0,
+            reason="約定",
+            timestamp=datetime.now(),
+            client_run_mode="live",
+            client_order_mode="broker_auto",
+            client_live_armed=True,
+        )
+
+
+def test_execution_result_request_accepts_pending_execution_id_in_live_broker_mode():
+    req = ExecutionResultRequest(
+        code="7203",
+        action="buy",
+        qty=100,
+        price=320.0,
+        reason="約定",
+        timestamp=datetime.now(),
+        client_run_mode="live",
+        client_order_mode="broker_auto",
+        client_live_armed=True,
+        pending_execution_id="pending-123",
+    )
+
+    assert req.pending_execution_id == "pending-123"
 
 
 def test_price_request_reference_feed_defaults_to_jquants_light():
