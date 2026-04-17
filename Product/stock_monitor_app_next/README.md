@@ -112,6 +112,47 @@ OPENROUTER_API_KEY=your_openrouter_api_key_here
 - Cron の頻度を上げる場合は Vercel プラン制約を確認したうえで `Product/stock_monitor_app_next/vercel.json` を更新してください。
 - Artifact / Single HTML 系の過去メモは `IMPLEMENTATION_NOTES.md` に残していますが、現行の保守対象は Next.js アプリです。
 
+## Vercel 本番チェックリスト
+
+### 1. Project Settings
+
+- Root Directory: `Product/stock_monitor_app_next`
+- Framework Preset: `Next.js`
+- Build Command: `npm run build`
+- Install Command: `npm install`
+- Production Branch: `main`
+
+### 2. Environment Variables
+
+| 区分 | 必要な変数 |
+| ---- | ---------- |
+| ベース運用 | `DATA_MODE=live`, `ENABLE_LIVE_DATA=true`, `JQUANTS_API_KEY`, `EDINET_DB_API_KEY` |
+| 価格 fallback / intraday | `ALPHA_VANTAGE_API_KEY` |
+| AI Navigator | `GEMINI_API_KEY` |
+| Quick / Deep AI | `OPENROUTER_API_KEY` |
+| Cron | `CRON_SECRET` |
+| 任意 | `MARKETAUX_API_KEY`, `DEEP_LLM_DAILY_CAP`, `QUICK_LLM_MODEL`, `DEEP_LLM_MODEL`, `DEEP_LLM_FALLBACK_MODEL`, `NEXT_PUBLIC_STOCK_MONITOR_RUNTIME` |
+
+補足:
+
+- `OPENROUTER_API_KEY` がない場合、`/api/deep/*` は 503 を返します。
+- `GEMINI_API_KEY` がない場合、AI Navigator 実行系は動きません。
+- `CRON_SECRET` を設定すると、Vercel Cron は `Authorization: Bearer <CRON_SECRET>` を自動送信します。
+
+### 3. Cron Jobs
+
+- `vercel.json` の定義は `/api/cron/evaluate-alerts` を UTC 日次 `0 0 * * *`
+- Hobby では高頻度 Cron を使えないため、この既定値を維持するのが安全です。
+- Vercel ダッシュボードの `Settings > Cron Jobs` で対象 path が見えていることを確認してください。
+
+### 4. Post-deploy Smoke Test
+
+- `/api/health` が JSON を返す
+- `/api/data-source-info` が provider 情報を返す
+- `/api/stocks` が 500 にならず、データ取得結果を返す
+- `/` を開いて初期表示が崩れていない
+- AI を使う場合は `/api/navigator/config` と AI 関連 UI が期待通りに動く
+
 ## 検証コマンド
 
 ```bash
