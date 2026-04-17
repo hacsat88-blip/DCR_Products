@@ -1,6 +1,5 @@
 import { scoreRelevance } from "./normalize";
 import { fetchMarketaux } from "./sources/marketaux";
-import { fetchNewsApi } from "./sources/newsApi";
 import { fetchRssFeed } from "./sources/rss";
 import type { NewsFetchOptions, NewsItem, NewsRegion, NewsSource } from "./types";
 
@@ -65,16 +64,6 @@ export async function fetchAllNews(options: NewsFetchOptions = {}): Promise<News
     fetchRssFeed(f.url, f.source, f.region, options.signal),
   );
 
-  if (options.newsApiKey) {
-    const query = options.symbols && options.symbols.length > 0 ? options.symbols.join(" OR ") : "stock market";
-    tasks.push(
-      fetchNewsApi(query, options.newsApiKey, {
-        region: options.region,
-        signal: options.signal,
-      }),
-    );
-  }
-
   const marketauxKey = options.marketauxKey ?? process.env.MARKETAUX_API_KEY;
   if (marketauxKey) {
     tasks.push(
@@ -93,7 +82,7 @@ export async function fetchAllNews(options: NewsFetchOptions = {}): Promise<News
     if (result.status === "fulfilled") {
       all.push(...result.value);
     } else {
-      const label = feeds[idx]?.source ?? "newsapi";
+      const label = feeds[idx]?.source ?? "marketaux";
       console.warn(`[news] fetch failed for ${label}:`, result.reason);
     }
   });
