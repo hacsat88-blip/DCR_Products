@@ -1,7 +1,5 @@
 "use client";
 
-import clsx from "clsx";
-
 import type { VIXAlert } from "@/types/navigator";
 
 interface VIXAlertBannerProps {
