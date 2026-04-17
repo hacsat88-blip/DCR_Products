@@ -142,7 +142,24 @@ const config: Config = {
         "text-secondary": "#D6E7F8",
         "text-muted": "#97AEC3",
         "border-subtle": "rgba(148,163,184,0.10)",
-        "border-active": "rgba(0,217,255,0.42)"
+        "border-active": "rgba(0,217,255,0.42)",
+        inpBg: {
+          base: "var(--inp-bg-base)",
+          surface: "var(--inp-bg-surface)",
+          elevated: "var(--inp-bg-elevated)"
+        },
+        inpBorder: {
+          DEFAULT: "var(--inp-border)",
+          strong: "var(--inp-border-strong)"
+        },
+        inpText: {
+          primary: "var(--inp-text-primary)",
+          secondary: "var(--inp-text-secondary)",
+          muted: "var(--inp-text-muted)"
+        },
+        inpAccent: "var(--inp-accent)",
+        inpPositive: "var(--inp-positive)",
+        inpNegative: "var(--inp-negative)"
       },
       boxShadow: {
         card: "0 1px 3px rgba(0,0,0,0.3), 0 1px 2px rgba(0,0,0,0.2)",
