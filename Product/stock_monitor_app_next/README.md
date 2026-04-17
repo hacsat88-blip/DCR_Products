@@ -43,6 +43,7 @@ JQUANTS_API_KEY=your_jquants_api_key_here
 EDINET_DB_API_KEY=your_edinet_db_api_key_here
 ALPHA_VANTAGE_API_KEY=your_alpha_vantage_api_key_here
 GEMINI_API_KEY=your_gemini_api_key_here
+OPENROUTER_API_KEY=your_openrouter_api_key_here
 ```
 
 ### 追加で使う環境変数
@@ -54,15 +55,21 @@ GEMINI_API_KEY=your_gemini_api_key_here
 | `QUICK_LLM_MODEL` | Quick tier モデル上書き | 任意 |
 | `DEEP_LLM_MODEL` | Deep tier モデル上書き | 任意 |
 | `DEEP_LLM_FALLBACK_MODEL` | Deep tier fallback モデル | 任意 |
+| `GOOGLE_API_KEY` | Quick tier の互換 fallback | 通常不要 |
 | `MARKETAUX_API_KEY` | 株式ニュース補強 | 任意 |
 | `CRON_SECRET` | `/api/cron/evaluate-alerts` 認証 | Cron 利用時は必須 |
 | `NEXT_PUBLIC_STOCK_MONITOR_RUNTIME` | Artifact 互換ランタイム切替 | 通常不要 |
+| `YAHOO_PRICE_CACHE_TTL_SECONDS` | Yahoo 価格キャッシュ TTL | 任意 |
+| `ALPHA_VANTAGE_PRICE_CACHE_TTL_SECONDS` | Alpha Vantage 価格キャッシュ TTL | 任意 |
+| `JQUANTS_PRICE_CACHE_TTL_SECONDS` | J-Quants 価格キャッシュ TTL | 任意 |
+| `EDINET_DB_BASE_URL` | EDINET DB ベース URL 上書き | 通常不要 |
 
 補足:
 
 - `GEMINI_API_KEY` は AI Navigator API で使います。
 - `OPENROUTER_API_KEY` は Quick / Deep API の主経路です。Quick 系は互換 fallback を持ちますが、Deep 系は OpenRouter 前提です。
 - `JQUANTS_REFRESH_TOKEN` / `JQUANTS_ID_TOKEN` は現行価格取得では使いません。
+- `CRON_SECRET` を Vercel Project Environment Variables に設定すると、Vercel Cron は同じ値を `Authorization: Bearer <CRON_SECRET>` で自動送信します。
 
 ## データソース
 
@@ -101,7 +108,8 @@ GEMINI_API_KEY=your_gemini_api_key_here
 - 保存は主に localStorage ベースです。
 - compare は最大 4 件の軽量設計です。
 - `/api/cron/evaluate-alerts` は `Authorization: Bearer <CRON_SECRET>` を要求します。
-- 現行リポジトリには `vercel.json` は含まれていません。Vercel Cron を使う場合はプロジェクト設定または別途設定ファイルで管理してください。
+- `vercel.json` では `/api/cron/evaluate-alerts` を UTC 日次 `0 0 * * *` で定義しています。Hobby 制限に合わせた安全側の既定値です。
+- Cron の頻度を上げる場合は Vercel プラン制約を確認したうえで `Product/stock_monitor_app_next/vercel.json` を更新してください。
 - Artifact / Single HTML 系の過去メモは `IMPLEMENTATION_NOTES.md` に残していますが、現行の保守対象は Next.js アプリです。
 
 ## 検証コマンド
