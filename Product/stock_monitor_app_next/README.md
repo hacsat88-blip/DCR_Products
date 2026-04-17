@@ -1,17 +1,25 @@
-# Stock Selection Dashboard (Phase 5)
+# Investment Navigator Pro
 
-日本株監視アプリの Phase 5 実装です。  
-Phase 4 までの `live/mock/fallback + scoring + alert + backtest` を維持しつつ、`蓄積・比較・振り返り` レイヤーを追加しました。
+Next.js ベースの投資判断支援ダッシュボードです。日本株・米国株・ETF を対象に、監視、比較、ポートフォリオ管理、バックテスト、アラート、AI ナビゲーターを 1 つのアプリにまとめています。
 
-## S1 完了状態 / S2 引き継ぎ（Task6）
+このディレクトリで現在メンテしている対象は Next.js アプリです。過去の Phase 単位メモや Single HTML 実験の詳細は `IMPLEMENTATION_NOTES.md` と `DESIGN.md` を参照してください。
 
-- S1（Next.js 版フル実装）の最終検証・引き継ぎパッケージを更新済み。
-- S2 単一HTML抽出の依存ブロッカーは `docs/dcr/specs/dependency-map-s1.md` に集約（Next route / env / browser API / adapter境界）。
-- S2 で優先して差し替える境界:
-  - API route 呼び出し（`/api/stocks`, `/api/market-index*`, `/api/navigator/run`, `/api/data-source-info`, `/api/health`）
-  - env 依存（API key / TTL / runtime）
-  - host 制約を受ける browser API（storage / download / import / notification）
-  - 注入済み adapter（`__STOCK_MONITOR_PERSISTENCE__`, `__STOCK_MONITOR_RUNTIME__`, `__STOCK_MONITOR_CLAUDE_SEARCH__`, `PollingController`）
+## 現在の機能範囲
+
+- ホームダッシュボード: マーケット、ポートフォリオ、AI Navigator、設定の 4 タブ
+- 監視系 UI: compare、snapshot archive、saved screens、ranking、export、データ品質表示
+- 個別ページ: `/portfolio`, `/backtest`, `/alerts`, `/etf`
+- AI 補助: AI Navigator、inline explain、radar score、portfolio review、why moved
+- 運用補助: PWA manifest、service worker、command palette、仮説ログ、アラート評価 API
+
+## 主要ディレクトリ
+
+- `src/app` : App Router のページと API ルート
+- `src/components` : ダッシュボード、チャート、ナビゲーター、UI 部品
+- `src/services` : データ取得、ニュース集約、LLM 呼び出し、価格プロバイダ
+- `src/store` : Zustand ストア
+- `src/lib` : alert、backtest、runtime、persistence などの補助ロジック
+- `public` : PWA 用アセット
 
 ## セットアップ
 
@@ -20,492 +28,96 @@ npm install
 npm run dev
 ```
 
-起動後: `http://localhost:3000`
+起動後は `http://localhost:3000` を開きます。
 
-Artifact 互換ランタイムを使う場合は `NEXT_PUBLIC_STOCK_MONITOR_RUNTIME=artifact` を指定し、必要に応じて `globalThis.__STOCK_MONITOR_PERSISTENCE__` に Storage 互換アダプタを注入してください。未注入時はセッション内メモリに退避します。
+## 環境変数
 
-## Single HTML v1（`artifact-dashboard.html`）
+ベースとなる live 構成は `.env.local.example` にあります。まずはそれを `.env.local` にコピーしてから、必要なキーを追加してください。
 
-`artifact-dashboard.html` は React/Next.js なしでそのまま実行できる単一ファイル版です。
-
-- ローカルで開く: `Product\stock_monitor_app_next\artifact-dashboard.html` をブラウザで直接開く
-- 簡易サーバーで開く（推奨）:
-
-```bash
-npx serve .
-```
-
-### Host 互換性（Claude / Gemini / Grok）
-
-- コード生成はどのモデルでも可能ですが、**実行可否はモデルではなくホストの実行環境依存**です。
-- そのため「コードを渡せば必ず動く」ではなく、「実行面（Artifact/Canvas/Preview等）があると動く」が正確です。
-
-### Single HTML v1 の実装ポリシー
-
-- 検索: `globalThis.__STOCK_MONITOR_CLAUDE_SEARCH__` があれば優先利用、未注入時はローカル検索へフォールバック
-- 永続化: `globalThis.__STOCK_MONITOR_PERSISTENCE__` があれば利用、未注入時は `localStorage`、さらに不可ならメモリへフォールバック
-- compare/watch/export/import/ranking は単一ファイル内で継続動作
-- APIキーや secret は埋め込まない
-
-検証:
-
-```bash
-npm run lint
-npm run build
-```
-
-## 環境変数（.env.local）
+### 基本構成
 
 ```env
-# live 運用の正規設定（server env）
 DATA_MODE=live
 ENABLE_LIVE_DATA=true
-
-# 必要時のみ（互換 fallback / クライアント公開用の補助）
-# NEXT_PUBLIC_DATA_MODE=live
-# NEXT_PUBLIC_ENABLE_LIVE_DATA=true
-
-# optional
+JQUANTS_API_KEY=your_jquants_api_key_here
+EDINET_DB_API_KEY=your_edinet_db_api_key_here
 ALPHA_VANTAGE_API_KEY=your_alpha_vantage_api_key_here
-EDINET_DB_API_KEY=your_key_here
-STOCKS_CACHE_TTL_SECONDS=120
-YAHOO_PRICE_CACHE_TTL_SECONDS=1800
-ALPHA_VANTAGE_PRICE_CACHE_TTL_SECONDS=1800
-EDINET_FUNDAMENTALS_CACHE_TTL_SECONDS=3600
-EDINET_RATE_LIMIT_BACKOFF_BASE_SECONDS=600
+GEMINI_API_KEY=your_gemini_api_key_here
 ```
 
-- 正規の live 判定は server env の `DATA_MODE` / `ENABLE_LIVE_DATA` を優先
-- `NEXT_PUBLIC_DATA_MODE` / `NEXT_PUBLIC_ENABLE_LIVE_DATA` は互換 fallback としてのみ利用
-- 価格データは Yahoo Finance を優先し、欠損時のみ Alpha Vantage を fallback 利用
-- `ALPHA_VANTAGE_API_KEY` は server env 専用（`NEXT_PUBLIC_*` で公開しない）
-- EDINET APIキー未設定時は `mock/fallback` で継続動作
-- `.env.local` はコミットしない（`.gitignore` で除外）
-- 常時運用時は「価格: 5〜15分」「財務: 30〜60分」を目安に手動更新
+### 追加で使う環境変数
 
-### 最小構成
+| 変数 | 用途 | 必須度 |
+| ---- | ---- | ------ |
+| `OPENROUTER_API_KEY` | `/api/quick/*`, `/api/deep/*` の LLM 呼び出し | Deep 系は必須 |
+| `DEEP_LLM_DAILY_CAP` | Deep 系の 1 日上限 | 任意 |
+| `QUICK_LLM_MODEL` | Quick tier モデル上書き | 任意 |
+| `DEEP_LLM_MODEL` | Deep tier モデル上書き | 任意 |
+| `DEEP_LLM_FALLBACK_MODEL` | Deep tier fallback モデル | 任意 |
+| `MARKETAUX_API_KEY` | 株式ニュース補強 | 任意 |
+| `CRON_SECRET` | `/api/cron/evaluate-alerts` 認証 | Cron 利用時は必須 |
+| `NEXT_PUBLIC_STOCK_MONITOR_RUNTIME` | Artifact 互換ランタイム切替 | 通常不要 |
 
-- live 運用:
-  - `DATA_MODE=live`
-  - `ENABLE_LIVE_DATA=true`
-  - （任意）`ALPHA_VANTAGE_API_KEY=...` ※ Yahoo 欠損時 fallback 強化
-- mock 運用:
-  - `DATA_MODE=mock`
-  - `ENABLE_LIVE_DATA=false`
+補足:
 
-## Price provider トラブルシュート
-
-- `Yahoo quotes failed for all symbols` が出るとき:
-  - `/api/yahoo-proxy` で upstream 到達性を確認
-  - 企業コードのサフィックス（`.T` など）マッピングを確認
-- `Alpha Vantage API key missing` が出るとき:
-  - `.env.local` に `ALPHA_VANTAGE_API_KEY=...` を追加し、dev server を再起動
-- `.env.local` を更新したら、dev server を完全再起動する
-- それでも古い失敗表示が残る場合は:
-  - 実行中プロセスを停止して再起動
-  - 必要に応じて `.next` を削除して再起動（キャッシュ影響を除外）
-
-## Phase 5 追加機能
-
-- Snapshot Archive:
-  - 手動保存
-  - autosave（refresh成功時）
-  - 保存上限 500（capture単位）
-- Compare View:
-  - 最大4銘柄の横並び比較
-  - 数値の簡易 diff highlight
-  - narrative summary / scoreSummary を分離表示
-- Ranking Board:
-  - 複数軸ソート
-  - compare 追加/解除
-  - ranking CSV export
-- Saved Screens:
-  - フィルタ/ソート保存・適用・削除・名称更新
-- Evaluation Timeline:
-  - score/price の時系列
-  - action change / score delta の確認
-- Export Panel:
-  - JSON export（対象選択）
-  - snapshots CSV / ranking CSV
-- Search:
-  - `登録銘柄` モード: プルダウンですぐ絞り込み
-  - `市場検索(API)` モード: ボタン実行でEDINET検索（クエリ結果はクライアント側で短期キャッシュ）
-
-## A〜U 改善パック（UI/UX 拡張）
-
-- データ品質リボン（DataQualityRibbon）
-  - Header直下で `dataMode / 最終更新 / provider状態` を常時表示
-- 判断レーン（ActionLaneBoard）
-  - `buy_now / wait_earnings / wait_pullback / exclude` の4レーンで俯瞰
-- 朝チェックモード（MorningCheckPanel）
-  - 前回スナップショットとの差分（判定・スコア・価格）を先に確認
-- 詳細ドロワーのクイックレビュー
-  - 最上部に `今の判定 / 次に見る数字 / 崩れる条件` を固定表示
-- 仮説ログ（StockDetailDrawer）
-  - `仮説 / 根拠 / 見直し日 / 検証結果` を localStorage 保存
-- アラート優先度・期限
-  - RuleManager で `priority` と `dueDate` を設定
-  - AlertCenter で `優先度バッジ` と `対応目安` を表示
-- 判定レビュー強化（DecisionReviewPanel）
-  - 同判定の過去簡易実績（次期平均リターン）を表示
-- 比較ビュー強化（ComparePanel）
-  - 価格は優劣色を付けず、成長・CF・PER/PBRの相対差を明示
-- 銘柄追加オンボーディング（StockOnboardingPanel）
-  - mock銘柄追加前に必須項目のJSONチェック
-- 崩れシミュレーター（CollapseSimulatorPanel）
-  - 売上成長/営業利益成長/PER補正で score/action を即時試算
-- 逆張り監査官（ContrarianPanel）
-  - 現在判断に対する反対意見を1件提示
-
-## Phase 5 修正版（最小差分）での追加整合
-
-- `captureId` / `captureSource` を Snapshot に導入
-  - 1回の保存操作で 1 capture を作成
-  - `captureSource` は `manual` / `autosave`
-  - SnapshotPanel は capture 件数表示・capture 単位削除
-- `rankingSortKey` を導入
-  - `sortKey`（一覧向け）と `rankingSortKey`（Ranking/Ranking CSV向け）を分離
-  - RankingBoard の並び順と Ranking CSV の順序を一致
-- scoring tuning 時の silent alert baseline 更新
-  - `setScoringConfig` / `resetScoringConfig` では alert event を追加しない
-  - 再評価後の `previousSnapshots` と `alertConditionState` を静かに再基準化
-  - 設定変更由来の `score_delta` / `action_changed` 誤発火を抑止
-- autosave capture 上限を追加
-  - `AUTOSAVE_CAPTURE_LIMIT = 30`
-  - 上限超過時は古い autosave capture から整理
-  - manual capture は autosave prune 対象外
-- Saved Screen の保存対象を明確化
-  - 保存: `filters`, `sortKey`, `rankingSortKey`, `compareSelection`
-  - 非保存: snapshot / alert history / backtest cache / 一時UI状態
-  - rename は空文字と重複名を拒否
-- archive migration を slice 単位で実装
-  - schema 不一致でも全 wipe しない
-  - 壊れたレコードだけ除外し、読める旧データは温存
-  - 旧 snapshot は `checkedAt` 単位で `captureId` を補完
-  - 旧 savedScreen は `rankingSortKey` を補完
-
-## summary 分離（Phase 4 継続）
-
-- `Stock.summary`: 企業説明（narrative）
-- `ScoreEvaluation.scoreSummary`: 判定要約
-
-この2つは分離されており、再評価で上書きされません。  
-検索対象は企業説明 (`Stock.summary`) を参照します。
-
-## tuning と alert の関係（Phase 4 継続）
-
-- scoringConfig 変更時は score/action を再計算
-- ただし alert は silent re-evaluation（通常 alert history を汚さない）
-- baseline も同時に更新し、次回 refresh で設定変更由来の差分通知を出さない
-- 市場由来の alert は refresh 時評価のみで発生
+- `GEMINI_API_KEY` は AI Navigator API で使います。
+- `OPENROUTER_API_KEY` は Quick / Deep API の主経路です。Quick 系は互換 fallback を持ちますが、Deep 系は OpenRouter 前提です。
+- `JQUANTS_REFRESH_TOKEN` / `JQUANTS_ID_TOKEN` は現行価格取得では使いません。
 
 ## データソース
 
-- Price data: Yahoo Finance (primary), Alpha Vantage (fallback)
-- Fundamentals: EDINET DB
-- 文章項目 / 補助履歴: mock
-- 設定タブの「データソース情報」パネルで以下を確認可能
-  - YF / AV の役割
-  - キャッシュ戦略（route/provider TTL）
-  - `ALPHA_VANTAGE_API_KEY` の末尾4文字マスク表示
-  - コール上限ガイダンス（YF / AV）
+| 種別 | 主要ソース | 補足 |
+| ---- | ---------- | ---- |
+| 日本株価 | J-Quants V2 | `JQUANTS_API_KEY` が必要 |
+| 米国株価 / 代替価格 | Yahoo Finance / Alpha Vantage | Alpha Vantage は fallback と intraday 用 |
+| 日本企業財務 | EDINET DB | `EDINET_DB_API_KEY` が必要 |
+| ニュース | RSS + Marketaux | Marketaux は任意 |
+| AI Navigator | Gemini | `GEMINI_API_KEY` が必要 |
+| Quick / Deep AI 補助 | OpenRouter | `OPENROUTER_API_KEY` 推奨 |
 
-## 常時ライブ運用の最小追加（Phase 5+）
+## 主要ページと API
 
-- EDINET fundamentals は provider 側で TTL キャッシュ（既定 3600秒）
-- EDINET 429 時はバックオフ窓を設定し、短時間の再試行を抑制
-- SummaryBar にフォールバック継続時間を表示
-  - providerごとの状態を `価格:正常 / 財務:待機中` の要約で表示
-  - 長文エラーは折りたたみ表示（詳細ログ）
-- 価格と財務の更新周期を分離（価格頻度高め、財務頻度低め）
-- Yahoo の CORS/可用性問題は `/api/yahoo-proxy` 経由で切り分け可能
+### ページ
 
-## Backtest の位置づけ
+- `/` : メインダッシュボード
+- `/portfolio` : 保有銘柄管理
+- `/backtest` : バックテスト
+- `/alerts` : アラート設定
+- `/etf` : ETF 一覧
 
-- Phase 5 UI は単銘柄バックテスト優先
-- watchlist backtest はエンジン側対応のみ（UI拡張は将来）
-- 簡易検証であり、投資成果を保証しません
+### API
 
-## Snapshot / Saved Screen / Compare 仕様
+- `/api/stocks` : 銘柄一覧と価格・財務の集約
+- `/api/stock-search` : 検索
+- `/api/market-index`, `/api/market-index-intraday` : 指数データ
+- `/api/navigator/run`, `/api/navigator/config` : AI Navigator
+- `/api/quick/*` : 軽量 AI 補助
+- `/api/deep/*` : 重めの AI 補助
+- `/api/cron/evaluate-alerts` : アラート評価
+- `/api/health`, `/api/data-source-info`, `/api/yahoo-proxy` : 運用確認系
 
-- compare 最大件数: 4
-- snapshots 最大件数: 500
-- savedScreens 最大件数: 30
-- autosaveSnapshots 初期値: `false`
+## 運用メモ
 
-## Export 仕様
+- 保存は主に localStorage ベースです。
+- compare は最大 4 件の軽量設計です。
+- `/api/cron/evaluate-alerts` は `Authorization: Bearer <CRON_SECRET>` を要求します。
+- 現行リポジトリには `vercel.json` は含まれていません。Vercel Cron を使う場合はプロジェクト設定または別途設定ファイルで管理してください。
+- Artifact / Single HTML 系の過去メモは `IMPLEMENTATION_NOTES.md` に残していますが、現行の保守対象は Next.js アプリです。
 
-- JSON:
-  - `compareSelection`
-  - `snapshots`
-  - `alertEvents`
-  - `savedScreens`
-  - `backtestResults`
-- CSV:
-  - `snapshots`
-  - `ranking`
-- クライアント側ダウンロードのみ
-- APIキーや `.env` 情報は出力しない
-
-## localStorage キー
-
-- Phase 3:
-  - `stock-monitor-alert-rules-v1`
-  - `stock-monitor-alert-events-v1`
-  - `stock-monitor-alert-snapshots-v1`
-  - `stock-monitor-alert-condition-state-v1`
-  - `stock-monitor-alert-notifications-v1`
-  - `stock-monitor-alert-schema-version`
-- Phase 4:
-  - `stock-monitor-scoring-config-v1`
-  - `stock-monitor-backtest-results-v1`
-  - `stock-monitor-backtest-schema-version`
-- Phase 5:
-  - `stock-monitor-archive-snapshots-v1`
-  - `stock-monitor-saved-screens-v1`
-  - `stock-monitor-compare-selection-v1`
-  - `stock-monitor-autosave-snapshots-v1`
-  - `stock-monitor-ranking-sort-v1`
-  - `stock-monitor-archive-schema-version`
-
-JSON破損時は壊れたレコードのみ除外し、schema version 不一致時も slice 単位 migration で復元します。
-
-## 主要ファイル（Phase 5）
-
-- `src/types/archive.ts`
-- `src/store/useStockStore.ts`
-- `src/components/dashboard/SnapshotPanel.tsx`
-- `src/components/dashboard/ComparePanel.tsx`
-- `src/components/dashboard/RankingBoard.tsx`
-- `src/components/dashboard/SavedScreenPanel.tsx`
-- `src/components/dashboard/TimelinePanel.tsx`
-- `src/components/dashboard/ExportPanel.tsx`
-- `src/components/dashboard/DataQualityRibbon.tsx`
-- `src/components/dashboard/ActionLaneBoard.tsx`
-
----
-
-## Investment Navigator Pro（Phase 6 統合ビルド）
-
-日本株（0000-99999）/ 米国株（2-5文字ティッカー）/ 日米 ETF を対象とした意思決定支援ダッシュボード。
-`stock_monitor_app_next` を土台に、LLM 二層 API・FlipCard・ポートフォリオ・バックテスト・アラート・PWA を統合。
-
-### 追加機能サマリ
-
-| 機能 | ページ / エンドポイント |
-| ------ | ------------------------- |
-| 範囲検索（JP 4-5桁 / US 2-5文字） | `src/components/search/RangePicker.tsx` |
-| ETF 一覧（日米） | `/etf` |
-| ポートフォリオ記録 | `/portfolio` + `useHoldingsStore` |
-| バックテスト（SMA/RSI/B&H） | `/backtest` + `src/lib/backtest/engine.ts` |
-| アラート（>=, <=, cross_up/down） | `/alerts` + `/api/cron/evaluate-alerts` |
-| 180° フリップ銘柄カード | `src/components/stock/FlipCard.tsx` |
-| レーダーチャート（5軸） | `src/components/charts/RadarChart.tsx` |
-| ローソク足 | `lightweight-charts` 経由（既存） |
-| Command Palette (Cmd+K) | `src/components/ui/AppCommandPaletteMount.tsx` |
-| スパークラインツールチップ | `src/components/ui/SparklineTooltip.tsx` |
-| セクター Treemap | `src/components/charts/SectorTreemap.tsx` |
-| 相関マトリクス | `src/components/charts/CorrelationHeatmap.tsx` |
-| ニュースセンチメント帯 | `src/components/news/NewsSentimentStrip.tsx` |
-| AI 解説ドロワー（🤖 なぜ？） | `src/components/ui/AiExplainDrawer.tsx` |
-| JSON スナップショット I/O | `src/lib/persistence/snapshotIo.ts` |
-| PWA（manifest + SW） | `public/manifest.json`, `public/sw.js` |
-
-### LLM 二層 API
-
-| 層 | モデル | エンドポイント | キャッシュ |
-| ---- | -------- | ---------------- | ---------- |
-| Quick（非推論） | OpenRouter 経由 `qwen/qwen3-next-80b-a3b-instruct:free` | `/api/quick/news-summary` | 30分 |
-| | | `/api/quick/inline-explain` | 24時間 |
-| Deep（推論） | OpenRouter `openai/gpt-oss-120b:free`（fallback: `nvidia/nemotron-3-super-120b-a12b:free`） | `/api/deep/radar-score` | 24時間 |
-| | | `/api/deep/portfolio-review` | 12時間 |
-| | | `/api/deep/backtest-interpret` | 24時間 |
-| **Tier 4 (Web grounded)** | `openai/gpt-oss-120b:free` + `openrouter:web_search`（fallback: `nvidia/nemotron-3-super-120b-a12b:free`） | `/api/deep/why-moved` | 1時間 |
-
-**全ての LLM 呼び出しは OpenRouter 経由に統一**（Google 側リクエスト制限の回避・API key 集約）。
-Quick tier の既定モデルは env `QUICK_LLM_MODEL` で上書き可（例: `google/gemini-2.5-flash` / `google/gemini-flash-1.5`）。
-
-**Tier 4 `/api/deep/why-moved`**: 銘柄の値動き要因を Web 検索でグラウンディングし、
-`確定材料 / 推測` を confidence 付きで JSON 出力。リクエスト body:
-
-```json
-{ "ticker": "7203", "moveContext": "+4.2% on 2x volume",
-  "articles": [{ "title": "...", "url": "...", "snippet": "..." }],
-  "useWebSearch": true, "reasoningEffort": "medium" }
-```
-
-共通: 入力ハッシュキャッシュ (`src/lib/llmCache.ts`)、レート制御 (`src/lib/rateLimiter.ts`)、
-日次上限 (`DEEP_LLM_DAILY_CAP`)、タイムアウト / 429 backoff。
-
-### データソース整理（Investment Navigator Pro）
-
-| 種別 | ソース | 鍵 | 備考 |
-| ------ | -------- | ---- | ------ |
-| 日本株価 | J-Quants V2 | `JQUANTS_API_KEY` | 既存 `jquantsPriceProvider.ts` |
-| 日本財務 | EDINET DB | `EDINETDB_API_KEY` | 既存 `edinetDbProvider.ts` |
-| 米国株価 | Yahoo Finance / Alpha Vantage | `ALPHA_VANTAGE_API_KEY` (任意) | 既存 |
-| ニュース (RSS) | Yahoo JP / Google News / 日経 / ロイター / Yahoo US | 鍵不要 | `src/services/news/sources/rss.ts` |
-| ニュース (株特化) | **Marketaux** | `MARKETAUX_API_KEY` (任意) | 100req/日 無料・sentiment 付き（米株中心） |
-
-### 追加環境変数（`.env.local`）
-
-```env
-# OpenRouter（全 LLM 呼び出しの統一エンドポイント）
-OPENROUTER_API_KEY=your_openrouter_key_here
-DEEP_LLM_DAILY_CAP=100
-# 任意: Quick tier のモデル上書き（既定: qwen/qwen3-next-80b-a3b-instruct:free）
-# QUICK_LLM_MODEL=google/gemini-2.5-flash
-# 任意: Deep tier のモデル上書き（既定: openai/gpt-oss-120b:free）
-# DEEP_LLM_MODEL=openai/gpt-oss-120b:free
-# DEEP_LLM_FALLBACK_MODEL=nvidia/nemotron-3-super-120b-a12b:free
-
-# 旧互換: Gemini 直接呼び出し時の fallback（通常は不要）
-# GEMINI_API_KEY=your_gemini_api_key_here
-
-# ニュース集約（任意 / 主要ソースは RSS のため未設定でも動作）
-MARKETAUX_API_KEY=your_marketaux_key_here
-
-# J-Quants V2（日本株価）
-JQUANTS_API_KEY=your_jquants_v2_key_here
-# 旧 refresh token 方式は廃止。上記 JQUANTS_API_KEY を使用。
-
-# EDINET DB（日本企業の財務・開示）
-EDINETDB_API_KEY=your_edinetdb_key_here
-
-# Vercel Cron（アラート評価用共有シークレット）
-CRON_SECRET=random_long_string_here
-```
-
-未設定時の挙動:
-
-- `OPENROUTER_API_KEY` 未設定 → 全 LLM API は 503 を返却、UI は graceful degrade
-- `MARKETAUX_API_KEY` 未設定 → RSS + 既存プロバイダのみでニュース集約（日本語カバレッジは十分）
-- `JQUANTS_API_KEY` 未設定 → Yahoo / Alpha Vantage にフォールバック
-- `CRON_SECRET` 未設定 → `/api/cron/evaluate-alerts` は 401 を返す（デプロイ時は必須）
-
-### localStorage キー（追加）
-
-- `stock-monitor:holdings:v1` — ポートフォリオ保有銘柄
-- `stock-monitor:backtest:v1` — バックテスト履歴（最新 5 件）
-- `stock-monitor:alerts:v1` — アラートルール
-- スナップショット I/O は全 `SNAPSHOT_KEYS` を 1 つの JSON で Export / Import 可能
-
-### Command Palette ショートカット
-
-| 操作 | アクション |
-| ------ | ---------- |
-| `Cmd/Ctrl + K` | パレット起動 |
-| `nav.home` / `nav.etf` / `nav.portfolio` / `nav.backtest` / `nav.alerts` | 画面遷移 |
-| `portfolio.addHolding` | ポートフォリオ画面で追加フォームにフォーカス |
-| `backtest.runSample` | バックテスト画面でサンプル実行 |
-| `alerts.evaluateNow` | アラート評価を即時実行 |
-| `io.export` / `io.import` | JSON スナップショット I/O |
-
-### Vercel デプロイ
-
-Hobby プラン前提。`vercel.json` に Cron を定義:
-
-```json
-{
-  "crons": [
-    { "path": "/api/cron/evaluate-alerts", "schedule": "0 * * * *" }
-  ]
-}
-```
-
-Hobby 無料枠は日次1回までのため、アラートはクライアント側 `setInterval`（5 分）との併用を推奨。
-
-### 検証
+## 検証コマンド
 
 ```bash
-# テスト: 56 files / 332 tests passing
-npx vitest run
-
-# ビルド: 17 pages, Compiled successfully
-npx next build
-
-# ワークスペースルートで構造整合確認
+npm run lint
+npm run test
+npm run build
 powershell ../../validate.ps1
 powershell ../../deploy.ps1 -Check
 ```
 
-### A11y 方針
+テスト件数やビルド出力件数は変わりやすいため README には固定値を書かず、都度コマンド結果を正としてください。
 
-- 全主要フォーム要素に `aria-label` / `role`
-- モーダルは `role="dialog"` + `aria-modal="true"` + Escape 閉じ
-- トースト通知は `role="log"` + `aria-live="polite"`
-- `prefers-reduced-motion` を Framer Motion で尊重
-- キーボード操作（Tab / Enter / Escape / Cmd+K）完全対応
+## 関連ドキュメント
 
-- `src/components/dashboard/MorningCheckPanel.tsx`
-- `src/components/dashboard/CollapseSimulatorPanel.tsx`
-- `src/components/dashboard/ContrarianPanel.tsx`
-- `src/components/dashboard/StockOnboardingPanel.tsx`
-
-## 現在の制約
-
-- 保存は localStorage のみ（サーバー永続化なし）
-- compare は最大4件の軽量設計
-- timeline は snapshot 依存（未保存時は empty state）
-- watchlist backtest UI は未実装（将来拡張）
-
-## 今後の拡張候補（Phase 6+）
-
-- watchlist比較UIの本格化
-- snapshot差分分析（期間比較）
-- exportテンプレート拡張
-- サーバー側アーカイブ/共有
-
-## Phase 6: サイバーデザイン + AI ナビゲーター + ローソク足チャート
-
-### 概要
-
-Investment Dashboard のサイバー風デザインと AI 投資パイプラインを統合しました。
-
-- **デザインシステム全面置換**: 黒背景 + 緑 #00ff41、Orbitron / Share Tech Mono フォント、スキャンライン、グロー効果
-- **日経225ローソク足チャート**: TradingView lightweight-charts で 5分足〜週足に対応
-- **AI 投資ナビゲーター**: Gemini API による 4段階パイプライン（マクロ分析 → 銘柄選定 → ディベート → 最終評価）
-
-### 追加環境変数
-
-```env
-# AI ナビゲーター（Gemini API）
-GEMINI_API_KEY=your_gemini_api_key_here
-
-# Alpha Vantage（5分足・15分足・1時間足に必要）
-ALPHA_VANTAGE_API_KEY=your_alpha_vantage_api_key_here
-```
-
-- `GEMINI_API_KEY` 未設定時: ナビゲーターは mock データで動作
-- `ALPHA_VANTAGE_API_KEY` 未設定時: 日足・週足のみ利用可能（Yahoo Finance 経由）
-- Alpha Vantage 無料枠: 25 リクエスト/日
-
-### ナビゲーター使い方
-
-1. マーケットタブ上部の **「AI NAVIGATOR」** ボタンをクリック
-2. モーダルで市場（JP / US / BOTH）、リスク許容度、投資期間を設定
-3. **「EXECUTE RESEARCH」** でパイプライン実行
-4. 結果はマーケットタブ上部に表示（マクロ環境、銘柄テーブル、ディベート判定、ベストピック）
-5. JSON エクスポート / インポートで結果を保存・復元可能
-
-### ローソク足チャート
-
-- 5分足 / 15分足 / 1時間足: Alpha Vantage API（要 API キー）
-- 日足 / 週足: Yahoo Finance（API キー不要）
-- ボリュームヒストグラム表示
-- サイバーテーマ（黒背景、緑/赤ローソク、緑グリッド）
-
-### 主要新規ファイル
-
-- `src/components/dashboard/NikkeiCandlestickChart.tsx` — ローソク足チャート
-- `src/components/navigator/` — AI ナビゲーター UI 一式
-- `src/services/gemini.ts` — Gemini API サービス層
-- `src/store/useNavigatorStore.ts` — ナビゲーター状態管理
-- `src/hooks/useNikkeiOhlc.ts` — OHLC データ取得フック
-- `src/types/navigator.ts` — ナビゲーター型定義
-- `src/app/api/navigator/` — ナビゲーター API ルート
-- `src/app/api/market-index-intraday/route.ts` — Alpha Vantage イントラデイ API
-
-### localStorage キー（ナビゲーター）
-
-- `stock-navigator-state-v1` — ナビゲーター設定・結果の永続化
+- `IMPLEMENTATION_NOTES.md` : 実装履歴、Phase 単位メモ、Artifact / Single HTML の補足
+- `DESIGN.md` : 設計メモ
+- `AGENTS.md` : 作業ルール
