@@ -293,7 +293,7 @@ JSON破損時は壊れたレコードのみ除外し、schema version 不一致�
 ### 追加機能サマリ
 
 | 機能 | ページ / エンドポイント |
-|------|-------------------------|
+| ------ | ------------------------- |
 | 範囲検索（JP 4-5桁 / US 2-5文字） | `src/components/search/RangePicker.tsx` |
 | ETF 一覧（日米） | `/etf` |
 | ポートフォリオ記録 | `/portfolio` + `useHoldingsStore` |
@@ -314,19 +314,20 @@ JSON破損時は壊れたレコードのみ除外し、schema version 不一致�
 ### LLM 二層 API
 
 | 層 | モデル | エンドポイント | キャッシュ |
-|----|--------|----------------|----------|
+| ---- | -------- | ---------------- | ---------- |
 | Quick（非推論） | OpenRouter 経由 `qwen/qwen3-next-80b-a3b-instruct:free` | `/api/quick/news-summary` | 30分 |
-|  |  | `/api/quick/inline-explain` | 24時間 |
-| Deep（推論） | OpenRouter `openai/gpt-oss-120b:free`<br/>fallback: `nvidia/nemotron-3-super-120b-a12b:free` | `/api/deep/radar-score` | 24時間 |
-|  |  | `/api/deep/portfolio-review` | 12時間 |
-|  |  | `/api/deep/backtest-interpret` | 24時間 |
-| **Tier 4 (Web grounded)** | `openai/gpt-oss-120b:free` + `openrouter:web_search`<br/>fallback: `nvidia/nemotron-3-super-120b-a12b:free` | `/api/deep/why-moved` | 1時間 |
+| | | `/api/quick/inline-explain` | 24時間 |
+| Deep（推論） | OpenRouter `openai/gpt-oss-120b:free`（fallback: `nvidia/nemotron-3-super-120b-a12b:free`） | `/api/deep/radar-score` | 24時間 |
+| | | `/api/deep/portfolio-review` | 12時間 |
+| | | `/api/deep/backtest-interpret` | 24時間 |
+| **Tier 4 (Web grounded)** | `openai/gpt-oss-120b:free` + `openrouter:web_search`（fallback: `nvidia/nemotron-3-super-120b-a12b:free`） | `/api/deep/why-moved` | 1時間 |
 
 **全ての LLM 呼び出しは OpenRouter 経由に統一**（Google 側リクエスト制限の回避・API key 集約）。
 Quick tier の既定モデルは env `QUICK_LLM_MODEL` で上書き可（例: `google/gemini-2.5-flash` / `google/gemini-flash-1.5`）。
 
 **Tier 4 `/api/deep/why-moved`**: 銘柄の値動き要因を Web 検索でグラウンディングし、
 `確定材料 / 推測` を confidence 付きで JSON 出力。リクエスト body:
+
 ```json
 { "ticker": "7203", "moveContext": "+4.2% on 2x volume",
   "articles": [{ "title": "...", "url": "...", "snippet": "..." }],
@@ -339,7 +340,7 @@ Quick tier の既定モデルは env `QUICK_LLM_MODEL` で上書き可（例: `g
 ### データソース整理（Investment Navigator Pro）
 
 | 種別 | ソース | 鍵 | 備考 |
-|------|--------|----|------|
+| ------ | -------- | ---- | ------ |
 | 日本株価 | J-Quants V2 | `JQUANTS_API_KEY` | 既存 `jquantsPriceProvider.ts` |
 | 日本財務 | EDINET DB | `EDINETDB_API_KEY` | 既存 `edinetDbProvider.ts` |
 | 米国株価 | Yahoo Finance / Alpha Vantage | `ALPHA_VANTAGE_API_KEY` (任意) | 既存 |
@@ -376,6 +377,7 @@ CRON_SECRET=random_long_string_here
 ```
 
 未設定時の挙動:
+
 - `OPENROUTER_API_KEY` 未設定 → 全 LLM API は 503 を返却、UI は graceful degrade
 - `MARKETAUX_API_KEY` 未設定 → RSS + 既存プロバイダのみでニュース集約（日本語カバレッジは十分）
 - `JQUANTS_API_KEY` 未設定 → Yahoo / Alpha Vantage にフォールバック
@@ -391,7 +393,7 @@ CRON_SECRET=random_long_string_here
 ### Command Palette ショートカット
 
 | 操作 | アクション |
-|------|----------|
+| ------ | ---------- |
 | `Cmd/Ctrl + K` | パレット起動 |
 | `nav.home` / `nav.etf` / `nav.portfolio` / `nav.backtest` / `nav.alerts` | 画面遷移 |
 | `portfolio.addHolding` | ポートフォリオ画面で追加フォームにフォーカス |
@@ -504,6 +506,6 @@ ALPHA_VANTAGE_API_KEY=your_alpha_vantage_api_key_here
 - `src/app/api/navigator/` — ナビゲーター API ルート
 - `src/app/api/market-index-intraday/route.ts` — Alpha Vantage イントラデイ API
 
-### localStorage キー（追加）
+### localStorage キー（ナビゲーター）
 
 - `stock-navigator-state-v1` — ナビゲーター設定・結果の永続化
