@@ -2,7 +2,7 @@
 
 > **For agentic workers:** REQUIRED: Use subagent-driven-development (if subagents available) or executing-plans to implement this plan. Steps use checkbox (`- [ ]`) syntax for tracking.
 
-**Goal:** Product/autotrader-ui に、SP-1 FastAPI の監視情報を 1 ページで可視化する監視中心の Next.js ダッシュボードを実装する。
+**Goal:** Product/autotrader-suite/ui に、SP-1 FastAPI の監視情報を 1 ページで可視化する監視中心の Next.js ダッシュボードを実装する。
 
 **Architecture:** Next.js 14 App Router で単一ページの監視コンソールを作る。初期化は `GET /api/settings`、継続更新は `WS /ws` を使い、`useTraderSocket` が raw payload を受信し、`lib/trader-view-model.ts` が UI 向け ViewModel に正規化する。設定更新は Next.js API route の薄い proxy を経由し、常に `RiskSettings` 全量 PUT で送る。
 
@@ -20,61 +20,61 @@
 
 | パス | 役割 |
 |---|---|
-| `Product/autotrader-ui/package.json` | Next/Vitest scripts と最小依存関係 |
-| `Product/autotrader-ui/tsconfig.json` | TypeScript 設定 |
-| `Product/autotrader-ui/next.config.mjs` | Next.js 基本設定 |
-| `Product/autotrader-ui/postcss.config.mjs` | Tailwind/PostCSS 設定 |
-| `Product/autotrader-ui/tailwind.config.ts` | 監視コンソール用デザイントークン |
-| `Product/autotrader-ui/.eslintrc.json` | Next ESLint 設定 |
-| `Product/autotrader-ui/next-env.d.ts` | Next.js 型定義 |
-| `Product/autotrader-ui/vitest.config.ts` | jsdom + alias + setupFiles |
-| `Product/autotrader-ui/tests/setup.ts` | jest-dom と WebSocket/fetch テスト初期化 |
-| `Product/autotrader-ui/app/layout.tsx` | ルート layout と metadata |
-| `Product/autotrader-ui/app/page.tsx` | server component として client entry を返す composition のみ |
-| `Product/autotrader-ui/app/globals.css` | 背景、タイポ、panel utility |
-| `Product/autotrader-ui/app/api/settings/route.ts` | backend settings endpoint への薄い proxy |
-| `Product/autotrader-ui/components/DashboardClient.tsx` | `use client` 境界。socket hook と settings fetch を束ねる |
-| `Product/autotrader-ui/components/DashboardShell.tsx` | page 全体の grid 組み立て |
-| `Product/autotrader-ui/components/StatusHeader.tsx` | 接続状態、更新時刻、stale/waiting 表示 |
-| `Product/autotrader-ui/components/PricePanel.tsx` | 現在値、出来高、feed、sparkline |
-| `Product/autotrader-ui/components/PositionPanel.tsx` | 保有数、平均取得単価、損益 |
-| `Product/autotrader-ui/components/LatestActionCard.tsx` | latest event の意味づけ表示 |
-| `Product/autotrader-ui/components/AiLogPanel.tsx` | `buy/sell/hold` のイベントログ |
-| `Product/autotrader-ui/components/OrderHistory.tsx` | `buy/sell` のみの履歴 |
-| `Product/autotrader-ui/components/RiskSettingsAccordion.tsx` | 折りたたみ式設定フォーム |
-| `Product/autotrader-ui/hooks/useTraderSocket.ts` | WebSocket 接続状態と再接続管理 |
-| `Product/autotrader-ui/lib/trader-view-model.ts` | raw payload 検証、履歴生成、50件丸め |
-| `Product/autotrader-ui/lib/api.ts` | settings GET/PUT helper |
-| `Product/autotrader-ui/lib/constants.ts` | stale 閾値、history 件数、既定 URL |
-| `Product/autotrader-ui/types/trader.ts` | raw payload 型と ViewModel 型 |
-| `Product/autotrader-ui/README.md` | セットアップと backend 接続手順 |
-| `Product/autotrader-ui/.env.local.example` | `NEXT_PUBLIC_AUTOTRADER_SERVER_BASE_URL` の例 |
-| `Product/autotrader-ui/tests/useTraderSocket.test.ts` | socket/reducer 系テスト |
-| `Product/autotrader-ui/tests/DashboardShell.test.tsx` | page/panel 表示統合テスト |
-| `Product/autotrader-ui/tests/RiskSettingsAccordion.test.tsx` | settings GET/PUT と auto/manual UX テスト |
+| `Product/autotrader-suite/ui/package.json` | Next/Vitest scripts と最小依存関係 |
+| `Product/autotrader-suite/ui/tsconfig.json` | TypeScript 設定 |
+| `Product/autotrader-suite/ui/next.config.mjs` | Next.js 基本設定 |
+| `Product/autotrader-suite/ui/postcss.config.mjs` | Tailwind/PostCSS 設定 |
+| `Product/autotrader-suite/ui/tailwind.config.ts` | 監視コンソール用デザイントークン |
+| `Product/autotrader-suite/ui/.eslintrc.json` | Next ESLint 設定 |
+| `Product/autotrader-suite/ui/next-env.d.ts` | Next.js 型定義 |
+| `Product/autotrader-suite/ui/vitest.config.ts` | jsdom + alias + setupFiles |
+| `Product/autotrader-suite/ui/tests/setup.ts` | jest-dom と WebSocket/fetch テスト初期化 |
+| `Product/autotrader-suite/ui/app/layout.tsx` | ルート layout と metadata |
+| `Product/autotrader-suite/ui/app/page.tsx` | server component として client entry を返す composition のみ |
+| `Product/autotrader-suite/ui/app/globals.css` | 背景、タイポ、panel utility |
+| `Product/autotrader-suite/ui/app/api/settings/route.ts` | backend settings endpoint への薄い proxy |
+| `Product/autotrader-suite/ui/components/DashboardClient.tsx` | `use client` 境界。socket hook と settings fetch を束ねる |
+| `Product/autotrader-suite/ui/components/DashboardShell.tsx` | page 全体の grid 組み立て |
+| `Product/autotrader-suite/ui/components/StatusHeader.tsx` | 接続状態、更新時刻、stale/waiting 表示 |
+| `Product/autotrader-suite/ui/components/PricePanel.tsx` | 現在値、出来高、feed、sparkline |
+| `Product/autotrader-suite/ui/components/PositionPanel.tsx` | 保有数、平均取得単価、損益 |
+| `Product/autotrader-suite/ui/components/LatestActionCard.tsx` | latest event の意味づけ表示 |
+| `Product/autotrader-suite/ui/components/AiLogPanel.tsx` | `buy/sell/hold` のイベントログ |
+| `Product/autotrader-suite/ui/components/OrderHistory.tsx` | `buy/sell` のみの履歴 |
+| `Product/autotrader-suite/ui/components/RiskSettingsAccordion.tsx` | 折りたたみ式設定フォーム |
+| `Product/autotrader-suite/ui/hooks/useTraderSocket.ts` | WebSocket 接続状態と再接続管理 |
+| `Product/autotrader-suite/ui/lib/trader-view-model.ts` | raw payload 検証、履歴生成、50件丸め |
+| `Product/autotrader-suite/ui/lib/api.ts` | settings GET/PUT helper |
+| `Product/autotrader-suite/ui/lib/constants.ts` | stale 閾値、history 件数、既定 URL |
+| `Product/autotrader-suite/ui/types/trader.ts` | raw payload 型と ViewModel 型 |
+| `Product/autotrader-suite/ui/README.md` | セットアップと backend 接続手順 |
+| `Product/autotrader-suite/ui/.env.local.example` | `NEXT_PUBLIC_AUTOTRADER_SERVER_BASE_URL` の例 |
+| `Product/autotrader-suite/ui/tests/useTraderSocket.test.ts` | socket/reducer 系テスト |
+| `Product/autotrader-suite/ui/tests/DashboardShell.test.tsx` | page/panel 表示統合テスト |
+| `Product/autotrader-suite/ui/tests/RiskSettingsAccordion.test.tsx` | settings GET/PUT と auto/manual UX テスト |
 
 ## Task 1: Workspace Bootstrap And Smoke Shell
 
 **Files:**
-- Create: `Product/autotrader-ui/package.json`
-- Create: `Product/autotrader-ui/tsconfig.json`
-- Create: `Product/autotrader-ui/next.config.mjs`
-- Create: `Product/autotrader-ui/postcss.config.mjs`
-- Create: `Product/autotrader-ui/tailwind.config.ts`
-- Create: `Product/autotrader-ui/.eslintrc.json`
-- Create: `Product/autotrader-ui/next-env.d.ts`
-- Create: `Product/autotrader-ui/vitest.config.ts`
-- Create: `Product/autotrader-ui/tests/setup.ts`
-- Create: `Product/autotrader-ui/app/layout.tsx`
-- Create: `Product/autotrader-ui/app/page.tsx`
-- Create: `Product/autotrader-ui/app/globals.css`
-- Create: `Product/autotrader-ui/README.md`
-- Create: `Product/autotrader-ui/.env.local.example`
-- Test: `Product/autotrader-ui/tests/DashboardShell.test.tsx`
+- Create: `Product/autotrader-suite/ui/package.json`
+- Create: `Product/autotrader-suite/ui/tsconfig.json`
+- Create: `Product/autotrader-suite/ui/next.config.mjs`
+- Create: `Product/autotrader-suite/ui/postcss.config.mjs`
+- Create: `Product/autotrader-suite/ui/tailwind.config.ts`
+- Create: `Product/autotrader-suite/ui/.eslintrc.json`
+- Create: `Product/autotrader-suite/ui/next-env.d.ts`
+- Create: `Product/autotrader-suite/ui/vitest.config.ts`
+- Create: `Product/autotrader-suite/ui/tests/setup.ts`
+- Create: `Product/autotrader-suite/ui/app/layout.tsx`
+- Create: `Product/autotrader-suite/ui/app/page.tsx`
+- Create: `Product/autotrader-suite/ui/app/globals.css`
+- Create: `Product/autotrader-suite/ui/README.md`
+- Create: `Product/autotrader-suite/ui/.env.local.example`
+- Test: `Product/autotrader-suite/ui/tests/DashboardShell.test.tsx`
 
 - [ ] **Step 1: Create the project manifest and scripts**
 
-Create `Product/autotrader-ui/package.json` with this baseline:
+Create `Product/autotrader-suite/ui/package.json` with this baseline:
 
 ```json
 {
@@ -118,13 +118,13 @@ Create `Product/autotrader-ui/package.json` with this baseline:
 Mirror the repo’s existing frontend conventions from `Product/stock_monitor_app_next`, but keep this app smaller. Include:
 
 ```ts
-// Product/autotrader-ui/next.config.mjs
+// Product/autotrader-suite/ui/next.config.mjs
 const nextConfig = { reactStrictMode: true };
 export default nextConfig;
 ```
 
 ```ts
-// Product/autotrader-ui/vitest.config.ts
+// Product/autotrader-suite/ui/vitest.config.ts
 import { defineConfig } from "vitest/config";
 import path from "node:path";
 
@@ -147,7 +147,7 @@ export default defineConfig({
 Run:
 
 ```bash
-Push-Location "c:/Users/hacsa/Desktop/サトシ開発/Product/autotrader-ui"
+Push-Location "c:/Users/hacsa/Desktop/サトシ開発/Product/autotrader-suite/ui"
 npm install
 ```
 
@@ -155,7 +155,7 @@ Expected: `package-lock.json` is created and install exits `0`.
 
 - [ ] **Step 4: Write the failing smoke test for the shell**
 
-Create `Product/autotrader-ui/tests/DashboardShell.test.tsx` with the smallest first assertion:
+Create `Product/autotrader-suite/ui/tests/DashboardShell.test.tsx` with the smallest first assertion:
 
 ```tsx
 import { render, screen } from "@testing-library/react";
@@ -173,7 +173,7 @@ test("shows waiting status before first tick", () => {
 Run:
 
 ```bash
-Push-Location "c:/Users/hacsa/Desktop/サトシ開発/Product/autotrader-ui"
+Push-Location "c:/Users/hacsa/Desktop/サトシ開発/Product/autotrader-suite/ui"
 npx vitest run tests/DashboardShell.test.tsx
 ```
 
@@ -184,7 +184,7 @@ Expected: FAIL because `app/page.tsx` or shell elements do not exist yet.
 Add `app/layout.tsx`, `app/globals.css`, and `app/page.tsx` with a minimal placeholder page:
 
 ```tsx
-// Product/autotrader-ui/app/page.tsx
+// Product/autotrader-suite/ui/app/page.tsx
 export default function HomePage(): JSX.Element {
   return (
     <main>
@@ -202,7 +202,7 @@ Also create `README.md` and `.env.local.example` now so later tasks only extend 
 Run:
 
 ```bash
-Push-Location "c:/Users/hacsa/Desktop/サトシ開発/Product/autotrader-ui"
+Push-Location "c:/Users/hacsa/Desktop/サトシ開発/Product/autotrader-suite/ui"
 npx vitest run tests/DashboardShell.test.tsx
 ```
 
@@ -212,22 +212,22 @@ Expected: PASS.
 
 ```bash
 Push-Location "c:/Users/hacsa/Desktop/サトシ開発"
-git add Product/autotrader-ui
+git add Product/autotrader-suite/ui
 git commit -m "feat(autotrader-ui): bootstrap Next.js dashboard workspace"
 ```
 
 ## Task 2: Implement Raw Contract Normalization And Socket State
 
 **Files:**
-- Create: `Product/autotrader-ui/types/trader.ts`
-- Create: `Product/autotrader-ui/lib/constants.ts`
-- Create: `Product/autotrader-ui/lib/trader-view-model.ts`
-- Create: `Product/autotrader-ui/hooks/useTraderSocket.ts`
-- Test: `Product/autotrader-ui/tests/useTraderSocket.test.ts`
+- Create: `Product/autotrader-suite/ui/types/trader.ts`
+- Create: `Product/autotrader-suite/ui/lib/constants.ts`
+- Create: `Product/autotrader-suite/ui/lib/trader-view-model.ts`
+- Create: `Product/autotrader-suite/ui/hooks/useTraderSocket.ts`
+- Test: `Product/autotrader-suite/ui/tests/useTraderSocket.test.ts`
 
 - [ ] **Step 1: Write the failing tests for payload normalization**
 
-Create `Product/autotrader-ui/tests/useTraderSocket.test.ts` with pure contract-first coverage before hook details:
+Create `Product/autotrader-suite/ui/tests/useTraderSocket.test.ts` with pure contract-first coverage before hook details:
 
 ```ts
 import { describe, expect, test } from "vitest";
@@ -285,7 +285,7 @@ Also add tests for:
 Run:
 
 ```bash
-Push-Location "c:/Users/hacsa/Desktop/サトシ開発/Product/autotrader-ui"
+Push-Location "c:/Users/hacsa/Desktop/サトシ開発/Product/autotrader-suite/ui"
 npx vitest run tests/useTraderSocket.test.ts
 ```
 
@@ -342,7 +342,7 @@ export function useTraderSocket() {
 Run:
 
 ```bash
-Push-Location "c:/Users/hacsa/Desktop/サトシ開発/Product/autotrader-ui"
+Push-Location "c:/Users/hacsa/Desktop/サトシ開発/Product/autotrader-suite/ui"
 npx vitest run tests/useTraderSocket.test.ts
 ```
 
@@ -352,24 +352,24 @@ Expected: PASS.
 
 ```bash
 Push-Location "c:/Users/hacsa/Desktop/サトシ開発"
-git add Product/autotrader-ui
+git add Product/autotrader-suite/ui
 git commit -m "feat(autotrader-ui): add trader socket state model"
 ```
 
 ## Task 3: Build The Monitoring Console UI
 
 **Files:**
-- Create: `Product/autotrader-ui/components/DashboardClient.tsx`
-- Create: `Product/autotrader-ui/components/DashboardShell.tsx`
-- Create: `Product/autotrader-ui/components/StatusHeader.tsx`
-- Create: `Product/autotrader-ui/components/PricePanel.tsx`
-- Create: `Product/autotrader-ui/components/PositionPanel.tsx`
-- Create: `Product/autotrader-ui/components/LatestActionCard.tsx`
-- Create: `Product/autotrader-ui/components/AiLogPanel.tsx`
-- Create: `Product/autotrader-ui/components/OrderHistory.tsx`
-- Modify: `Product/autotrader-ui/app/page.tsx`
-- Modify: `Product/autotrader-ui/app/globals.css`
-- Test: `Product/autotrader-ui/tests/DashboardShell.test.tsx`
+- Create: `Product/autotrader-suite/ui/components/DashboardClient.tsx`
+- Create: `Product/autotrader-suite/ui/components/DashboardShell.tsx`
+- Create: `Product/autotrader-suite/ui/components/StatusHeader.tsx`
+- Create: `Product/autotrader-suite/ui/components/PricePanel.tsx`
+- Create: `Product/autotrader-suite/ui/components/PositionPanel.tsx`
+- Create: `Product/autotrader-suite/ui/components/LatestActionCard.tsx`
+- Create: `Product/autotrader-suite/ui/components/AiLogPanel.tsx`
+- Create: `Product/autotrader-suite/ui/components/OrderHistory.tsx`
+- Modify: `Product/autotrader-suite/ui/app/page.tsx`
+- Modify: `Product/autotrader-suite/ui/app/globals.css`
+- Test: `Product/autotrader-suite/ui/tests/DashboardShell.test.tsx`
 
 - [ ] **Step 1: Extend the failing UI tests**
 
@@ -402,7 +402,7 @@ Use mocked hook output so the page test stays deterministic.
 Run:
 
 ```bash
-Push-Location "c:/Users/hacsa/Desktop/サトシ開発/Product/autotrader-ui"
+Push-Location "c:/Users/hacsa/Desktop/サトシ開発/Product/autotrader-suite/ui"
 npx vitest run tests/DashboardShell.test.tsx
 ```
 
@@ -413,7 +413,7 @@ Expected: FAIL because panels and feed badges do not exist yet.
 Build the page around an explicit client boundary:
 
 ```tsx
-// Product/autotrader-ui/app/page.tsx
+// Product/autotrader-suite/ui/app/page.tsx
 import { DashboardClient } from "@/components/DashboardClient";
 
 export default function HomePage(): JSX.Element {
@@ -422,7 +422,7 @@ export default function HomePage(): JSX.Element {
 ```
 
 ```tsx
-// Product/autotrader-ui/components/DashboardClient.tsx
+// Product/autotrader-suite/ui/components/DashboardClient.tsx
 "use client";
 
 import { DashboardShell } from "@/components/DashboardShell";
@@ -465,7 +465,7 @@ Add compact but readable utilities to `app/globals.css` using the dark-console d
 Run:
 
 ```bash
-Push-Location "c:/Users/hacsa/Desktop/サトシ開発/Product/autotrader-ui"
+Push-Location "c:/Users/hacsa/Desktop/サトシ開発/Product/autotrader-suite/ui"
 npx vitest run tests/DashboardShell.test.tsx
 ```
 
@@ -475,19 +475,19 @@ Expected: PASS.
 
 ```bash
 Push-Location "c:/Users/hacsa/Desktop/サトシ開発"
-git add Product/autotrader-ui
+git add Product/autotrader-suite/ui
 git commit -m "feat(autotrader-ui): add monitoring dashboard panels"
 ```
 
 ## Task 4: Add Settings Proxy And Minimal Edit UX
 
 **Files:**
-- Create: `Product/autotrader-ui/lib/api.ts`
-- Create: `Product/autotrader-ui/app/api/settings/route.ts`
-- Create: `Product/autotrader-ui/components/RiskSettingsAccordion.tsx`
-- Modify: `Product/autotrader-ui/components/DashboardShell.tsx`
-- Modify: `Product/autotrader-ui/types/trader.ts`
-- Test: `Product/autotrader-ui/tests/RiskSettingsAccordion.test.tsx`
+- Create: `Product/autotrader-suite/ui/lib/api.ts`
+- Create: `Product/autotrader-suite/ui/app/api/settings/route.ts`
+- Create: `Product/autotrader-suite/ui/components/RiskSettingsAccordion.tsx`
+- Modify: `Product/autotrader-suite/ui/components/DashboardShell.tsx`
+- Modify: `Product/autotrader-suite/ui/types/trader.ts`
+- Test: `Product/autotrader-suite/ui/tests/RiskSettingsAccordion.test.tsx`
 
 - [ ] **Step 1: Write the failing settings tests**
 
@@ -525,7 +525,7 @@ test("keeps draft values when PUT fails", async () => {
 Run:
 
 ```bash
-Push-Location "c:/Users/hacsa/Desktop/サトシ開発/Product/autotrader-ui"
+Push-Location "c:/Users/hacsa/Desktop/サトシ開発/Product/autotrader-suite/ui"
 npx vitest run tests/RiskSettingsAccordion.test.tsx
 ```
 
@@ -575,7 +575,7 @@ Rules:
 Run:
 
 ```bash
-Push-Location "c:/Users/hacsa/Desktop/サトシ開発/Product/autotrader-ui"
+Push-Location "c:/Users/hacsa/Desktop/サトシ開発/Product/autotrader-suite/ui"
 npx vitest run tests/RiskSettingsAccordion.test.tsx
 ```
 
@@ -585,19 +585,19 @@ Expected: PASS.
 
 ```bash
 Push-Location "c:/Users/hacsa/Desktop/サトシ開発"
-git add Product/autotrader-ui
+git add Product/autotrader-suite/ui
 git commit -m "feat(autotrader-ui): add settings proxy and accordion editor"
 ```
 
 ## Task 5: Final Wiring, Docs, And Verification
 
 **Files:**
-- Modify: `Product/autotrader-ui/app/page.tsx`
-- Modify: `Product/autotrader-ui/README.md`
-- Modify: `Product/autotrader-ui/.env.local.example`
-- Modify: `Product/autotrader-ui/tests/DashboardShell.test.tsx`
-- Modify: `Product/autotrader-ui/tests/useTraderSocket.test.ts`
-- Modify: `Product/autotrader-ui/tests/RiskSettingsAccordion.test.tsx`
+- Modify: `Product/autotrader-suite/ui/app/page.tsx`
+- Modify: `Product/autotrader-suite/ui/README.md`
+- Modify: `Product/autotrader-suite/ui/.env.local.example`
+- Modify: `Product/autotrader-suite/ui/tests/DashboardShell.test.tsx`
+- Modify: `Product/autotrader-suite/ui/tests/useTraderSocket.test.ts`
+- Modify: `Product/autotrader-suite/ui/tests/RiskSettingsAccordion.test.tsx`
 
 - [ ] **Step 1: Add the final integrated assertions**
 
@@ -612,7 +612,7 @@ Before final verification, ensure the test set includes:
 Run:
 
 ```bash
-Push-Location "c:/Users/hacsa/Desktop/サトシ開発/Product/autotrader-ui"
+Push-Location "c:/Users/hacsa/Desktop/サトシ開発/Product/autotrader-suite/ui"
 npm run test
 ```
 
@@ -623,7 +623,7 @@ Expected: all Vitest tests pass.
 Run:
 
 ```bash
-Push-Location "c:/Users/hacsa/Desktop/サトシ開発/Product/autotrader-ui"
+Push-Location "c:/Users/hacsa/Desktop/サトシ開発/Product/autotrader-suite/ui"
 npm run lint
 ```
 
@@ -634,7 +634,7 @@ Expected: no ESLint errors.
 Run:
 
 ```bash
-Push-Location "c:/Users/hacsa/Desktop/サトシ開発/Product/autotrader-ui"
+Push-Location "c:/Users/hacsa/Desktop/サトシ開発/Product/autotrader-suite/ui"
 npm run build
 ```
 
@@ -647,14 +647,14 @@ Use three terminals.
 Terminal A:
 
 ```bash
-Push-Location "c:/Users/hacsa/Desktop/サトシ開発/Product/autotrader"
+Push-Location "c:/Users/hacsa/Desktop/サトシ開発/Product/autotrader-suite/backend"
 ./.venv/Scripts/python.exe -m uvicorn server.main:app --host 127.0.0.1 --port 8000
 ```
 
 Terminal B:
 
 ```bash
-Push-Location "c:/Users/hacsa/Desktop/サトシ開発/Product/autotrader-ui"
+Push-Location "c:/Users/hacsa/Desktop/サトシ開発/Product/autotrader-suite/ui"
 npm run dev
 ```
 
@@ -725,13 +725,13 @@ Extend `README.md` with:
 
 ```bash
 Push-Location "c:/Users/hacsa/Desktop/サトシ開発"
-git add Product/autotrader-ui
+git add Product/autotrader-suite/ui
 git commit -m "feat(autotrader-ui): ship SP-3 monitoring dashboard"
 ```
 
 ## Verification Checklist
 
-- [ ] `Product/autotrader-ui` が Next.js アプリとして起動できる
+- [ ] `Product/autotrader-suite/ui` が Next.js アプリとして起動できる
 - [ ] `/api/settings` proxy が backend settings と疎通する
 - [ ] `WS /ws` の execution/reference event を区別表示できる
 - [ ] `LatestActionCard` が reference hold を誤って実行判断に見せない
@@ -741,3 +741,4 @@ git commit -m "feat(autotrader-ui): ship SP-3 monitoring dashboard"
 - [ ] `npm run test` が通る
 - [ ] `npm run lint` が通る
 - [ ] `npm run build` が通る
+

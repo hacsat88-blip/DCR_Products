@@ -1,0 +1,17 @@
+{
+	"version": "2.0.0",
+	"tasks": [
+		{
+			"label": "Install autotrader-ui deps",
+			"type": "shell",
+			"command": "npm",
+			"args": [
+				"install",
+				"--no-audit",
+				"--no-fund",
+				"--progress=false"
+			],
+			"isBackground": false
+		}
+	]
+}

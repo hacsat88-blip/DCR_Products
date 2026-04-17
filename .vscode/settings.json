@@ -1,5 +1,12 @@
 {
   "github.copilot.chat.codeGeneration.useInstructionFiles": true,
   "editor.inlineSuggest.enabled": true,
-  "redhat.telemetry.enabled": true
+  "redhat.telemetry.enabled": true,
+  "python.defaultInterpreterPath": "${workspaceFolder}/Product/autotrader-suite/backend/.venv/Scripts/python.exe",
+  "typescript.tsdk": "Product/dexter-jp/node_modules/typescript/lib",
+  "typescript.enablePromptUseWorkspaceTsdk": false,
+  "markdownlint.ignore": [
+    ".cursor/rules/**/*.mdc"
+],
+"editor.formatOnSave": true
 }

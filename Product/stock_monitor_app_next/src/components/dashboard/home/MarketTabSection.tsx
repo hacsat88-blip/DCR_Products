@@ -4,10 +4,9 @@ import React, { Suspense } from "react";
 
 import { DecisionBoard } from "@/components/dashboard/DecisionBoard";
 import { KpiCards } from "@/components/dashboard/KpiCards";
-import { NikkeiCandlestickChart } from "@/components/dashboard/NikkeiCandlestickChart";
+import { NikkeiChartPanel } from "@/components/dashboard/NikkeiChartPanel";
 import { RankingBoard } from "@/components/dashboard/RankingBoard";
 import { BenchmarkChart } from "@/components/dashboard/BenchmarkChart";
-import { NikkeiTrendChart } from "@/components/dashboard/NikkeiTrendChart";
 import { FilterPanel } from "@/components/screener/FilterPanel";
 import { SearchBar } from "@/components/screener/SearchBar";
 import { StockGrid } from "@/components/stock/StockGrid";
@@ -159,11 +158,7 @@ export function MarketTabSection({
         nikkei={nikkei}
       />
 
-      <NikkeiCandlestickChart lastUpdatedAt={lastUpdatedAt} />
-
-      <Suspense fallback={<SkeletonCard />}>
-        <NikkeiTrendChart lastUpdatedAt={lastUpdatedAt} />
-      </Suspense>
+      <NikkeiChartPanel lastUpdatedAt={lastUpdatedAt} />
 
       <Suspense fallback={<SkeletonCard />}>
         <BenchmarkChart stocks={stocks} />
