@@ -29,7 +29,6 @@ export interface NewsFetchOptions {
   region?: NewsRegion;
   symbols?: string[];
   limit?: number;
-  newsApiKey?: string;
   marketauxKey?: string;
   signal?: AbortSignal;
 }
