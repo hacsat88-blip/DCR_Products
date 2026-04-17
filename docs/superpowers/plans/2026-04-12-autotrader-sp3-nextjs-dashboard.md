@@ -115,7 +115,7 @@ Create `Product/autotrader-suite/ui/package.json` with this baseline:
 
 - [ ] **Step 2: Add Next/Tailwind/Vitest config files**
 
-Mirror the repo’s existing frontend conventions from `Product/stock_monitor_app_next`, but keep this app smaller. Include:
+Mirror the repo’s existing frontend conventions and shared TypeScript/Tailwind patterns, but keep this app smaller. Include:
 
 ```ts
 // Product/autotrader-suite/ui/next.config.mjs
