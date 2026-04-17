@@ -282,6 +282,159 @@ JSON破損時は壊れたレコードのみ除外し、schema version 不一致�
 - `src/components/dashboard/ExportPanel.tsx`
 - `src/components/dashboard/DataQualityRibbon.tsx`
 - `src/components/dashboard/ActionLaneBoard.tsx`
+
+---
+
+## Investment Navigator Pro（Phase 6 統合ビルド）
+
+日本株（0000-99999）/ 米国株（2-5文字ティッカー）/ 日米 ETF を対象とした意思決定支援ダッシュボード。
+`stock_monitor_app_next` を土台に、LLM 二層 API・FlipCard・ポートフォリオ・バックテスト・アラート・PWA を統合。
+
+### 追加機能サマリ
+
+| 機能 | ページ / エンドポイント |
+|------|-------------------------|
+| 範囲検索（JP 4-5桁 / US 2-5文字） | `src/components/search/RangePicker.tsx` |
+| ETF 一覧（日米） | `/etf` |
+| ポートフォリオ記録 | `/portfolio` + `useHoldingsStore` |
+| バックテスト（SMA/RSI/B&H） | `/backtest` + `src/lib/backtest/engine.ts` |
+| アラート（>=, <=, cross_up/down） | `/alerts` + `/api/cron/evaluate-alerts` |
+| 180° フリップ銘柄カード | `src/components/stock/FlipCard.tsx` |
+| レーダーチャート（5軸） | `src/components/charts/RadarChart.tsx` |
+| ローソク足 | `lightweight-charts` 経由（既存） |
+| Command Palette (Cmd+K) | `src/components/ui/AppCommandPaletteMount.tsx` |
+| スパークラインツールチップ | `src/components/ui/SparklineTooltip.tsx` |
+| セクター Treemap | `src/components/charts/SectorTreemap.tsx` |
+| 相関マトリクス | `src/components/charts/CorrelationHeatmap.tsx` |
+| ニュースセンチメント帯 | `src/components/news/NewsSentimentStrip.tsx` |
+| AI 解説ドロワー（🤖 なぜ？） | `src/components/ui/AiExplainDrawer.tsx` |
+| JSON スナップショット I/O | `src/lib/persistence/snapshotIo.ts` |
+| PWA（manifest + SW） | `public/manifest.json`, `public/sw.js` |
+
+### LLM 二層 API
+
+| 層 | モデル | エンドポイント | キャッシュ |
+|----|--------|----------------|----------|
+| Quick（非推論） | OpenRouter 経由 `qwen/qwen3-next-80b-a3b-instruct:free` | `/api/quick/news-summary` | 30分 |
+|  |  | `/api/quick/inline-explain` | 24時間 |
+| Deep（推論） | OpenRouter `openai/gpt-oss-120b:free`<br/>fallback: `nvidia/nemotron-3-super-120b-a12b:free` | `/api/deep/radar-score` | 24時間 |
+|  |  | `/api/deep/portfolio-review` | 12時間 |
+|  |  | `/api/deep/backtest-interpret` | 24時間 |
+| **Tier 4 (Web grounded)** | `openai/gpt-oss-120b:free` + `openrouter:web_search`<br/>fallback: `nvidia/nemotron-3-super-120b-a12b:free` | `/api/deep/why-moved` | 1時間 |
+
+**全ての LLM 呼び出しは OpenRouter 経由に統一**（Google 側リクエスト制限の回避・API key 集約）。
+Quick tier の既定モデルは env `QUICK_LLM_MODEL` で上書き可（例: `google/gemini-2.5-flash` / `google/gemini-flash-1.5`）。
+
+**Tier 4 `/api/deep/why-moved`**: 銘柄の値動き要因を Web 検索でグラウンディングし、
+`確定材料 / 推測` を confidence 付きで JSON 出力。リクエスト body:
+```json
+{ "ticker": "7203", "moveContext": "+4.2% on 2x volume",
+  "articles": [{ "title": "...", "url": "...", "snippet": "..." }],
+  "useWebSearch": true, "reasoningEffort": "medium" }
+```
+
+共通: 入力ハッシュキャッシュ (`src/lib/llmCache.ts`)、レート制御 (`src/lib/rateLimiter.ts`)、
+日次上限 (`DEEP_LLM_DAILY_CAP`)、タイムアウト / 429 backoff。
+
+### データソース整理（Investment Navigator Pro）
+
+| 種別 | ソース | 鍵 | 備考 |
+|------|--------|----|------|
+| 日本株価 | J-Quants V2 | `JQUANTS_API_KEY` | 既存 `jquantsPriceProvider.ts` |
+| 日本財務 | EDINET DB | `EDINETDB_API_KEY` | 既存 `edinetDbProvider.ts` |
+| 米国株価 | Yahoo Finance / Alpha Vantage | `ALPHA_VANTAGE_API_KEY` (任意) | 既存 |
+| ニュース (RSS) | Yahoo JP / Google News / 日経 / ロイター / Yahoo US | 鍵不要 | `src/services/news/sources/rss.ts` |
+| ニュース (株特化) | **Marketaux** | `MARKETAUX_API_KEY` (任意) | 100req/日 無料・sentiment 付き（米株中心） |
+
+### 追加環境変数（`.env.local`）
+
+```env
+# OpenRouter（全 LLM 呼び出しの統一エンドポイント）
+OPENROUTER_API_KEY=your_openrouter_key_here
+DEEP_LLM_DAILY_CAP=100
+# 任意: Quick tier のモデル上書き（既定: qwen/qwen3-next-80b-a3b-instruct:free）
+# QUICK_LLM_MODEL=google/gemini-2.5-flash
+# 任意: Deep tier のモデル上書き（既定: openai/gpt-oss-120b:free）
+# DEEP_LLM_MODEL=openai/gpt-oss-120b:free
+# DEEP_LLM_FALLBACK_MODEL=nvidia/nemotron-3-super-120b-a12b:free
+
+# 旧互換: Gemini 直接呼び出し時の fallback（通常は不要）
+# GEMINI_API_KEY=your_gemini_api_key_here
+
+# ニュース集約（任意 / 主要ソースは RSS のため未設定でも動作）
+MARKETAUX_API_KEY=your_marketaux_key_here
+
+# J-Quants V2（日本株価）
+JQUANTS_API_KEY=your_jquants_v2_key_here
+# 旧 refresh token 方式は廃止。上記 JQUANTS_API_KEY を使用。
+
+# EDINET DB（日本企業の財務・開示）
+EDINETDB_API_KEY=your_edinetdb_key_here
+
+# Vercel Cron（アラート評価用共有シークレット）
+CRON_SECRET=random_long_string_here
+```
+
+未設定時の挙動:
+- `OPENROUTER_API_KEY` 未設定 → 全 LLM API は 503 を返却、UI は graceful degrade
+- `MARKETAUX_API_KEY` 未設定 → RSS + 既存プロバイダのみでニュース集約（日本語カバレッジは十分）
+- `JQUANTS_API_KEY` 未設定 → Yahoo / Alpha Vantage にフォールバック
+- `CRON_SECRET` 未設定 → `/api/cron/evaluate-alerts` は 401 を返す（デプロイ時は必須）
+
+### localStorage キー（追加）
+
+- `stock-monitor:holdings:v1` — ポートフォリオ保有銘柄
+- `stock-monitor:backtest:v1` — バックテスト履歴（最新 5 件）
+- `stock-monitor:alerts:v1` — アラートルール
+- スナップショット I/O は全 `SNAPSHOT_KEYS` を 1 つの JSON で Export / Import 可能
+
+### Command Palette ショートカット
+
+| 操作 | アクション |
+|------|----------|
+| `Cmd/Ctrl + K` | パレット起動 |
+| `nav.home` / `nav.etf` / `nav.portfolio` / `nav.backtest` / `nav.alerts` | 画面遷移 |
+| `portfolio.addHolding` | ポートフォリオ画面で追加フォームにフォーカス |
+| `backtest.runSample` | バックテスト画面でサンプル実行 |
+| `alerts.evaluateNow` | アラート評価を即時実行 |
+| `io.export` / `io.import` | JSON スナップショット I/O |
+
+### Vercel デプロイ
+
+Hobby プラン前提。`vercel.json` に Cron を定義:
+
+```json
+{
+  "crons": [
+    { "path": "/api/cron/evaluate-alerts", "schedule": "0 * * * *" }
+  ]
+}
+```
+
+Hobby 無料枠は日次1回までのため、アラートはクライアント側 `setInterval`（5 分）との併用を推奨。
+
+### 検証
+
+```bash
+# テスト: 56 files / 332 tests passing
+npx vitest run
+
+# ビルド: 17 pages, Compiled successfully
+npx next build
+
+# ワークスペースルートで構造整合確認
+powershell ../../validate.ps1
+powershell ../../deploy.ps1 -Check
+```
+
+### A11y 方針
+
+- 全主要フォーム要素に `aria-label` / `role`
+- モーダルは `role="dialog"` + `aria-modal="true"` + Escape 閉じ
+- トースト通知は `role="log"` + `aria-live="polite"`
+- `prefers-reduced-motion` を Framer Motion で尊重
+- キーボード操作（Tab / Enter / Escape / Cmd+K）完全対応
+
 - `src/components/dashboard/MorningCheckPanel.tsx`
 - `src/components/dashboard/CollapseSimulatorPanel.tsx`
 - `src/components/dashboard/ContrarianPanel.tsx`

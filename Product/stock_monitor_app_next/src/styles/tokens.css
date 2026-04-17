@@ -1,0 +1,40 @@
+:root {
+  --inp-bg-base: #0B1017;
+  --inp-bg-surface: #141A24;
+  --inp-bg-elevated: #1B2331;
+  --inp-bg-glass: rgba(27, 35, 49, 0.72);
+  --inp-border: #263042;
+  --inp-border-strong: #34425C;
+  --inp-text-primary: #E6EDF7;
+  --inp-text-secondary: #9AA9BF;
+  --inp-text-muted: #637087;
+  --inp-accent: #00D9FF;        /* cyan — primary */
+  --inp-accent-glow: 0 0 24px rgba(0, 217, 255, 0.35);
+  --inp-positive: #22C55E;
+  --inp-negative: #F97066;
+  --inp-warning: #F6C343;
+  --inp-info: #8AB4FF;
+  --inp-radar-axis: #34425C;
+  --inp-chart-grid: #1F2A3D;
+  --inp-shadow-card: 0 12px 40px rgba(0, 0, 0, 0.45);
+  --inp-radius-card: 16px;
+  --inp-radius-control: 10px;
+  --inp-duration-flip: 620ms;
+  --inp-ease-flip: cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+.inp-glass {
+  background: var(--inp-bg-glass);
+  backdrop-filter: blur(18px) saturate(1.1);
+  -webkit-backdrop-filter: blur(18px) saturate(1.1);
+  border: 1px solid var(--inp-border);
+  box-shadow: var(--inp-shadow-card);
+}
+
+.inp-neon-ring {
+  box-shadow: 0 0 0 1px var(--inp-accent), var(--inp-accent-glow);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .inp-flip-card { transition: none !important; }
+}
