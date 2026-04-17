@@ -14,13 +14,6 @@ import type {
   MarketScope,
   RiskTolerance,
   InvestmentHorizon,
-  GeopoliticalRisk,
-  MarketSentiment,
-  EconomicIndicator,
-  CentralBankPolicy,
-  VIXAlert,
-  PanelistVote,
-  ConvergenceStatus,
 } from "@/types/navigator";
 
 // ────────────────────────────────────────────────
