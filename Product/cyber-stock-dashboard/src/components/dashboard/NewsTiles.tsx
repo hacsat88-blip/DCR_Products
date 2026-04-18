@@ -14,9 +14,24 @@ interface NewsItem {
   sentimentLabel?: "positive" | "neutral" | "negative";
 }
 
-async function fetchNews(): Promise<{ items: NewsItem[] }> {
+interface NewsResponse {
+  items: NewsItem[];
+  warning?: string;
+}
+
+async function fetchNews(): Promise<NewsResponse> {
   const res = await fetch("/api/news?limit=12", { cache: "no-store" });
-  if (!res.ok) throw new Error(`news ${res.status}`);
+  if (!res.ok) {
+    const fallback = `news ${res.status}`;
+    let detail: string | undefined;
+    try {
+      const body = (await res.json()) as { detail?: string; error?: string };
+      detail = body.detail ?? body.error;
+    } catch {
+      // ignore json parse errors
+    }
+    throw new Error(detail ?? fallback);
+  }
   return res.json();
 }
 
@@ -34,6 +49,8 @@ export function NewsTiles() {
   });
 
   const items = q.data?.items ?? [];
+  const warning = q.data?.warning;
+  const errorDetail = q.error instanceof Error ? q.error.message : undefined;
 
   return (
     <section className="flex flex-col gap-3">
@@ -48,6 +65,14 @@ export function NewsTiles() {
       {q.isError && (
         <NeonCard glow="alert" className="text-xs text-alert">
           ニュース取得に失敗しました
+          {errorDetail && (
+            <p className="mt-1 text-[10px] text-text/60">{errorDetail}</p>
+          )}
+        </NeonCard>
+      )}
+      {warning && (
+        <NeonCard glow="subtle" className="text-[11px] text-amber-300/80">
+          {warning}
         </NeonCard>
       )}
       {items.length > 0 && (

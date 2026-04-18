@@ -9,6 +9,7 @@ vi.mock("@/lib/services/marketIndices", () => ({
       source: "alphaVantage",
       currency: "USD",
       status: "ok",
+      fallbackReason: null,
       data: [
         { date: "2025-01-01", open: 100, high: 101, low: 99, close: 100, volume: 0 },
         { date: "2025-01-02", open: 100, high: 102, low: 99.5, close: 101, volume: 0 },
@@ -32,6 +33,8 @@ describe("/api/indices route", () => {
     expect(Array.isArray(body.items)).toBe(true);
     expect(body.range).toBe("daily");
     expect(body.items[0].id).toBe("SPX");
+    expect(body.items[0].source).toBe("alphaVantage");
+    expect("fallbackReason" in body.items[0]).toBe(true);
   });
 
   it("defaults range to daily when invalid", async () => {

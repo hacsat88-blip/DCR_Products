@@ -38,7 +38,9 @@ npm run dev
 `.env.example` を `.env.local` にコピーして必要なキーを設定してください。
 
 - `OPENROUTER_API_KEY` + `OPENROUTER_MODEL_REASONING` / `OPENROUTER_MODEL_FAST`: LLM 連携 (未設定時は friendly fallback)
-- `JQUANTS_REFRESH_TOKEN`, `ALPHA_VANTAGE_API_KEY`, `MARKETAUX_API_KEY`, `EDINETDB_API_KEY`: 市場データ
+- `JQUANTS_API_KEY`, `ALPHA_VANTAGE_API_KEY`, `MARKETAUX_API_KEY`, `EDINETDB_API_KEY`: 市場データ (`J-Quants V2` は `x-api-key` ヘッダーで API キー認証)
+- 価格/指数データは `J-Quants/Alpha Vantage` 失敗時に `Yahoo Finance` へ自動フォールバック（Yahoo 用の追加キーは不要）
+- `JQUANTS_REFRESH_TOKEN` (任意/旧互換): `JQUANTS_API_KEY` 未設定時のみ旧 V1 認証へフォールバック
 - `DATABASE_URL` + `DATABASE_DRIVER` (`sqlite` | `pg`): SQLite (better-sqlite3) / Neon Postgres を切替
 - `CRON_SECRET`: Vercel Cron 標準の認証キー。`Authorization: Bearer ${CRON_SECRET}` で `/api/portfolio/snapshot` 等を保護
 - `CRON_KEY` (任意/旧方式): `x-cron-key` ヘッダーの互換用。移行中のみ設定
@@ -59,7 +61,7 @@ npm run dev
 
 ## 既知制約
 - Turbopack は Windows + 日本語パスで panic (`build` は webpack 固定で回避)
-- J-Quants 無料プランは前営業日終値のみ。N225/TOPIX 指数は擬似データフォールバック
+- J-Quants 無料プランは前営業日終値のみ。取得失敗時は Yahoo → 静的系列の順でフォールバック
 - Alpha Vantage 5 req/min。in-memory queue で守るが複数プロセス共有不可
 - レート制限・キャッシュは in-memory (Vercel 本番は Upstash 等への置換推奨)
 

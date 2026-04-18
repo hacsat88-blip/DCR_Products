@@ -10,7 +10,10 @@ export async function GET(req: Request): Promise<Response> {
   const range: IndexRange = rawRange === "weekly" ? "weekly" : "daily";
 
   try {
-    const items = await getAllIndices(range);
+    const items = (await getAllIndices(range)).map((item) => ({
+      ...item,
+      fallbackReason: item.fallbackReason ?? null,
+    }));
     return NextResponse.json(
       { items, range, asOf: new Date().toISOString() },
       {

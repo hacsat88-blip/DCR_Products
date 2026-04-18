@@ -84,4 +84,27 @@ describe("createAlphaVantageClient", () => {
     const client = createAlphaVantageClient({ fetchImpl, apiKey: "K" });
     await expect(client.getQuote("AAPL")).rejects.toThrow();
   });
+
+  it("returns friendly error when daily series payload shape is unexpected", async () => {
+    const fetchImpl = vi
+      .fn<typeof fetch>()
+      .mockResolvedValueOnce(mockResponse({ Information: "demo limit reached" }));
+    const client = createAlphaVantageClient({ fetchImpl, apiKey: "K" });
+    await expect(client.getDailyAdjusted("AAPL")).rejects.toThrow(
+      /AlphaVantage info/,
+    );
+  });
+
+  it("does not leak zod internals when daily series key is missing", async () => {
+    const fetchImpl = vi
+      .fn<typeof fetch>()
+      .mockResolvedValueOnce(mockResponse({ "Meta Data": {} }));
+    const client = createAlphaVantageClient({ fetchImpl, apiKey: "K" });
+    const err = await client
+      .getDailyAdjusted("AAPL")
+      .then(() => null, (e) => e);
+    const message = err instanceof Error ? err.message : String(err);
+    expect(message).toMatch(/daily data unavailable/);
+    expect(message).not.toMatch(/invalid_type/);
+  });
 });

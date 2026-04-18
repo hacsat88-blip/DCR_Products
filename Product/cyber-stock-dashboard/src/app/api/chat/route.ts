@@ -5,6 +5,7 @@ import {
   chatWithHistoryStream,
   type ChatTurn,
 } from "@/lib/llm/router";
+import { LLMError } from "@/lib/llm/openrouterClient";
 import { clientIpFromRequest, rateLimit } from "@/lib/rateLimitMemory";
 
 export const runtime = "nodejs";
@@ -30,6 +31,56 @@ type ChatContext = z.infer<typeof ChatRequestSchema>["context"];
 
 const FOOTER = "\n\n※参考情報。最終判断はご自身で。";
 const RATE_KEY = "chat";
+const CHAT_AUTH_ERROR_MESSAGE =
+  "AIチャットの認証に失敗しました。OpenRouter APIキーの無効・期限切れ、またはアカウント不一致の可能性があります。管理者設定を確認してください。";
+const CHAT_GENERIC_ERROR_MESSAGE =
+  "AIチャットの応答取得に失敗しました。時間をおいて再試行してください。";
+
+type PublicChatError = {
+  status: number;
+  error: string;
+  message: string;
+};
+
+function mapChatError(err: unknown): PublicChatError {
+  if (err instanceof LLMError && err.kind === "auth") {
+    return {
+      status: 401,
+      error: "llm_auth_failed",
+      message: CHAT_AUTH_ERROR_MESSAGE,
+    };
+  }
+
+  if (err instanceof LLMError && err.kind === "rate_limit") {
+    return {
+      status: 429,
+      error: "llm_rate_limited",
+      message: "AIチャットが混み合っています。少し待って再試行してください。",
+    };
+  }
+
+  return {
+    status: 500,
+    error: "llm_error",
+    message: CHAT_GENERIC_ERROR_MESSAGE,
+  };
+}
+
+function safeErrorMessage(err: unknown): string {
+  const raw = err instanceof Error ? err.message : String(err);
+  return raw.length > 400 ? `${raw.slice(0, 400)}...` : raw;
+}
+
+function logChatError(stage: string, err: unknown, mapped: PublicChatError): void {
+  console.error("[/api/chat] request failed", {
+    stage,
+    publicError: mapped.error,
+    publicStatus: mapped.status,
+    llmKind: err instanceof LLMError ? err.kind : null,
+    llmStatus: err instanceof LLMError ? err.status : null,
+    errorMessage: safeErrorMessage(err),
+  });
+}
 
 function buildContextPrefix(context: ChatContext): string | null {
   if (!context) return null;
@@ -101,12 +152,14 @@ export async function POST(req: Request) {
       const text = await chatWithHistory(history);
       return NextResponse.json({ content: text + FOOTER });
     } catch (err) {
+      const mapped = mapChatError(err);
+      logChatError("non_stream", err, mapped);
       return NextResponse.json(
         {
-          error: "llm_error",
-          message: err instanceof Error ? err.message : String(err),
+          error: mapped.error,
+          message: mapped.message,
         },
-        { status: 500 },
+        { status: mapped.status },
       );
     }
   }
@@ -126,26 +179,25 @@ export async function POST(req: Request) {
             send({ delta });
           }
         } catch (streamErr) {
+          const mappedStreamErr = mapChatError(streamErr);
+          logChatError("stream_primary", streamErr, mappedStreamErr);
           usedFallback = true;
           if (any) {
             send({
               warning: "stream_interrupted",
-              message:
-                streamErr instanceof Error
-                  ? streamErr.message
-                  : String(streamErr),
+              message: mappedStreamErr.message,
             });
           } else {
             try {
               const text = await chatWithHistory(history);
               send({ delta: text });
             } catch (fallbackErr) {
+              const mappedFallbackErr = mapChatError(fallbackErr);
+              logChatError("stream_fallback", fallbackErr, mappedFallbackErr);
               send({
-                error: "llm_error",
-                message:
-                  fallbackErr instanceof Error
-                    ? fallbackErr.message
-                    : String(fallbackErr),
+                error: mappedFallbackErr.error,
+                message: mappedFallbackErr.message,
+                status: mappedFallbackErr.status,
               });
             }
           }
@@ -153,9 +205,12 @@ export async function POST(req: Request) {
         send({ delta: FOOTER });
         send({ done: true, fallback: usedFallback });
       } catch (err) {
+        const mapped = mapChatError(err);
+        logChatError("stream_unhandled", err, mapped);
         send({
-          error: "llm_error",
-          message: err instanceof Error ? err.message : String(err),
+          error: mapped.error,
+          message: mapped.message,
+          status: mapped.status,
         });
       } finally {
         controller.enqueue(encoder.encode("data: [DONE]\n\n"));

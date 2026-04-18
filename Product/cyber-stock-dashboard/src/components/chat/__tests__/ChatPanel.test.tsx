@@ -80,6 +80,34 @@ describe("ChatPanel", () => {
     });
   });
 
+  it("shows friendly auth message from SSE error event", async () => {
+    const stream = makeSseStream([
+      `data: ${JSON.stringify({
+        error: "llm_auth_failed",
+        message:
+          "AIチャットの認証に失敗しました。OpenRouter APIキーの無効・期限切れ、またはアカウント不一致の可能性があります。管理者設定を確認してください。",
+      })}\n\n`,
+      `data: [DONE]\n\n`,
+    ]);
+    fetchMock.mockResolvedValue(
+      new Response(stream, {
+        status: 200,
+        headers: { "Content-Type": "text/event-stream" },
+      }),
+    );
+
+    render(<ChatPanel />);
+    const input = screen.getByLabelText("質問入力");
+    fireEvent.change(input, { target: { value: "x" } });
+    fireEvent.click(screen.getByRole("button", { name: /送信/ }));
+
+    await waitFor(() => {
+      expect(screen.getByRole("alert")).toHaveTextContent(/APIキー/);
+    });
+    expect(screen.getByRole("alert")).not.toHaveTextContent(/User not found/);
+    expect(screen.getByRole("alert")).not.toHaveTextContent(/OpenRouter HTTP 401/);
+  });
+
   it("supports cancel via AbortController", async () => {
     let abortFired = false;
     const longStream = new ReadableStream<Uint8Array>({
