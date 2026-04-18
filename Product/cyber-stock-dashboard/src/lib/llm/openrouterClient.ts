@@ -53,6 +53,18 @@ const defaultSleep = (ms: number) =>
     setTimeout(resolve, ms);
   });
 
+function normalizeSecret(raw: string | undefined): string | undefined {
+  if (!raw) return undefined;
+  let value = raw.trim();
+  if (!value) return undefined;
+  const wrappedInDoubleQuote = value.startsWith('"') && value.endsWith('"');
+  const wrappedInSingleQuote = value.startsWith("'") && value.endsWith("'");
+  if (wrappedInDoubleQuote || wrappedInSingleQuote) {
+    value = value.slice(1, -1).trim();
+  }
+  return value || undefined;
+}
+
 interface OpenRouterChoice {
   message?: { content?: string | null };
 }
@@ -83,7 +95,7 @@ export async function chat<T>(options: ChatOptions<T>): Promise<T | string> {
   const sleep = options.sleepImpl ?? defaultSleep;
   const maxRetries = options.maxRetries ?? 3;
   const baseUrl = options.baseUrl ?? DEFAULT_BASE_URL;
-  const apiKey = options.apiKey ?? process.env.OPENROUTER_API_KEY;
+  const apiKey = normalizeSecret(options.apiKey ?? process.env.OPENROUTER_API_KEY);
 
   if (!fetchImpl) {
     throw new LLMError("network", "fetch is not available in this environment");
@@ -206,7 +218,7 @@ export async function* chatStream(
 ): AsyncGenerator<string, void, unknown> {
   const fetchImpl = options.fetchImpl ?? globalThis.fetch;
   const baseUrl = options.baseUrl ?? DEFAULT_BASE_URL;
-  const apiKey = options.apiKey ?? process.env.OPENROUTER_API_KEY;
+  const apiKey = normalizeSecret(options.apiKey ?? process.env.OPENROUTER_API_KEY);
 
   if (!fetchImpl) {
     throw new LLMError("network", "fetch is not available in this environment");

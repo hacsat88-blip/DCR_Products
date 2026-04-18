@@ -126,4 +126,23 @@ describe("openrouterClient.chat", () => {
       if (prev !== undefined) process.env.OPENROUTER_API_KEY = prev;
     }
   });
+
+  it("normalizes quoted OPENROUTER_API_KEY from env before Authorization header", async () => {
+    const prev = process.env.OPENROUTER_API_KEY;
+    process.env.OPENROUTER_API_KEY = '  "sk-env-key"  ';
+    const fetchImpl = vi.fn(async () => makeResponse(makeChatBody("ok")));
+    try {
+      await chat({
+        model: "x",
+        messages: [{ role: "user", content: "x" }],
+        fetchImpl: fetchImpl as unknown as typeof fetch,
+      });
+      const init = (fetchImpl.mock.calls[0] as unknown as [string, RequestInit])[1];
+      const headers = init.headers as Record<string, string>;
+      expect(headers.Authorization).toBe("Bearer sk-env-key");
+    } finally {
+      if (prev === undefined) delete process.env.OPENROUTER_API_KEY;
+      else process.env.OPENROUTER_API_KEY = prev;
+    }
+  });
 });

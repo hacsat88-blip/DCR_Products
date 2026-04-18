@@ -32,7 +32,14 @@ export interface FetchAllNewsParams {
 
 export interface AggregatorDeps {
   db?: Database;
-  marketauxClient?: { getNews: (p?: { symbols?: string[]; sectors?: string[]; limit?: number }) => Promise<NewsItem[]> };
+  marketauxClient?: {
+    getNews: (p?: {
+      symbols?: string[];
+      sectors?: string[];
+      language?: string;
+      limit?: number;
+    }) => Promise<NewsItem[]>;
+  };
   fetchRss?: () => Promise<NewsItem[]>;
   summarize?: typeof summarizeNews;
   now?: () => number;
@@ -89,6 +96,17 @@ function rowToNewsItem(row: NewsCache): AggregatedNewsItem {
   };
 }
 
+const JA_RSS_SOURCE_IDS = new Set(
+  RSS_SOURCES.filter((s) => s.lang === "ja").map((s) => s.id),
+);
+
+function isJapaneseNewsItem(item: NewsItem): boolean {
+  const lang = item.language?.toLowerCase();
+  if (lang && lang.startsWith("ja")) return true;
+  if (item.source && JA_RSS_SOURCE_IDS.has(item.source)) return true;
+  return false;
+}
+
 /** cache hit 判定: 最新 fetchedAt が TTL 以内なら有効 */
 function isCacheFresh(rows: NewsCache[], nowMs: number): boolean {
   if (rows.length === 0) return false;
@@ -108,6 +126,7 @@ function tryMarketaux(
     .getNews({
       symbols: params.symbols,
       sectors: params.sectors,
+      language: "ja",
       limit: params.limit,
     })
     .catch((e: unknown) => {
@@ -153,7 +172,10 @@ export async function fetchAllNews(
     try {
       const rows = getRecentNews(db, limit);
       if (isCacheFresh(rows, now())) {
-        return rows.map(rowToNewsItem).slice(0, limit);
+        return rows
+          .map(rowToNewsItem)
+          .filter(isJapaneseNewsItem)
+          .slice(0, limit);
       }
     } catch (e) {
       console.warn(`[news.aggregator] cache read failed: ${String(e)}`);
@@ -180,7 +202,7 @@ export async function fetchAllNews(
     (a, b) =>
       new Date(b.publishedAt).getTime() - new Date(a.publishedAt).getTime(),
   );
-  const trimmed = deduped.slice(0, limit);
+  const trimmed = deduped.filter(isJapaneseNewsItem).slice(0, limit);
 
   // 4) LLM 要約（先頭 N 件）。失敗時は原文 title を summary にフォールバック。
   const summarizer = deps.summarize ?? summarizeNews;

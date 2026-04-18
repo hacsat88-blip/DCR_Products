@@ -61,6 +61,18 @@ describe("/api/chat route", () => {
     expect(body.message).toContain("LLM");
   });
 
+  it("treats blank OPENROUTER_API_KEY as unconfigured", async () => {
+    process.env.OPENROUTER_API_KEY = '   ""   ';
+    const res = await POST(
+      makeReq({ messages: [{ role: "user", content: "hi" }] }),
+    );
+    expect(res.status).toBe(503);
+    const body = await res.json();
+    expect(body.error).toBe("llm_unconfigured");
+    expect(streamMock).not.toHaveBeenCalled();
+    expect(nonStreamMock).not.toHaveBeenCalled();
+  });
+
   it("validates request body", async () => {
     const res = await POST(makeReq({ messages: [] }));
     expect(res.status).toBe(400);

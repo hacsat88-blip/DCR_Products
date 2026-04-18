@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { z } from "zod";
 import { fetchAllNews } from "@/lib/services/news/aggregator";
 import { fetchAllRss } from "@/lib/services/news/rssFetcher";
+import { RSS_SOURCES } from "@/lib/services/news/sources";
 
 export const runtime = "nodejs";
 
@@ -45,6 +46,17 @@ function toErrorDetail(e: unknown): string {
   return e instanceof Error ? e.message : String(e);
 }
 
+const EN_RSS_SOURCE_IDS = new Set(
+  RSS_SOURCES.filter((s) => s.lang === "en").map((s) => s.id),
+);
+
+function isEnglishNews(item: { language?: string; source?: string }): boolean {
+  const lang = item.language?.toLowerCase();
+  if (lang && lang.startsWith("en")) return true;
+  if (item.source && EN_RSS_SOURCE_IDS.has(item.source)) return true;
+  return false;
+}
+
 export async function GET(req: Request): Promise<Response> {
   const url = new URL(req.url);
   const parsed = QuerySchema.safeParse({
@@ -71,14 +83,14 @@ export async function GET(req: Request): Promise<Response> {
     try {
       const rssItems = await fetchAllRss();
       const limit = parsed.data.limit ?? 30;
-      const items = rssItems.slice(0, limit);
+      const items = rssItems.filter((item) => !isEnglishNews(item)).slice(0, limit);
       if (items.length > 0) {
         return NextResponse.json(
           {
             items,
             count: items.length,
             fallback: true,
-            warning: `news_partial_fallback: ${detail}`,
+            warning: `ニュース取得はフォールバック中です: ${detail}`,
           },
           { headers: { "cache-control": "public, max-age=60" } },
         );
@@ -87,13 +99,13 @@ export async function GET(req: Request): Promise<Response> {
       return NextResponse.json(
         {
           error: "news_fetch_failed",
-          detail: `${detail}; rss_fallback_failed: ${toErrorDetail(rssErr)}`,
+          detail: `ニュース取得に失敗しました: ${detail}; RSSフォールバックも失敗: ${toErrorDetail(rssErr)}`,
         },
         { status: 502 },
       );
     }
     return NextResponse.json(
-      { error: "news_fetch_failed", detail },
+      { error: "news_fetch_failed", detail: `ニュース取得に失敗しました: ${detail}` },
       { status: 502 },
     );
   }
