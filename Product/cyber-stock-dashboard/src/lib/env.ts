@@ -1,6 +1,7 @@
 import { z } from "zod";
 
 const ServerEnvSchema = z.object({
+  JQUANTS_API_KEY: z.string().min(1).optional(),
   JQUANTS_REFRESH_TOKEN: z.string().min(1).optional(),
   ALPHA_VANTAGE_API_KEY: z.string().min(1).optional(),
   MARKETAUX_API_KEY: z.string().min(1).optional(),

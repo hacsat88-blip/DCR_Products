@@ -38,7 +38,8 @@ npm run dev
 `.env.example` を `.env.local` にコピーして必要なキーを設定してください。
 
 - `OPENROUTER_API_KEY` + `OPENROUTER_MODEL_REASONING` / `OPENROUTER_MODEL_FAST`: LLM 連携 (未設定時は friendly fallback)
-- `JQUANTS_REFRESH_TOKEN`, `ALPHA_VANTAGE_API_KEY`, `MARKETAUX_API_KEY`, `EDINETDB_API_KEY`: 市場データ
+- `JQUANTS_API_KEY`, `ALPHA_VANTAGE_API_KEY`, `MARKETAUX_API_KEY`, `EDINETDB_API_KEY`: 市場データ (`J-Quants V2` は `x-api-key` ヘッダーで API キー認証)
+- `JQUANTS_REFRESH_TOKEN` (任意/旧互換): `JQUANTS_API_KEY` 未設定時のみ旧 V1 認証へフォールバック
 - `DATABASE_URL` + `DATABASE_DRIVER` (`sqlite` | `pg`): SQLite (better-sqlite3) / Neon Postgres を切替
 - `CRON_SECRET`: Vercel Cron 標準の認証キー。`Authorization: Bearer ${CRON_SECRET}` で `/api/portfolio/snapshot` 等を保護
 - `CRON_KEY` (任意/旧方式): `x-cron-key` ヘッダーの互換用。移行中のみ設定
