@@ -139,13 +139,24 @@ export async function fetchAllNews(
   const limit = params.limit ?? 30;
   const useCache = params.useCache ?? true;
   const now = deps.now ?? (() => Date.now());
-  const db = deps.db ?? getDb();
+  let db = deps.db;
+  if (!db) {
+    try {
+      db = getDb();
+    } catch (e) {
+      console.warn(`[news.aggregator] db unavailable: ${String(e)}`);
+    }
+  }
 
   // 1) cache check
-  if (useCache) {
-    const rows = getRecentNews(db, limit);
-    if (isCacheFresh(rows, now())) {
-      return rows.map(rowToNewsItem).slice(0, limit);
+  if (useCache && db) {
+    try {
+      const rows = getRecentNews(db, limit);
+      if (isCacheFresh(rows, now())) {
+        return rows.map(rowToNewsItem).slice(0, limit);
+      }
+    } catch (e) {
+      console.warn(`[news.aggregator] cache read failed: ${String(e)}`);
     }
   }
 
@@ -217,7 +228,7 @@ export async function fetchAllNews(
   }
 
   // 5) 永続化
-  if (summarized.length > 0) {
+  if (db && summarized.length > 0) {
     const rows: NewNewsCache[] = summarized.map((n) => ({
       source: n.source ?? "unknown",
       externalId: n.id,

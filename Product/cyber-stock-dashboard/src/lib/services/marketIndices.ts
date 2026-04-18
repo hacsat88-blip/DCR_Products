@@ -250,7 +250,7 @@ export async function getIndexSeries(
     }
   }
 
-  // static 経路 — 取得失敗扱い (status: error) で擬似データを返す
+  // static 経路 — 想定フォールバックとして擬似データを返す
   const fallback = generateStaticCandles(
     STATIC_SEEDS[id],
     STATIC_BASES[id],
@@ -263,8 +263,8 @@ export async function getIndexSeries(
     symbol: desc.symbol,
     source: desc.source,
     currency: desc.currency,
-    status: "error",
-    error: desc.note ?? "static fallback",
+    status: "ok",
+    error: desc.note,
     data: ranged,
     latest: buildLatest(ranged),
     range,

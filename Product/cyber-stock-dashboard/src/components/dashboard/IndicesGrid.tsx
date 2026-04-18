@@ -78,6 +78,7 @@ function IndexCard({
 }) {
   const isUp = (item.latest?.change ?? 0) >= 0;
   const color = isUp ? "#34d399" : "#FF3B6B";
+  const fallbackNote = item.status === "ok" ? item.error?.trim() : undefined;
   return (
     <NeonCard
       glow={item.status === "error" ? "alert" : "subtle"}
@@ -109,7 +110,12 @@ function IndexCard({
         </div>
 
         {item.status === "ok" ? (
-          <IndexChart data={item.data} height={120} color={color} />
+          <>
+            <IndexChart data={item.data} height={120} color={color} />
+            {fallbackNote && (
+              <p className="text-[10px] text-amber-300/80">{fallbackNote}</p>
+            )}
+          </>
         ) : (
           <div className="flex h-[120px] flex-col items-center justify-center gap-2 text-center">
             <p className="text-xs text-alert">データ取得失敗</p>

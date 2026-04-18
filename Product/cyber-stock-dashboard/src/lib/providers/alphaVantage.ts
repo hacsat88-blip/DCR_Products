@@ -61,6 +61,23 @@ export interface CreateAlphaVantageClientOptions extends FetchDeps {
   baseUrl?: string;
 }
 
+function responseKeys(json: unknown): string {
+  if (!json || typeof json !== "object") return "(non-object response)";
+  const keys = Object.keys(json as Record<string, unknown>);
+  return keys.length > 0 ? keys.join(", ") : "(no keys)";
+}
+
+function buildSchemaError(
+  scope: string,
+  json: unknown,
+  hint?: string,
+): Error {
+  const suffix = hint ? ` ${hint}` : "";
+  return new Error(
+    `AlphaVantage ${scope} unavailable.${suffix} response keys: ${responseKeys(json)}`,
+  );
+}
+
 export function createAlphaVantageClient(
   opts: CreateAlphaVantageClientOptions = {},
 ): AlphaVantageClient {
@@ -84,6 +101,9 @@ export function createAlphaVantageClient(
     if (json && typeof json === "object" && "Note" in json) {
       throw new Error(`AlphaVantage rate limited: ${String(json.Note)}`);
     }
+    if (json && typeof json === "object" && "Information" in json) {
+      throw new Error(`AlphaVantage info: ${String(json.Information)}`);
+    }
     if (json && typeof json === "object" && "Error Message" in json) {
       throw new Error(`AlphaVantage error: ${String(json["Error Message"])}`);
     }
@@ -96,8 +116,13 @@ export function createAlphaVantageClient(
       symbol,
       outputsize: "compact",
     });
-    const parsed = DailyAdjustedResponseSchema.parse(json);
-    const series = parsed["Time Series (Daily)"];
+    const parsed = DailyAdjustedResponseSchema.safeParse(json);
+    if (!parsed.success) {
+      throw new Error(
+        `AlphaVantage daily data unavailable for ${symbol}. Check API key/rate limit/symbol. response keys: ${responseKeys(json)}`,
+      );
+    }
+    const series = parsed.data["Time Series (Daily)"];
     const candles: Candle[] = Object.entries(series).map(([date, row]) =>
       CandleSchema.parse({
         date,
@@ -115,8 +140,11 @@ export function createAlphaVantageClient(
 
   async function getQuote(symbol: string): Promise<Quote> {
     const json = await call({ function: "GLOBAL_QUOTE", symbol });
-    const parsed = GlobalQuoteResponseSchema.parse(json);
-    const q = parsed["Global Quote"];
+    const parsed = GlobalQuoteResponseSchema.safeParse(json);
+    if (!parsed.success) {
+      throw buildSchemaError("quote data", json, `symbol=${symbol}.`);
+    }
+    const q = parsed.data["Global Quote"];
     const pctRaw = q["10. change percent"];
     const changePercent =
       pctRaw != null ? Number(pctRaw.replace("%", "")) : undefined;
@@ -142,8 +170,15 @@ export function createAlphaVantageClient(
       from_currency: String(from),
       to_currency: String(to),
     });
-    const parsed = FxResponseSchema.parse(json);
-    return parsed["Realtime Currency Exchange Rate"]["5. Exchange Rate"];
+    const parsed = FxResponseSchema.safeParse(json);
+    if (!parsed.success) {
+      throw buildSchemaError(
+        "FX data",
+        json,
+        `pair=${String(from)}/${String(to)}.`,
+      );
+    }
+    return parsed.data["Realtime Currency Exchange Rate"]["5. Exchange Rate"];
   }
 
   return { getDailyAdjusted, getQuote, getFxRate };

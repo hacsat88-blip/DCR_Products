@@ -10,6 +10,7 @@ vi.mock("@/lib/llm/router", () => ({
 
 import { POST } from "@/app/api/chat/route";
 import { resetRateLimit } from "@/lib/rateLimitMemory";
+import { LLMError } from "@/lib/llm/openrouterClient";
 
 const ORIG_KEY = process.env.OPENROUTER_API_KEY;
 
@@ -154,5 +155,53 @@ describe("/api/chat route", () => {
     const body = await res.json();
     expect(body.content).toContain("回答本文");
     expect(body.content).toContain("参考情報");
+  });
+
+  it("maps OpenRouter auth failure to 401 with friendly message (non-stream)", async () => {
+    nonStreamMock.mockRejectedValue(
+      new LLMError(
+        "auth",
+        'OpenRouter HTTP 401: {"error":{"message":"User not found.","code":401}}',
+        { status: 401 },
+      ),
+    );
+    const res = await POST(
+      makeReq({
+        messages: [{ role: "user", content: "test" }],
+        stream: false,
+      }),
+    );
+    expect(res.status).toBe(401);
+    const body = await res.json();
+    expect(body.error).toBe("llm_auth_failed");
+    expect(body.message).toContain("APIキー");
+    expect(body.message).toContain("アカウント");
+    expect(body.message).not.toContain("User not found");
+    expect(body.message).not.toContain("OpenRouter HTTP 401");
+  });
+
+  it("does not leak provider payload in streaming fallback auth error", async () => {
+    const authErr = new LLMError(
+      "auth",
+      'OpenRouter HTTP 401: {"error":{"message":"User not found.","code":401}}',
+      { status: 401 },
+    );
+    streamMock.mockImplementation(async function* () {
+      throw authErr;
+    });
+    nonStreamMock.mockRejectedValue(authErr);
+
+    const res = await POST(
+      makeReq({ messages: [{ role: "user", content: "test" }] }),
+    );
+    expect(res.status).toBe(200);
+    const chunks = await readSse(res);
+    const joined = chunks.join("\n");
+    expect(joined).toContain('"error":"llm_auth_failed"');
+    expect(joined).toContain("APIキー");
+    expect(joined).toContain("アカウント");
+    expect(joined).not.toContain("User not found");
+    expect(joined).not.toContain("OpenRouter HTTP 401");
+    expect(nonStreamMock).toHaveBeenCalledTimes(1);
   });
 });

@@ -60,11 +60,12 @@ describe("marketIndices.getIndexSeries", () => {
     expect(res.latest).toBeDefined();
   });
 
-  it("static-source indices always return status='error' with fallback data", async () => {
+  it("static-source indices return fallback data without hard error status", async () => {
     const res = await getIndexSeries("N225", "daily", {
       now: () => new Date("2025-06-02T00:00:00Z").getTime(),
     });
-    expect(res.status).toBe("error");
+    expect(res.status).toBe("ok");
+    expect(res.error).toContain("静的フォールバック");
     expect(res.data.length).toBeGreaterThan(20);
     expect(res.id).toBe("N225");
   });

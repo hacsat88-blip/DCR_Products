@@ -258,4 +258,34 @@ describe("aggregator.fetchAllNews", () => {
     expect(result).toHaveLength(1);
     expect(result[0].title).toBe("rss only");
   });
+
+  it("continues fetching RSS even when cache DB access fails", async () => {
+    const now = Date.now();
+    const fetchRss = vi.fn(async () => [
+      mkItem({ id: "rss:recover", url: "https://x.test/recover", title: "recover" }),
+    ]);
+    const result = await fetchAllNews(
+      { limit: 5 },
+      {
+        // invalid db object to force cache/persist failures
+        db: {} as never,
+        fetchRss,
+        marketauxClient: { getNews: vi.fn(async () => []) },
+        summarize: vi.fn(async () => ({
+          items: [
+            {
+              title: "recover",
+              summary: "回復動作（推定）。",
+              sentiment: "neutral",
+              sectors: [],
+            },
+          ],
+        })) as never,
+        now: () => now,
+      },
+    );
+    expect(fetchRss).toHaveBeenCalledOnce();
+    expect(result).toHaveLength(1);
+    expect(result[0].title).toBe("recover");
+  });
 });
