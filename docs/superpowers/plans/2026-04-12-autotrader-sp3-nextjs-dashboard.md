@@ -18,40 +18,40 @@
 
 ## File Structure Map
 
-| パス | 役割 |
-|---|---|
-| `Product/autotrader-suite/ui/package.json` | Next/Vitest scripts と最小依存関係 |
-| `Product/autotrader-suite/ui/tsconfig.json` | TypeScript 設定 |
-| `Product/autotrader-suite/ui/next.config.mjs` | Next.js 基本設定 |
-| `Product/autotrader-suite/ui/postcss.config.mjs` | Tailwind/PostCSS 設定 |
-| `Product/autotrader-suite/ui/tailwind.config.ts` | 監視コンソール用デザイントークン |
-| `Product/autotrader-suite/ui/.eslintrc.json` | Next ESLint 設定 |
-| `Product/autotrader-suite/ui/next-env.d.ts` | Next.js 型定義 |
-| `Product/autotrader-suite/ui/vitest.config.ts` | jsdom + alias + setupFiles |
-| `Product/autotrader-suite/ui/tests/setup.ts` | jest-dom と WebSocket/fetch テスト初期化 |
-| `Product/autotrader-suite/ui/app/layout.tsx` | ルート layout と metadata |
-| `Product/autotrader-suite/ui/app/page.tsx` | server component として client entry を返す composition のみ |
-| `Product/autotrader-suite/ui/app/globals.css` | 背景、タイポ、panel utility |
-| `Product/autotrader-suite/ui/app/api/settings/route.ts` | backend settings endpoint への薄い proxy |
-| `Product/autotrader-suite/ui/components/DashboardClient.tsx` | `use client` 境界。socket hook と settings fetch を束ねる |
-| `Product/autotrader-suite/ui/components/DashboardShell.tsx` | page 全体の grid 組み立て |
-| `Product/autotrader-suite/ui/components/StatusHeader.tsx` | 接続状態、更新時刻、stale/waiting 表示 |
-| `Product/autotrader-suite/ui/components/PricePanel.tsx` | 現在値、出来高、feed、sparkline |
-| `Product/autotrader-suite/ui/components/PositionPanel.tsx` | 保有数、平均取得単価、損益 |
-| `Product/autotrader-suite/ui/components/LatestActionCard.tsx` | latest event の意味づけ表示 |
-| `Product/autotrader-suite/ui/components/AiLogPanel.tsx` | `buy/sell/hold` のイベントログ |
-| `Product/autotrader-suite/ui/components/OrderHistory.tsx` | `buy/sell` のみの履歴 |
-| `Product/autotrader-suite/ui/components/RiskSettingsAccordion.tsx` | 折りたたみ式設定フォーム |
-| `Product/autotrader-suite/ui/hooks/useTraderSocket.ts` | WebSocket 接続状態と再接続管理 |
-| `Product/autotrader-suite/ui/lib/trader-view-model.ts` | raw payload 検証、履歴生成、50件丸め |
-| `Product/autotrader-suite/ui/lib/api.ts` | settings GET/PUT helper |
-| `Product/autotrader-suite/ui/lib/constants.ts` | stale 閾値、history 件数、既定 URL |
-| `Product/autotrader-suite/ui/types/trader.ts` | raw payload 型と ViewModel 型 |
-| `Product/autotrader-suite/ui/README.md` | セットアップと backend 接続手順 |
-| `Product/autotrader-suite/ui/.env.local.example` | `NEXT_PUBLIC_AUTOTRADER_SERVER_BASE_URL` の例 |
-| `Product/autotrader-suite/ui/tests/useTraderSocket.test.ts` | socket/reducer 系テスト |
-| `Product/autotrader-suite/ui/tests/DashboardShell.test.tsx` | page/panel 表示統合テスト |
-| `Product/autotrader-suite/ui/tests/RiskSettingsAccordion.test.tsx` | settings GET/PUT と auto/manual UX テスト |
+| パス                                                               | 役割                                                         |
+| ------------------------------------------------------------------ | ------------------------------------------------------------ |
+| `Product/autotrader-suite/ui/package.json`                         | Next/Vitest scripts と最小依存関係                           |
+| `Product/autotrader-suite/ui/tsconfig.json`                        | TypeScript 設定                                              |
+| `Product/autotrader-suite/ui/next.config.mjs`                      | Next.js 基本設定                                             |
+| `Product/autotrader-suite/ui/postcss.config.mjs`                   | Tailwind/PostCSS 設定                                        |
+| `Product/autotrader-suite/ui/tailwind.config.ts`                   | 監視コンソール用デザイントークン                             |
+| `Product/autotrader-suite/ui/.eslintrc.json`                       | Next ESLint 設定                                             |
+| `Product/autotrader-suite/ui/next-env.d.ts`                        | Next.js 型定義                                               |
+| `Product/autotrader-suite/ui/vitest.config.ts`                     | jsdom + alias + setupFiles                                   |
+| `Product/autotrader-suite/ui/tests/setup.ts`                       | jest-dom と WebSocket/fetch テスト初期化                     |
+| `Product/autotrader-suite/ui/app/layout.tsx`                       | ルート layout と metadata                                    |
+| `Product/autotrader-suite/ui/app/page.tsx`                         | server component として client entry を返す composition のみ |
+| `Product/autotrader-suite/ui/app/globals.css`                      | 背景、タイポ、panel utility                                  |
+| `Product/autotrader-suite/ui/app/api/settings/route.ts`            | backend settings endpoint への薄い proxy                     |
+| `Product/autotrader-suite/ui/components/DashboardClient.tsx`       | `use client` 境界。socket hook と settings fetch を束ねる    |
+| `Product/autotrader-suite/ui/components/DashboardShell.tsx`        | page 全体の grid 組み立て                                    |
+| `Product/autotrader-suite/ui/components/StatusHeader.tsx`          | 接続状態、更新時刻、stale/waiting 表示                       |
+| `Product/autotrader-suite/ui/components/PricePanel.tsx`            | 現在値、出来高、feed、sparkline                              |
+| `Product/autotrader-suite/ui/components/PositionPanel.tsx`         | 保有数、平均取得単価、損益                                   |
+| `Product/autotrader-suite/ui/components/LatestActionCard.tsx`      | latest event の意味づけ表示                                  |
+| `Product/autotrader-suite/ui/components/AiLogPanel.tsx`            | `buy/sell/hold` のイベントログ                               |
+| `Product/autotrader-suite/ui/components/OrderHistory.tsx`          | `buy/sell` のみの履歴                                        |
+| `Product/autotrader-suite/ui/components/RiskSettingsAccordion.tsx` | 折りたたみ式設定フォーム                                     |
+| `Product/autotrader-suite/ui/hooks/useTraderSocket.ts`             | WebSocket 接続状態と再接続管理                               |
+| `Product/autotrader-suite/ui/lib/trader-view-model.ts`             | raw payload 検証、履歴生成、50件丸め                         |
+| `Product/autotrader-suite/ui/lib/api.ts`                           | settings GET/PUT helper                                      |
+| `Product/autotrader-suite/ui/lib/constants.ts`                     | stale 閾値、history 件数、既定 URL                           |
+| `Product/autotrader-suite/ui/types/trader.ts`                      | raw payload 型と ViewModel 型                                |
+| `Product/autotrader-suite/ui/README.md`                            | セットアップと backend 接続手順                              |
+| `Product/autotrader-suite/ui/.env.local.example`                   | `NEXT_PUBLIC_AUTOTRADER_SERVER_BASE_URL` の例                |
+| `Product/autotrader-suite/ui/tests/useTraderSocket.test.ts`        | socket/reducer 系テスト                                      |
+| `Product/autotrader-suite/ui/tests/DashboardShell.test.tsx`        | page/panel 表示統合テスト                                    |
+| `Product/autotrader-suite/ui/tests/RiskSettingsAccordion.test.tsx` | settings GET/PUT と auto/manual UX テスト                    |
 
 ## Task 1: Workspace Bootstrap And Smoke Shell
 

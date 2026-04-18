@@ -37,11 +37,11 @@
 
 **サブプロジェクト分割:**
 
-| # | サブプロジェクト | 主な技術 | 依存関係 |
-|---|----------------|---------|---------|
-| SP-1 | Python ブリッジサーバー | FastAPI, Gemini API | なし（最初に構築） |
-| SP-2 | Excel VBA 層 | VBA, MSXML2.ServerXMLHTTP.6.0 | SP-1 が必要 |
-| SP-3 | Next.js ダッシュボード | Next.js 14, WebSocket | SP-1 が必要 |
+| #    | サブプロジェクト        | 主な技術                      | 依存関係           |
+| ---- | ----------------------- | ----------------------------- | ------------------ |
+| SP-1 | Python ブリッジサーバー | FastAPI, Gemini API           | なし（最初に構築） |
+| SP-2 | Excel VBA 層            | VBA, MSXML2.ServerXMLHTTP.6.0 | SP-1 が必要        |
+| SP-3 | Next.js ダッシュボード  | Next.js 14, WebSocket         | SP-1 が必要        |
 
 **開発順序:** SP-1 → SP-3（並行可）→ SP-2（実機接続）
 
@@ -81,12 +81,12 @@ autotrader/
 
 ### API エンドポイント
 
-| メソッド | パス | 役割 |
-|---------|------|------|
-| POST | `/api/price` | VBA から株価データを受信し、AI 判断を返す |
-| GET | `/api/settings` | 現在のリスク設定を返す |
-| PUT | `/api/settings` | リスク設定を更新する |
-| WS | `/ws` | Next.js へ全状態をリアルタイム配信 |
+| メソッド | パス            | 役割                                      |
+| -------- | --------------- | ----------------------------------------- |
+| POST     | `/api/price`    | VBA から株価データを受信し、AI 判断を返す |
+| GET      | `/api/settings` | 現在のリスク設定を返す                    |
+| PUT      | `/api/settings` | リスク設定を更新する                      |
+| WS       | `/ws`           | Next.js へ全状態をリアルタイム配信        |
 
 ### 株価受信 → 判断フロー
 
@@ -150,21 +150,21 @@ POST /api/price
 
 ### リスク設定のデフォルト値
 
-| 設定項目 | デフォルト | 説明 |
-|---------|-----------|------|
-| `limit_per_order` | 100,000円 | 1回の発注上限金額 |
-| `stop_loss_pct` | 3.0% | 損切りライン（平均取得単価からの下落率） |
-| `max_qty_per_order` | 100株 | 1回の最大発注数量 |
-| `poll_interval_sec` | 5 | VBA からの送信間隔（秒） |
-| `max_daily_loss_yen` | 15,000円 | 当日実現損失がこの金額を超えたら新規建て停止 |
-| `max_consecutive_losses` | 2 | 連敗回数の上限 |
-| `cooldown_minutes_after_loss` | 15 | 損失クローズ後に新規建てを止める時間 |
-| `min_five_bar_range_pct` | 0.8% | 直近5本の値幅がこの閾値未満なら薄商いとみなす |
-| `min_last_bar_volume_ratio` | 1.2 | 直近バー出来高 / 5本平均出来高 の下限 |
-| `max_reference_gap_pct` | 4.0% | execution と reference の許容乖離上限 |
-| `flat_before_close_minutes` | 10 | 引け前の強制手仕舞い開始時刻 |
-| `max_spread_bps` | 20.0 | 板スプレッドの許容上限 |
-| `skip_open_minutes` | 5 | 寄り付き直後の新規停止時間 |
+| 設定項目                      | デフォルト | 説明                                          |
+| ----------------------------- | ---------- | --------------------------------------------- |
+| `limit_per_order`             | 100,000円  | 1回の発注上限金額                             |
+| `stop_loss_pct`               | 3.0%       | 損切りライン（平均取得単価からの下落率）      |
+| `max_qty_per_order`           | 100株      | 1回の最大発注数量                             |
+| `poll_interval_sec`           | 5          | VBA からの送信間隔（秒）                      |
+| `max_daily_loss_yen`          | 15,000円   | 当日実現損失がこの金額を超えたら新規建て停止  |
+| `max_consecutive_losses`      | 2          | 連敗回数の上限                                |
+| `cooldown_minutes_after_loss` | 15         | 損失クローズ後に新規建てを止める時間          |
+| `min_five_bar_range_pct`      | 0.8%       | 直近5本の値幅がこの閾値未満なら薄商いとみなす |
+| `min_last_bar_volume_ratio`   | 1.2        | 直近バー出来高 / 5本平均出来高 の下限         |
+| `max_reference_gap_pct`       | 4.0%       | execution と reference の許容乖離上限         |
+| `flat_before_close_minutes`   | 10         | 引け前の強制手仕舞い開始時刻                  |
+| `max_spread_bps`              | 20.0       | 板スプレッドの許容上限                        |
+| `skip_open_minutes`           | 5          | 寄り付き直後の新規停止時間                    |
 
 ### WebSocket ペイロード（毎受信後に配信）
 
@@ -281,25 +281,25 @@ autotrader-ui/
 
 ## 6. エラーハンドリング
 
-| 障害シナリオ | 対処 |
-|------------|------|
-| Python サーバーが落ちている | VBA: タイムアウト検知 → 発注スキップ |
-| Gemini API エラー | risk_guard が hold を返す（フォールバック） |
-| RSS データ取得失敗 | VBA: 前回値を使わず、そのサイクルをスキップ |
-| WebSocket 切断 | Next.js: 5秒後に自動再接続 |
-| 市場時間外 | risk_guard が hold を強制 |
+| 障害シナリオ                       | 対処                                               |
+| ---------------------------------- | -------------------------------------------------- |
+| Python サーバーが落ちている        | VBA: タイムアウト検知 → 発注スキップ               |
+| Gemini API エラー                  | risk_guard が hold を返す（フォールバック）        |
+| RSS データ取得失敗                 | VBA: 前回値を使わず、そのサイクルをスキップ        |
+| WebSocket 切断                     | Next.js: 5秒後に自動再接続                         |
+| 市場時間外                         | risk_guard が hold を強制                          |
 | reference snapshot missing / stale | warning を表示・記録するが execution action は維持 |
 
 ---
 
 ## 7. 技術スタック
 
-| 層 | 技術 |
-|---|------|
-| AI エンジン | Python 3.11+, FastAPI, `google-genai` SDK |
-| 株価・発注 | Excel VBA, MarketSpeed II RSS |
-| フロントエンド | Next.js 14, TypeScript, Tailwind CSS, Zustand |
-| 通信 | REST（VBA↔Python）, WebSocket（Python↔Next.js） |
+| 層             | 技術                                            |
+| -------------- | ----------------------------------------------- |
+| AI エンジン    | Python 3.11+, FastAPI, `google-genai` SDK       |
+| 株価・発注     | Excel VBA, MarketSpeed II RSS                   |
+| フロントエンド | Next.js 14, TypeScript, Tailwind CSS, Zustand   |
+| 通信           | REST（VBA↔Python）, WebSocket（Python↔Next.js） |
 
 ---
 
