@@ -2,22 +2,27 @@ import {
   createAlphaVantageClient,
   type AlphaVantageClient,
 } from "@/lib/providers/alphaVantage";
+import {
+  createYahooFinanceClient,
+  type YahooFinanceClient,
+} from "@/lib/providers/yahooFinance";
 import type { Candle } from "@/lib/providers/types";
 
 export type IndexId = "N225" | "TOPIX" | "DJI" | "SPX" | "IXIC";
 export type IndexRange = "daily" | "weekly";
 export type IndexStatus = "ok" | "error";
+export type IndexDataSource = "alphaVantage" | "yahoo" | "static";
 
 export interface IndexDescriptor {
   id: IndexId;
   label: string;
   symbol: string;
-  /** どこから取得するか */
-  source: "alphaVantage" | "static";
+  /** 1st priority source */
+  primarySource: "alphaVantage" | "yahoo";
   /** Alpha Vantage を使う場合の代替シンボル (ETF proxy) */
   proxySymbol?: string;
+  yahooSymbol: string;
   currency: "JPY" | "USD";
-  note?: string;
 }
 
 export const INDEX_REGISTRY: Record<IndexId, IndexDescriptor> = {
@@ -25,40 +30,43 @@ export const INDEX_REGISTRY: Record<IndexId, IndexDescriptor> = {
     id: "N225",
     label: "日経平均",
     symbol: "^N225",
-    source: "static",
+    primarySource: "yahoo",
+    yahooSymbol: "^N225",
     currency: "JPY",
-    note: "Yahoo/J-Quants 指数 API 未契約のため静的フォールバック",
   },
   TOPIX: {
     id: "TOPIX",
     label: "TOPIX",
-    symbol: "TOPIX",
-    source: "static",
+    symbol: "^TOPX",
+    primarySource: "yahoo",
+    yahooSymbol: "^TOPX",
     currency: "JPY",
-    note: "J-Quants 指数 API 未契約のため静的フォールバック",
   },
   DJI: {
     id: "DJI",
     label: "NY ダウ",
     symbol: "^DJI",
-    source: "alphaVantage",
+    primarySource: "alphaVantage",
     proxySymbol: "DIA",
+    yahooSymbol: "^DJI",
     currency: "USD",
   },
   SPX: {
     id: "SPX",
     label: "S&P 500",
     symbol: "^GSPC",
-    source: "alphaVantage",
+    primarySource: "alphaVantage",
     proxySymbol: "SPY",
+    yahooSymbol: "^GSPC",
     currency: "USD",
   },
   IXIC: {
     id: "IXIC",
     label: "NASDAQ",
     symbol: "^IXIC",
-    source: "alphaVantage",
+    primarySource: "alphaVantage",
     proxySymbol: "QQQ",
+    yahooSymbol: "^IXIC",
     currency: "USD",
   },
 };
@@ -69,13 +77,13 @@ export interface IndexResult {
   id: IndexId;
   label: string;
   symbol: string;
-  source: IndexDescriptor["source"];
+  source: IndexDataSource;
   proxySymbol?: string;
   currency: IndexDescriptor["currency"];
   status: IndexStatus;
   error?: string;
+  fallbackReason?: string | null;
   data: Candle[];
-  /** 最新終値・前日比など */
   latest?: {
     date: string;
     close: number;
@@ -87,13 +95,17 @@ export interface IndexResult {
 
 export interface MarketIndicesDeps {
   alpha?: AlphaVantageClient;
-  /** 静的フォールバック生成のシード時刻 */
+  yahoo?: YahooFinanceClient;
   now?: () => number;
 }
 
 const TRADING_DAYS = 60;
+const YAHOO_LOOKBACK_DAYS = 400;
 
-/** 営業日（土日除外）で N 日分の擬似データを生成 */
+function toErrorMessage(error: unknown): string {
+  return error instanceof Error ? error.message : String(error);
+}
+
 function generateStaticCandles(seed: number, baseValue: number, nowMs: number): Candle[] {
   const out: Candle[] = [];
   let cursor = nowMs;
@@ -103,7 +115,6 @@ function generateStaticCandles(seed: number, baseValue: number, nowMs: number): 
     const d = new Date(cursor);
     const dow = d.getUTCDay();
     if (dow !== 0 && dow !== 6) {
-      // 簡易乱数 (mulberry32)
       s = (s + 0x6d2b79f5) | 0;
       let t = Math.imul(s ^ (s >>> 15), 1 | s);
       t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
@@ -128,15 +139,13 @@ function generateStaticCandles(seed: number, baseValue: number, nowMs: number): 
   return out.reverse();
 }
 
-/** Candle[] を週足 (週次最終営業日) にダウンサンプル */
 export function toWeekly(candles: Candle[]): Candle[] {
   if (candles.length === 0) return [];
   const buckets = new Map<string, Candle[]>();
   for (const c of candles) {
     const d = new Date(c.date + "T00:00:00Z");
-    // ISO週キー
     const day = d.getUTCDay();
-    const diff = (day + 6) % 7; // Mon=0
+    const diff = (day + 6) % 7;
     const monday = new Date(d.getTime() - diff * 86400000);
     const key = monday.toISOString().slice(0, 10);
     const arr = buckets.get(key) ?? [];
@@ -185,7 +194,46 @@ function applyRange(data: Candle[], range: IndexRange): Candle[] {
   return range === "weekly" ? toWeekly(data) : data;
 }
 
-/** 単一指数を取得。失敗を throw せず IndexResult として返す */
+function buildStaticFallback(
+  desc: IndexDescriptor,
+  range: IndexRange,
+  nowMs: number,
+  fallbackReason: string,
+): IndexResult {
+  const staticCandles = generateStaticCandles(
+    STATIC_SEEDS[desc.id],
+    STATIC_BASES[desc.id],
+    nowMs,
+  );
+  const data = applyRange(staticCandles, range);
+  return {
+    id: desc.id,
+    label: desc.label,
+    symbol: desc.symbol,
+    source: "static",
+    proxySymbol: desc.proxySymbol,
+    currency: desc.currency,
+    status: "ok",
+    fallbackReason,
+    error: fallbackReason,
+    data,
+    latest: buildLatest(data),
+    range,
+  };
+}
+
+async function fetchYahoo(
+  desc: IndexDescriptor,
+  deps: MarketIndicesDeps,
+): Promise<Candle[]> {
+  const now = deps.now ?? Date.now;
+  const yahoo = deps.yahoo ?? createYahooFinanceClient({ now });
+  return yahoo.getDailyCandles(desc.yahooSymbol, {
+    market: "us",
+    days: YAHOO_LOOKBACK_DAYS,
+  });
+}
+
 export async function getIndexSeries(
   id: IndexId,
   range: IndexRange = "daily",
@@ -201,6 +249,7 @@ export async function getIndexSeries(
       currency: "USD",
       status: "error",
       error: `unknown index ${id}`,
+      fallbackReason: null,
       data: [],
       range,
     };
@@ -208,8 +257,7 @@ export async function getIndexSeries(
 
   const now = deps.now ?? Date.now;
 
-  // alphaVantage 経路
-  if (desc.source === "alphaVantage") {
+  if (desc.primarySource === "alphaVantage") {
     try {
       const alpha = deps.alpha ?? createAlphaVantageClient();
       const target = desc.proxySymbol ?? desc.symbol;
@@ -219,59 +267,64 @@ export async function getIndexSeries(
         id: desc.id,
         label: desc.label,
         symbol: desc.symbol,
-        source: desc.source,
+        source: "alphaVantage",
         proxySymbol: desc.proxySymbol,
         currency: desc.currency,
         status: "ok",
+        fallbackReason: null,
         data: ranged,
         latest: buildLatest(ranged),
         range,
       };
-    } catch (e) {
-      const fallback = generateStaticCandles(
-        STATIC_SEEDS[id],
-        STATIC_BASES[id],
-        now(),
-      );
-      const ranged = applyRange(fallback, range);
-      return {
-        id: desc.id,
-        label: desc.label,
-        symbol: desc.symbol,
-        source: desc.source,
-        proxySymbol: desc.proxySymbol,
-        currency: desc.currency,
-        status: "error",
-        error: e instanceof Error ? e.message : String(e),
-        data: ranged,
-        latest: buildLatest(ranged),
-        range,
-      };
+    } catch (alphaError) {
+      const alphaMessage = toErrorMessage(alphaError);
+      try {
+        const yahooCandles = await fetchYahoo(desc, deps);
+        const ranged = applyRange(yahooCandles, range).slice(-TRADING_DAYS);
+        const fallbackReason = `Alpha Vantage failed: ${alphaMessage}`;
+        return {
+          id: desc.id,
+          label: desc.label,
+          symbol: desc.symbol,
+          source: "yahoo",
+          proxySymbol: desc.proxySymbol,
+          currency: desc.currency,
+          status: "ok",
+          fallbackReason,
+          data: ranged,
+          latest: buildLatest(ranged),
+          range,
+        };
+      } catch (yahooError) {
+        const yahooMessage = toErrorMessage(yahooError);
+        const fallbackReason = `Alpha Vantage failed: ${alphaMessage}; Yahoo failed: ${yahooMessage}; static fallback used`;
+        return buildStaticFallback(desc, range, now(), fallbackReason);
+      }
     }
   }
 
-  // static 経路 — 想定フォールバックとして擬似データを返す
-  const fallback = generateStaticCandles(
-    STATIC_SEEDS[id],
-    STATIC_BASES[id],
-    now(),
-  );
-  const ranged = applyRange(fallback, range);
-  return {
-    id: desc.id,
-    label: desc.label,
-    symbol: desc.symbol,
-    source: desc.source,
-    currency: desc.currency,
-    status: "ok",
-    error: desc.note,
-    data: ranged,
-    latest: buildLatest(ranged),
-    range,
-  };
+  try {
+    const yahooCandles = await fetchYahoo(desc, deps);
+    const ranged = applyRange(yahooCandles, range).slice(-TRADING_DAYS);
+    return {
+      id: desc.id,
+      label: desc.label,
+      symbol: desc.symbol,
+      source: "yahoo",
+      currency: desc.currency,
+      status: "ok",
+      fallbackReason: null,
+      data: ranged,
+      latest: buildLatest(ranged),
+      range,
+    };
+  } catch (yahooError) {
+    const yahooMessage = toErrorMessage(yahooError);
+    const fallbackReason = `Yahoo failed: ${yahooMessage}; static fallback used`;
+    return buildStaticFallback(desc, range, now(), fallbackReason);
+  }
 }
 
-/** 全指数を並列取得 */
 export async function getAllIndices(
   range: IndexRange = "daily",
   deps: MarketIndicesDeps = {},

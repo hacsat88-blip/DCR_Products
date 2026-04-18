@@ -78,10 +78,12 @@ function IndexCard({
 }) {
   const isUp = (item.latest?.change ?? 0) >= 0;
   const color = isUp ? "#34d399" : "#FF3B6B";
-  const fallbackNote = item.status === "ok" ? item.error?.trim() : undefined;
+  const hasChartData = item.data.length > 0;
+  const fallbackText = item.fallbackReason?.trim() || item.error?.trim();
+  const showFallbackWarning = hasChartData && Boolean(fallbackText);
   return (
     <NeonCard
-      glow={item.status === "error" ? "alert" : "subtle"}
+      glow={showFallbackWarning ? "alert" : "subtle"}
       className="relative overflow-hidden p-4"
     >
       <ScanLines />
@@ -109,18 +111,28 @@ function IndexCard({
           )}
         </div>
 
-        {item.status === "ok" ? (
+        {hasChartData ? (
           <>
             <IndexChart data={item.data} height={120} color={color} />
-            {fallbackNote && (
-              <p className="text-[10px] text-amber-300/80">{fallbackNote}</p>
+            {showFallbackWarning && (
+              <div className="flex items-center justify-between gap-2">
+                <p className="text-[10px] text-amber-300/80">
+                  フォールバックデータを表示中 ({item.source})
+                </p>
+                <NeonButton size="sm" variant="ghost" onClick={onRetry}>
+                  再試行
+                </NeonButton>
+              </div>
+            )}
+            {showFallbackWarning && fallbackText && (
+              <p className="text-[10px] text-text/50">{fallbackText}</p>
             )}
           </>
         ) : (
           <div className="flex h-[120px] flex-col items-center justify-center gap-2 text-center">
             <p className="text-xs text-alert">データ取得失敗</p>
-            {item.error && (
-              <p className="text-[10px] text-text/50">{item.error}</p>
+            {fallbackText && (
+              <p className="text-[10px] text-text/50">{fallbackText}</p>
             )}
             <NeonButton size="sm" variant="ghost" onClick={onRetry}>
               再試行

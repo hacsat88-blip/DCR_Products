@@ -25,6 +25,8 @@ interface PricesResponse {
   interval: "1d" | "1w";
   candles: Candle[];
   count: number;
+  source?: "jquants" | "alphaVantage" | "yahoo";
+  fallbackReason?: string | null;
   error?: string;
 }
 
@@ -149,6 +151,7 @@ export function StockDetail({ symbol }: StockDetailProps) {
         risk: matched.scores.e,
       }
     : null;
+  const fallbackMessage = pricesQ.data?.fallbackReason;
 
   return (
     <main className="relative mx-auto flex min-h-screen w-full max-w-6xl flex-col gap-6 p-4 sm:p-6">
@@ -225,7 +228,17 @@ export function StockDetail({ symbol }: StockDetailProps) {
             </NeonButton>
           </div>
         ) : (
-          <CandleChart data={pricesQ.data?.candles ?? []} />
+          <div className="flex flex-col gap-2">
+            {fallbackMessage && (
+              <p className="text-[11px] text-amber-300/80">
+                フォールバックデータを表示中 ({pricesQ.data?.source ?? "unknown"})
+              </p>
+            )}
+            {fallbackMessage && (
+              <p className="text-[10px] text-text/50">{fallbackMessage}</p>
+            )}
+            <CandleChart data={pricesQ.data?.candles ?? []} />
+          </div>
         )}
       </NeonCard>
 
