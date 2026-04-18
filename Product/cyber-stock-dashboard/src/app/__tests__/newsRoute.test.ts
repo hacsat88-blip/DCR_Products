@@ -46,8 +46,34 @@ describe("/api/news route", () => {
     const body = await res.json();
     expect(body.fallback).toBe(true);
     expect(body.count).toBe(1);
-    expect(body.warning).toContain("news_partial_fallback");
+    expect(body.warning).toContain("ニュース取得はフォールバック中です");
     expect(body.warning).toContain("marketaux timeout");
+  });
+
+  it("suppresses English items in RSS fallback payload", async () => {
+    fetchAllNewsMock.mockRejectedValueOnce(new Error("primary failed"));
+    fetchAllRssMock.mockResolvedValueOnce([
+      {
+        ...sampleNewsItem,
+        id: "news:en",
+        source: "yahoo-finance-us",
+        language: "en",
+        title: "US markets rally",
+      },
+      {
+        ...sampleNewsItem,
+        id: "news:ja",
+        source: "nhk-business",
+        language: "ja",
+        title: "日本株は続伸",
+      },
+    ]);
+    const res = await GET(new Request("http://localhost/api/news?limit=5"));
+    expect(res.status).toBe(200);
+    const body = await res.json();
+    expect(body.fallback).toBe(true);
+    expect(body.count).toBe(1);
+    expect(body.items[0].id).toBe("news:ja");
   });
 
   it("returns consistent 502 error when both primary and RSS fallback fail", async () => {
@@ -57,8 +83,9 @@ describe("/api/news route", () => {
     expect(res.status).toBe(502);
     const body = await res.json();
     expect(body.error).toBe("news_fetch_failed");
+    expect(body.detail).toContain("ニュース取得に失敗しました");
     expect(body.detail).toContain("primary failed");
-    expect(body.detail).toContain("rss_fallback_failed");
+    expect(body.detail).toContain("RSSフォールバックも失敗");
   });
 });
 

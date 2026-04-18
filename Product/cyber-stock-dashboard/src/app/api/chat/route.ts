@@ -42,6 +42,18 @@ type PublicChatError = {
   message: string;
 };
 
+function normalizeSecret(raw: string | undefined): string | undefined {
+  if (!raw) return undefined;
+  let value = raw.trim();
+  if (!value) return undefined;
+  const wrappedInDoubleQuote = value.startsWith('"') && value.endsWith('"');
+  const wrappedInSingleQuote = value.startsWith("'") && value.endsWith("'");
+  if (wrappedInDoubleQuote || wrappedInSingleQuote) {
+    value = value.slice(1, -1).trim();
+  }
+  return value || undefined;
+}
+
 function mapChatError(err: unknown): PublicChatError {
   if (err instanceof LLMError && err.kind === "auth") {
     return {
@@ -107,7 +119,7 @@ function sseChunk(data: object): string {
 }
 
 export async function POST(req: Request) {
-  if (!process.env.OPENROUTER_API_KEY) {
+  if (!normalizeSecret(process.env.OPENROUTER_API_KEY)) {
     return NextResponse.json(
       { error: "llm_unconfigured", message: "LLM 未設定です" },
       { status: 503 },
