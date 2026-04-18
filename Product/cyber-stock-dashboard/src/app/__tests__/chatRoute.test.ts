@@ -169,6 +169,22 @@ describe("/api/chat route", () => {
     expect(body.content).toContain("参考情報");
   });
 
+  it("replaces non-Japanese non-stream output with Japanese fallback message", async () => {
+    nonStreamMock.mockResolvedValue("This answer is only in English.");
+    const res = await POST(
+      makeReq({
+        messages: [{ role: "user", content: "test" }],
+        stream: false,
+      }),
+    );
+    expect(res.status).toBe(200);
+    const body = await res.json();
+    expect(body.content).toContain("日本語");
+    expect(body.content).toContain("再度お試しください");
+    expect(body.content).toContain("参考情報");
+    expect(body.content).not.toContain("This answer is only in English.");
+  });
+
   it("maps OpenRouter auth failure to 401 with friendly message (non-stream)", async () => {
     nonStreamMock.mockRejectedValue(
       new LLMError(
@@ -215,5 +231,41 @@ describe("/api/chat route", () => {
     expect(joined).not.toContain("User not found");
     expect(joined).not.toContain("OpenRouter HTTP 401");
     expect(nonStreamMock).toHaveBeenCalledTimes(1);
+  });
+
+  it("replaces English fallback output with Japanese when stream fails before any token", async () => {
+    streamMock.mockImplementation(async function* () {
+      throw new Error("stream boom");
+    });
+    nonStreamMock.mockResolvedValue("This fallback is only in English.");
+
+    const res = await POST(
+      makeReq({ messages: [{ role: "user", content: "test" }] }),
+    );
+    expect(res.status).toBe(200);
+    const chunks = await readSse(res);
+    const joined = chunks.join("\n");
+    expect(joined).toContain("日本語");
+    expect(joined).toContain("再度お試しください");
+    expect(joined).toContain('"fallback":true');
+    expect(joined).not.toContain("This fallback is only in English.");
+  });
+
+  it("falls back to Japanese interruption message when streamed text is interrupted in English", async () => {
+    streamMock.mockImplementation(async function* () {
+      yield "This answer stopped midway.";
+      throw new Error("stream boom");
+    });
+
+    const res = await POST(
+      makeReq({ messages: [{ role: "user", content: "test" }] }),
+    );
+    expect(res.status).toBe(200);
+    const chunks = await readSse(res);
+    const joined = chunks.join("\n");
+    expect(joined).toContain("配信が途中で中断");
+    expect(joined).toContain("日本語");
+    expect(joined).not.toContain("This answer stopped midway.");
+    expect(joined).toContain('"fallback":true');
   });
 });
