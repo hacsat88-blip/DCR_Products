@@ -1,4 +1,7 @@
 /* eslint-disable @typescript-eslint/no-require-imports */
+import fs from "node:fs";
+import path from "node:path";
+import { fileURLToPath } from "node:url";
 import type { BetterSQLite3Database } from "drizzle-orm/better-sqlite3";
 import * as schema from "./schema";
 
@@ -16,13 +19,29 @@ function resolveDriver(): "sqlite" | "postgres" {
   return d === "postgres" || d === "pg" ? "postgres" : "sqlite";
 }
 
+function resolveSqliteFile(url: string): string {
+  const file = url.startsWith("file://")
+    ? fileURLToPath(url)
+    : url.startsWith("file:")
+      ? url.slice(5)
+      : url;
+
+  if (file === ":memory:") {
+    return file;
+  }
+
+  const resolved = path.resolve(file);
+  fs.mkdirSync(path.dirname(resolved), { recursive: true });
+  return resolved;
+}
+
 function createSqliteDb(): Database {
    
   const Database = require("better-sqlite3");
    
   const { drizzle } = require("drizzle-orm/better-sqlite3");
   const url = process.env.DATABASE_URL ?? "file:./local.db";
-  const file = url.startsWith("file:") ? url.slice(5) : url;
+  const file = resolveSqliteFile(url);
   const sqlite = new Database(file);
   sqlite.pragma("journal_mode = WAL");
   return drizzle(sqlite, { schema }) as Database;

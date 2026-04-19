@@ -134,6 +134,50 @@ describe("/api/chat route", () => {
     expect(arr[0].content).toContain("押し目?");
   });
 
+  it("injects portfolio summary into first user message", async () => {
+    let capturedHistory: unknown = null;
+    streamMock.mockImplementation(async function* (history: unknown) {
+      capturedHistory = history;
+      yield "ok";
+    });
+    await POST(
+      makeReq({
+        messages: [{ role: "user", content: "保有のリスクは?" }],
+        context: {
+          portfolioSummary:
+            "保有 2銘柄。主力 7203 60.0%。評価損益 +70,000円。7203 への集中に注意。",
+        },
+      }),
+    );
+
+    const arr = capturedHistory as { role: string; content: string }[];
+    expect(arr[0].content).toContain("ポートフォリオ");
+    expect(arr[0].content).toContain("7203 60.0%");
+    expect(arr[0].content).toContain("保有のリスクは?");
+  });
+
+  it("injects portfolio summary into first user message context", async () => {
+    let capturedHistory: unknown = null;
+    streamMock.mockImplementation(async function* (history: unknown) {
+      capturedHistory = history;
+      yield "ok";
+    });
+    await POST(
+      makeReq({
+        messages: [{ role: "user", content: "ポートフォリオを見て" }],
+        context: {
+          market: "JP/US",
+          portfolioSummary:
+            "保有: Toyota 62.5%, Apple 37.5%。集中: Toyota。損益: Toyota +12.4%, Apple -3.2%。",
+        },
+      }),
+    );
+    const arr = capturedHistory as { role: string; content: string }[];
+    expect(arr[0].content).toContain("ポートフォリオ");
+    expect(arr[0].content).toContain("Toyota");
+    expect(arr[0].content).toContain("Apple");
+  });
+
   it("rate limits after 10 requests from same IP", async () => {
     streamMock.mockImplementation(async function* () {
       yield "ok";
@@ -167,6 +211,71 @@ describe("/api/chat route", () => {
     const body = await res.json();
     expect(body.content).toContain("回答本文");
     expect(body.content).toContain("参考情報");
+  });
+
+  it("passes webSearch opt-in to the non-stream router path", async () => {
+    nonStreamMock.mockResolvedValue("回答本文");
+    const res = await POST(
+      makeReq({
+        messages: [{ role: "user", content: "test" }],
+        stream: false,
+        webSearch: true,
+      }),
+    );
+    expect(res.status).toBe(200);
+    expect(nonStreamMock.mock.calls[0]?.[1]).toMatchObject({ webSearch: true });
+  });
+
+  it("replaces non-Japanese non-stream output with Japanese fallback message", async () => {
+    nonStreamMock.mockResolvedValue("This answer is only in English.");
+    const res = await POST(
+      makeReq({
+        messages: [{ role: "user", content: "test" }],
+        stream: false,
+      }),
+    );
+    expect(res.status).toBe(200);
+    const body = await res.json();
+    expect(body.content).toContain("日本語");
+    expect(body.content).toContain("再度お試しください");
+    expect(body.content).toContain("参考情報");
+    expect(body.content).not.toContain("This answer is only in English.");
+  });
+
+  it("localizes Fact and Unknown labels into Japanese in non-stream output", async () => {
+    nonStreamMock.mockResolvedValue(
+      "Fact: 円安が進行しています。\nUnknown: 来週の政策変更有無は未確認です。",
+    );
+    const res = await POST(
+      makeReq({
+        messages: [{ role: "user", content: "test" }],
+        stream: false,
+      }),
+    );
+    expect(res.status).toBe(200);
+    const body = await res.json();
+    expect(body.content).toContain("事実");
+    expect(body.content).toContain("不明");
+    expect(body.content).not.toContain("Fact");
+    expect(body.content).not.toContain("Unknown");
+  });
+
+  it("replaces suspicious path-like prompt leakage with Japanese fallback message", async () => {
+    nonStreamMock.mockResolvedValue(
+      '"C:\\Users\\hacsa\\Desktop\\- Fact 歴史的に、日本市場において電力・ガス（ユーティリティ）、.txt"',
+    );
+    const res = await POST(
+      makeReq({
+        messages: [{ role: "user", content: "test" }],
+        stream: false,
+      }),
+    );
+    expect(res.status).toBe(200);
+    const body = await res.json();
+    expect(body.content).toContain("日本語");
+    expect(body.content).toContain("再度お試しください");
+    expect(body.content).not.toContain("C:\\Users\\hacsa\\Desktop");
+    expect(body.content).not.toContain(".txt");
   });
 
   it("maps OpenRouter auth failure to 401 with friendly message (non-stream)", async () => {
@@ -215,5 +324,58 @@ describe("/api/chat route", () => {
     expect(joined).not.toContain("User not found");
     expect(joined).not.toContain("OpenRouter HTTP 401");
     expect(nonStreamMock).toHaveBeenCalledTimes(1);
+  });
+
+  it("replaces English fallback output with Japanese when stream fails before any token", async () => {
+    streamMock.mockImplementation(async function* () {
+      throw new Error("stream boom");
+    });
+    nonStreamMock.mockResolvedValue("This fallback is only in English.");
+
+    const res = await POST(
+      makeReq({ messages: [{ role: "user", content: "test" }] }),
+    );
+    expect(res.status).toBe(200);
+    const chunks = await readSse(res);
+    const joined = chunks.join("\n");
+    expect(joined).toContain("日本語");
+    expect(joined).toContain("再度お試しください");
+    expect(joined).toContain('"fallback":true');
+    expect(joined).not.toContain("This fallback is only in English.");
+  });
+
+  it("falls back to Japanese interruption message when streamed text is interrupted in English", async () => {
+    streamMock.mockImplementation(async function* () {
+      yield "This answer stopped midway.";
+      throw new Error("stream boom");
+    });
+
+    const res = await POST(
+      makeReq({ messages: [{ role: "user", content: "test" }] }),
+    );
+    expect(res.status).toBe(200);
+    const chunks = await readSse(res);
+    const joined = chunks.join("\n");
+    expect(joined).toContain("配信が途中で中断");
+    expect(joined).toContain("日本語");
+    expect(joined).not.toContain("This answer stopped midway.");
+    expect(joined).toContain('"fallback":true');
+  });
+
+  it("suppresses suspicious path-like streamed output before sending to client", async () => {
+    streamMock.mockImplementation(async function* () {
+      yield '"C:\\Users\\hacsa\\Desktop\\- Fact 歴史的に、日本市場において電力・ガス（ユーティリティ）、.txt"';
+    });
+
+    const res = await POST(
+      makeReq({ messages: [{ role: "user", content: "test" }] }),
+    );
+    expect(res.status).toBe(200);
+    const chunks = await readSse(res);
+    const joined = chunks.join("\n");
+    expect(joined).toContain("日本語");
+    expect(joined).toContain("再度お試しください");
+    expect(joined).not.toContain("C:\\Users\\hacsa\\Desktop");
+    expect(joined).not.toContain(".txt");
   });
 });

@@ -11,6 +11,7 @@ import {
 import type { JQuantsClient } from "@/lib/providers/jquants";
 import type { AlphaVantageClient } from "@/lib/providers/alphaVantage";
 import { portfolioSnapshot } from "@/lib/db/schema";
+import { buildPortfolioChatContext } from "@/lib/portfolioChatContext";
 
 function makeJq(closes: Record<string, number>): JQuantsClient {
   return {
@@ -212,6 +213,41 @@ describe("listPortfolioWithValuation", () => {
     });
     expect(result[0].currentPrice).toBeNull();
     expect(result[0].priceError).toBe("boom");
+  });
+});
+
+describe("buildPortfolioChatContext", () => {
+  it("summarizes holdings, weights, pnl, and concentration risk", () => {
+    const summary = buildPortfolioChatContext([
+      {
+        code: "7203",
+        currentPrice: 3000,
+        marketValueJpy: 300_000,
+        costJpy: 250_000,
+        pnlJpy: 50_000,
+        weightPercent: 60,
+      },
+      {
+        code: "AAPL",
+        currentPrice: 200,
+        marketValueJpy: 200_000,
+        costJpy: 180_000,
+        pnlJpy: 20_000,
+        weightPercent: 40,
+      },
+    ]);
+
+    expect(summary).toContain("2銘柄");
+    expect(summary).toContain("7203 60.0%");
+    expect(summary).toContain("AAPL 40.0%");
+    expect(summary).toContain("評価損益 +70,000円");
+    expect(summary).toContain("集中");
+  });
+
+  it("returns explicit no-holdings guidance when portfolio is empty", () => {
+    expect(buildPortfolioChatContext([])).toContain(
+      "保有銘柄は未登録",
+    );
   });
 });
 

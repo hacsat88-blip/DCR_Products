@@ -23,9 +23,11 @@ const ChatRequestSchema = z.object({
       tickers: z.array(z.string().max(20)).max(20).optional(),
       sector: z.string().max(80).optional(),
       market: z.string().max(20).optional(),
-    })
-    .optional(),
+      portfolioSummary: z.string().max(2000).optional(),
+  })
+  .optional(),
   stream: z.boolean().optional().default(true),
+  webSearch: z.boolean().optional().default(false),
 });
 type ChatContext = z.infer<typeof ChatRequestSchema>["context"];
 
@@ -35,6 +37,12 @@ const CHAT_AUTH_ERROR_MESSAGE =
   "AIチャットの認証に失敗しました。OpenRouter APIキーの無効・期限切れ、またはアカウント不一致の可能性があります。管理者設定を確認してください。";
 const CHAT_GENERIC_ERROR_MESSAGE =
   "AIチャットの応答取得に失敗しました。時間をおいて再試行してください。";
+const CHAT_JAPANESE_RETRY_MESSAGE =
+  "AIチャットの応答を日本語で生成できませんでした。恐れ入りますが、時間をおいて再度お試しください。";
+const STREAM_INTERRUPTED_WARNING = "配信が途中で中断されました。";
+const STREAM_INTERRUPTED_MESSAGE =
+  "AIチャットの配信が途中で中断されたため、日本語で確認できた内容に切り替えました。";
+const WINDOWS_PATH_PATTERN = /[A-Za-z]:\\[^\n]*/;
 
 type PublicChatError = {
   status: number;
@@ -101,6 +109,7 @@ function buildContextPrefix(context: ChatContext): string | null {
     parts.push(`ティッカー: ${context.tickers.join(", ")}`);
   if (context.sector) parts.push(`セクター: ${context.sector}`);
   if (context.market) parts.push(`市場: ${context.market}`);
+  if (context.portfolioSummary) parts.push(`ポートフォリオ: ${context.portfolioSummary}`);
   return parts.length ? `[対象: ${parts.join(" / ")}]\n` : null;
 }
 
@@ -116,6 +125,37 @@ function injectContext(messages: ChatTurn[], context: ChatContext): ChatTurn[] {
 
 function sseChunk(data: object): string {
   return `data: ${JSON.stringify(data)}\n\n`;
+}
+
+function stripFooter(text: string): string {
+  return text.split(FOOTER).join("").trim();
+}
+
+function localizeBoundaryLabels(text: string): string {
+  return text
+    .replace(/\bFact\b/g, "事実")
+    .replace(/\bUnknown\b/g, "不明");
+}
+
+function isJapaneseText(text: string): boolean {
+  return /[ぁ-んァ-ヶ一-龠々ー]/.test(text);
+}
+
+function containsPromptLeakage(text: string): boolean {
+  return WINDOWS_PATH_PATTERN.test(text);
+}
+
+function normalizeJapaneseAssistantText(text: string): string {
+  const content = localizeBoundaryLabels(stripFooter(text));
+  if (!content) return CHAT_JAPANESE_RETRY_MESSAGE;
+  if (containsPromptLeakage(content)) return CHAT_JAPANESE_RETRY_MESSAGE;
+  return isJapaneseText(content) ? content : CHAT_JAPANESE_RETRY_MESSAGE;
+}
+
+function normalizeJapaneseAssistantDeltas(deltas: string[]): string[] {
+  const raw = deltas.join("");
+  const normalized = normalizeJapaneseAssistantText(raw);
+  return normalized === stripFooter(raw) ? deltas : [normalized];
 }
 
 export async function POST(req: Request) {
@@ -160,9 +200,13 @@ export async function POST(req: Request) {
   const wantStream = parsed.data.stream;
 
   if (!wantStream) {
-    try {
-      const text = await chatWithHistory(history);
-      return NextResponse.json({ content: text + FOOTER });
+      try {
+        const text = await chatWithHistory(history, {
+          webSearch: parsed.data.webSearch,
+        });
+        return NextResponse.json({
+          content: normalizeJapaneseAssistantText(text) + FOOTER,
+        });
     } catch (err) {
       const mapped = mapChatError(err);
       logChatError("non_stream", err, mapped);
@@ -184,25 +228,31 @@ export async function POST(req: Request) {
       const send = (obj: object) =>
         controller.enqueue(encoder.encode(sseChunk(obj)));
       try {
-        let any = false;
+        let finalDeltas: string[] = [];
+        const deltas: string[] = [];
         try {
-          for await (const delta of chatWithHistoryStream(history)) {
-            any = true;
-            send({ delta });
+          for await (const delta of chatWithHistoryStream(history, {
+            webSearch: parsed.data.webSearch,
+          })) {
+            deltas.push(delta);
           }
+          finalDeltas = normalizeJapaneseAssistantDeltas(deltas);
         } catch (streamErr) {
           const mappedStreamErr = mapChatError(streamErr);
           logChatError("stream_primary", streamErr, mappedStreamErr);
           usedFallback = true;
-          if (any) {
+          if (deltas.length > 0) {
+            finalDeltas = normalizeJapaneseAssistantDeltas(deltas);
             send({
-              warning: "stream_interrupted",
-              message: mappedStreamErr.message,
+              warning: STREAM_INTERRUPTED_WARNING,
+              message: STREAM_INTERRUPTED_MESSAGE,
             });
           } else {
             try {
-              const text = await chatWithHistory(history);
-              send({ delta: text });
+              const text = await chatWithHistory(history, {
+                webSearch: parsed.data.webSearch,
+              });
+              finalDeltas = [normalizeJapaneseAssistantText(text)];
             } catch (fallbackErr) {
               const mappedFallbackErr = mapChatError(fallbackErr);
               logChatError("stream_fallback", fallbackErr, mappedFallbackErr);
@@ -214,7 +264,12 @@ export async function POST(req: Request) {
             }
           }
         }
-        send({ delta: FOOTER });
+        if (finalDeltas.length > 0) {
+          for (const delta of finalDeltas) {
+            send({ delta });
+          }
+          send({ delta: FOOTER });
+        }
         send({ done: true, fallback: usedFallback });
       } catch (err) {
         const mapped = mapChatError(err);

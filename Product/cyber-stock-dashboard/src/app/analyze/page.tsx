@@ -76,6 +76,9 @@ const STYLES: Style[] = [
 ];
 
 export default function AnalyzePage() {
+  const showWebSearchToggle =
+    process.env.NEXT_PUBLIC_OPENROUTER_ENABLE_WEB_SEARCH?.trim().toLowerCase() === "true" ||
+    process.env.NEXT_PUBLIC_OPENROUTER_ENABLE_WEB_SEARCH?.trim() === "1";
   const [market, setMarket] = React.useState<Market>("JP");
   const [priceMin, setPriceMin] = React.useState<number>(100);
   const [priceMax, setPriceMax] = React.useState<number>(3000);
@@ -290,6 +293,7 @@ export default function AnalyzePage() {
           tickers: (result?.data?.analyses ?? []).map((a) => a.code).slice(0, 10),
           sector: theme || undefined,
         }}
+        showWebSearchToggle={showWebSearchToggle}
       />
 
       <Disclaimer />
