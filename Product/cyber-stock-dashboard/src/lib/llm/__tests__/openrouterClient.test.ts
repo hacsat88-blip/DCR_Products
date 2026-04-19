@@ -145,4 +145,26 @@ describe("openrouterClient.chat", () => {
       else process.env.OPENROUTER_API_KEY = prev;
     }
   });
+
+  it("includes OpenRouter server tools in the request body when provided", async () => {
+    const fetchImpl = vi.fn(async () => makeResponse(makeChatBody("ok")));
+    await chat({
+      ...baseOpts,
+      fetchImpl: fetchImpl as unknown as typeof fetch,
+      tools: [
+        {
+          type: "openrouter:web_search",
+          parameters: { max_results: 3, max_total_results: 9 },
+        },
+      ],
+    });
+    const init = (fetchImpl.mock.calls[0] as unknown as [string, RequestInit])[1];
+    const body = JSON.parse(init.body as string);
+    expect(body.tools).toEqual([
+      {
+        type: "openrouter:web_search",
+        parameters: { max_results: 3, max_total_results: 9 },
+      },
+    ]);
+  });
 });

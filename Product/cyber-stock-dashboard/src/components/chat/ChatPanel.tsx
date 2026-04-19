@@ -4,6 +4,7 @@ import * as React from "react";
 import { NeonButton } from "@/components/ui/NeonButton";
 import { NeonCard } from "@/components/ui/NeonCard";
 import { cn } from "@/lib/cn";
+import { buildPortfolioChatContext } from "@/lib/portfolioChatContext";
 import { QuickPrompts } from "./QuickPrompts";
 
 export interface ChatMessage {
@@ -12,13 +13,20 @@ export interface ChatMessage {
 }
 
 export interface ChatPanelProps {
-  context?: { tickers?: string[]; sector?: string; market?: string };
+  context?: {
+    tickers?: string[];
+    sector?: string;
+    market?: string;
+    portfolioSummary?: string;
+  };
   initialMessages?: ChatMessage[];
   className?: string;
   title?: string;
   collapsible?: boolean;
   defaultCollapsed?: boolean;
   showQuickPrompts?: boolean;
+  enablePortfolioContext?: boolean;
+  showWebSearchToggle?: boolean;
 }
 
 interface SSEChunk {
@@ -28,6 +36,19 @@ interface SSEChunk {
   error?: string;
   message?: string;
   fallback?: boolean;
+}
+
+interface PortfolioContextRow {
+  code: string;
+  marketValueJpy: number;
+  costJpy: number;
+  pnlJpy: number;
+  weightPercent: number;
+  currentPrice: number | null;
+}
+
+interface PortfolioApiResponse {
+  data?: PortfolioContextRow[];
 }
 
 function parseSSELines(buffer: string): { events: SSEChunk[]; rest: string } {
@@ -64,6 +85,8 @@ export function ChatPanel({
   collapsible = false,
   defaultCollapsed = false,
   showQuickPrompts = true,
+  enablePortfolioContext = false,
+  showWebSearchToggle = false,
 }: ChatPanelProps) {
   const [messages, setMessages] = React.useState<ChatMessage[]>(initialMessages);
   const [input, setInput] = React.useState("");
@@ -71,6 +94,16 @@ export function ChatPanel({
   const [pending, setPending] = React.useState("");
   const [error, setError] = React.useState<string | null>(null);
   const [collapsed, setCollapsed] = React.useState(defaultCollapsed);
+  const [portfolioState, setPortfolioState] = React.useState<
+    "available" | "empty" | "unavailable" | null
+  >(context?.portfolioSummary ? "available" : null);
+  const [portfolioSummary, setPortfolioSummary] = React.useState<string | undefined>(
+    context?.portfolioSummary,
+  );
+  const [portfolioTickers, setPortfolioTickers] = React.useState<string[] | undefined>(
+    context?.tickers,
+  );
+  const [webSearchEnabled, setWebSearchEnabled] = React.useState(false);
   const abortRef = React.useRef<AbortController | null>(null);
   const listRef = React.useRef<HTMLDivElement | null>(null);
   const pendingRef = React.useRef("");
@@ -78,6 +111,47 @@ export function ChatPanel({
   React.useEffect(() => {
     if (listRef.current) listRef.current.scrollTop = listRef.current.scrollHeight;
   }, [messages, pending]);
+
+  const loadPortfolioContext = React.useCallback(async () => {
+    try {
+      const res = await fetch("/api/portfolio", { cache: "no-store" });
+      if (!res.ok) throw new Error(`portfolio ${res.status}`);
+      const json = (await res.json()) as PortfolioApiResponse;
+      const rows = Array.isArray(json.data) ? json.data : [];
+      return {
+        portfolioSummary: buildPortfolioChatContext(rows),
+        portfolioTickers:
+          rows.length > 0 ? rows.map((row) => row.code) : context?.tickers,
+        portfolioState: (rows.length > 0 ? "available" : "empty") as
+          | "available"
+          | "empty",
+      };
+    } catch {
+      return {
+        portfolioSummary: undefined,
+        portfolioTickers: context?.tickers,
+        portfolioState: "unavailable" as const,
+      };
+    }
+  }, [context]);
+
+  React.useEffect(() => {
+    if (!enablePortfolioContext) return;
+
+    let active = true;
+    async function hydratePortfolioContext() {
+      const next = await loadPortfolioContext();
+      if (!active) return;
+      setPortfolioSummary(next.portfolioSummary);
+      setPortfolioTickers(next.portfolioTickers);
+      setPortfolioState(next.portfolioState);
+    }
+
+    void hydratePortfolioContext();
+    return () => {
+      active = false;
+    };
+  }, [enablePortfolioContext, loadPortfolioContext]);
 
   const send = React.useCallback(
     async (text: string) => {
@@ -98,10 +172,33 @@ export function ChatPanel({
       abortRef.current = ac;
 
       try {
+        let resolvedSummary = portfolioSummary;
+        let resolvedTickers = portfolioTickers ?? context?.tickers;
+        if (enablePortfolioContext && portfolioState == null) {
+          const nextPortfolio = await loadPortfolioContext();
+          resolvedSummary = nextPortfolio.portfolioSummary;
+          resolvedTickers = nextPortfolio.portfolioTickers;
+          setPortfolioSummary(nextPortfolio.portfolioSummary);
+          setPortfolioTickers(nextPortfolio.portfolioTickers);
+          setPortfolioState(nextPortfolio.portfolioState);
+        }
+        const requestContext =
+          enablePortfolioContext && resolvedSummary
+            ? {
+                ...context,
+                tickers: resolvedTickers,
+                portfolioSummary: resolvedSummary,
+              }
+            : context;
         const res = await fetch("/api/chat", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ messages: next, context, stream: true }),
+          body: JSON.stringify({
+            messages: next,
+            context: requestContext,
+            stream: true,
+            webSearch: webSearchEnabled,
+          }),
           signal: ac.signal,
         });
 
@@ -172,7 +269,17 @@ export function ChatPanel({
         abortRef.current = null;
       }
     },
-    [messages, streaming, context],
+    [
+      messages,
+      streaming,
+      context,
+      enablePortfolioContext,
+      loadPortfolioContext,
+      portfolioState,
+      portfolioSummary,
+      portfolioTickers,
+      webSearchEnabled,
+    ],
   );
 
   const cancel = React.useCallback(() => {
@@ -183,6 +290,15 @@ export function ChatPanel({
     e.preventDefault();
     void send(input);
   }
+
+  const portfolioHint =
+    portfolioState === "available"
+      ? "ポートフォリオ文脈を自動添付中"
+      : portfolioState === "empty"
+        ? "ポートフォリオ未登録のため一般情報として回答します"
+        : portfolioState === "unavailable"
+          ? "ポートフォリオ取得失敗のため一般情報として回答します"
+          : null;
 
   return (
     <NeonCard glow="subtle" className={cn("flex flex-col gap-3", className)}>
@@ -203,10 +319,40 @@ export function ChatPanel({
         )}
       </header>
 
+      {portfolioHint && (
+        <p className="text-[11px] text-text/60" role="status">
+          {portfolioHint}
+        </p>
+      )}
+
       {!collapsed && (
         <>
           {showQuickPrompts && (
-            <QuickPrompts onPick={(t) => void send(t)} disabled={streaming} />
+            <QuickPrompts
+              onPick={(prompt) => void send(prompt.query)}
+              disabled={streaming}
+              portfolioAware={portfolioState === "available"}
+            />
+          )}
+
+          {showWebSearchToggle && (
+            <label className="flex items-center justify-between gap-3 rounded-lg border border-text/15 bg-bg/40 px-3 py-2 text-xs text-text/70">
+              <span>
+                最新情報モード（Web検索）
+                <span className="ml-2 text-[10px] text-amber-200">
+                  beta / 追加コストの可能性あり
+                </span>
+              </span>
+              <input
+                type="checkbox"
+                role="checkbox"
+                aria-label="Web検索"
+                checked={webSearchEnabled}
+                onChange={(e) => setWebSearchEnabled(e.target.checked)}
+                disabled={streaming}
+                className="h-4 w-4 accent-cyan-400"
+              />
+            </label>
           )}
 
           <div

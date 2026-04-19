@@ -3,6 +3,7 @@ import {
   chatStream,
   type ChatMessage,
   type ChatOptions,
+  type OpenRouterWebSearchTool,
 } from "./openrouterClient";
 import {
   ANALYZER_SYSTEM_PROMPT,
@@ -98,6 +99,13 @@ const CHAT_SYSTEM = withBoundary(
 - 末尾に必ず「※参考情報。最終判断はご自身で。」を付与する`,
 );
 
+const CHAT_WEB_SEARCH_APPENDIX = `
+
+# WEB SEARCH STYLE
+- 最新情報が必要なときだけ Web検索結果を根拠として使う
+- 検索を使った場合は、回答末尾に「参考ソース:」を置き、媒体名や URL を 2〜5 件だけ簡潔に列挙する
+- 検索結果の丸写しはしない`;
+
 export interface ChatTurn {
   role: "user" | "assistant";
   content: string;
@@ -107,17 +115,68 @@ export interface ChatHistoryOptions extends RouterCallOptions {
   /** 将来のストリーミング対応用フック (現状未使用) */
   stream?: boolean;
   onToken?: (token: string) => void;
+  webSearch?: boolean;
+}
+
+function webSearchEnabled(): boolean {
+  const raw = process.env.OPENROUTER_ENABLE_WEB_SEARCH?.trim().toLowerCase();
+  return raw === "1" || raw === "true";
+}
+
+function parsePositiveInt(
+  raw: string | undefined,
+  fallback: number,
+): number {
+  const n = Number(raw);
+  return Number.isInteger(n) && n > 0 ? n : fallback;
+}
+
+function parseDomainList(raw: string | undefined): string[] | undefined {
+  if (!raw) return undefined;
+  const domains = raw
+    .split(",")
+    .map((part) => part.trim())
+    .filter(Boolean);
+  return domains.length > 0 ? domains : undefined;
+}
+
+function webSearchTools(enabled: boolean | undefined): OpenRouterWebSearchTool[] | undefined {
+  if (!enabled || !webSearchEnabled()) return undefined;
+  return [
+    {
+      type: "openrouter:web_search",
+      parameters: {
+        max_results: parsePositiveInt(
+          process.env.OPENROUTER_WEB_SEARCH_MAX_RESULTS,
+          5,
+        ),
+        max_total_results: parsePositiveInt(
+          process.env.OPENROUTER_WEB_SEARCH_MAX_TOTAL_RESULTS,
+          15,
+        ),
+        allowed_domains: parseDomainList(
+          process.env.OPENROUTER_WEB_SEARCH_ALLOWED_DOMAINS,
+        ),
+      },
+    },
+  ];
+}
+
+function chatSystemPrompt(webSearch: boolean | undefined): string {
+  return webSearch && webSearchEnabled()
+    ? `${CHAT_SYSTEM}${CHAT_WEB_SEARCH_APPENDIX}`
+    : CHAT_SYSTEM;
 }
 
 export async function chatWithHistory(
   history: ChatTurn[],
   opts: ChatHistoryOptions = {},
 ): Promise<string> {
+  const { stream: _stream, onToken: _onToken, webSearch, ...rest } = opts;
   const messages: ChatMessage[] = [
-    { role: "system", content: CHAT_SYSTEM },
+    { role: "system", content: chatSystemPrompt(webSearch) },
     ...history.map<ChatMessage>((t) => ({ role: t.role, content: t.content })),
   ];
-  const { stream: _stream, onToken: _onToken, ...rest } = opts;
   void _stream;
   void _onToken;
   return chat({
@@ -126,6 +185,7 @@ export async function chatWithHistory(
     temperature: 0.4,
     maxTokens: 1024,
     messages,
+    tools: webSearchTools(webSearch),
   });
 }
 
@@ -135,18 +195,20 @@ export async function chatWithHistory(
  */
 export async function* chatWithHistoryStream(
   history: ChatTurn[],
-  opts: RouterCallOptions = {},
+  opts: ChatHistoryOptions = {},
 ): AsyncGenerator<string, void, unknown> {
+  const { webSearch, ...rest } = opts;
   const messages: ChatMessage[] = [
-    { role: "system", content: CHAT_SYSTEM },
+    { role: "system", content: chatSystemPrompt(webSearch) },
     ...history.map<ChatMessage>((t) => ({ role: t.role, content: t.content })),
   ];
   yield* chatStream({
-    ...opts,
+    ...rest,
     model: fastModel(),
     temperature: 0.4,
     maxTokens: 1024,
     messages,
+    tools: webSearchTools(webSearch),
   });
 }
 

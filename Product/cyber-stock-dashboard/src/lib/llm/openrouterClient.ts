@@ -27,6 +27,18 @@ export interface ResponseFormat<T> {
   name?: string;
 }
 
+export interface OpenRouterWebSearchTool {
+  type: "openrouter:web_search";
+  parameters?: {
+    engine?: "auto" | "native" | "exa" | "firecrawl" | "parallel";
+    max_results?: number;
+    max_total_results?: number;
+    search_context_size?: "low" | "medium" | "high";
+    allowed_domains?: string[];
+    excluded_domains?: string[];
+  };
+}
+
 export interface ChatOptions<T = string> {
   model: string;
   messages: ChatMessage[];
@@ -44,6 +56,8 @@ export interface ChatOptions<T = string> {
   baseUrl?: string;
   /** API キー (省略時は env.OPENROUTER_API_KEY) */
   apiKey?: string;
+  /** OpenRouter server tools */
+  tools?: OpenRouterWebSearchTool[];
 }
 
 const DEFAULT_BASE_URL = "https://openrouter.ai/api/v1/chat/completions";
@@ -110,6 +124,7 @@ export async function chat<T>(options: ChatOptions<T>): Promise<T | string> {
     temperature: options.temperature ?? 0.2,
   };
   if (options.maxTokens !== undefined) body.max_tokens = options.maxTokens;
+  if (options.tools?.length) body.tools = options.tools;
 
   if (options.responseFormat) {
     let jsonSchema: unknown;
@@ -234,6 +249,7 @@ export async function* chatStream(
     stream: true,
   };
   if (options.maxTokens !== undefined) body.max_tokens = options.maxTokens;
+  if (options.tools?.length) body.tools = options.tools;
 
   let response: Response;
   try {

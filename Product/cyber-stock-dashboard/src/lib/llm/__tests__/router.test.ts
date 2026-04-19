@@ -146,4 +146,46 @@ describe("router", () => {
     expect(body.messages[0].role).toBe("system");
     expect(body.messages).toHaveLength(4);
   });
+
+  it("chatWithHistory adds web search tool when env flag and opt-in are enabled", async () => {
+    const prev = process.env.OPENROUTER_ENABLE_WEB_SEARCH;
+    process.env.OPENROUTER_ENABLE_WEB_SEARCH = "true";
+    const fetchImpl = vi.fn(async () => textResponse("ok"));
+    try {
+      await chatWithHistory(
+        [{ role: "user", content: "最新ニュースを確認して" }],
+        { ...callOpts, fetchImpl: fetchImpl as unknown as typeof fetch, webSearch: true },
+      );
+      const init = (fetchImpl.mock.calls[0] as unknown as [string, RequestInit])[1];
+      const body = JSON.parse(init.body as string);
+      expect(body.tools).toEqual([
+        {
+          type: "openrouter:web_search",
+          parameters: { max_results: 5, max_total_results: 15 },
+        },
+      ]);
+      expect(body.messages[0].content).toContain("参考ソース");
+    } finally {
+      if (prev === undefined) delete process.env.OPENROUTER_ENABLE_WEB_SEARCH;
+      else process.env.OPENROUTER_ENABLE_WEB_SEARCH = prev;
+    }
+  });
+
+  it("chatWithHistory omits web search tool when env flag is disabled", async () => {
+    const prev = process.env.OPENROUTER_ENABLE_WEB_SEARCH;
+    delete process.env.OPENROUTER_ENABLE_WEB_SEARCH;
+    const fetchImpl = vi.fn(async () => textResponse("ok"));
+    try {
+      await chatWithHistory(
+        [{ role: "user", content: "最新ニュースを確認して" }],
+        { ...callOpts, fetchImpl: fetchImpl as unknown as typeof fetch, webSearch: true },
+      );
+      const init = (fetchImpl.mock.calls[0] as unknown as [string, RequestInit])[1];
+      const body = JSON.parse(init.body as string);
+      expect(body.tools).toBeUndefined();
+    } finally {
+      if (prev === undefined) delete process.env.OPENROUTER_ENABLE_WEB_SEARCH;
+      else process.env.OPENROUTER_ENABLE_WEB_SEARCH = prev;
+    }
+  });
 });

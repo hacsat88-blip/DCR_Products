@@ -23,9 +23,11 @@ const ChatRequestSchema = z.object({
       tickers: z.array(z.string().max(20)).max(20).optional(),
       sector: z.string().max(80).optional(),
       market: z.string().max(20).optional(),
-    })
-    .optional(),
+      portfolioSummary: z.string().max(2000).optional(),
+  })
+  .optional(),
   stream: z.boolean().optional().default(true),
+  webSearch: z.boolean().optional().default(false),
 });
 type ChatContext = z.infer<typeof ChatRequestSchema>["context"];
 
@@ -40,6 +42,7 @@ const CHAT_JAPANESE_RETRY_MESSAGE =
 const STREAM_INTERRUPTED_WARNING = "配信が途中で中断されました。";
 const STREAM_INTERRUPTED_MESSAGE =
   "AIチャットの配信が途中で中断されたため、日本語で確認できた内容に切り替えました。";
+const WINDOWS_PATH_PATTERN = /[A-Za-z]:\\[^\n]*/;
 
 type PublicChatError = {
   status: number;
@@ -106,6 +109,7 @@ function buildContextPrefix(context: ChatContext): string | null {
     parts.push(`ティッカー: ${context.tickers.join(", ")}`);
   if (context.sector) parts.push(`セクター: ${context.sector}`);
   if (context.market) parts.push(`市場: ${context.market}`);
+  if (context.portfolioSummary) parts.push(`ポートフォリオ: ${context.portfolioSummary}`);
   return parts.length ? `[対象: ${parts.join(" / ")}]\n` : null;
 }
 
@@ -127,13 +131,24 @@ function stripFooter(text: string): string {
   return text.split(FOOTER).join("").trim();
 }
 
+function localizeBoundaryLabels(text: string): string {
+  return text
+    .replace(/\bFact\b/g, "事実")
+    .replace(/\bUnknown\b/g, "不明");
+}
+
 function isJapaneseText(text: string): boolean {
   return /[ぁ-んァ-ヶ一-龠々ー]/.test(text);
 }
 
+function containsPromptLeakage(text: string): boolean {
+  return WINDOWS_PATH_PATTERN.test(text);
+}
+
 function normalizeJapaneseAssistantText(text: string): string {
-  const content = stripFooter(text);
+  const content = localizeBoundaryLabels(stripFooter(text));
   if (!content) return CHAT_JAPANESE_RETRY_MESSAGE;
+  if (containsPromptLeakage(content)) return CHAT_JAPANESE_RETRY_MESSAGE;
   return isJapaneseText(content) ? content : CHAT_JAPANESE_RETRY_MESSAGE;
 }
 
@@ -185,11 +200,13 @@ export async function POST(req: Request) {
   const wantStream = parsed.data.stream;
 
   if (!wantStream) {
-    try {
-      const text = await chatWithHistory(history);
-      return NextResponse.json({
-        content: normalizeJapaneseAssistantText(text) + FOOTER,
-      });
+      try {
+        const text = await chatWithHistory(history, {
+          webSearch: parsed.data.webSearch,
+        });
+        return NextResponse.json({
+          content: normalizeJapaneseAssistantText(text) + FOOTER,
+        });
     } catch (err) {
       const mapped = mapChatError(err);
       logChatError("non_stream", err, mapped);
@@ -214,7 +231,9 @@ export async function POST(req: Request) {
         let finalDeltas: string[] = [];
         const deltas: string[] = [];
         try {
-          for await (const delta of chatWithHistoryStream(history)) {
+          for await (const delta of chatWithHistoryStream(history, {
+            webSearch: parsed.data.webSearch,
+          })) {
             deltas.push(delta);
           }
           finalDeltas = normalizeJapaneseAssistantDeltas(deltas);
@@ -230,7 +249,9 @@ export async function POST(req: Request) {
             });
           } else {
             try {
-              const text = await chatWithHistory(history);
+              const text = await chatWithHistory(history, {
+                webSearch: parsed.data.webSearch,
+              });
               finalDeltas = [normalizeJapaneseAssistantText(text)];
             } catch (fallbackErr) {
               const mappedFallbackErr = mapChatError(fallbackErr);

@@ -13,6 +13,10 @@ import {
 } from "@/components/charts";
 
 export default function HomePage() {
+  const showWebSearchToggle =
+    process.env.NEXT_PUBLIC_OPENROUTER_ENABLE_WEB_SEARCH?.trim().toLowerCase() === "true" ||
+    process.env.NEXT_PUBLIC_OPENROUTER_ENABLE_WEB_SEARCH?.trim() === "1";
+
   return (
     <main className="relative mx-auto flex min-h-screen w-full max-w-7xl flex-col gap-8 p-4 sm:p-6 lg:p-8">
       <ScanLines className="!fixed inset-0 !rounded-none opacity-40" />
@@ -42,6 +46,8 @@ export default function HomePage() {
           collapsible
           defaultCollapsed
           showQuickPrompts
+          enablePortfolioContext
+          showWebSearchToggle={showWebSearchToggle}
         />
 
         <Disclaimer />
