@@ -11,7 +11,7 @@ import {
   type YahooFinanceClient,
 } from "@/lib/providers/yahooFinance";
 import type { Candle } from "@/lib/providers/types";
-import { aggregateWeekly } from "@/components/charts/CandleChart";
+import { aggregateWeekly } from "@/lib/candleAggregation";
 
 export interface PricesRouteDeps {
   jquants?: JQuantsClient;

@@ -1,8 +1,7 @@
 "use client";
 
 import * as React from "react";
-import { NeonButton } from "@/components/ui/NeonButton";
-import { NeonCard } from "@/components/ui/NeonCard";
+import { Card } from "@/components/ember/ui/Card";
 import { cn } from "@/lib/cn";
 import { buildPortfolioChatContext } from "@/lib/portfolioChatContext";
 import { QuickPrompts } from "./QuickPrompts";
@@ -301,26 +300,26 @@ export function ChatPanel({
           : null;
 
   return (
-    <NeonCard glow="subtle" className={cn("flex flex-col gap-3", className)}>
+    <Card soft className={cn("flex flex-col gap-3", className)}>
       <header className="flex items-center justify-between">
-        <h2 className="heading-en text-sm font-bold tracking-wider text-neon">
+        <h2 className="text-sm font-semibold tracking-wide" style={{ color: "var(--coral)" }}>
           💬 {title}
         </h2>
         {collapsible && (
-          <NeonButton
+          <button
             type="button"
-            variant="ghost"
-            size="sm"
             onClick={() => setCollapsed((c) => !c)}
             aria-expanded={!collapsed}
+            className="rounded-md px-2 py-1 text-xs font-medium transition hover:opacity-80"
+            style={{ color: "var(--ink-soft)", border: "1px solid var(--border)" }}
           >
             {collapsed ? "開く" : "閉じる"}
-          </NeonButton>
+          </button>
         )}
       </header>
 
       {portfolioHint && (
-        <p className="text-[11px] text-text/60" role="status">
+        <p className="text-[11px]" style={{ color: "var(--ink-mute)" }} role="status">
           {portfolioHint}
         </p>
       )}
@@ -336,10 +335,17 @@ export function ChatPanel({
           )}
 
           {showWebSearchToggle && (
-            <label className="flex items-center justify-between gap-3 rounded-lg border border-text/15 bg-bg/40 px-3 py-2 text-xs text-text/70">
+            <label
+              className="flex items-center justify-between gap-3 rounded-lg px-3 py-2 text-xs"
+              style={{
+                color: "var(--ink-soft)",
+                background: "var(--surface-soft)",
+                border: "1px solid var(--border)",
+              }}
+            >
               <span>
                 最新情報モード（Web検索）
-                <span className="ml-2 text-[10px] text-amber-200">
+                <span className="ml-2 text-[10px]" style={{ color: "var(--coral)" }}>
                   beta / 追加コストの可能性あり
                 </span>
               </span>
@@ -350,20 +356,26 @@ export function ChatPanel({
                 checked={webSearchEnabled}
                 onChange={(e) => setWebSearchEnabled(e.target.checked)}
                 disabled={streaming}
-                className="h-4 w-4 accent-cyan-400"
+                className="h-4 w-4"
+                style={{ accentColor: "var(--coral)" }}
               />
             </label>
           )}
 
           <div
             ref={listRef}
-            className="max-h-80 min-h-32 overflow-y-auto rounded-xl border border-neon/20 bg-bg/40 p-3 font-mono text-sm leading-relaxed"
+            className="max-h-80 min-h-32 overflow-y-auto rounded-xl p-3 text-sm leading-relaxed"
+            style={{
+              background: "var(--surface-soft)",
+              border: "1px solid var(--border)",
+              fontFamily: "var(--font-jp, var(--font-sans))",
+            }}
             aria-live="polite"
             aria-busy={streaming}
             data-testid="chat-list"
           >
             {messages.length === 0 && !pending && !streaming && (
-              <p className="text-text/40">
+              <p style={{ color: "var(--ink-mute)" }}>
                 質問を入力するか、上のチップから選んでください。
               </p>
             )}
@@ -371,18 +383,23 @@ export function ChatPanel({
               {messages.map((m, i) => (
                 <li
                   key={i}
-                  className={cn(
-                    "flex",
-                    m.role === "user" ? "justify-end" : "justify-start",
-                  )}
+                  className={cn("flex", m.role === "user" ? "justify-end" : "justify-start")}
                 >
                   <span
-                    className={cn(
-                      "inline-block max-w-[85%] whitespace-pre-wrap rounded-lg border px-3 py-2",
+                    className="inline-block max-w-[85%] whitespace-pre-wrap rounded-lg px-3 py-2"
+                    style={
                       m.role === "user"
-                        ? "border-neon/50 bg-neon/10 text-neon"
-                        : "border-accent/40 bg-accent/10 text-text",
-                    )}
+                        ? {
+                            background: "var(--coral)",
+                            color: "#fff",
+                            border: "1px solid var(--coral)",
+                          }
+                        : {
+                            background: "var(--surface)",
+                            color: "var(--ink)",
+                            border: "1px solid var(--border)",
+                          }
+                    }
                     data-role={m.role}
                   >
                     {m.content}
@@ -392,7 +409,12 @@ export function ChatPanel({
               {pending && (
                 <li className="flex justify-start">
                   <span
-                    className="inline-block max-w-[85%] whitespace-pre-wrap rounded-lg border border-accent/40 bg-accent/10 px-3 py-2 text-text"
+                    className="inline-block max-w-[85%] whitespace-pre-wrap rounded-lg px-3 py-2"
+                    style={{
+                      background: "var(--surface)",
+                      color: "var(--ink)",
+                      border: "1px solid var(--border)",
+                    }}
                     data-role="assistant-pending"
                   >
                     {pending}
@@ -402,7 +424,12 @@ export function ChatPanel({
               {streaming && !pending && (
                 <li className="flex justify-start">
                   <span
-                    className="inline-flex animate-pulse items-center gap-1 rounded-lg border border-accent/40 bg-accent/10 px-3 py-2 text-accent"
+                    className="inline-flex animate-pulse items-center gap-1 rounded-lg px-3 py-2"
+                    style={{
+                      background: "var(--surface)",
+                      color: "var(--coral)",
+                      border: "1px solid var(--border)",
+                    }}
                     data-testid="thinking"
                   >
                     考え中…
@@ -413,7 +440,7 @@ export function ChatPanel({
           </div>
 
           {error && (
-            <p className="text-xs text-alert" role="alert">
+            <p className="text-xs" style={{ color: "var(--coral)" }} role="alert">
               {error}
             </p>
           )}
@@ -427,34 +454,39 @@ export function ChatPanel({
               maxLength={2000}
               disabled={streaming}
               aria-label="質問入力"
-              className="flex-1 rounded-lg border border-text/20 bg-bg/60 p-2 text-sm text-text placeholder:text-text/40 focus:border-neon/60 focus:outline-none"
+              className="flex-1 rounded-lg p-2 text-sm focus:outline-none"
+              style={{
+                background: "var(--surface)",
+                color: "var(--ink)",
+                border: "1px solid var(--border)",
+              }}
             />
             {streaming ? (
-              <NeonButton
+              <button
                 type="button"
-                variant="danger"
-                size="md"
                 onClick={cancel}
+                className="rounded-lg px-4 py-2 text-sm font-medium text-white transition hover:opacity-90"
+                style={{ background: "#B45550" }}
               >
                 キャンセル
-              </NeonButton>
+              </button>
             ) : (
-              <NeonButton
+              <button
                 type="submit"
-                variant="primary"
-                size="md"
                 disabled={!input.trim()}
+                className="rounded-lg px-4 py-2 text-sm font-medium text-white transition hover:opacity-90 disabled:opacity-40"
+                style={{ background: "var(--coral)" }}
               >
                 送信
-              </NeonButton>
+              </button>
             )}
           </form>
-          <p className="text-[10px] text-text/40">
+          <p className="text-[10px]" style={{ color: "var(--ink-mute)" }}>
             ※参考情報のみ。投資判断はご自身の責任で行ってください。
           </p>
         </>
       )}
-    </NeonCard>
+    </Card>
   );
 }
 
