@@ -1,99 +1,204 @@
 @import "tailwindcss";
 
+/* Ember Stock Atelier - warm Claude-inspired palette */
 :root {
-  --bg: #050B1A;
-  --neon: #00E1FF;
-  --neon-2: #2A6BFF;
-  --accent: #B86BFF;
-  --alert: #FF3B6B;
-  --text: #F4FAFF;
+  /* light (default) */
+  --bg: #F5EFE8;
+  --bg-2: #EAE1D4;
+  --bg-3: #FAF7F2;
+  --surface: #FFFFFF;
+  --surface-soft: rgba(255, 255, 255, 0.6);
+  --border: rgba(42, 38, 34, 0.10);
+  --border-strong: rgba(42, 38, 34, 0.18);
+  --ink: #2A2622;
+  --ink-soft: #5C5249;
+  --ink-mute: #8C7F72;
+
+  --coral: #D97757;
+  --coral-2: #E89A7A;
+  --coral-deep: #B85A3F;
+  --clay: #C89B6B;
+  --plum: #7B5E8C;
+  --sage: #7A8E6B;
+  --moss: #5E7556;
+
+  --up: #5E7556;
+  --down: #C04A4A;
+
+  --grad-warm: linear-gradient(135deg, #F5EFE8 0%, #EAE1D4 100%);
+  --grad-coral: linear-gradient(135deg, #D97757 0%, #E89A7A 100%);
+  --grad-mesh:
+    radial-gradient(circle at 20% 10%, rgba(217, 119, 87, 0.16), transparent 45%),
+    radial-gradient(circle at 90% 0%, rgba(200, 155, 107, 0.15), transparent 50%),
+    radial-gradient(circle at 70% 100%, rgba(123, 94, 140, 0.10), transparent 55%),
+    radial-gradient(circle at 0% 100%, rgba(122, 142, 107, 0.10), transparent 50%);
+
+  --shadow-sm: 0 1px 2px rgba(42, 38, 34, 0.05), 0 1px 3px rgba(42, 38, 34, 0.04);
+  --shadow-md: 0 4px 16px -4px rgba(42, 38, 34, 0.08), 0 2px 8px -2px rgba(42, 38, 34, 0.05);
+  --shadow-lg: 0 12px 40px -8px rgba(42, 38, 34, 0.12), 0 4px 16px -4px rgba(42, 38, 34, 0.06);
+
+  --r-sm: 8px;
+  --r-md: 14px;
+  --r-lg: 22px;
+  --r-xl: 32px;
+
+  --font-ui: var(--font-dm-sans), "Noto Sans JP", ui-sans-serif, system-ui, sans-serif;
+  --font-jp-ui: var(--font-noto-jp), var(--font-dm-sans), ui-sans-serif, system-ui, sans-serif;
+  --font-display: var(--font-instrument-serif), "Hiragino Mincho ProN", "Yu Mincho", serif;
+  --font-jp-display: var(--font-shippori), "Hiragino Mincho ProN", "Yu Mincho", serif;
+  --font-mono: var(--font-jetbrains-mono), ui-monospace, monospace;
+}
+
+[data-theme="dark"] {
+  --bg: #1F1812;
+  --bg-2: #2A201A;
+  --bg-3: #18120E;
+  --surface: #2D241D;
+  --surface-soft: rgba(45, 36, 29, 0.6);
+  --border: rgba(245, 239, 232, 0.10);
+  --border-strong: rgba(245, 239, 232, 0.18);
+  --ink: #F5EFE8;
+  --ink-soft: #C9BEB1;
+  --ink-mute: #8C7F72;
+
+  --coral: #E89A7A;
+  --coral-2: #F2B89D;
+  --coral-deep: #D97757;
+  --clay: #D4B080;
+  --plum: #A88BB8;
+  --sage: #9AB088;
+  --moss: #B5C7A4;
+
+  --up: #9AB088;
+  --down: #E08585;
+
+  --grad-warm: linear-gradient(135deg, #1F1812 0%, #2A201A 100%);
+  --grad-mesh:
+    radial-gradient(circle at 20% 10%, rgba(232, 154, 122, 0.18), transparent 45%),
+    radial-gradient(circle at 90% 0%, rgba(212, 176, 128, 0.12), transparent 50%),
+    radial-gradient(circle at 70% 100%, rgba(168, 139, 184, 0.12), transparent 55%),
+    radial-gradient(circle at 0% 100%, rgba(154, 176, 136, 0.10), transparent 50%);
+
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.3);
+  --shadow-md: 0 4px 16px -4px rgba(0, 0, 0, 0.35);
+  --shadow-lg: 0 12px 40px -8px rgba(0, 0, 0, 0.5);
 }
 
 @theme inline {
   --color-bg: var(--bg);
-  --color-neon: var(--neon);
-  --color-neon2: var(--neon-2);
-  --color-accent: var(--accent);
-  --color-alert: var(--alert);
-  --color-text: var(--text);
-  --font-sans: "Inter", "Noto Sans JP", ui-sans-serif, system-ui, sans-serif;
+  --color-bg-2: var(--bg-2);
+  --color-bg-3: var(--bg-3);
+  --color-surface: var(--surface);
+  --color-border: var(--border);
+  --color-border-strong: var(--border-strong);
+  --color-ink: var(--ink);
+  --color-ink-soft: var(--ink-soft);
+  --color-ink-mute: var(--ink-mute);
+  --color-coral: var(--coral);
+  --color-coral-2: var(--coral-2);
+  --color-coral-deep: var(--coral-deep);
+  --color-clay: var(--clay);
+  --color-plum: var(--plum);
+  --color-sage: var(--sage);
+  --color-moss: var(--moss);
+  --color-up: var(--up);
+  --color-down: var(--down);
+  --font-sans: var(--font-ui);
+  --font-serif: var(--font-display);
+  --font-mono: var(--font-mono);
+  --radius-sm: var(--r-sm);
+  --radius-md: var(--r-md);
+  --radius-lg: var(--r-lg);
+  --radius-xl: var(--r-xl);
 }
 
-html,
-body {
-  background-color: var(--bg);
-  color: var(--text);
-}
+* { box-sizing: border-box; }
 
-body {
-  font-family: "Inter", "Noto Sans JP", ui-sans-serif, system-ui, sans-serif;
+html, body {
+  margin: 0;
+  padding: 0;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--font-ui);
   font-feature-settings: "ss01", "cv11", "tnum";
-  line-height: 1.7;
-  background-image:
-    repeating-linear-gradient(
-      to bottom,
-      rgba(0, 225, 255, 0.04) 0px,
-      rgba(0, 225, 255, 0.04) 1px,
-      transparent 1px,
-      transparent 3px
-    ),
-    radial-gradient(
-      ellipse at top,
-      rgba(42, 107, 255, 0.12),
-      transparent 60%
-    );
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+  transition: background 0.4s ease, color 0.3s ease;
+}
+
+body {
+  background: var(--bg);
+  background-image: var(--grad-mesh);
   background-attachment: fixed;
+  min-height: 100vh;
 }
 
-.heading-en {
-  font-family: "Inter", ui-sans-serif, system-ui, sans-serif;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-}
+.serif { font-family: var(--font-display); font-weight: 400; letter-spacing: -0.01em; }
+.serif-jp { font-family: var(--font-jp-display); font-weight: 400; letter-spacing: 0.01em; }
+.mono  { font-family: var(--font-mono); font-variant-numeric: tabular-nums; }
+.tnum  { font-variant-numeric: tabular-nums; }
 
-@keyframes neon-pulse {
-  0%, 100% {
-    box-shadow:
-      0 0 12px rgba(0, 225, 255, 0.35),
-      inset 0 0 8px rgba(0, 225, 255, 0.18);
-  }
-  50% {
-    box-shadow:
-      0 0 28px rgba(0, 225, 255, 0.65),
-      inset 0 0 14px rgba(0, 225, 255, 0.32);
-  }
-}
+button { font-family: inherit; cursor: pointer; }
+button:focus-visible { outline: 2px solid var(--coral); outline-offset: 2px; }
 
-.animate-neon-pulse {
-  animation: neon-pulse 2.4s ease-in-out infinite;
-}
-
-::-webkit-scrollbar {
-  width: 10px;
-  height: 10px;
-}
-::-webkit-scrollbar-track {
-  background: rgba(5, 11, 26, 0.85);
-}
-::-webkit-scrollbar-thumb {
-  background: linear-gradient(180deg, var(--neon), var(--neon-2));
-  border-radius: 9999px;
-  box-shadow: 0 0 12px rgba(0, 225, 255, 0.55);
-}
-::-webkit-scrollbar-thumb:hover {
-  background: linear-gradient(180deg, var(--neon), var(--accent));
-}
+::-webkit-scrollbar { width: 10px; height: 10px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--border-strong); border-radius: 9999px; }
+::-webkit-scrollbar-thumb:hover { background: var(--coral); }
 
 * {
-  scrollbar-color: var(--neon) rgba(5, 11, 26, 0.85);
+  scrollbar-color: var(--border-strong) transparent;
   scrollbar-width: thin;
 }
 
+.ember-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--r-lg);
+  box-shadow: var(--shadow-md);
+}
+
+.ember-card-soft {
+  background: var(--surface-soft);
+  backdrop-filter: blur(12px);
+  border: 1px solid var(--border);
+  border-radius: var(--r-lg);
+}
+
+.ember-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  border-radius: 9999px;
+  font-size: 11px;
+  letter-spacing: 0.04em;
+  background: var(--bg-2);
+  color: var(--ink-soft);
+  border: 1px solid var(--border);
+}
+
+.ember-kbd {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  padding: 1px 5px;
+  border-radius: 4px;
+  background: var(--bg-2);
+  color: var(--ink-mute);
+  border: 1px solid var(--border);
+}
+
+.ember-blob {
+  position: absolute;
+  border-radius: 9999px;
+  filter: blur(60px);
+  pointer-events: none;
+  opacity: 0.55;
+}
+
 @media (prefers-reduced-motion: reduce) {
-  *,
-  *::before,
-  *::after {
-    animation: none !important;
-    transition: none !important;
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
   }
 }
