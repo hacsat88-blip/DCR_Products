@@ -30,7 +30,7 @@ export function Sparkline({
     ]);
     const line = "M " + pts.map((p) => p.join(",")).join(" L ");
     const area = `${line} L ${width},${height} L 0,${height} Z`;
-    return { line, area };
+    return { line, area, pts };
   }, [data, width, height]);
 
   if (!paths) return null;
@@ -47,15 +47,25 @@ export function Sparkline({
           <stop offset="0%" stopColor={color} stopOpacity={0.32} />
           <stop offset="100%" stopColor={color} stopOpacity={0} />
         </linearGradient>
+        <linearGradient id={`${uid}-stroke`} x1="0" y1="0" x2="1" y2="0">
+          <stop offset="0%" stopColor={color} stopOpacity={0.4} />
+          <stop offset="100%" stopColor={color} stopOpacity={1} />
+        </linearGradient>
       </defs>
       <path d={paths.area} fill={`url(#${uid})`} />
       <path
         d={paths.line}
         fill="none"
-        stroke={color}
+        stroke={`url(#${uid}-stroke)`}
         strokeWidth={strokeWidth}
         strokeLinecap="round"
         strokeLinejoin="round"
+      />
+      <circle
+        cx={paths.pts[paths.pts.length - 1][0]}
+        cy={paths.pts[paths.pts.length - 1][1]}
+        r={2}
+        fill={color}
       />
     </svg>
   );

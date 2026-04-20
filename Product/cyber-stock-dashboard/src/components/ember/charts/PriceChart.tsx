@@ -157,8 +157,10 @@ export function PriceChart({
       >
         <defs>
           <linearGradient id={gradId} x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%" stopColor={accent} stopOpacity={0.3} />
-            <stop offset="100%" stopColor={accent} stopOpacity={0} />
+            <stop offset="0%" stopColor={accent} stopOpacity={0.25}>
+              <animate attributeName="stop-opacity" values="0.18;0.25;0.18" dur="4s" repeatCount="indefinite" />
+            </stop>
+            <stop offset="100%" stopColor={accent} stopOpacity={0.02} />
           </linearGradient>
           <clipPath id={clipId}>
             <rect x={PAD.l} y={PAD.t} width={innerW} height={innerH} />
@@ -321,6 +323,27 @@ export function PriceChart({
               stroke="var(--surface)"
               strokeWidth="2"
             />
+            {/* Floating tooltip */}
+            {(() => {
+              const ty = yS(tipCandle.c);
+              const tooltipX = tipX > width * 0.7 ? tipX - 120 : tipX + 12;
+              const tooltipY = Math.max(PAD.t + 4, Math.min(ty - 28, height - PAD.b - 60));
+              return (
+                <g>
+                  <rect x={tooltipX} y={tooltipY} width={110} height={52} rx={6}
+                    fill="var(--surface)" stroke="var(--border)" strokeWidth={1} opacity={0.95} />
+                  <text x={tooltipX + 8} y={tooltipY + 16} fill="var(--ink-mute)" style={{ fontSize: 10 }}>
+                    {fmtFull(tipCandle.t)}
+                  </text>
+                  <text x={tooltipX + 8} y={tooltipY + 32} fill="var(--ink)" style={{ fontSize: 13, fontWeight: 600 }}>
+                    {tipCandle.c.toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 2 })}
+                  </text>
+                  <text x={tooltipX + 8} y={tooltipY + 46} fill={tipCandle.c >= tipCandle.o ? 'var(--up)' : 'var(--down)'} style={{ fontSize: 10 }}>
+                    {tipCandle.c >= tipCandle.o ? '▲' : '▼'} {((tipCandle.c - tipCandle.o) / tipCandle.o * 100).toFixed(2)}%
+                  </text>
+                </g>
+              );
+            })()}
           </g>
         )}
       </svg>

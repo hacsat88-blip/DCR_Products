@@ -2,7 +2,7 @@
 
 import * as React from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { Card, SectionHead, Stat, UpDown } from "@/components/ember/ui";
+import { Card, SectionHead, SectorDot, Stat, UpDown } from "@/components/ember/ui";
 import { DonutChart, type DonutSlice } from "@/components/ember/charts";
 import { HoldingRow, type Holding } from "@/components/ember/composites";
 import type { PortfolioWithValue } from "@/lib/services/portfolio";
@@ -81,6 +81,35 @@ const inputCls =
   "rounded-md border border-border bg-bg-2 px-3 py-2 text-sm text-ink outline-none focus:border-[color:var(--coral)]";
 const labelCls = "flex flex-col gap-1 text-ink-soft";
 
+function AnimatedValue({ value, format }: { value: number; format: (n: number) => string }) {
+  const [displayed, setDisplayed] = React.useState(value);
+  const prevRef = React.useRef(value);
+
+  React.useEffect(() => {
+    const from = prevRef.current;
+    const to = value;
+    prevRef.current = to;
+    if (from === to) return;
+
+    const duration = 600;
+    const start = performance.now();
+    let raf: number;
+
+    const tick = (now: number) => {
+      const elapsed = now - start;
+      const progress = Math.min(elapsed / duration, 1);
+      const eased = 1 - Math.pow(1 - progress, 3);
+      setDisplayed(from + (to - from) * eased);
+      if (progress < 1) raf = requestAnimationFrame(tick);
+    };
+
+    raf = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(raf);
+  }, [value]);
+
+  return <>{format(displayed)}</>;
+}
+
 function PortfolioPageInner() {
   const qc = useQueryClient();
   const query = useQuery({ queryKey: ["portfolio"], queryFn: fetchPortfolio });
@@ -89,6 +118,7 @@ function PortfolioPageInner() {
   const [form, setForm] = React.useState<FormState>(initialForm);
   const [formError, setFormError] = React.useState<string | null>(null);
   const [lookupStatus, setLookupStatus] = React.useState<"idle" | "loading" | "done" | "notfound">("idle");
+  const [lookupSector, setLookupSector] = React.useState<string | null>(null);
   const [deleteConfirm, setDeleteConfirm] = React.useState<{ id: number; name: string } | null>(null);
   const lookupTimerRef = React.useRef<ReturnType<typeof setTimeout> | null>(null);
   const lookupAbortRef = React.useRef<AbortController | null>(null);
@@ -104,12 +134,39 @@ function PortfolioPageInner() {
     };
   }, []);
 
+  // Pre-fill form from URL params (?add=CODE&market=JP|US&name=NAME)
+  const prefillApplied = React.useRef(false);
+  React.useEffect(() => {
+    if (prefillApplied.current) return;
+    prefillApplied.current = true;
+    const params = new URLSearchParams(window.location.search);
+    const addCode = params.get("add");
+    if (!addCode) return;
+    const addMarket = params.get("market") as Market | null;
+    const addName = params.get("name");
+    // Use functional updater queued in a microtask to satisfy lint
+    queueMicrotask(() => {
+      setForm((f) => ({
+        ...f,
+        code: addCode,
+        market: addMarket === "US" ? "US" : "JP",
+        name: addName ?? "",
+        currency: addMarket === "US" ? "USD" : "JPY",
+      }));
+      if (addName) setLookupStatus("done");
+    });
+    setTimeout(() => {
+      document.querySelector("[data-form-section]")?.scrollIntoView({ behavior: "smooth", block: "center" });
+    }, 300);
+  }, []);
+
   const addMut = useMutation({
     mutationFn: postPortfolio,
     onSuccess: () => {
       setForm(initialForm);
       setFormError(null);
       setLookupStatus("idle");
+      setLookupSector(null);
       lookupContextRef.current = {
         code: initialForm.code,
         market: initialForm.market,
@@ -198,12 +255,13 @@ function PortfolioPageInner() {
       if (controller.signal.aborted) return;
       const latest = lookupContextRef.current;
       if (latest.code.trim() !== trimmed || latest.market !== market) return;
-      const { name, currency } = j.data as { name: string; currency: Currency; sector: string | null };
+      const { name, currency, sector } = j.data as { name: string; currency: Currency; sector: string | null };
       setForm((f) =>
         f.code.trim() === trimmed && f.market === market
           ? { ...f, name, currency }
           : f,
       );
+      setLookupSector(sector ?? null);
       setLookupStatus("done");
     } catch (error) {
       if ((error as { name?: string }).name === "AbortError") return;
@@ -222,10 +280,11 @@ function PortfolioPageInner() {
     lookupContextRef.current = { code: newCode, market: form.market };
     setForm((f) => ({ ...f, code: newCode }));
     setLookupStatus("idle");
+    setLookupSector(null);
     if (lookupTimerRef.current) clearTimeout(lookupTimerRef.current);
     lookupAbortRef.current?.abort();
     lookupAbortRef.current = null;
-    if (newCode.trim().length >= 3) {
+    if (newCode.trim().length >= 2) {
       lookupTimerRef.current = setTimeout(() => {
         lookupCode(newCode, form.market);
       }, 600);
@@ -236,6 +295,7 @@ function PortfolioPageInner() {
     lookupContextRef.current = { code: form.code, market: newMarket };
     setForm((f) => ({ ...f, market: newMarket, currency: newMarket === "JP" ? "JPY" : "USD" }));
     setLookupStatus("idle");
+    setLookupSector(null);
     if (form.code.trim().length >= 3) {
       if (lookupTimerRef.current) clearTimeout(lookupTimerRef.current);
       lookupAbortRef.current?.abort();
@@ -264,17 +324,17 @@ function PortfolioPageInner() {
       {/* Hero stats */}
       <section className="grid gap-4 md:grid-cols-3">
         <Card>
-          <Stat label="評価額 (JPY)" value={fmtJpy(totalValue)} />
+          <Stat label="評価額 (JPY)" value={<AnimatedValue value={totalValue} format={fmtJpy} />} />
         </Card>
         <Card>
           <Stat
             label="評価損益"
-            value={fmtJpy(totalPnl)}
+            value={<AnimatedValue value={totalPnl} format={fmtJpy} />}
             sub={<UpDown value={totalPnlPct} />}
           />
         </Card>
         <Card>
-          <Stat label="保有銘柄数" value={rows.length} mono />
+          <Stat label="保有銘柄数" value={<AnimatedValue value={rows.length} format={(n) => String(Math.round(n))} />} mono />
         </Card>
       </section>
 
@@ -307,6 +367,14 @@ function PortfolioPageInner() {
                     >
                       削除
                     </button>
+                    <a
+                      href={`/stocks?code=${h.ticker}`}
+                      className="rounded-md border border-border px-2 py-1 text-ink-soft hover:text-coral hover:border-coral transition-colors"
+                      style={{ fontSize: 10 }}
+                      title="リサーチ"
+                    >
+                      🔍
+                    </a>
                   </div>
                 ))}
               </div>
@@ -326,9 +394,11 @@ function PortfolioPageInner() {
         </Card>
       </section>
 
+      <div data-form-section>
       <Card>
         <SectionHead eyebrow="ADD / UPDATE" title="銘柄を追加・更新" />
-        <form onSubmit={onSubmit} className="mt-6 grid gap-3 md:grid-cols-3 lg:grid-cols-4" style={{ fontSize: 12 }}>
+        <form onSubmit={onSubmit} className="mt-6 flex flex-col gap-4" style={{ fontSize: 12 }}>
+          <div className="grid gap-3 md:grid-cols-4">
           <label className={labelCls}>
             コード*
             <div className="relative">
@@ -342,7 +412,7 @@ function PortfolioPageInner() {
                   }
                 }}
                 placeholder="例: 7203 / NVDA"
-                className={inputCls}
+                className={`${inputCls}${lookupStatus === "done" ? " lookup-glow" : ""}`}
               />
               {lookupStatus === "loading" && (
                 <span className="absolute right-2 top-1/2 -translate-y-1/2 text-ink-mute" style={{ fontSize: 10 }}>🔍</span>
@@ -369,6 +439,12 @@ function PortfolioPageInner() {
               className={inputCls}
               style={{ opacity: lookupStatus === "loading" ? 0.6 : 1 }}
             />
+            {lookupSector && (
+              <span className="inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-ink-mute border border-border" style={{ fontSize: 10 }}>
+                <SectorDot sector={lookupSector} />
+                {lookupSector}
+              </span>
+            )}
           </label>
           <label className={labelCls}>
             通貨
@@ -377,6 +453,9 @@ function PortfolioPageInner() {
               <option value="USD">USD</option>
             </select>
           </label>
+          </div>
+          <div className="border-t border-border" />
+          <div className="grid gap-3 md:grid-cols-4">
           <label className={labelCls} htmlFor="quantity-input">
             数量
             <input id="quantity-input" type="number" min="0" step="any" value={form.quantity} onChange={(e) => setForm({ ...form, quantity: e.target.value })} className={inputCls} />
@@ -385,7 +464,7 @@ function PortfolioPageInner() {
             平均取得単価
             <input id="avg-cost-input" type="number" min="0" step="any" value={form.avgCost} onChange={(e) => setForm({ ...form, avgCost: e.target.value })} className={inputCls} />
           </label>
-          <label className={`${labelCls} md:col-span-2`}>
+          <label className={`${labelCls}`}>
             メモ
             <input value={form.note} onChange={(e) => setForm({ ...form, note: e.target.value })} className={inputCls} />
           </label>
@@ -399,9 +478,11 @@ function PortfolioPageInner() {
               {addMut.isPending ? "保存中…" : "追加 / 更新"}
             </button>
           </div>
+          </div>
         </form>
         {formError && <p className="mt-3" style={{ color: "var(--down)", fontSize: 12 }}>{formError}</p>}
       </Card>
+      </div>
 
       {deleteConfirm && (
         <div
