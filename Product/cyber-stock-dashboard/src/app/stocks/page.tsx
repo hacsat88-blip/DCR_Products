@@ -193,15 +193,16 @@ export default function StocksPage() {
     [stock, days],
   );
 
-  const runResearch = async () => {
-    const code = searchCode.trim();
+  const runResearch = async (codeOverride?: string, marketOverride?: "JP" | "US") => {
+    const code = (codeOverride ?? searchCode).trim();
+    const market = marketOverride ?? searchMarket;
     if (!code) return;
     setResearch({ status: "loading", analysis: null, error: null });
     try {
       const res = await fetch("/api/research", {
         method: "POST",
         headers: { "content-type": "application/json" },
-        body: JSON.stringify({ code, market: searchMarket }),
+        body: JSON.stringify({ code, market }),
       });
       const j = await res.json();
       if (!res.ok) throw new Error(j.error ?? "analyze failed");
@@ -221,6 +222,24 @@ export default function StocksPage() {
       setResearch({ status: "error", analysis: null, error: e instanceof Error ? e.message : "エラーが発生しました" });
     }
   };
+
+  // Auto-trigger research from URL params (?code=XXX&market=JP|US)
+  const autoResearchRan = React.useRef(false);
+  React.useEffect(() => {
+    if (autoResearchRan.current) return;
+    autoResearchRan.current = true;
+    const params = new URLSearchParams(window.location.search);
+    const codeParam = params.get("code");
+    if (codeParam) {
+      const marketParam = params.get("market");
+      const market: "JP" | "US" = marketParam === "US" ? "US" : "JP";
+      queueMicrotask(() => {
+        setSearchCode(codeParam);
+        setSearchMarket(market);
+        runResearch(codeParam, market);
+      });
+    }
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   const inputCls = "rounded-md border border-border bg-bg-2 px-3 py-2 text-sm text-ink outline-none focus:border-[color:var(--coral)]";
 
@@ -294,7 +313,18 @@ export default function StocksPage() {
       {research.status === "done" && research.analysis && (
         <div ref={researchPanelRef}>
           <Card>
-            <SectionHead eyebrow="ANALYSIS RESULT" title="AI分析結果" />
+            <div className="flex items-center gap-3 flex-wrap">
+              <SectionHead eyebrow="ANALYSIS RESULT" title="AI分析結果" />
+              <div className="flex gap-2 ml-auto">
+                <a
+                  href={`/portfolio?add=${encodeURIComponent(research.analysis.code)}&market=${searchMarket}&name=${encodeURIComponent(research.analysis.name)}`}
+                  className="rounded-full px-3 py-1 text-white"
+                  style={{ background: "var(--coral)", fontSize: 11, fontWeight: 600 }}
+                >
+                  + ポートフォリオに追加
+                </a>
+              </div>
+            </div>
             <div className="mt-4">
               <ResearchPanel analysis={research.analysis} />
             </div>

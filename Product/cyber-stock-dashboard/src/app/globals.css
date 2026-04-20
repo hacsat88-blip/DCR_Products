@@ -243,3 +243,17 @@ button:focus-visible { outline: 2px solid var(--coral); outline-offset: 2px; }
     transition: transform 0.01ms, box-shadow 0.01ms;
   }
 }
+
+.ember-card-grid {
+  background-image:
+    linear-gradient(to right, var(--border) 1px, transparent 1px),
+    linear-gradient(to bottom, var(--border) 1px, transparent 1px);
+  background-size: 40px 40px;
+  background-position: -1px -1px;
+  opacity: 0.4;
+  pointer-events: none;
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  z-index: 0;
+}

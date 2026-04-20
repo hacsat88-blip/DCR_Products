@@ -148,9 +148,10 @@ export function DonutChart({
             opacity={hoverId == null || isHovered ? 1 : 0.45}
             style={{
               cursor: "pointer",
-              transform: `translate(${tx}px, ${ty}px)`,
-              transition: "opacity 0.2s ease, transform 0.2s ease",
-              filter: isHovered ? `url(#glow-${uid}-${s.id})` : undefined,
+              transform: `translate(${tx}px, ${ty}px)${isHovered ? ' scale(1.04)' : ''}`,
+              transformOrigin: 'center',
+              transition: "opacity 0.2s ease, transform 0.2s ease, filter 0.2s ease",
+              filter: isHovered ? `url(#glow-${uid}-${s.id}) brightness(1.1)` : undefined,
               outline: "none",
             }}
             onMouseEnter={() => handleEnter(s.id)}

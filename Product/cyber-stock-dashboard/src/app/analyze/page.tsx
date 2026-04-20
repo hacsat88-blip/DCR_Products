@@ -197,30 +197,72 @@ export default function AnalyzePage() {
             <div className="mt-2 flex items-center gap-3">
               <div className="flex flex-col gap-1 flex-1">
                 <label htmlFor="price-min-slider" className="text-ink-mute" style={{ fontSize: 10 }}>最小価格</label>
-                <input
-                  id="price-min-slider"
-                  type="range"
-                  min={0}
-                  max={limit}
-                  step={market === "US" ? 1 : 10}
-                  value={priceMin}
-                  onChange={(e) => setPriceMin(Math.min(Number(e.target.value), priceMax))}
-                  style={{ accentColor: "var(--coral)" }}
-                />
+                <div className="flex items-center gap-1.5">
+                  <button
+                    type="button"
+                    onClick={() => setPriceMin((v) => Math.max(0, v - (market === "US" ? 1 : 100)))}
+                    className="flex items-center justify-center rounded-md border border-border bg-bg-2 text-ink-soft hover:border-[color:var(--coral)] hover:text-coral transition-colors"
+                    style={{ width: 28, height: 28, fontSize: 14, fontWeight: 700, lineHeight: 1 }}
+                    aria-label="最小価格を下げる"
+                  >
+                    −
+                  </button>
+                  <input
+                    id="price-min-slider"
+                    type="range"
+                    min={0}
+                    max={limit}
+                    step={market === "US" ? 1 : 10}
+                    value={priceMin}
+                    onChange={(e) => setPriceMin(Math.min(Number(e.target.value), priceMax))}
+                    className="flex-1"
+                    style={{ accentColor: "var(--coral)" }}
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setPriceMin((v) => Math.min(priceMax, v + (market === "US" ? 1 : 100)))}
+                    className="flex items-center justify-center rounded-md border border-border bg-bg-2 text-ink-soft hover:border-[color:var(--coral)] hover:text-coral transition-colors"
+                    style={{ width: 28, height: 28, fontSize: 14, fontWeight: 700, lineHeight: 1 }}
+                    aria-label="最小価格を上げる"
+                  >
+                    +
+                  </button>
+                </div>
               </div>
               <span className="text-ink-mute self-end pb-1" style={{ fontSize: 14 }}>〜</span>
               <div className="flex flex-col gap-1 flex-1">
                 <label htmlFor="price-max-slider" className="text-ink-mute" style={{ fontSize: 10 }}>最大価格</label>
-                <input
-                  id="price-max-slider"
-                  type="range"
-                  min={0}
-                  max={limit}
-                  step={market === "US" ? 1 : 10}
-                  value={priceMax}
-                  onChange={(e) => setPriceMax(Math.max(Number(e.target.value), priceMin))}
-                  style={{ accentColor: "var(--coral)" }}
-                />
+                <div className="flex items-center gap-1.5">
+                  <button
+                    type="button"
+                    onClick={() => setPriceMax((v) => Math.max(priceMin, v - (market === "US" ? 1 : 100)))}
+                    className="flex items-center justify-center rounded-md border border-border bg-bg-2 text-ink-soft hover:border-[color:var(--coral)] hover:text-coral transition-colors"
+                    style={{ width: 28, height: 28, fontSize: 14, fontWeight: 700, lineHeight: 1 }}
+                    aria-label="最大価格を下げる"
+                  >
+                    −
+                  </button>
+                  <input
+                    id="price-max-slider"
+                    type="range"
+                    min={0}
+                    max={limit}
+                    step={market === "US" ? 1 : 10}
+                    value={priceMax}
+                    onChange={(e) => setPriceMax(Math.max(Number(e.target.value), priceMin))}
+                    className="flex-1"
+                    style={{ accentColor: "var(--coral)" }}
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setPriceMax((v) => Math.min(limit, v + (market === "US" ? 1 : 100)))}
+                    className="flex items-center justify-center rounded-md border border-border bg-bg-2 text-ink-soft hover:border-[color:var(--coral)] hover:text-coral transition-colors"
+                    style={{ width: 28, height: 28, fontSize: 14, fontWeight: 700, lineHeight: 1 }}
+                    aria-label="最大価格を上げる"
+                  >
+                    +
+                  </button>
+                </div>
               </div>
             </div>
           </div>

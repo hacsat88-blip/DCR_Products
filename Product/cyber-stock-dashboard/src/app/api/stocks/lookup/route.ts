@@ -6,6 +6,7 @@ import {
   usEtfName,
   jpEtfName,
 } from "@/lib/services/analysis/etfList";
+import { jpCompanyName } from "@/lib/services/analysis/jpCompanyList";
 import usSymbolListJson from "@/lib/services/analysis/usSymbolList.json";
 
 export const runtime = "nodejs";
@@ -88,8 +89,16 @@ export async function GET(req: Request): Promise<Response> {
         },
       });
     }
-  } catch {
-    // J-Quants 失敗時はコードをそのまま返す
+  } catch (err) {
+    console.warn("[stocks/lookup] J-Quants getListedInfo failed:", err);
+  }
+
+  // Local company name fallback
+  const localName = jpCompanyName(normalized);
+  if (localName) {
+    return NextResponse.json({
+      data: { name: localName, currency: "JPY", sector: null },
+    });
   }
 
   return NextResponse.json({

@@ -103,6 +103,18 @@ export default function PickCard({ stock, onSelect, reason }: PickCardProps) {
             {reason}
           </p>
         )}
+
+        {/* Cross-tool navigation */}
+        <div className="mt-2 flex gap-2">
+          <a
+            href={`/portfolio?add=${encodeURIComponent(stock.ticker)}&market=${stock.currency === 'JPY' ? 'JP' : 'US'}&name=${encodeURIComponent(stock.name)}`}
+            onClick={(e) => e.stopPropagation()}
+            className="text-coral hover:underline"
+            style={{ fontSize: 11 }}
+          >
+            + ポートフォリオに追加
+          </a>
+        </div>
       </button>
     </div>
   );
