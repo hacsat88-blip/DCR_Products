@@ -10,6 +10,7 @@ import {
   SectionHead,
   Stat,
   UpDown,
+  Icon,
 } from "@/components/ember/ui";
 import {
   DonutChart,
@@ -217,7 +218,7 @@ export default function HomePage() {
         <Link href="/stocks" className={`${styles.cta} ${styles.cta1}`}>
           <Card className="h-full transition-all hover:-translate-y-0.5 hover:shadow-lg border-border hover:border-[color:var(--coral)]">
             <div className="flex flex-col gap-3">
-              <div className="text-3xl">📊</div>
+              <div className="text-coral"><Icon name="chart" size={28} label="銘柄リサーチ" /></div>
               <h3 className="font-serif text-ink" style={{ fontSize: 18, fontWeight: 600 }}>銘柄リサーチ</h3>
               <p className="text-ink-soft" style={{ fontSize: 13 }}>
                 AI が 5 軸スコアリングと短中長期シナリオを生成
@@ -230,7 +231,7 @@ export default function HomePage() {
         <Link href="/portfolio" className={`${styles.cta} ${styles.cta2}`}>
           <Card className="h-full transition-all hover:-translate-y-0.5 hover:shadow-lg border-border hover:border-[color:var(--coral)]">
             <div className="flex flex-col gap-3">
-              <div className="text-3xl">💼</div>
+              <div className="text-coral"><Icon name="briefcase" size={28} label="ポートフォリオ" /></div>
               <h3 className="font-serif text-ink" style={{ fontSize: 18, fontWeight: 600 }}>ポートフォリオ</h3>
               <p className="text-ink-soft" style={{ fontSize: 13 }}>
                 保有銘柄を一元管理。評価損益とアロケーションを可視化
@@ -243,7 +244,7 @@ export default function HomePage() {
         <Link href="/analyze" className={`${styles.cta} ${styles.cta3}`}>
           <Card className="h-full transition-all hover:-translate-y-0.5 hover:shadow-lg border-border hover:border-[color:var(--coral)]">
             <div className="flex flex-col gap-3">
-              <div className="text-3xl">🎯</div>
+              <div className="text-coral"><Icon name="target" size={28} label="ねらい目分析" /></div>
               <h3 className="font-serif text-ink" style={{ fontSize: 18, fontWeight: 600 }}>ねらい目分析</h3>
               <p className="text-ink-soft" style={{ fontSize: 13 }}>
                 AI が押し目候補を自動スクリーニング
