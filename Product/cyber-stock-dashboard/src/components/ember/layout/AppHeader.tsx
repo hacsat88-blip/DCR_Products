@@ -47,8 +47,19 @@ export function AppHeader() {
         </div>
         <ThemeToggle />
       </div>
-      <div className="md:hidden border-t border-border px-4 py-2 overflow-x-auto">
+      <div className="md:hidden border-t border-border px-4 py-2 overflow-x-auto" style={{ position: "relative" }}>
         <Tabs tabs={TABS} current={current} onChange={handleChange} />
+        <div
+          style={{
+            position: "absolute",
+            right: 0,
+            top: 0,
+            bottom: 0,
+            width: 32,
+            background: "linear-gradient(to left, var(--bg), transparent)",
+            pointerEvents: "none",
+          }}
+        />
       </div>
     </header>
   );

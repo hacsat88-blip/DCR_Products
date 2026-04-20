@@ -205,7 +205,7 @@ export function RadarChart({
           points={ringPoints(ring / 100)}
           fill="none"
           stroke="var(--border)"
-          strokeOpacity={ri === RINGS.length - 1 ? 0.5 : 0.22}
+          strokeOpacity={ri === RINGS.length - 1 ? 0.6 : 0.3}
           strokeWidth="1"
           strokeDasharray={ri === RINGS.length - 1 ? undefined : "2 4"}
         />
@@ -344,7 +344,7 @@ export function RadarChart({
         y={cy - 10}
         textAnchor="middle"
         dominantBaseline="middle"
-        fontSize={Math.round(size * 0.092)}
+        fontSize={Math.min(32, Math.round(size * 0.085))}
         fontWeight="500"
         fill="var(--ink)"
         style={{ fontFamily: "var(--font-display, Georgia, serif)" }}

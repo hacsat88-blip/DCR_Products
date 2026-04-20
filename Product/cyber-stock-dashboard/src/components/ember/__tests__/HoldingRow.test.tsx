@@ -60,10 +60,37 @@ describe("HoldingRow", () => {
   it("invokes onSelect on click and Enter", () => {
     const onSelect = vi.fn();
     render(<HoldingRow holding={baseHolding} onSelect={onSelect} />);
-    const row = screen.getByRole("row");
+    const row = screen.getByRole("button");
     fireEvent.click(row);
     expect(onSelect).toHaveBeenCalledWith("h1");
     fireEvent.keyDown(row, { key: "Enter" });
     expect(onSelect).toHaveBeenCalledTimes(2);
+  });
+
+  it("has role=button when onSelect is provided", () => {
+    const onSelect = vi.fn();
+    render(<HoldingRow holding={baseHolding} onSelect={onSelect} />);
+    expect(screen.getByRole("button")).toBeInTheDocument();
+  });
+
+  it("has role=group when onSelect is not provided", () => {
+    render(<HoldingRow holding={baseHolding} />);
+    expect(screen.getByRole("group")).toBeInTheDocument();
+  });
+
+  it("has aria-label with name and ticker for editing", () => {
+    const onSelect = vi.fn();
+    render(<HoldingRow holding={baseHolding} onSelect={onSelect} />);
+    expect(
+      screen.getByRole("button", { name: "Toyota (7203) を編集" }),
+    ).toBeInTheDocument();
+  });
+
+  it("responds to Space key when onSelect is provided", () => {
+    const onSelect = vi.fn();
+    render(<HoldingRow holding={baseHolding} onSelect={onSelect} />);
+    const row = screen.getByRole("button");
+    fireEvent.keyDown(row, { key: " " });
+    expect(onSelect).toHaveBeenCalledWith("h1");
   });
 });

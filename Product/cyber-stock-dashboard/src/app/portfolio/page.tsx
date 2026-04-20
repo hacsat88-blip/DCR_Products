@@ -6,6 +6,7 @@ import { Card, SectionHead, Stat, UpDown } from "@/components/ember/ui";
 import { DonutChart, type DonutSlice } from "@/components/ember/charts";
 import { HoldingRow, type Holding } from "@/components/ember/composites";
 import type { PortfolioWithValue } from "@/lib/services/portfolio";
+import { ToastProvider, ToastContainer, useToast } from "@/components/ember/ui/Toast";
 
 type Market = "JP" | "US";
 type Currency = "JPY" | "USD";
@@ -80,25 +81,50 @@ const inputCls =
   "rounded-md border border-border bg-bg-2 px-3 py-2 text-sm text-ink outline-none focus:border-[color:var(--coral)]";
 const labelCls = "flex flex-col gap-1 text-ink-soft";
 
-export default function PortfolioPage() {
+function PortfolioPageInner() {
   const qc = useQueryClient();
   const query = useQuery({ queryKey: ["portfolio"], queryFn: fetchPortfolio });
+  const { addToast } = useToast();
 
   const [form, setForm] = React.useState<FormState>(initialForm);
   const [formError, setFormError] = React.useState<string | null>(null);
+  const [lookupStatus, setLookupStatus] = React.useState<"idle" | "loading" | "done" | "notfound">("idle");
+  const [deleteConfirm, setDeleteConfirm] = React.useState<{ id: number; name: string } | null>(null);
+  const lookupTimerRef = React.useRef<ReturnType<typeof setTimeout> | null>(null);
+  const lookupAbortRef = React.useRef<AbortController | null>(null);
+  const lookupContextRef = React.useRef<{ code: string; market: Market }>({
+    code: initialForm.code,
+    market: initialForm.market,
+  });
+
+  React.useEffect(() => {
+    return () => {
+      if (lookupTimerRef.current) clearTimeout(lookupTimerRef.current);
+      lookupAbortRef.current?.abort();
+    };
+  }, []);
 
   const addMut = useMutation({
     mutationFn: postPortfolio,
     onSuccess: () => {
       setForm(initialForm);
       setFormError(null);
+      setLookupStatus("idle");
+      lookupContextRef.current = {
+        code: initialForm.code,
+        market: initialForm.market,
+      };
       qc.invalidateQueries({ queryKey: ["portfolio"] });
+      addToast("銘柄を追加しました", "success");
     },
     onError: (e: Error) => setFormError(e.message),
   });
   const delMut = useMutation({
     mutationFn: deletePortfolio,
-    onSuccess: () => qc.invalidateQueries({ queryKey: ["portfolio"] }),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["portfolio"] });
+      addToast("銘柄を削除しました", "success");
+    },
   });
 
   const onSubmit = (e: React.FormEvent) => {
@@ -130,8 +156,94 @@ export default function PortfolioPage() {
   };
 
   const onDelete = (id: number, name: string) => {
-    if (!confirm(`「${name}」を削除しますか？`)) return;
-    delMut.mutate(id);
+    setDeleteConfirm({ id, name });
+  };
+
+  const executeDelete = () => {
+    if (!deleteConfirm) return;
+    delMut.mutate(deleteConfirm.id);
+    setDeleteConfirm(null);
+  };
+
+  const cancelDelete = () => {
+    setDeleteConfirm(null);
+  };
+
+  React.useEffect(() => {
+    const handleEsc = (e: KeyboardEvent) => {
+      if (e.key === "Escape" && deleteConfirm) {
+        cancelDelete();
+      }
+    };
+    if (deleteConfirm) {
+      window.addEventListener("keydown", handleEsc);
+      return () => window.removeEventListener("keydown", handleEsc);
+    }
+  }, [deleteConfirm]);
+
+  const lookupCode = React.useCallback(async (code: string, market: Market) => {
+    const trimmed = code.trim();
+    if (!trimmed) return;
+    lookupAbortRef.current?.abort();
+    const controller = new AbortController();
+    lookupAbortRef.current = controller;
+    setLookupStatus("loading");
+    try {
+      const res = await fetch(
+        `/api/stocks/lookup?code=${encodeURIComponent(trimmed)}&market=${market}`,
+        { signal: controller.signal },
+      );
+      const j = await res.json();
+      if (!res.ok) throw new Error(j.error ?? "lookup failed");
+      if (controller.signal.aborted) return;
+      const latest = lookupContextRef.current;
+      if (latest.code.trim() !== trimmed || latest.market !== market) return;
+      const { name, currency } = j.data as { name: string; currency: Currency; sector: string | null };
+      setForm((f) =>
+        f.code.trim() === trimmed && f.market === market
+          ? { ...f, name, currency }
+          : f,
+      );
+      setLookupStatus("done");
+    } catch (error) {
+      if ((error as { name?: string }).name === "AbortError") return;
+      const latest = lookupContextRef.current;
+      if (latest.code.trim() === trimmed && latest.market === market) {
+        setLookupStatus("notfound");
+      }
+    } finally {
+      if (lookupAbortRef.current === controller) {
+        lookupAbortRef.current = null;
+      }
+    }
+  }, []);
+
+  const onCodeChange = (newCode: string) => {
+    lookupContextRef.current = { code: newCode, market: form.market };
+    setForm((f) => ({ ...f, code: newCode }));
+    setLookupStatus("idle");
+    if (lookupTimerRef.current) clearTimeout(lookupTimerRef.current);
+    lookupAbortRef.current?.abort();
+    lookupAbortRef.current = null;
+    if (newCode.trim().length >= 3) {
+      lookupTimerRef.current = setTimeout(() => {
+        lookupCode(newCode, form.market);
+      }, 600);
+    }
+  };
+
+  const onMarketChange = (newMarket: Market) => {
+    lookupContextRef.current = { code: form.code, market: newMarket };
+    setForm((f) => ({ ...f, market: newMarket, currency: newMarket === "JP" ? "JPY" : "USD" }));
+    setLookupStatus("idle");
+    if (form.code.trim().length >= 3) {
+      if (lookupTimerRef.current) clearTimeout(lookupTimerRef.current);
+      lookupAbortRef.current?.abort();
+      lookupAbortRef.current = null;
+      lookupTimerRef.current = setTimeout(() => {
+        lookupCode(form.code, newMarket);
+      }, 300);
+    }
   };
 
   const rows = query.data ?? [];
@@ -219,18 +331,44 @@ export default function PortfolioPage() {
         <form onSubmit={onSubmit} className="mt-6 grid gap-3 md:grid-cols-3 lg:grid-cols-4" style={{ fontSize: 12 }}>
           <label className={labelCls}>
             コード*
-            <input required value={form.code} onChange={(e) => setForm({ ...form, code: e.target.value })} className={inputCls} />
+            <div className="relative">
+              <input
+                required
+                value={form.code}
+                onChange={(e) => onCodeChange(e.target.value)}
+                onBlur={() => {
+                  if (form.code.trim().length >= 2 && lookupStatus === "idle") {
+                    lookupCode(form.code, form.market);
+                  }
+                }}
+                placeholder="例: 7203 / NVDA"
+                className={inputCls}
+              />
+              {lookupStatus === "loading" && (
+                <span className="absolute right-2 top-1/2 -translate-y-1/2 text-ink-mute" style={{ fontSize: 10 }}>🔍</span>
+              )}
+              {lookupStatus === "done" && (
+                <span className="absolute right-2 top-1/2 -translate-y-1/2" style={{ color: "var(--up)", fontSize: 10 }}>✓</span>
+              )}
+            </div>
           </label>
           <label className={labelCls}>
             市場
-            <select value={form.market} onChange={(e) => setForm({ ...form, market: e.target.value as Market })} className={inputCls}>
+            <select value={form.market} onChange={(e) => onMarketChange(e.target.value as Market)} className={inputCls}>
               <option value="JP">JP</option>
               <option value="US">US</option>
             </select>
           </label>
           <label className={labelCls}>
             名称*
-            <input required value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} className={inputCls} />
+            <input
+              required
+              value={form.name}
+              onChange={(e) => setForm({ ...form, name: e.target.value })}
+              placeholder={lookupStatus === "loading" ? "検索中…" : "自動入力 or 手動入力"}
+              className={inputCls}
+              style={{ opacity: lookupStatus === "loading" ? 0.6 : 1 }}
+            />
           </label>
           <label className={labelCls}>
             通貨
@@ -239,13 +377,13 @@ export default function PortfolioPage() {
               <option value="USD">USD</option>
             </select>
           </label>
-          <label className={labelCls}>
+          <label className={labelCls} htmlFor="quantity-input">
             数量
-            <input type="number" min="0" step="any" value={form.quantity} onChange={(e) => setForm({ ...form, quantity: e.target.value })} className={inputCls} />
+            <input id="quantity-input" type="number" min="0" step="any" value={form.quantity} onChange={(e) => setForm({ ...form, quantity: e.target.value })} className={inputCls} />
           </label>
-          <label className={labelCls}>
+          <label className={labelCls} htmlFor="avg-cost-input">
             平均取得単価
-            <input type="number" min="0" step="any" value={form.avgCost} onChange={(e) => setForm({ ...form, avgCost: e.target.value })} className={inputCls} />
+            <input id="avg-cost-input" type="number" min="0" step="any" value={form.avgCost} onChange={(e) => setForm({ ...form, avgCost: e.target.value })} className={inputCls} />
           </label>
           <label className={`${labelCls} md:col-span-2`}>
             メモ
@@ -264,6 +402,57 @@ export default function PortfolioPage() {
         </form>
         {formError && <p className="mt-3" style={{ color: "var(--down)", fontSize: 12 }}>{formError}</p>}
       </Card>
+
+      {deleteConfirm && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/50"
+          onClick={cancelDelete}
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="delete-dialog-title"
+        >
+          <div
+            className="rounded-lg p-6 shadow-xl"
+            style={{ background: "var(--surface)", maxWidth: 400 }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <h3 id="delete-dialog-title" className="text-ink font-semibold" style={{ fontSize: 16 }}>
+              銘柄を削除
+            </h3>
+            <p className="mt-2 text-ink-soft" style={{ fontSize: 14 }}>
+              「{deleteConfirm.name}」を削除してもよろしいですか？
+            </p>
+            <div className="mt-4 flex gap-2 justify-end">
+              <button
+                type="button"
+                onClick={cancelDelete}
+                className="rounded-md px-4 py-2 border border-border text-ink-soft hover:bg-bg-2"
+                style={{ fontSize: 13 }}
+              >
+                キャンセル
+              </button>
+              <button
+                type="button"
+                onClick={executeDelete}
+                className="rounded-md px-4 py-2 text-white"
+                style={{ background: "var(--down)", fontSize: 13, fontWeight: 600 }}
+              >
+                削除
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      <ToastContainer />
     </main>
+  );
+}
+
+export default function PortfolioPage() {
+  return (
+    <ToastProvider>
+      <PortfolioPageInner />
+    </ToastProvider>
   );
 }

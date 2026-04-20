@@ -98,6 +98,16 @@ export function DonutChart({
     setHoverId(null);
     onSliceHover?.(null);
   };
+  const handleKeyDown = (e: React.KeyboardEvent, id: string) => {
+    if (e.key === "Enter" || e.key === " ") {
+      e.preventDefault();
+      if (hoverId === id) {
+        handleLeave();
+      } else {
+        handleEnter(id);
+      }
+    }
+  };
 
   const displayLabel = hovered
     ? hovered.label
@@ -141,9 +151,17 @@ export function DonutChart({
               transform: `translate(${tx}px, ${ty}px)`,
               transition: "opacity 0.2s ease, transform 0.2s ease",
               filter: isHovered ? `url(#glow-${uid}-${s.id})` : undefined,
+              outline: "none",
             }}
             onMouseEnter={() => handleEnter(s.id)}
             onMouseLeave={handleLeave}
+            onFocus={() => handleEnter(s.id)}
+            onBlur={handleLeave}
+            onKeyDown={(e) => handleKeyDown(e, s.id)}
+            tabIndex={0}
+            role="button"
+            aria-label={`${s.label} ${((s.value / total) * 100).toFixed(1)}%`}
+            className="focus-visible:outline-2 focus-visible:outline-coral focus-visible:outline-offset-2"
           />
         );
       })}

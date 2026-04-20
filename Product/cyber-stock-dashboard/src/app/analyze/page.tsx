@@ -189,30 +189,39 @@ export default function AnalyzePage() {
           </label>
 
           <div className="md:col-span-2">
-            <p className="text-ink-soft" style={{ letterSpacing: "0.1em" }}>
-              PRICE RANGE ({currency}): {priceMin.toLocaleString()} – {priceMax.toLocaleString()}
-            </p>
-            <div className="mt-2 flex flex-col gap-2">
-              <input
-                type="range"
-                aria-label="price min"
-                min={0}
-                max={limit}
-                step={market === "US" ? 1 : 10}
-                value={priceMin}
-                onChange={(e) => setPriceMin(Math.min(Number(e.target.value), priceMax))}
-                style={{ accentColor: "var(--coral)" }}
-              />
-              <input
-                type="range"
-                aria-label="price max"
-                min={0}
-                max={limit}
-                step={market === "US" ? 1 : 10}
-                value={priceMax}
-                onChange={(e) => setPriceMax(Math.max(Number(e.target.value), priceMin))}
-                style={{ accentColor: "var(--coral)" }}
-              />
+            <div className="flex items-center justify-between">
+              <p className="text-ink-soft" style={{ letterSpacing: "0.1em" }}>
+                PRICE RANGE ({currency}): {priceMin.toLocaleString()} – {priceMax.toLocaleString()}
+              </p>
+            </div>
+            <div className="mt-2 flex items-center gap-3">
+              <div className="flex flex-col gap-1 flex-1">
+                <label htmlFor="price-min-slider" className="text-ink-mute" style={{ fontSize: 10 }}>最小価格</label>
+                <input
+                  id="price-min-slider"
+                  type="range"
+                  min={0}
+                  max={limit}
+                  step={market === "US" ? 1 : 10}
+                  value={priceMin}
+                  onChange={(e) => setPriceMin(Math.min(Number(e.target.value), priceMax))}
+                  style={{ accentColor: "var(--coral)" }}
+                />
+              </div>
+              <span className="text-ink-mute self-end pb-1" style={{ fontSize: 14 }}>〜</span>
+              <div className="flex flex-col gap-1 flex-1">
+                <label htmlFor="price-max-slider" className="text-ink-mute" style={{ fontSize: 10 }}>最大価格</label>
+                <input
+                  id="price-max-slider"
+                  type="range"
+                  min={0}
+                  max={limit}
+                  step={market === "US" ? 1 : 10}
+                  value={priceMax}
+                  onChange={(e) => setPriceMax(Math.max(Number(e.target.value), priceMin))}
+                  style={{ accentColor: "var(--coral)" }}
+                />
+              </div>
             </div>
           </div>
 
@@ -267,6 +276,14 @@ export default function AnalyzePage() {
               <span key={i} className="text-ink-soft" style={{ fontSize: 12 }}>{w}</span>
             ))}
           </div>
+        </Card>
+      )}
+
+      {!loading && !error && warnings.length === 0 && analyses.length === 0 && result && (
+        <Card>
+          <p className="text-ink-soft" style={{ fontSize: 14 }}>
+            条件に合う銘柄が見つかりませんでした。価格帯や市場を変更してお試しください。
+          </p>
         </Card>
       )}
 

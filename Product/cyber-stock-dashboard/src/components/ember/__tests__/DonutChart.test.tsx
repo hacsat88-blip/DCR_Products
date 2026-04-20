@@ -1,5 +1,5 @@
-import { describe, it, expect } from "vitest";
-import { render } from "@testing-library/react";
+import { describe, it, expect, vi } from "vitest";
+import { render, fireEvent } from "@testing-library/react";
 import { DonutChart } from "../charts/DonutChart";
 
 describe("DonutChart", () => {
@@ -37,5 +37,42 @@ describe("DonutChart", () => {
       p.getAttribute("fill"),
     );
     expect(fills.every((f) => f && f.startsWith("var(--"))).toBe(true);
+  });
+
+  // Accessibility tests
+  it("each slice has tabIndex=0 for keyboard navigation", () => {
+    const { container } = render(<DonutChart slices={slices} />);
+    const paths = container.querySelectorAll("path");
+    paths.forEach((path) => {
+      expect(path.getAttribute("tabindex")).toBe("0");
+    });
+  });
+
+  it("each slice has role=button", () => {
+    const { container } = render(<DonutChart slices={slices} />);
+    const paths = container.querySelectorAll("path");
+    paths.forEach((path) => {
+      expect(path.getAttribute("role")).toBe("button");
+    });
+  });
+
+  it("each slice has aria-label with label and percentage", () => {
+    const { container } = render(<DonutChart slices={slices} />);
+    const paths = container.querySelectorAll("path");
+    expect(paths[0].getAttribute("aria-label")).toBe("Tech 40.0%");
+    expect(paths[1].getAttribute("aria-label")).toBe("Finance 35.0%");
+    expect(paths[2].getAttribute("aria-label")).toBe("Energy 25.0%");
+  });
+
+  it("calls onSliceHover when slice is focused", () => {
+    const onSliceHover = vi.fn();
+    const { container } = render(
+      <DonutChart slices={slices} onSliceHover={onSliceHover} />,
+    );
+    const firstPath = container.querySelector("path");
+    if (firstPath) {
+      fireEvent.focus(firstPath);
+    }
+    expect(onSliceHover).toHaveBeenCalledWith("a");
   });
 });

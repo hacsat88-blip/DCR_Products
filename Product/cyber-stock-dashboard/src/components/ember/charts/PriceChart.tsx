@@ -174,7 +174,7 @@ export function PriceChart({
               y1={yS(v)}
               y2={yS(v)}
               stroke="var(--ink)"
-              strokeOpacity={0.06}
+              strokeOpacity={0.12}
               strokeDasharray="2 4"
             />
             <text

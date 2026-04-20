@@ -36,7 +36,7 @@ const BASE_PILL: React.CSSProperties = {
 export function Tabs({ tabs, current, onChange }: TabsProps) {
   return (
     <nav
-      aria-label="Navigation tabs"
+      aria-label="メインナビゲーション"
       style={{
         display: "inline-flex",
         gap: 4,

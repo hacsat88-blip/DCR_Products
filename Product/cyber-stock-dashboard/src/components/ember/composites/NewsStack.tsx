@@ -47,6 +47,20 @@ export default function NewsStack({ items, threshold = 5 }: NewsStackProps) {
     [animating, total],
   );
 
+  const handleKeyDown = useCallback(
+    (e: React.KeyboardEvent) => {
+      if (animating) return;
+      if (e.key === 'ArrowRight' || e.key === ' ' || e.key === 'Enter') {
+        e.preventDefault();
+        advance(1);
+      } else if (e.key === 'ArrowLeft') {
+        e.preventDefault();
+        advance(-1);
+      }
+    },
+    [advance, animating],
+  );
+
   // Pointer drag handlers
   const onPointerDown = useCallback((e: React.PointerEvent) => {
     dragStart.current = { x: e.clientX, y: e.clientY };
@@ -128,14 +142,18 @@ export default function NewsStack({ items, threshold = 5 }: NewsStackProps) {
             return (
               <div
                 key={item.id}
-                className="absolute inset-x-0 top-0"
-                style={cardStyle(depth)}
+                className="absolute inset-x-0 top-0 focus-visible:outline-2 focus-visible:outline-coral focus-visible:outline-offset-2"
+                style={{ ...cardStyle(depth), outline: 'none' }}
                 {...(depth === 0
                   ? {
                       onPointerDown,
                       onPointerMove,
                       onPointerUp,
                       onPointerCancel: onPointerUp,
+                      tabIndex: 0,
+                      role: 'button',
+                      'aria-label': 'ニュース詳細・次のニュースへ進む',
+                      onKeyDown: handleKeyDown,
                     }
                   : {})}
               >
