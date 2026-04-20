@@ -1,6 +1,6 @@
 import React from "react";
 
-type Tone = "default" | "coral" | "plum" | "sage" | "clay";
+type Tone = "default" | "coral" | "plum" | "sage" | "clay" | "moss" | "ink";
 
 const TONE_STYLES: Record<
   Tone,
@@ -12,24 +12,34 @@ const TONE_STYLES: Record<
     borderColor: "var(--border)",
   },
   coral: {
-    background: "rgba(217,119,87,0.12)",
+    background: "color-mix(in srgb, var(--coral) 12%, transparent)",
     color:      "var(--coral-deep)",
-    borderColor: "rgba(217,119,87,0.25)",
+    borderColor: "color-mix(in srgb, var(--coral) 25%, transparent)",
   },
   plum: {
-    background: "rgba(123,94,140,0.10)",
+    background: "color-mix(in srgb, var(--plum) 10%, transparent)",
     color:      "var(--plum)",
-    borderColor: "rgba(123,94,140,0.20)",
+    borderColor: "color-mix(in srgb, var(--plum) 20%, transparent)",
   },
   sage: {
-    background: "rgba(122,142,107,0.12)",
+    background: "color-mix(in srgb, var(--sage) 12%, transparent)",
     color:      "var(--sage)",
-    borderColor: "rgba(122,142,107,0.22)",
+    borderColor: "color-mix(in srgb, var(--sage) 22%, transparent)",
   },
   clay: {
-    background: "rgba(200,155,107,0.12)",
+    background: "color-mix(in srgb, var(--clay) 12%, transparent)",
     color:      "var(--clay)",
-    borderColor: "rgba(200,155,107,0.22)",
+    borderColor: "color-mix(in srgb, var(--clay) 22%, transparent)",
+  },
+  moss: {
+    background: "color-mix(in srgb, var(--moss) 12%, transparent)",
+    color:      "var(--moss)",
+    borderColor: "color-mix(in srgb, var(--moss) 22%, transparent)",
+  },
+  ink: {
+    background: "color-mix(in srgb, var(--ink) 8%, transparent)",
+    color:      "var(--ink)",
+    borderColor: "color-mix(in srgb, var(--ink) 15%, transparent)",
   },
 };
 

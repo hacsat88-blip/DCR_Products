@@ -11,8 +11,8 @@
   --border: rgba(42, 38, 34, 0.10);
   --border-strong: rgba(42, 38, 34, 0.18);
   --ink: #2A2622;
-  --ink-soft: #5C5249;
-  --ink-mute: #8C7F72;
+  --ink-soft: #4A3F36;
+  --ink-mute: #6F6357;
 
   --coral: #D97757;
   --coral-2: #E89A7A;
@@ -59,7 +59,7 @@
   --border-strong: rgba(245, 239, 232, 0.18);
   --ink: #F5EFE8;
   --ink-soft: #C9BEB1;
-  --ink-mute: #8C7F72;
+  --ink-mute: #A89B8D;
 
   --coral: #E89A7A;
   --coral-2: #F2B89D;
@@ -196,9 +196,50 @@ button:focus-visible { outline: 2px solid var(--coral); outline-offset: 2px; }
   opacity: 0.55;
 }
 
+.transition-base { transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1); }
+.transition-fast { transition: all 0.15s cubic-bezier(0.4, 0, 0.2, 1); }
+.transition-slow { transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
+
+/* FlipCard 3D Transform */
+.flip-card {
+  perspective: 1200px;
+  position: relative;
+  width: 100%;
+}
+
+.flip-card-inner {
+  display: grid;
+  grid-template-areas: "stack";
+  width: 100%;
+  height: 100%;
+  transition: transform 650ms cubic-bezier(0.22, 1, 0.36, 1),
+              box-shadow 400ms ease;
+  transform-style: preserve-3d;
+}
+
+.flip-card-inner.is-flipped {
+  transform: rotateY(180deg);
+  box-shadow: var(--shadow-lg);
+}
+
+.flip-face {
+  grid-area: stack;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  border-radius: inherit;
+  min-height: 100%;
+}
+
+.flip-face-back {
+  transform: rotateY(180deg);
+}
+
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {
     animation-duration: 0.01ms !important;
     transition-duration: 0.01ms !important;
+  }
+  .flip-card-inner {
+    transition: transform 0.01ms, box-shadow 0.01ms;
   }
 }

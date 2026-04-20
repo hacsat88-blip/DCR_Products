@@ -40,11 +40,17 @@ function createSqliteDb(): Database {
   const Database = require("better-sqlite3");
    
   const { drizzle } = require("drizzle-orm/better-sqlite3");
+   
+  const { migrate } = require("drizzle-orm/better-sqlite3/migrator");
   const url = process.env.DATABASE_URL ?? "file:./local.db";
   const file = resolveSqliteFile(url);
   const sqlite = new Database(file);
   sqlite.pragma("journal_mode = WAL");
-  return drizzle(sqlite, { schema }) as Database;
+  const db = drizzle(sqlite, { schema }) as Database;
+  // Auto-migrate on first open so tables always exist
+  const migrationsFolder = path.resolve(process.cwd(), "drizzle");
+  migrate(db, { migrationsFolder });
+  return db;
 }
 
 function createPostgresDb(): Database {
@@ -76,12 +82,12 @@ export async function runMigrations(): Promise<void> {
   if (driver === "postgres") {
      
     const { migrate } = require("drizzle-orm/neon-http/migrator");
-    await migrate(getDb() as never, { migrationsFolder: "./drizzle/pg" });
+    await migrate(getDb() as never, { migrationsFolder: path.resolve(process.cwd(), "drizzle/pg") });
     return;
   }
    
   const { migrate } = require("drizzle-orm/better-sqlite3/migrator");
-  migrate(getDb(), { migrationsFolder: "./drizzle" });
+  migrate(getDb(), { migrationsFolder: path.resolve(process.cwd(), "drizzle") });
 }
 
 export { schema };

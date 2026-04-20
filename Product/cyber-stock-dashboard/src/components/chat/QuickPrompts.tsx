@@ -59,14 +59,14 @@ export function QuickPrompts({
           disabled={disabled}
           title={p.requiresPortfolio ? "保有銘柄を参照して評価します" : undefined}
           className={cn(
-            "rounded-full border border-accent/50 bg-accent/10 px-3 py-1 text-xs text-accent transition-shadow",
-            "hover:shadow-[0_0_12px_rgba(184,107,255,0.5)]",
+            "rounded-full border border-[color:var(--coral)]/50 bg-[color:var(--coral)]/10 px-3 py-1 text-xs text-[color:var(--coral)] transition-shadow",
+            "hover:shadow-[0_0_12px_rgba(217,119,87,0.4)]",
             "disabled:cursor-not-allowed disabled:opacity-50",
           )}
         >
           #{p.label}
           {p.requiresPortfolio && (
-            <span className="ml-1 rounded-full border border-neon/40 px-1 text-[10px] text-neon">
+            <span className="ml-1 rounded-full border border-[color:var(--plum)]/40 px-1 text-[10px] text-[color:var(--plum)]">
               PF
             </span>
           )}

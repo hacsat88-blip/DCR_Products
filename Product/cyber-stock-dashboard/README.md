@@ -38,6 +38,8 @@ npm run dev
 `.env.example` を `.env.local` にコピーして必要なキーを設定してください。
 
 - `OPENROUTER_API_KEY` + `OPENROUTER_MODEL_REASONING` / `OPENROUTER_MODEL_FAST`: LLM 連携 (未設定時は friendly fallback)
+- `NEXT_PUBLIC_OPENROUTER_ENABLE_WEB_SEARCH`, `OPENROUTER_ENABLE_WEB_SEARCH`: Web検索トグル表示 / サーバー側検索有効化
+- `OPENROUTER_WEB_SEARCH_MAX_RESULTS`, `OPENROUTER_WEB_SEARCH_MAX_TOTAL_RESULTS`, `OPENROUTER_WEB_SEARCH_ALLOWED_DOMAINS`: Web検索件数とドメイン制御
 - `JQUANTS_API_KEY`, `ALPHA_VANTAGE_API_KEY`, `MARKETAUX_API_KEY`, `EDINETDB_API_KEY`: 市場データ (`J-Quants V2` は `x-api-key` ヘッダーで API キー認証)
 - 価格/指数データは `J-Quants/Alpha Vantage` 失敗時に `Yahoo Finance` へ自動フォールバック（Yahoo 用の追加キーは不要）
 - `JQUANTS_REFRESH_TOKEN` (任意/旧互換): `JQUANTS_API_KEY` 未設定時のみ旧 V1 認証へフォールバック

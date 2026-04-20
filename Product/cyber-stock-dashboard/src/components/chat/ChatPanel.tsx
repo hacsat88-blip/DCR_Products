@@ -445,41 +445,51 @@ export function ChatPanel({
             </p>
           )}
 
-          <form onSubmit={onSubmit} className="flex gap-2">
-            <input
-              type="text"
-              value={input}
-              onChange={(e) => setInput(e.target.value)}
-              placeholder="例: 半導体の押し目教えて"
-              maxLength={2000}
-              disabled={streaming}
-              aria-label="質問入力"
-              className="flex-1 rounded-lg p-2 text-sm focus:outline-none"
-              style={{
-                background: "var(--surface)",
-                color: "var(--ink)",
-                border: "1px solid var(--border)",
-              }}
-            />
-            {streaming ? (
-              <button
-                type="button"
-                onClick={cancel}
-                className="rounded-lg px-4 py-2 text-sm font-medium text-white transition hover:opacity-90"
-                style={{ background: "#B45550" }}
+          <form onSubmit={onSubmit} className="flex flex-col gap-2">
+            <div className="flex gap-2">
+              <input
+                type="text"
+                value={input}
+                onChange={(e) => setInput(e.target.value)}
+                placeholder="例: 半導体の押し目教えて"
+                maxLength={2000}
+                disabled={streaming}
+                aria-label="質問入力"
+                className="flex-1 rounded-lg p-2 text-sm focus:outline-none"
+                style={{
+                  background: "var(--surface)",
+                  color: "var(--ink)",
+                  border: "1px solid var(--border)",
+                }}
+              />
+              {streaming ? (
+                <button
+                  type="button"
+                  onClick={cancel}
+                  className="rounded-lg px-4 py-2 text-sm font-medium text-white transition hover:opacity-90"
+                  style={{ background: "#B45550" }}
+                >
+                  キャンセル
+                </button>
+              ) : (
+                <button
+                  type="submit"
+                  disabled={!input.trim()}
+                  className="rounded-lg px-4 py-2 text-sm font-medium text-white transition hover:opacity-90 disabled:opacity-40"
+                  style={{ background: "var(--coral)" }}
+                >
+                  送信
+                </button>
+              )}
+            </div>
+            <div className="flex justify-end">
+              <span
+                className="text-xs"
+                style={{ color: input.length > 1900 ? "var(--down)" : "var(--ink-mute)" }}
               >
-                キャンセル
-              </button>
-            ) : (
-              <button
-                type="submit"
-                disabled={!input.trim()}
-                className="rounded-lg px-4 py-2 text-sm font-medium text-white transition hover:opacity-90 disabled:opacity-40"
-                style={{ background: "var(--coral)" }}
-              >
-                送信
-              </button>
-            )}
+                残り {2000 - input.length} 文字
+              </span>
+            </div>
           </form>
           <p className="text-[10px]" style={{ color: "var(--ink-mute)" }}>
             ※参考情報のみ。投資判断はご自身の責任で行ってください。

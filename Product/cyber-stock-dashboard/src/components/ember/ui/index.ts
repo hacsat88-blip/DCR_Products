@@ -34,3 +34,6 @@ export type { CardProps } from "./Card";
 
 export { Chip } from "./Chip";
 export type { ChipProps } from "./Chip";
+
+export { default as FlipCard } from "./FlipCard";
+export type { FlipCardProps } from "./FlipCard";

@@ -1,6 +1,7 @@
 "use client";
 
 import * as React from "react";
+import Link from "next/link";
 import { useQuery } from "@tanstack/react-query";
 import {
   Blob,
@@ -27,6 +28,7 @@ import { ChatPanel } from "@/components/chat/ChatPanel";
 import type { IndexResult, IndexRange } from "@/lib/services/marketIndices";
 import type { StockAnalysis } from "@/lib/llm/schemas";
 import type { PortfolioWithValue } from "@/lib/services/portfolio";
+import styles from "./page.module.css";
 
 interface IndicesResponse {
   items: IndexResult[];
@@ -200,17 +202,56 @@ export default function HomePage() {
       <Blob top="-120px" right="-100px" size={360} opacity={0.5} />
 
       {/* Hero */}
-      <section className="relative">
-        <p className="text-ink-mute" style={{ fontSize: 11, letterSpacing: "0.18em", textTransform: "uppercase" }}>
-          Ember Stock Atelier · 株式投資の手仕事
-        </p>
-        <h1 className="font-serif text-ink mt-3" style={{ fontSize: 56, lineHeight: 1.05, fontWeight: 400 }}>
-          今日のマーケットを、<br />
-          <span style={{ color: "var(--coral)" }}>静かに、深く読む。</span>
+      <section className={`relative ${styles.hero}`}>
+        <h1 className="font-serif text-ink" style={{ fontSize: 'clamp(32px, 5vw, 56px)', lineHeight: 1.05, fontWeight: 400 }}>
+          AI が読み解く、<br />
+          <span style={{ color: "var(--coral)" }}>株式投資の今</span>
         </h1>
-        <p className="font-serif text-ink-soft mt-4" style={{ fontSize: 16, maxWidth: 560 }}>
-          指数・ニュース・ポートフォリオ・注目銘柄を一画面で。判断の素材を、過不足なく。
+        <p className="text-ink-mute mt-3" style={{ fontSize: 13, letterSpacing: "0.12em" }}>
+          Ember Stock Atelier · Cyber Stock Dashboard
         </p>
+      </section>
+
+      {/* CTA Cards */}
+      <section className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <Link href="/stocks" className={`${styles.cta} ${styles.cta1}`}>
+          <Card className="h-full transition-all hover:-translate-y-0.5 hover:shadow-lg border-border hover:border-[color:var(--coral)]">
+            <div className="flex flex-col gap-3">
+              <div className="text-3xl">📊</div>
+              <h3 className="font-serif text-ink" style={{ fontSize: 18, fontWeight: 600 }}>銘柄リサーチ</h3>
+              <p className="text-ink-soft" style={{ fontSize: 13 }}>
+                AI が 5 軸スコアリングと短中長期シナリオを生成
+              </p>
+              <div className="text-coral" style={{ fontSize: 13 }}>→</div>
+            </div>
+          </Card>
+        </Link>
+
+        <Link href="/portfolio" className={`${styles.cta} ${styles.cta2}`}>
+          <Card className="h-full transition-all hover:-translate-y-0.5 hover:shadow-lg border-border hover:border-[color:var(--coral)]">
+            <div className="flex flex-col gap-3">
+              <div className="text-3xl">💼</div>
+              <h3 className="font-serif text-ink" style={{ fontSize: 18, fontWeight: 600 }}>ポートフォリオ</h3>
+              <p className="text-ink-soft" style={{ fontSize: 13 }}>
+                保有銘柄を一元管理。評価損益とアロケーションを可視化
+              </p>
+              <div className="text-coral" style={{ fontSize: 13 }}>→</div>
+            </div>
+          </Card>
+        </Link>
+
+        <Link href="/analyze" className={`${styles.cta} ${styles.cta3}`}>
+          <Card className="h-full transition-all hover:-translate-y-0.5 hover:shadow-lg border-border hover:border-[color:var(--coral)]">
+            <div className="flex flex-col gap-3">
+              <div className="text-3xl">🎯</div>
+              <h3 className="font-serif text-ink" style={{ fontSize: 18, fontWeight: 600 }}>ねらい目分析</h3>
+              <p className="text-ink-soft" style={{ fontSize: 13 }}>
+                AI が押し目候補を自動スクリーニング
+              </p>
+              <div className="text-coral" style={{ fontSize: 13 }}>→</div>
+            </div>
+          </Card>
+        </Link>
       </section>
 
       {/* Indices strip */}
@@ -230,7 +271,11 @@ export default function HomePage() {
             />
           }
         />
-        <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-5">
+        <div
+          className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-5"
+          aria-live="polite"
+          aria-busy={indicesQ.isLoading}
+        >
           {indicesQ.isLoading
             ? Array.from({ length: 5 }).map((_, i) => (
                 <Card key={i} className="h-36 animate-pulse" padded={false}>
@@ -308,21 +353,23 @@ export default function HomePage() {
           title="本日の注目候補"
           jp="AIスクリーニング"
         />
-        {picks.length === 0 ? (
-          <Card className="text-ink-mute" padded>
-            {picksQ.isLoading ? "読み込み中…" : "候補がありません"}
-          </Card>
-        ) : (
-          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-            {picks.slice(0, 8).map((p, i) => (
-              <PickCard
-                key={`${p.market}:${p.symbol}`}
-                stock={pickToStock(p, i)}
-                reason={p.analysis?.catalysts?.[0] ?? p.analysis?.scenarios?.short?.mid}
-              />
-            ))}
-          </div>
-        )}
+        <div aria-live="polite" aria-busy={picksQ.isLoading}>
+          {picks.length === 0 ? (
+            <Card className="text-ink-mute" padded>
+              {picksQ.isLoading ? "読み込み中…" : "候補がありません"}
+            </Card>
+          ) : (
+            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+              {picks.slice(0, 8).map((p, i) => (
+                <PickCard
+                  key={`${p.market}:${p.symbol}`}
+                  stock={pickToStock(p, i)}
+                  reason={p.analysis?.catalysts?.[0] ?? p.analysis?.scenarios?.short?.mid}
+                />
+              ))}
+            </div>
+          )}
+        </div>
         <p className="text-ink-mute" style={{ fontSize: 11 }}>※ 売買推奨ではありません。最終判断はご自身で。</p>
       </section>
 
@@ -330,13 +377,15 @@ export default function HomePage() {
       <section className="grid gap-6 lg:grid-cols-3">
         <div className="lg:col-span-2 flex flex-col gap-4">
           <SectionHead eyebrow="NEWS FEED" title="マーケットニュース" jp="日本語フィード" />
-          {newsRecords.length === 0 ? (
-            <Card className="text-ink-mute">
-              {newsQ.isLoading ? "読み込み中…" : "ニュースなし"}
-            </Card>
-          ) : (
-            <NewsStack items={newsRecords} threshold={5} />
-          )}
+          <div aria-live="polite" aria-busy={newsQ.isLoading}>
+            {newsRecords.length === 0 ? (
+              <Card className="text-ink-mute">
+                {newsQ.isLoading ? "読み込み中…" : "ニュースなし"}
+              </Card>
+            ) : (
+              <NewsStack items={newsRecords} threshold={5} />
+            )}
+          </div>
         </div>
 
         <div className="flex flex-col gap-4">

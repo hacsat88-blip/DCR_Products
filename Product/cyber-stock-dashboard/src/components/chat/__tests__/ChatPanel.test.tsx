@@ -242,4 +242,16 @@ describe("ChatPanel", () => {
     fireEvent.click(screen.getByRole("button", { name: /開く/ }));
     expect(screen.getByLabelText("質問入力")).toBeInTheDocument();
   });
+
+  it("I13: shows character counter below input", () => {
+    render(<ChatPanel />);
+    const input = screen.getByLabelText("質問入力") as HTMLInputElement;
+    
+    expect(screen.getByText(/残り 2000 文字/i)).toBeInTheDocument();
+    
+    fireEvent.change(input, { target: { value: "a".repeat(1901) } });
+    
+    const counter = screen.getByText(/残り 99 文字/i);
+    expect(counter).toBeInTheDocument();
+  });
 });
