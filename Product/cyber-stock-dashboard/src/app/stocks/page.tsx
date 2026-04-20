@@ -1,7 +1,7 @@
 "use client";
 
 import * as React from "react";
-import { Card, Chip, SectionHead, Stat } from "@/components/ember/ui";
+import { Card, Chip, Icon, SectionHead, Stat } from "@/components/ember/ui";
 import { PriceChart, RadarChart, type Candle } from "@/components/ember/charts";
 import {
   RankRow,
@@ -286,7 +286,7 @@ export default function StocksPage() {
           <button
             type="submit"
             disabled={research.status === "loading" || !searchCode.trim()}
-            className="rounded-full px-5 py-2 text-white"
+            className="inline-flex items-center gap-2 rounded-full px-5 py-2 text-white"
             style={{
               background: "var(--coral)",
               fontSize: 13,
@@ -294,7 +294,8 @@ export default function StocksPage() {
               opacity: research.status === "loading" || !searchCode.trim() ? 0.6 : 1,
             }}
           >
-            {research.status === "loading" ? "🔄 分析中…" : "🔍 リサーチ実行"}
+            <Icon name={research.status === "loading" ? "spinner" : "search"} size={13} />
+            {research.status === "loading" ? "分析中…" : "リサーチ実行"}
           </button>
         </form>
         {research.status === "loading" && (
@@ -303,8 +304,9 @@ export default function StocksPage() {
           </p>
         )}
         {research.status === "error" && (
-          <p className="mt-3" style={{ color: "var(--down)", fontSize: 12 }}>
-            ⚠️ {research.error}
+          <p className="mt-3 inline-flex items-center gap-1.5" style={{ color: "var(--down)", fontSize: 12 }}>
+            <Icon name="alert" size={12} />
+            {research.error}
           </p>
         )}
       </Card>

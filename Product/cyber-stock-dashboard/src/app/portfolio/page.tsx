@@ -2,7 +2,7 @@
 
 import * as React from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { Card, SectionHead, SectorDot, Stat, UpDown } from "@/components/ember/ui";
+import { Card, Icon, SectionHead, SectorDot, Stat, UpDown } from "@/components/ember/ui";
 import { DonutChart, type DonutSlice } from "@/components/ember/charts";
 import { HoldingRow, type Holding } from "@/components/ember/composites";
 import type { PortfolioWithValue } from "@/lib/services/portfolio";
@@ -369,11 +369,11 @@ function PortfolioPageInner() {
                     </button>
                     <a
                       href={`/stocks?code=${h.ticker}`}
-                      className="rounded-md border border-border px-2 py-1 text-ink-soft hover:text-coral hover:border-coral transition-colors"
-                      style={{ fontSize: 10 }}
+                      className="grid h-7 w-7 place-items-center rounded-md border border-border text-ink-soft hover:text-coral hover:border-coral transition-colors"
                       title="リサーチ"
+                      aria-label="リサーチ"
                     >
-                      🔍
+                      <Icon name="search" size={13} />
                     </a>
                   </div>
                 ))}
@@ -415,10 +415,14 @@ function PortfolioPageInner() {
                 className={`${inputCls}${lookupStatus === "done" ? " lookup-glow" : ""}`}
               />
               {lookupStatus === "loading" && (
-                <span className="absolute right-2 top-1/2 -translate-y-1/2 text-ink-mute" style={{ fontSize: 10 }}>🔍</span>
+                <span className="absolute right-2 top-1/2 -translate-y-1/2 text-ink-mute" aria-label="検索中">
+                  <Icon name="spinner" size={12} />
+                </span>
               )}
               {lookupStatus === "done" && (
-                <span className="absolute right-2 top-1/2 -translate-y-1/2" style={{ color: "var(--up)", fontSize: 10 }}>✓</span>
+                <span className="absolute right-2 top-1/2 -translate-y-1/2" style={{ color: "var(--up)" }} aria-label="取得完了">
+                  <Icon name="check" size={12} />
+                </span>
               )}
             </div>
           </label>

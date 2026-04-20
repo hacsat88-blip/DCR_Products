@@ -111,11 +111,11 @@ describe('HomePage', () => {
     expect(screen.getByText(/マーケットニュース/)).toBeInTheDocument();
   });
 
-  it('CTA cards have emojis', () => {
+  it('CTA cards have icon labels', () => {
     render(<HomePage />);
-    
-    expect(screen.getByText('📊')).toBeInTheDocument();
-    expect(screen.getByText('💼')).toBeInTheDocument();
-    expect(screen.getByText('🎯')).toBeInTheDocument();
+
+    expect(screen.getByLabelText('銘柄リサーチ')).toBeInTheDocument();
+    expect(screen.getByLabelText('ポートフォリオ')).toBeInTheDocument();
+    expect(screen.getByLabelText('ねらい目分析')).toBeInTheDocument();
   });
 });

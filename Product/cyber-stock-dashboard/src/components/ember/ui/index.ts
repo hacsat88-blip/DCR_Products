@@ -7,6 +7,8 @@ export type { TabsProps, TabItem } from "./Tabs";
 
 export { ThemeToggle } from "./ThemeToggle";
 export type { ThemeToggleProps } from "./ThemeToggle";
+export { Icon } from "./Icon";
+export type { IconName, IconProps } from "./Icon";
 
 export { Stat } from "./Stat";
 export type { StatProps } from "./Stat";
