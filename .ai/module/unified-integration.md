@@ -29,16 +29,16 @@
 
 全環境で使用可能なキーワードプレフィクス。tmux 不要、動作戦略の宣言のみ。
 
-| Keyword | Mode | 適用環境 |
-|---------|------|----------|
-| `autopilot:` | 自律実行 | VS Code / Copilot CLI / Claude Code / Codex |
-| `ralph:` | 完了保証ループ | 同上（`ulw` 内包） |
-| `ulw` | 超並列バッチ処理 | 同上 |
-| `ralplan:` | 反復プラン精度向上 | 同上 |
-| `deep-interview:` | ソクラテス式要件整理 | 同上 |
-| `ultrathink:` | 深層推論 | 同上 |
-| `deepsearch:` | コード全域調査 | 同上 |
-| `team:` | チームパイプライン | 同上 |
+| Keyword           | Mode                 | 適用環境                                    |
+| ----------------- | -------------------- | ------------------------------------------- |
+| `autopilot:`      | 自律実行             | VS Code / Copilot CLI / Claude Code / Codex |
+| `ralph:`          | 完了保証ループ       | 同上（`ulw` 内包）                          |
+| `ulw`             | 超並列バッチ処理     | 同上                                        |
+| `ralplan:`        | 反復プラン精度向上   | 同上                                        |
+| `deep-interview:` | ソクラテス式要件整理 | 同上                                        |
+| `ultrathink:`     | 深層推論             | 同上                                        |
+| `deepsearch:`     | コード全域調査       | 同上                                        |
+| `team:`           | チームパイプライン   | 同上                                        |
 
 ## Team Pipeline（チームパイプライン詳細）
 
@@ -48,13 +48,13 @@
 team-plan → team-prd → team-exec → team-verify → team-fix (loop)
 ```
 
-| フェーズ | 内容 | DCR対応 |
-|----------|------|----------|
-| team-plan | 要件分析・依存関係整理 | p/ Plan Gate |
-| team-prd | 実装仕様書（PRD）生成 | writing-plans skill |
-| team-exec | 実装（チャンク分割） | P2実行 |
-| team-verify | 全チェックリスト検証 | q/ QA Gate |
-| team-fix | 不合格項目修正ループ | systematic-debugging skill → re-verify |
+| フェーズ    | 内容                   | DCR対応                                |
+| ----------- | ---------------------- | -------------------------------------- |
+| team-plan   | 要件分析・依存関係整理 | p/ Plan Gate                           |
+| team-prd    | 実装仕様書（PRD）生成  | writing-plans skill                    |
+| team-exec   | 実装（チャンク分割）   | P2実行                                 |
+| team-verify | 全チェックリスト検証   | q/ QA Gate                             |
+| team-fix    | 不合格項目修正ループ   | systematic-debugging skill → re-verify |
 
 ## Canonical Priority
 

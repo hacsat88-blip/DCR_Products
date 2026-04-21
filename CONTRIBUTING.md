@@ -7,12 +7,12 @@ VS Code Copilot, Copilot CLI, Claude Code, Codex, Cursor の5環境に対応し�
 
 ## ディレクトリ構造
 
-| Layer | Path | 説明 |
-|-------|------|------|
-| Source | `rules/`, `skills/`, `.ai/agents-source/` | 編集対象の正本 |
-| Kernel | `.ai/kernel/` | 共通仕様の正本（_base.md, gates/, environments/） |
-| Runtime | `.github/`, `AGENTS.md`, `CLAUDE.md` | エディタが読む入口 |
-| Generated | `.cursor/rules/*.mdc`, `.claude/agents/`, `.codex/agents/` | deploy.ps1 の出力（手編集禁止） |
+| Layer     | Path                                                       | 説明                                              |
+| --------- | ---------------------------------------------------------- | ------------------------------------------------- |
+| Source    | `rules/`, `skills/`, `.ai/agents-source/`                  | 編集対象の正本                                    |
+| Kernel    | `.ai/kernel/`                                              | 共通仕様の正本（_base.md, gates/, environments/） |
+| Runtime   | `.github/`, `AGENTS.md`, `CLAUDE.md`                       | エディタが読む入口                                |
+| Generated | `.cursor/rules/*.mdc`, `.claude/agents/`, `.codex/agents/` | deploy.ps1 の出力（手編集禁止）                   |
 
 ## ルールの追加・変更
 
@@ -93,8 +93,8 @@ inherits:
 
 ## 権限モデル
 
-| Level | 内容 | 例 |
-|-------|------|-----|
-| P1 | 自律実行（報告不要） | ファイル読み取り、検索、git status |
-| P2 | 実行→事後報告 | ファイル編集、新規作成 |
-| P3 | 計画→承認→実行 | ファイル削除、依存関係変更、設定変更 |
+| Level | 内容                 | 例                                   |
+| ----- | -------------------- | ------------------------------------ |
+| P1    | 自律実行（報告不要） | ファイル読み取り、検索、git status   |
+| P2    | 実行→事後報告        | ファイル編集、新規作成               |
+| P3    | 計画→承認→実行       | ファイル削除、依存関係変更、設定変更 |

@@ -47,13 +47,13 @@
 
 ## 🎯 ファイル対応表：モデル・環境別
 
-| 環境 / モデル | メインロード | 参照先 | 用途 |
-|-------------|-----------|--------|------|
-| **VS Code Copilot Chat** | `.github/copilot-instructions.md` | `.ai/kernel/_base.md` + `environments/vscode-copilot.md` | Chat 統合 |
-| **Claude Code** | `CLAUDE.md` | `.ai/kernel/_base.md` + `environments/claude-code.md` | Code 通合 |
-| **GitHub Copilot CLI** | `AGENTS.md` | `.ai/kernel/_base.md` + `environments/copilot-cli.md` | CLI 起動時 |
-| **Cursor（Composer/Agent）** | `.cursor/rules/dcr-kernel.md` | `.ai/kernel/_base.md` + `environments/cursor.md` | ルール自動ロード |
-| **Codex** | `AGENTS.md` | `.ai/kernel/_base.md` + `environments/codex.md` | リファレンス |
+| 環境 / モデル                | メインロード                      | 参照先                                                   | 用途             |
+| ---------------------------- | --------------------------------- | -------------------------------------------------------- | ---------------- |
+| **VS Code Copilot Chat**     | `.github/copilot-instructions.md` | `.ai/kernel/_base.md` + `environments/vscode-copilot.md` | Chat 統合        |
+| **Claude Code**              | `CLAUDE.md`                       | `.ai/kernel/_base.md` + `environments/claude-code.md`    | Code 通合        |
+| **GitHub Copilot CLI**       | `AGENTS.md`                       | `.ai/kernel/_base.md` + `environments/copilot-cli.md`    | CLI 起動時       |
+| **Cursor（Composer/Agent）** | `.cursor/rules/dcr-kernel.md`     | `.ai/kernel/_base.md` + `environments/cursor.md`         | ルール自動ロード |
+| **Codex**                    | `AGENTS.md`                       | `.ai/kernel/_base.md` + `environments/codex.md`          | リファレンス     |
 
 ---
 
@@ -122,17 +122,17 @@
 
 **統一トリガーハンドラ** → 全モデルで共有：
 
-| トリガー | ファイル | 動作 |
-|---------|---------|------|
-| `a/` | `trigger-a-review.md` | コード・デザイン審査 |
-| `a/ debug` | `trigger-a-debug.md` | デバッグ（症状 → 根本原因） |
-| `s/` | `trigger-s.md` | 戦略概観（現状→問い→方向） |
-| `i/` | `trigger-i.md` | 競合解決（複数アイデアの統合） |
-| `r/` | `trigger-r.md` | トレードオフ分析 |
-| `d/` | `trigger-d.md` | 悪手分析（失敗シナリオ） |
-| `p/` | `trigger-p.md` | Plan Gate（計画ロック） |
-| `q/` | `trigger-q.md` | QA Gate（検証ロック） |
-| `sh/` | `trigger-sh.md` | Ship Gate（リリース判定） |
+| トリガー   | ファイル              | 動作                           |
+| ---------- | --------------------- | ------------------------------ |
+| `a/`       | `trigger-a-review.md` | コード・デザイン審査           |
+| `a/ debug` | `trigger-a-debug.md`  | デバッグ（症状 → 根本原因）    |
+| `s/`       | `trigger-s.md`        | 戦略概観（現状→問い→方向）     |
+| `i/`       | `trigger-i.md`        | 競合解決（複数アイデアの統合） |
+| `r/`       | `trigger-r.md`        | トレードオフ分析               |
+| `d/`       | `trigger-d.md`        | 悪手分析（失敗シナリオ）       |
+| `p/`       | `trigger-p.md`        | Plan Gate（計画ロック）        |
+| `q/`       | `trigger-q.md`        | QA Gate（検証ロック）          |
+| `sh/`      | `trigger-sh.md`       | Ship Gate（リリース判定）      |
 
 追加トリガー（リクエスト駆動）:
 - `trigger-harness-audit.md`

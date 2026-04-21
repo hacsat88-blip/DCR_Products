@@ -45,14 +45,14 @@ DCR (Dynamic Context Router) は、5つの AI 開発環境に統一的なルー�
 
 不変の共通仕様。全環境が参照する唯一の正本。
 
-| ファイル | 責務 |
-|---------|------|
-| `_base.md` | シグナル、トリガー、実行モード、ツール優先順位 |
-| `_permissions.md` | P1/P2/P3 権限モデル |
-| `_safety-boundaries.md` | 安全境界の定義 |
-| `_module-behaviors.md` | モジュール動作定義 |
-| `gates/` | ゲートトリガー (p/, q/, sh/ 等) |
-| `environments/` | 環境固有の差分定義 |
+| ファイル                | 責務                                           |
+| ----------------------- | ---------------------------------------------- |
+| `_base.md`              | シグナル、トリガー、実行モード、ツール優先順位 |
+| `_permissions.md`       | P1/P2/P3 権限モデル                            |
+| `_safety-boundaries.md` | 安全境界の定義                                 |
+| `_module-behaviors.md`  | モジュール動作定義                             |
+| `gates/`                | ゲートトリガー (p/, q/, sh/ 等)                |
+| `environments/`         | 環境固有の差分定義                             |
 
 ### 2. Source Layer
 
@@ -66,13 +66,13 @@ DCR (Dynamic Context Router) は、5つの AI 開発環境に統一的なルー�
 
 各エディタが直接読む入口ファイル。
 
-| 環境 | Entrypoint |
-|------|-----------|
+| 環境            | Entrypoint                        |
+| --------------- | --------------------------------- |
 | VS Code Copilot | `.github/copilot-instructions.md` |
-| Copilot CLI | `AGENTS.md` |
-| Codex | `AGENTS.md` |
-| Claude Code | `CLAUDE.md` |
-| Cursor | `.cursor/rules/dcr-kernel.md` |
+| Copilot CLI     | `AGENTS.md`                       |
+| Codex           | `AGENTS.md`                       |
+| Claude Code     | `CLAUDE.md`                       |
+| Cursor          | `.cursor/rules/dcr-kernel.md`     |
 
 ### 4. Generated Layer
 
@@ -139,12 +139,12 @@ challenge:
 
 ## Decision Log
 
-| 日付 | 決定 | 理由 |
-|------|------|------|
-| 2025-01 | Kernel を `.ai/kernel/` に分離 | 環境差分の管理を容易にするため |
-| 2025-01 | TOML + MD でエージェント定義 | Codex (TOML) と Claude (MD) の双方に対応 |
-| 2025-06 | Gate state persistence 導入 | ゲートがガイダンスのみで強制力がなかった問題を解決 |
-| 2025-06 | challenge metadata 拡充 | 高リスクルールの品質保証を自動化 |
-| 2025-06 | deprecated/prefer lifecycle | スキル/ルールの段階的廃止を安全に管理 |
-| 2025-06 | deploy.ps1 に Watch/Backup 追加 | 開発体験の向上とロールバック安全性の確保 |
-| 2025-06 | validate.ps1 を 13 checks に拡張 | 重複検出、エージェントバージョン、説明品質の検証 |
+| 日付    | 決定                             | 理由                                               |
+| ------- | -------------------------------- | -------------------------------------------------- |
+| 2025-01 | Kernel を `.ai/kernel/` に分離   | 環境差分の管理を容易にするため                     |
+| 2025-01 | TOML + MD でエージェント定義     | Codex (TOML) と Claude (MD) の双方に対応           |
+| 2025-06 | Gate state persistence 導入      | ゲートがガイダンスのみで強制力がなかった問題を解決 |
+| 2025-06 | challenge metadata 拡充          | 高リスクルールの品質保証を自動化                   |
+| 2025-06 | deprecated/prefer lifecycle      | スキル/ルールの段階的廃止を安全に管理              |
+| 2025-06 | deploy.ps1 に Watch/Backup 追加  | 開発体験の向上とロールバック安全性の確保           |
+| 2025-06 | validate.ps1 を 13 checks に拡張 | 重複検出、エージェントバージョン、説明品質の検証   |

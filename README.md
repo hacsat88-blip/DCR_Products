@@ -4,14 +4,14 @@ AI エージェント設定・ルール・スキルの一元管理リポジト�
 
 ## 対応エディタ / CLI
 
-| ツール | エントリポイント |
-| -------- | --------- |
-| VS Code Copilot | `.github/copilot-instructions.md` |
-| GitHub Copilot CLI | `AGENTS.md` |
-| Codex | `AGENTS.md` |
-| Claude Code | `CLAUDE.md` |
-| Cursor | `.cursor/rules/` |
-| Gemini / Antigravity | `.gemini/settings.json` |
+| ツール               | エントリポイント                  |
+| -------------------- | --------------------------------- |
+| VS Code Copilot      | `.github/copilot-instructions.md` |
+| GitHub Copilot CLI   | `AGENTS.md`                       |
+| Codex                | `AGENTS.md`                       |
+| Claude Code          | `CLAUDE.md`                       |
+| Cursor               | `.cursor/rules/`                  |
+| Gemini / Antigravity | `.gemini/settings.json`           |
 
 ## 運用クイックガイド
 
