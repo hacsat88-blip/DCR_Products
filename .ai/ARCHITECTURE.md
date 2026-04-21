@@ -69,7 +69,7 @@ DCR (Dynamic Context Router) は、5つの AI 開発環境に統一的なルー�
 | 環境 | Entrypoint |
 |------|-----------|
 | VS Code Copilot | `.github/copilot-instructions.md` |
-| Copilot CLI | `COPILOT_CLI.md` |
+| Copilot CLI | `AGENTS.md` |
 | Codex | `AGENTS.md` |
 | Claude Code | `CLAUDE.md` |
 | Cursor | `.cursor/rules/dcr-kernel.md` |

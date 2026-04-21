@@ -8,7 +8,7 @@
 
 - VS Code Chat では `.github/copilot-instructions.md` が主要 entrypoint になる
 - module files と command files の参照一覧を entrypoint 内に保持する
-- `COPILOT_CLI.md` を full reference として案内する
+- GitHub Copilot CLI 向けの詳細差分は `AGENTS.md` と `.ai/kernel/environments/copilot-cli.md` で管理する
 - instructions 互換性を優先し、共通ルールは [../_base.md](../_base.md) を source of truth とする
 
 ## Session plan handoff

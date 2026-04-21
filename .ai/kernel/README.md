@@ -51,7 +51,7 @@
 |-------------|-----------|--------|------|
 | **VS Code Copilot Chat** | `.github/copilot-instructions.md` | `.ai/kernel/_base.md` + `environments/vscode-copilot.md` | Chat 統合 |
 | **Claude Code** | `CLAUDE.md` | `.ai/kernel/_base.md` + `environments/claude-code.md` | Code 通合 |
-| **GitHub Copilot CLI** | `COPILOT_CLI.md` | `.ai/kernel/_base.md` + `environments/copilot-cli.md` | CLI 起動時 |
+| **GitHub Copilot CLI** | `AGENTS.md` | `.ai/kernel/_base.md` + `environments/copilot-cli.md` | CLI 起動時 |
 | **Cursor（Composer/Agent）** | `.cursor/rules/dcr-kernel.md` | `.ai/kernel/_base.md` + `environments/cursor.md` | ルール自動ロード |
 | **Codex** | `AGENTS.md` | `.ai/kernel/_base.md` + `environments/codex.md` | リファレンス |
 
@@ -163,7 +163,7 @@
     │
     ├─ GitHub Copilot CLI
     │   ↓
-    │   COPILOT_CLI.md（明示読み込み）
+    │   AGENTS.md（共通入口）
     │   ↓
     │   .ai/kernel/ 参照
     │
@@ -239,10 +239,9 @@ gate/trigger-a-review.md を実行
 ### Before（現状：重複が高い）
 
 ```
-ファイル数: 5 個
+ファイル数: 4 個
 AGENTS.md          ～170 行
 CLAUDE.md          ～200 行
-COPILOT_CLI.md     ～350 行（CLI固有で多い）
 dcr-kernel.md      ～150 行
 copilot-instructions.md  ～160 行
 ────────────────────────────
@@ -307,7 +306,6 @@ gate/*.md（12個）   ～300 行（統一）
 □ copilot-instructions.md → 参照層に縮約
 □ CLAUDE.md → 参照層に縮約
 □ AGENTS.md → 参照層に縮約
-□ COPILOT_CLI.md → 参照層に縮約
 □ .cursor/rules/dcr-kernel.md → 参照層に縮約
 ```
 
@@ -323,7 +321,7 @@ gate/*.md（12個）   ～300 行（統一）
 
 - **統合元仕様**: `.ai/module/unified-integration.md`
 - **検証スクリプト**: `validate.ps1` / `deploy.ps1`
-- **モデルファイル**: `AGENTS.md` / `CLAUDE.md` / `COPILOT_CLI.md` / `.cursor/rules/dcr-kernel.md` / `.github/copilot-instructions.md`
+- **モデルファイル**: `AGENTS.md` / `CLAUDE.md` / `.cursor/rules/dcr-kernel.md` / `.github/copilot-instructions.md`
 
 ---
 

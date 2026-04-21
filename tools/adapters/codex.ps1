@@ -44,9 +44,11 @@ $content = @"
 <!-- GENERATED FROM .ai/kernel + rules/ + skills/ + .ai/agents-source/ - DO NOT EDIT DIRECTLY -->
 <!-- Run: .\tools\deploy-all.ps1 to regenerate -->
 
-# Codex Entrypoint
+# Codex / GitHub Copilot CLI Entrypoint
 
-Unified entry point for GitHub Copilot CLI (Codex) environment.
+Unified entry point for Codex and GitHub Copilot CLI environments.
+
+GitHub Copilot CLI specific behavior lives in [.ai/kernel/environments/copilot-cli.md](.ai/kernel/environments/copilot-cli.md).
 
 ## Included Rules
 

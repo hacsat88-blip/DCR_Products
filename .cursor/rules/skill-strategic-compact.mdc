@@ -56,6 +56,6 @@ Auto-compaction の問題:
 
 ## DCR との統合
 
-- Copilot CLI: `COPILOT_CLI.md` の session-state / plan.md と併用
+- Copilot CLI: `AGENTS.md` と CLI の session-state / plan.md と併用
 - VS Code Copilot: 長いチャットセッションでの意識的な区切り
 - 全般: DCR の `s/` トリガーで戦略的な区切りを判断

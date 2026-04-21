@@ -2,7 +2,7 @@
 
 ## Entrypoint
 
-- `COPILOT_CLI.md`
+- `AGENTS.md`
 
 ## Environment-specific behavior
 
@@ -25,7 +25,7 @@
 
 - セッション間の計画引き継ぎは `docs/dcr/plans/` に保存する
 - p/ gate で承認された計画が `docs/dcr/plans/` に存在する場合、セッション開始時に自動読み込みする
-- CLI にはメモリツールがないため、gate state は `session-state` ファイル（`COPILOT_CLI.md` の Task tracking セクション準拠）で管理する
+- CLI にはメモリツールがないため、gate state は `session-state` ファイル（GitHub Copilot CLI の Task tracking ルール準拠）で管理する
 - `docs/dcr/plans/` が cross-environment 計画共有ポイントとなる
 
 ## Gate state interaction

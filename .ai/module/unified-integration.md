@@ -95,7 +95,7 @@ team-plan → team-prd → team-exec → team-verify → team-fix (loop)
 
 ## Notes
 
-- Copilot CLI は `COPILOT_CLI.md` を優先
+- Copilot CLI は `AGENTS.md` を入口とし、CLI 固有差分は `.ai/kernel/environments/copilot-cli.md` を参照する
 - VS Code Copilot は `.github/copilot-instructions.md` を優先
 - Codex は `AGENTS.md` を優先
 - Cursor は `.cursor/rules/`（`deploy.ps1` 生成）を優先

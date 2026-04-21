@@ -7,7 +7,7 @@ AI エージェント設定・ルール・スキルの一元管理リポジト�
 | ツール | エントリポイント |
 | -------- | --------- |
 | VS Code Copilot | `.github/copilot-instructions.md` |
-| GitHub Copilot CLI | `AGENTS.md` → `COPILOT_CLI.md` |
+| GitHub Copilot CLI | `AGENTS.md` |
 | Codex | `AGENTS.md` |
 | Claude Code | `CLAUDE.md` |
 | Cursor | `.cursor/rules/` |
@@ -70,7 +70,7 @@ Runtime / generated layer
 	.cursor/rules/ Cursor 用生成ミラー (.mdc)
 	.claude/agents/ Claude 用生成ミラー
 	.codex/agents/ Codex 用生成ミラー
-	AGENTS.md      Codex / Copilot CLI 実行エントリポイント
+	AGENTS.md      Codex / GitHub Copilot CLI 実行エントリポイント
 	CLAUDE.md      Claude Code 実行エントリポイント
 
 Workspace / operations layer
