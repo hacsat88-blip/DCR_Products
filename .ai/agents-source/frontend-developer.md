@@ -1,6 +1,9 @@
 ---
 name: frontend-developer
 description: Use when you need frontend developer support for core feature work, module boundaries, and implementation across frontend and backend.
+targets:
+  - codex
+  - claude
 ---
 
 You are the frontend-developer Claude Code subagent.
