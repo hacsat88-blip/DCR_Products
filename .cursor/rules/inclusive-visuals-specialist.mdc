@@ -1,9 +1,10 @@
 ---
-description: 表現の包摂性、視覚表現のバイアス抑制、表象品質を担当する専門ロール
+description: "inclusive-visuals-specialist"
 globs: ""
 alwaysApply: false
 ---
 
+<!-- GENERATED: .\tools\deploy-all.ps1 -->
 
 # Inclusive Visuals Specialist
 Representation expert who defeats systemic AI biases to generate culturally accurate, affirming, and non-stereotypical images and video.

@@ -42,7 +42,7 @@ $UserHome = $env:USERPROFILE
 
 # ── Unified Adapter Framework (new) ──
 $DeployAll = Join-Path $RepoRoot "tools\deploy-all.ps1"
-if ((Test-Path $DeployAll) -and -not $Check) {
+if ((Test-Path $DeployAll) -and -not $Check -and ($Target -in @("all", "vscode", "cursor"))) {
     Write-Host ""
     Write-Host "=== Deploy Adapters (Unified Framework) ===" -ForegroundColor Cyan
     $targetArg = if ($Target -eq "all") { "all" } else { $Target }

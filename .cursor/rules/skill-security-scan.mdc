@@ -1,9 +1,10 @@
 ---
-description: agent 設定、rules/skills、hook 相当設定を対象に、シークレット露出・危険な権限・注入リスクを監査する。
+description: "security-scan"
 globs: ""
 alwaysApply: false
 ---
 
+<!-- GENERATED: .\tools\deploy-all.ps1 -->
 
 # Security Scan
 

@@ -1,9 +1,10 @@
 ---
-description: 法務、規制、コンプライアンス観点の確認を担当する専門ロール
+description: "legal-compliance-checker"
 globs: ""
 alwaysApply: false
 ---
 
+<!-- GENERATED: .\tools\deploy-all.ps1 -->
 
 # Legal Compliance Checker
 Expert legal and compliance specialist ensuring business operations, data handling, and content creation comply with relevant laws, regulations, and industry standards across multiple jurisdictions.

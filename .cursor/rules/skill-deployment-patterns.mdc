@@ -1,9 +1,10 @@
 ---
-description: CI/CD、ヘルスチェック、ロールバック、段階リリースの標準パターン。運用前提の安全なデプロイを定義する。
+description: "deployment-patterns"
 globs: ""
 alwaysApply: false
 ---
 
+<!-- GENERATED: .\tools\deploy-all.ps1 -->
 
 # Deployment Patterns
 

@@ -1,9 +1,10 @@
 ---
-description: Use when the user asks to create a poster, piece of art, visual design, or other static design piece using design philosophy. Outputs .png and .pdf files only. This skill creates original visual designs via a two-step process: design philosophy document + canvas expression.
+description: "canvas-design"
 globs: ""
 alwaysApply: false
 ---
 
+<!-- GENERATED: .\tools\deploy-all.ps1 -->
 
 These are instructions for creating design philosophies - aesthetic movements that are then EXPRESSED VISUALLY. Output only .md files, .pdf files, and .png files.
 

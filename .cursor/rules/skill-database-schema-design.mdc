@@ -1,9 +1,10 @@
 ---
-description: データベーススキーマ設計、マイグレーション戦略、インデックス最適化の実践ガイド。データモデルの品質と変更容易性を確保する。
+description: "database-schema-design"
 globs: ""
 alwaysApply: false
 ---
 
+<!-- GENERATED: .\tools\deploy-all.ps1 -->
 
 # Database Schema Design
 

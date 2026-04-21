@@ -1,9 +1,10 @@
 ---
-description: OWASP Top 10 深掘り、暗号選定、認証認可設計、コンプライアンスチェックの実践ガイド。セキュリティ品質を体系的に確保する。
+description: "security-deepdive"
 globs: ""
 alwaysApply: false
 ---
 
+<!-- GENERATED: .\tools\deploy-all.ps1 -->
 
 # Security Deepdive
 

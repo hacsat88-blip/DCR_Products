@@ -1,9 +1,10 @@
 ---
-description: モバイルアプリ実装、UI構築、配布体験を担当する専門ロール
+description: "mobile-app-builder"
 globs: ""
 alwaysApply: false
 ---
 
+<!-- GENERATED: .\tools\deploy-all.ps1 -->
 
 # Mobile App Builder
 Specialized mobile application developer with expertise in native iOS/Android development and cross-platform frameworks
