@@ -24,6 +24,11 @@ package:
   tags:
     - planning
     - workflow
+targets:
+  - vscode
+  - cursor
+  - claude
+  - codex
 ---
 
 # Writing Plans
@@ -39,6 +44,7 @@ Assume they are a skilled developer, but know almost nothing about our toolset o
 **Context:** This should be run in a dedicated worktree (created by brainstorming skill).
 
 **Save plans to:** `docs/dcr/plans/YYYY-MM-DD-<feature-name>.md`
+
 - (User preferences for plan location override this default)
 
 ## Scope Check
@@ -59,6 +65,7 @@ This structure informs the task decomposition. Each task should produce self-con
 ## Bite-Sized Task Granularity
 
 **Each step is one action (2-5 minutes):**
+
 - "Write the failing test" - step
 - "Run it to make sure it fails" - step
 - "Implement the minimal code to make the test pass" - step
@@ -89,6 +96,7 @@ This structure informs the task decomposition. Each task should produce self-con
 ### Task N: [Component Name]
 
 **Files:**
+
 - Create: `exact/path/to/file.py`
 - Modify: `exact/path/to/existing.py:123-145`
 - Test: `tests/exact/path/to/test.py`
@@ -127,6 +135,7 @@ git commit -m "feat: add specific feature"
 ````
 
 ## Remember
+
 - Exact file paths always
 - Complete code in plan (not "add validation")
 - Exact commands with expected output
@@ -143,6 +152,7 @@ After writing the complete plan:
 3. If ✅ Approved: proceed to execution handoff
 
 **Review loop guidance:**
+
 - Same agent that wrote the plan fixes it (preserves context)
 - If loop exceeds 3 iterations, surface to human for guidance
 - Reviewers are advisory — explain disagreements if you believe feedback is incorrect
@@ -156,11 +166,13 @@ After saving the plan:
 **Execution path depends on harness capabilities:**
 
 **If harness has subagents (Claude Code, etc.):**
+
 - **REQUIRED:** Use subagent-driven-development
 - Do NOT offer a choice - subagent-driven is the standard approach
 - Fresh subagent per task + two-stage review
 
 **If harness does NOT have subagents:**
+
 - Execute plan in current session using the Execution Process below
 - Batch execution with checkpoints for review
 
@@ -169,24 +181,31 @@ After saving the plan:
 When executing a plan without subagent support:
 
 ### Step 1: Load and Review Plan
+
 1. Read plan file
 2. Review critically — identify any questions or concerns
 3. If concerns: Raise them with your human partner before starting
 4. If no concerns: Create TodoWrite and proceed
 
 ### Step 2: Execute Tasks
+
 For each task:
+
 1. Mark as in_progress
 2. Follow each step exactly (plan has bite-sized steps)
 3. Run verifications as specified
 4. Mark as completed
 
 ### Step 3: Complete Development
+
 After all tasks complete and verified:
+
 - Use finishing-a-development-branch to verify tests, present options, execute choice
 
 ### When to Stop and Ask for Help
+
 **STOP executing immediately when:**
+
 - Hit a blocker (missing dependency, test fails, instruction unclear)
 - Plan has critical gaps preventing starting
 - You don't understand an instruction
@@ -195,6 +214,7 @@ After all tasks complete and verified:
 **Ask for clarification rather than guessing. Don't force through blockers.**
 
 ### Execution Safety Rules
+
 - Never start implementation on main/master branch without explicit user consent
 - Follow plan steps exactly — don't improvise
 - Don't skip verifications
@@ -205,6 +225,7 @@ After all tasks complete and verified:
 If working in a Git worktree (created by `using-git-worktrees` skill), `writing-plans` automatically initializes the Manus 3-file pattern:
 
 **Automatic Initialization:**
+
 - `task_plan.md` — Goal, Scope, Phases, Success Criteria, Blockers
 - `findings.md` — Decisions, Research, Error Patterns
 - `progress.md` — Checklist, Session Timeline, Verification Status
@@ -214,6 +235,7 @@ If working in a Git worktree (created by `using-git-worktrees` skill), `writing-
 **Control:** `.dcr/config.json` — Set `commit_session_files: true/false` per project
 
 **Workflow:**
+
 1. writing-plans creates worktree + initializes 3 files
 2. Dispatch to subagent-driven-development (or executing-plans)
 3. Agents read + update 3 files throughout session

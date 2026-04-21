@@ -1,9 +1,10 @@
 ---
-description: project/global スコープと confidence を持つ instinct 運用。学びを status/export/import/evolve/promote で管理し、再利用可能な skill/rule 候補へ昇格する。
+description: "continuous-learning-v2"
 globs: ""
 alwaysApply: false
 ---
 
+<!-- GENERATED: .\tools\deploy-all.ps1 -->
 
 # Continuous Learning v2 (Light)
 

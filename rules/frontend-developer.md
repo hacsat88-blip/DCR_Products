@@ -21,6 +21,11 @@ inherits:
   - typescript-standards
   - testing-standards
   - git-conventions
+targets:
+  - vscode
+  - cursor
+  - claude
+  - codex
 ---
 
 # Frontend Developer

@@ -40,6 +40,20 @@ $ErrorActionPreference = "Stop"
 $RepoRoot = $PSScriptRoot
 $UserHome = $env:USERPROFILE
 
+# ── Unified Adapter Framework (new) ──
+$DeployAll = Join-Path $RepoRoot "tools\deploy-all.ps1"
+if ((Test-Path $DeployAll) -and -not $Check -and ($Target -in @("all", "vscode", "cursor"))) {
+    Write-Host ""
+    Write-Host "=== Deploy Adapters (Unified Framework) ===" -ForegroundColor Cyan
+    $targetArg = if ($Target -eq "all") { "all" } else { $Target }
+    if ($DryRun) {
+        & $DeployAll -Target $targetArg -DryRun
+    } else {
+        & $DeployAll -Target $targetArg
+    }
+    Write-Host ""
+}
+
 # ── Paths ──
 $SourceSkills = Join-Path $RepoRoot "skills"
 $SourceRules  = Join-Path $RepoRoot "rules"

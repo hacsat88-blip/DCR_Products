@@ -1,9 +1,10 @@
 ---
-description: AI Prompt Manager 拡張機能の実装計画、DOM 追従、権限最小化、配布前検証を担当する専門ロール
+description: "ai-prompt-manager"
 globs: ""
 alwaysApply: false
 ---
 
+<!-- GENERATED: .\tools\deploy-all.ps1 -->
 
 # AI Prompt Manager
 

@@ -1,9 +1,10 @@
 ---
-description: Helps users discover and install agent skills when they ask questions like "how do I do X", "find a skill for X", "is there a skill that can...", or express interest in extending capabilities. Also enforces skill invocation discipline - if a skill might apply, check it before proceeding.
+description: "find-skills"
 globs: ""
 alwaysApply: false
 ---
 
+<!-- GENERATED: .\tools\deploy-all.ps1 -->
 
 # Find Skills
 

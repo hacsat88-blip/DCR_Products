@@ -1,9 +1,10 @@
 ---
-description: タスクに最適なスキルを選定し、Transparency for delegation に則り報告するルーター。Layer 1でカバーできないとき、または「何を使えばいい？」と聞かれたときに自動発火する。
+description: "skill-router"
 globs: ""
 alwaysApply: false
 ---
 
+<!-- GENERATED: .\tools\deploy-all.ps1 -->
 
 # Skill Router
 

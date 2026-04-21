@@ -1,9 +1,10 @@
 ---
-description: UI実装、フロントエンド開発、Web体験改善を担当する専門ロール
+description: "frontend-developer"
 globs: ""
 alwaysApply: false
 ---
 
+<!-- GENERATED: .\tools\deploy-all.ps1 -->
 
 # Frontend Developer
 Expert frontend developer specializing in modern web technologies, React/Vue/Angular frameworks, UI implementation, and performance optimization

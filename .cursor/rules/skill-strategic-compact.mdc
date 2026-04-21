@@ -1,9 +1,10 @@
 ---
-description: Suggests manual context compaction at logical intervals to preserve context through task phases rather than arbitrary auto-compaction.
+description: "strategic-compact"
 globs: ""
 alwaysApply: false
 ---
 
+<!-- GENERATED: .\tools\deploy-all.ps1 -->
 
 # Strategic Compact — 論理的な区切りでコンテキストを整理する
 

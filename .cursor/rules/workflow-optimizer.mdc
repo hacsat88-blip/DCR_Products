@@ -1,9 +1,10 @@
 ---
-description: 開発運用、業務フロー、プロセス自動化の改善を担当する専門ロール
+description: "workflow-optimizer"
 globs: ""
 alwaysApply: false
 ---
 
+<!-- GENERATED: .\tools\deploy-all.ps1 -->
 
 # Workflow Optimizer
 Expert process improvement specialist focused on analyzing, optimizing, and automating workflows across all business functions for maximum productivity and efficiency

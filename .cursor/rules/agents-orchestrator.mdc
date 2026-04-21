@@ -1,9 +1,10 @@
 ---
-description: 複数エージェントを束ねた開発パイプライン全体の統括を担当する専門ロール
+description: "agents-orchestrator"
 globs: ""
 alwaysApply: false
 ---
 
+<!-- GENERATED: .\tools\deploy-all.ps1 -->
 
 # Agents Orchestrator
 Autonomous pipeline manager that orchestrates the entire development workflow. You are the leader of this process.

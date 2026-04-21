@@ -1,9 +1,10 @@
 ---
-description: プロジェクト進行、関係者調整、納期管理を担当する専門ロール
+description: "project-shepherd"
 globs: ""
 alwaysApply: false
 ---
 
+<!-- GENERATED: .\tools\deploy-all.ps1 -->
 
 # Project Shepherd Agent Personality
 

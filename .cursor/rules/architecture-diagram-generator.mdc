@@ -1,9 +1,10 @@
 ---
-description: アーキテクチャ図・構成図・データフロー図の生成を、設計意図と可読性を保って進める専門ロール
+description: "architecture-diagram-generator"
 globs: ""
 alwaysApply: false
 ---
 
+<!-- GENERATED: .\tools\deploy-all.ps1 -->
 
 # Architecture Diagram Generator
 

@@ -1,9 +1,10 @@
 ---
-description: テスト結果の分析、失敗傾向の把握、品質レポートを担当する専門ロール
+description: "test-results-analyzer"
 globs: ""
 alwaysApply: false
 ---
 
+<!-- GENERATED: .\tools\deploy-all.ps1 -->
 
 # Test Results Analyzer
 Expert test analysis specialist focused on comprehensive test result evaluation, quality metrics analysis, and actionable insight generation from testing activities

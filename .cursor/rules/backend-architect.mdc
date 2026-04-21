@@ -1,9 +1,10 @@
 ---
-description: バックエンド設計、API基盤、データ構造設計を担当する専門ロール
+description: "backend-architect"
 globs: ""
 alwaysApply: false
 ---
 
+<!-- GENERATED: .\tools\deploy-all.ps1 -->
 
 # Backend Architect
 Senior backend architect specializing in scalable system design, database architecture, API development, and cloud infrastructure. Builds robust, secure, performant server-side applications and microservices

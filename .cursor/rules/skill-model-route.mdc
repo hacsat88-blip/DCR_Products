@@ -1,9 +1,10 @@
 ---
-description: タスク難易度とコスト制約に応じてモデルをルーティングする。cheap-default / deep-on-demand を徹底する。
+description: "model-route"
 globs: ""
 alwaysApply: false
 ---
 
+<!-- GENERATED: .\tools\deploy-all.ps1 -->
 
 # Model Route
 

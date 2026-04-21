@@ -1,9 +1,10 @@
 ---
-description: Use when executing implementation plans with independent tasks in the current session, or dispatching parallel agents for concurrent problem-solving
+description: "subagent-driven-development"
 globs: ""
 alwaysApply: false
 ---
 
+<!-- GENERATED: .\tools\deploy-all.ps1 -->
 
 # Subagent-Driven Development
 

@@ -1,9 +1,10 @@
 ---
-description: Use when encountering any bug, test failure, or unexpected behavior, before proposing fixes
+description: "systematic-debugging"
 globs: ""
 alwaysApply: false
 ---
 
+<!-- GENERATED: .\tools\deploy-all.ps1 -->
 
 # Systematic Debugging
 

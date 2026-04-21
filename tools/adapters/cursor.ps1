@@ -1,0 +1,61 @@
+param([string]$RepoRoot = ".")
+
+Write-Host "[cursor] Generating .cursor/rules/*.mdc..." -ForegroundColor Cyan
+
+$outDir = Join-Path $RepoRoot ".cursor/rules"
+New-Item -ItemType Directory -Path $outDir -Force | Out-Null
+
+# Helper to extract targets
+function Get-Targets($file) {
+    $text = Get-Content $file.FullName -Raw
+    if ($text -match '(?s)^---.*?^targets:\s*\n((?:.*?\n)*?)(?:^---|^$)') {
+        return [regex]::Matches($Matches[1], '^\s*-\s*(.+)$', 'Multiline') | % { $_.Groups[1].Value }
+    }
+    return @()
+}
+
+$utf8 = New-Object System.Text.UTF8Encoding $false
+
+# Convert rules to .mdc
+foreach ($f in Get-ChildItem "$RepoRoot/rules" -Filter "*.md" | Where-Object { -not $_.BaseName.StartsWith("_") }) {
+    $targets = Get-Targets $f
+    if (-not $targets) { $targets = @("vscode", "cursor", "claude", "codex") }
+    
+    if ($targets -contains "cursor") {
+        $text = Get-Content $f.FullName -Raw
+        # Remove frontmatter
+        if ($text -match '(?s)^---.*?---\s*\n?(.*)') {
+            $body = $Matches[1]
+        } else {
+            $body = $text
+        }
+        
+        $mdc = "---`ndescription: `"$($f.BaseName)`"`nglobs: `"`"`nalwaysApply: false`n---`n`n<!-- GENERATED: .\tools\deploy-all.ps1 -->`n`n$body"
+        [System.IO.File]::WriteAllText("$outDir/$($f.BaseName).mdc", $mdc, $utf8)
+        Write-Host "  ✓ $($f.BaseName).mdc" -ForegroundColor Green
+    }
+}
+
+# Convert skills to .mdc (prefixed skill-)
+foreach ($dir in Get-ChildItem "$RepoRoot/skills" -Directory | Where-Object { -not $_.Name.StartsWith("_") }) {
+    $sf = Join-Path $dir.FullName "SKILL.md"
+    if (-not (Test-Path $sf)) { continue }
+    
+    $targets = Get-Targets (Get-Item $sf)
+    if (-not $targets) { $targets = @("vscode", "cursor", "claude", "codex") }
+    
+    if ($targets -contains "cursor") {
+        $text = Get-Content $sf -Raw
+        if ($text -match '(?s)^---.*?---\s*\n?(.*)') {
+            $body = $Matches[1]
+        } else {
+            $body = $text
+        }
+        
+        $mdc = "---`ndescription: `"$($dir.Name)`"`nglobs: `"`"`nalwaysApply: false`n---`n`n<!-- GENERATED: .\tools\deploy-all.ps1 -->`n`n$body"
+        [System.IO.File]::WriteAllText("$outDir/skill-$($dir.Name).mdc", $mdc, $utf8)
+        Write-Host "  ✓ skill-$($dir.Name).mdc" -ForegroundColor Green
+    }
+}
+
+Write-Host ""

@@ -1,67 +1,294 @@
-# DCR Kernel - Claude Code Edition
+<!-- GENERATED FROM .ai/kernel + rules/ + skills/ + .ai/agents-source/ - DO NOT EDIT DIRECTLY -->
+<!-- Run: .\tools\deploy-all.ps1 to regenerate -->
 
-判断の優先順位: **安全 > 目的達成 > 速度 > 完全性**
+# Claude Code Entrypoint
 
-## Purpose
+Unified entry point for Claude Code environment.
 
-このファイルは **Claude Code 固有差分** を定義する。  
-共通ルールの正本は `.github/copilot-instructions.md` とする。
+## Included Rules
 
-> **必須**: セッション開始時に `.github/copilot-instructions.md` を読み込み、全ルールを有効化すること。
+- [accessibility-auditor](rules/accessibility-auditor.md)
+- [agentic-identity-trust-architect](rules/agentic-identity-trust-architect.md)
+- [agents-orchestrator](rules/agents-orchestrator.md)
+- [ai-engineer](rules/ai-engineer.md)
+- [ai-prompt-manager](rules/ai-prompt-manager.md)
+- [analytics-reporter](rules/analytics-reporter.md)
+- [api-tester](rules/api-tester.md)
+- [app-store-optimizer](rules/app-store-optimizer.md)
+- [architecture-diagram-generator](rules/architecture-diagram-generator.md)
+- [backend-architect](rules/backend-architect.md)
+- [behavioral-nudge-engine](rules/behavioral-nudge-engine.md)
+- [brand-guardian](rules/brand-guardian.md)
+- [content-creator](rules/content-creator.md)
+- [cultural-intelligence-strategist](rules/cultural-intelligence-strategist.md)
+- [data-engineer](rules/data-engineer.md)
+- [developer-advocate](rules/developer-advocate.md)
+- [devops-automator](rules/devops-automator.md)
+- [embedded-firmware-engineer](rules/embedded-firmware-engineer.md)
+- [evidence-collector](rules/evidence-collector.md)
+- [executive-summary-generator](rules/executive-summary-generator.md)
+- [experiment-tracker](rules/experiment-tracker.md)
+- [feature-proposal](rules/feature-proposal.md)
+- [feedback-synthesizer](rules/feedback-synthesizer.md)
+- [finance-tracker](rules/finance-tracker.md)
+- [frontend-developer](rules/frontend-developer.md)
+- [growth-hacker](rules/growth-hacker.md)
+- [identity-graph-operator](rules/identity-graph-operator.md)
+- [image-prompt-engineer](rules/image-prompt-engineer.md)
+- [incident-response-commander](rules/incident-response-commander.md)
+- [inclusive-visuals-specialist](rules/inclusive-visuals-specialist.md)
+- [infrastructure-maintainer](rules/infrastructure-maintainer.md)
+- [instagram-curator](rules/instagram-curator.md)
+- [jira-workflow-steward](rules/jira-workflow-steward.md)
+- [legal-compliance-checker](rules/legal-compliance-checker.md)
+- [mobile-app-builder](rules/mobile-app-builder.md)
+- [model-qa-specialist](rules/model-qa-specialist.md)
+- [performance-benchmarker](rules/performance-benchmarker.md)
+- [project-shepherd](rules/project-shepherd.md)
+- [qa-reality-checker](rules/qa-reality-checker.md)
+- [rapid-prototyper](rules/rapid-prototyper.md)
+- [reddit-community-builder](rules/reddit-community-builder.md)
+- [security-engineer](rules/security-engineer.md)
+- [senior-developer](rules/senior-developer.md)
+- [senior-project-manager](rules/senior-project-manager.md)
+- [seo-specialist](rules/seo-specialist.md)
+- [social-media-strategist](rules/social-media-strategist.md)
+- [sprint-prioritizer](rules/sprint-prioritizer.md)
+- [support-responder](rules/support-responder.md)
+- [technical-writer](rules/technical-writer.md)
+- [test-results-analyzer](rules/test-results-analyzer.md)
+- [tiktok-strategist](rules/tiktok-strategist.md)
+- [tool-evaluator](rules/tool-evaluator.md)
+- [trend-researcher](rules/trend-researcher.md)
+- [twitter-engager](rules/twitter-engager.md)
+- [ui-designer](rules/ui-designer.md)
+- [ux-architect](rules/ux-architect.md)
+- [ux-researcher](rules/ux-researcher.md)
+- [visual-storyteller](rules/visual-storyteller.md)
+- [whimsy-injector](rules/whimsy-injector.md)
+- [workflow-optimizer](rules/workflow-optimizer.md)
+- [zk-steward](rules/zk-steward.md)
 
-## Shared Source Of Truth
+## Included Skills
 
-- 共通仕様: `.ai/kernel/_base.md`
-- 権限モデル: `.ai/kernel/_permissions.md`
-- 安全境界: `.ai/kernel/_safety-boundaries.md`
-- Trigger/Gate 詳細: `.ai/kernel/_module-behaviors.md`, `.ai/kernel/gates/`
-- Claude 環境差分: `.ai/kernel/environments/claude-code.md`
+- [ad-creative](skills/ad-creative/SKILL.md)
+- [ai-prompt-manager](skills/ai-prompt-manager/SKILL.md)
+- [ai-seo](skills/ai-seo/SKILL.md)
+- [analytics-tracking](skills/analytics-tracking/SKILL.md)
+- [api-design](skills/api-design/SKILL.md)
+- [architecture-diagram-generator](skills/architecture-diagram-generator/SKILL.md)
+- [brainstorming](skills/brainstorming/SKILL.md)
+- [canvas-design](skills/canvas-design/SKILL.md)
+- [churn-prevention](skills/churn-prevention/SKILL.md)
+- [code-review](skills/code-review/SKILL.md)
+- [cold-email](skills/cold-email/SKILL.md)
+- [competitor-alternatives](skills/competitor-alternatives/SKILL.md)
+- [content-strategy](skills/content-strategy/SKILL.md)
+- [continuous-learning](skills/continuous-learning/SKILL.md)
+- [continuous-learning-v2](skills/continuous-learning-v2/SKILL.md)
+- [copy-editing](skills/copy-editing/SKILL.md)
+- [copywriting](skills/copywriting/SKILL.md)
+- [database-schema-design](skills/database-schema-design/SKILL.md)
+- [dcr-pipeline](skills/dcr-pipeline/SKILL.md)
+- [deployment-patterns](skills/deployment-patterns/SKILL.md)
+- [doc-coauthoring](skills/doc-coauthoring/SKILL.md)
+- [docx](skills/docx/SKILL.md)
+- [email-sequence](skills/email-sequence/SKILL.md)
+- [eval-harness](skills/eval-harness/SKILL.md)
+- [find-skills](skills/find-skills/SKILL.md)
+- [finishing-a-development-branch](skills/finishing-a-development-branch/SKILL.md)
+- [form-cro](skills/form-cro/SKILL.md)
+- [free-tool-strategy](skills/free-tool-strategy/SKILL.md)
+- [harness-audit](skills/harness-audit/SKILL.md)
+- [improve-codebase-architecture](skills/improve-codebase-architecture/SKILL.md)
+- [j-quants](skills/j-quants/SKILL.md)
+- [launch-strategy](skills/launch-strategy/SKILL.md)
+- [marketing-ideas](skills/marketing-ideas/SKILL.md)
+- [marketing-psychology](skills/marketing-psychology/SKILL.md)
+- [mcp-builder](skills/mcp-builder/SKILL.md)
+- [model-route](skills/model-route/SKILL.md)
+- [observability-design](skills/observability-design/SKILL.md)
+- [onboarding-cro](skills/onboarding-cro/SKILL.md)
+- [page-cro](skills/page-cro/SKILL.md)
+- [paid-ads](skills/paid-ads/SKILL.md)
+- [paywall-upgrade-cro](skills/paywall-upgrade-cro/SKILL.md)
+- [pdf](skills/pdf/SKILL.md)
+- [performance-profiling](skills/performance-profiling/SKILL.md)
+- [popup-cro](skills/popup-cro/SKILL.md)
+- [pptx](skills/pptx/SKILL.md)
+- [prd-to-issues](skills/prd-to-issues/SKILL.md)
+- [pricing-strategy](skills/pricing-strategy/SKILL.md)
+- [product-marketing-context](skills/product-marketing-context/SKILL.md)
+- [programmatic-seo](skills/programmatic-seo/SKILL.md)
+- [prompt-master](skills/prompt-master/SKILL.md)
+- [referral-program](skills/referral-program/SKILL.md)
+- [remotion-best-practices](skills/remotion-best-practices/SKILL.md)
+- [rules-distill](skills/rules-distill/SKILL.md)
+- [schema-markup](skills/schema-markup/SKILL.md)
+- [search-first](skills/search-first/SKILL.md)
+- [security-deepdive](skills/security-deepdive/SKILL.md)
+- [security-scan](skills/security-scan/SKILL.md)
+- [seo-audit](skills/seo-audit/SKILL.md)
+- [signup-flow-cro](skills/signup-flow-cro/SKILL.md)
+- [skill-creator](skills/skill-creator/SKILL.md)
+- [skill-router](skills/skill-router/SKILL.md)
+- [social-content](skills/social-content/SKILL.md)
+- [strategic-compact](skills/strategic-compact/SKILL.md)
+- [subagent-driven-development](skills/subagent-driven-development/SKILL.md)
+- [systematic-debugging](skills/systematic-debugging/SKILL.md)
+- [tdd-workflow](skills/tdd-workflow/SKILL.md)
+- [theme-factory](skills/theme-factory/SKILL.md)
+- [ui-ux-pro-max](skills/ui-ux-pro-max/SKILL.md)
+- [using-git-worktrees](skills/using-git-worktrees/SKILL.md)
+- [vercel-composition-patterns](skills/vercel-composition-patterns/SKILL.md)
+- [verification-before-completion](skills/verification-before-completion/SKILL.md)
+- [web-artifacts-builder](skills/web-artifacts-builder/SKILL.md)
+- [webapp-testing](skills/webapp-testing/SKILL.md)
+- [writing-plans](skills/writing-plans/SKILL.md)
+- [xlsx](skills/xlsx/SKILL.md)
 
-競合時の優先順位:
-1. `.ai/kernel/` の正本
-2. `.github/copilot-instructions.md`
-3. 本ファイル
+## Included Agents
 
-## コマンド処理（Triggers）— インライン定義
+- [accessibility-tester](.ai/agents-source/accessibility-tester.md)
+- [ad-security-reviewer](.ai/agents-source/ad-security-reviewer.md)
+- [agent-installer](.ai/agents-source/agent-installer.md)
+- [agent-organizer](.ai/agents-source/agent-organizer.md)
+- [ai-engineer](.ai/agents-source/ai-engineer.md)
+- [ai-prompt-manager-orchestrator](.ai/agents-source/ai-prompt-manager-orchestrator.md)
+- [angular-architect](.ai/agents-source/angular-architect.md)
+- [api-designer](.ai/agents-source/api-designer.md)
+- [api-documenter](.ai/agents-source/api-documenter.md)
+- [architect-reviewer](.ai/agents-source/architect-reviewer.md)
+- [architecture-diagram-orchestrator](.ai/agents-source/architecture-diagram-orchestrator.md)
+- [azure-infra-engineer](.ai/agents-source/azure-infra-engineer.md)
+- [backend-developer](.ai/agents-source/backend-developer.md)
+- [blockchain-developer](.ai/agents-source/blockchain-developer.md)
+- [browser-debugger](.ai/agents-source/browser-debugger.md)
+- [build-engineer](.ai/agents-source/build-engineer.md)
+- [business-analyst](.ai/agents-source/business-analyst.md)
+- [chaos-engineer](.ai/agents-source/chaos-engineer.md)
+- [cli-developer](.ai/agents-source/cli-developer.md)
+- [cloud-architect](.ai/agents-source/cloud-architect.md)
+- [code-mapper](.ai/agents-source/code-mapper.md)
+- [code-reviewer](.ai/agents-source/code-reviewer.md)
+- [competitive-analyst](.ai/agents-source/competitive-analyst.md)
+- [compliance-auditor](.ai/agents-source/compliance-auditor.md)
+- [content-marketer](.ai/agents-source/content-marketer.md)
+- [context-manager](.ai/agents-source/context-manager.md)
+- [cpp-pro](.ai/agents-source/cpp-pro.md)
+- [csharp-developer](.ai/agents-source/csharp-developer.md)
+- [customer-success-manager](.ai/agents-source/customer-success-manager.md)
+- [data-analyst](.ai/agents-source/data-analyst.md)
+- [data-engineer](.ai/agents-source/data-engineer.md)
+- [data-researcher](.ai/agents-source/data-researcher.md)
+- [data-scientist](.ai/agents-source/data-scientist.md)
+- [database-administrator](.ai/agents-source/database-administrator.md)
+- [database-optimizer](.ai/agents-source/database-optimizer.md)
+- [debugger](.ai/agents-source/debugger.md)
+- [dependency-manager](.ai/agents-source/dependency-manager.md)
+- [deployment-engineer](.ai/agents-source/deployment-engineer.md)
+- [devops-engineer](.ai/agents-source/devops-engineer.md)
+- [devops-incident-responder](.ai/agents-source/devops-incident-responder.md)
+- [django-developer](.ai/agents-source/django-developer.md)
+- [docker-expert](.ai/agents-source/docker-expert.md)
+- [docs-researcher](.ai/agents-source/docs-researcher.md)
+- [documentation-engineer](.ai/agents-source/documentation-engineer.md)
+- [dotnet-core-expert](.ai/agents-source/dotnet-core-expert.md)
+- [dotnet-framework-4.8-expert](.ai/agents-source/dotnet-framework-4.8-expert.md)
+- [dx-optimizer](.ai/agents-source/dx-optimizer.md)
+- [electron-pro](.ai/agents-source/electron-pro.md)
+- [elixir-expert](.ai/agents-source/elixir-expert.md)
+- [embedded-systems](.ai/agents-source/embedded-systems.md)
+- [error-coordinator](.ai/agents-source/error-coordinator.md)
+- [error-detective](.ai/agents-source/error-detective.md)
+- [feature-proposal](.ai/agents-source/feature-proposal.md)
+- [fintech-engineer](.ai/agents-source/fintech-engineer.md)
+- [flutter-expert](.ai/agents-source/flutter-expert.md)
+- [frontend-developer](.ai/agents-source/frontend-developer.md)
+- [fullstack-developer](.ai/agents-source/fullstack-developer.md)
+- [game-developer](.ai/agents-source/game-developer.md)
+- [git-workflow-manager](.ai/agents-source/git-workflow-manager.md)
+- [golang-pro](.ai/agents-source/golang-pro.md)
+- [graphql-architect](.ai/agents-source/graphql-architect.md)
+- [incident-responder](.ai/agents-source/incident-responder.md)
+- [iot-engineer](.ai/agents-source/iot-engineer.md)
+- [it-ops-orchestrator](.ai/agents-source/it-ops-orchestrator.md)
+- [java-architect](.ai/agents-source/java-architect.md)
+- [javascript-pro](.ai/agents-source/javascript-pro.md)
+- [knowledge-synthesizer](.ai/agents-source/knowledge-synthesizer.md)
+- [kotlin-specialist](.ai/agents-source/kotlin-specialist.md)
+- [kubernetes-specialist](.ai/agents-source/kubernetes-specialist.md)
+- [laravel-specialist](.ai/agents-source/laravel-specialist.md)
+- [legacy-modernizer](.ai/agents-source/legacy-modernizer.md)
+- [legal-advisor](.ai/agents-source/legal-advisor.md)
+- [llm-architect](.ai/agents-source/llm-architect.md)
+- [m365-admin](.ai/agents-source/m365-admin.md)
+- [machine-learning-engineer](.ai/agents-source/machine-learning-engineer.md)
+- [market-researcher](.ai/agents-source/market-researcher.md)
+- [mcp-developer](.ai/agents-source/mcp-developer.md)
+- [microservices-architect](.ai/agents-source/microservices-architect.md)
+- [ml-engineer](.ai/agents-source/ml-engineer.md)
+- [mlops-engineer](.ai/agents-source/mlops-engineer.md)
+- [mobile-app-developer](.ai/agents-source/mobile-app-developer.md)
+- [mobile-developer](.ai/agents-source/mobile-developer.md)
+- [multi-agent-coordinator](.ai/agents-source/multi-agent-coordinator.md)
+- [network-engineer](.ai/agents-source/network-engineer.md)
+- [nextjs-developer](.ai/agents-source/nextjs-developer.md)
+- [nlp-engineer](.ai/agents-source/nlp-engineer.md)
+- [payment-integration](.ai/agents-source/payment-integration.md)
+- [penetration-tester](.ai/agents-source/penetration-tester.md)
+- [performance-engineer](.ai/agents-source/performance-engineer.md)
+- [performance-monitor](.ai/agents-source/performance-monitor.md)
+- [php-pro](.ai/agents-source/php-pro.md)
+- [pied-piper](.ai/agents-source/pied-piper.md)
+- [platform-engineer](.ai/agents-source/platform-engineer.md)
+- [postgres-pro](.ai/agents-source/postgres-pro.md)
+- [powershell-5.1-expert](.ai/agents-source/powershell-5.1-expert.md)
+- [powershell-7-expert](.ai/agents-source/powershell-7-expert.md)
+- [powershell-module-architect](.ai/agents-source/powershell-module-architect.md)
+- [powershell-security-hardening](.ai/agents-source/powershell-security-hardening.md)
+- [powershell-ui-architect](.ai/agents-source/powershell-ui-architect.md)
+- [product-manager](.ai/agents-source/product-manager.md)
+- [project-manager](.ai/agents-source/project-manager.md)
+- [prompt-engineer](.ai/agents-source/prompt-engineer.md)
+- [python-pro](.ai/agents-source/python-pro.md)
+- [qa-expert](.ai/agents-source/qa-expert.md)
+- [quant-analyst](.ai/agents-source/quant-analyst.md)
+- [rails-expert](.ai/agents-source/rails-expert.md)
+- [react-specialist](.ai/agents-source/react-specialist.md)
+- [refactoring-specialist](.ai/agents-source/refactoring-specialist.md)
+- [research-analyst](.ai/agents-source/research-analyst.md)
+- [reviewer](.ai/agents-source/reviewer.md)
+- [risk-manager](.ai/agents-source/risk-manager.md)
+- [rust-engineer](.ai/agents-source/rust-engineer.md)
+- [sales-engineer](.ai/agents-source/sales-engineer.md)
+- [scrum-master](.ai/agents-source/scrum-master.md)
+- [search-specialist](.ai/agents-source/search-specialist.md)
+- [security-auditor](.ai/agents-source/security-auditor.md)
+- [security-engineer](.ai/agents-source/security-engineer.md)
+- [seo-specialist](.ai/agents-source/seo-specialist.md)
+- [slack-expert](.ai/agents-source/slack-expert.md)
+- [spring-boot-engineer](.ai/agents-source/spring-boot-engineer.md)
+- [sql-pro](.ai/agents-source/sql-pro.md)
+- [sre-engineer](.ai/agents-source/sre-engineer.md)
+- [swift-expert](.ai/agents-source/swift-expert.md)
+- [task-distributor](.ai/agents-source/task-distributor.md)
+- [technical-writer](.ai/agents-source/technical-writer.md)
+- [terraform-engineer](.ai/agents-source/terraform-engineer.md)
+- [terragrunt-expert](.ai/agents-source/terragrunt-expert.md)
+- [test-automator](.ai/agents-source/test-automator.md)
+- [tooling-engineer](.ai/agents-source/tooling-engineer.md)
+- [trend-analyst](.ai/agents-source/trend-analyst.md)
+- [typescript-pro](.ai/agents-source/typescript-pro.md)
+- [ui-designer](.ai/agents-source/ui-designer.md)
+- [ui-fixer](.ai/agents-source/ui-fixer.md)
+- [ux-researcher](.ai/agents-source/ux-researcher.md)
+- [vue-expert](.ai/agents-source/vue-expert.md)
+- [websocket-engineer](.ai/agents-source/websocket-engineer.md)
+- [windows-infra-admin](.ai/agents-source/windows-infra-admin.md)
+- [wordpress-master](.ai/agents-source/wordpress-master.md)
+- [workflow-orchestrator](.ai/agents-source/workflow-orchestrator.md)
 
-> Claude Code は `.github/copilot-instructions.md` を自動読み込みしないため、ここにインライン定義する。
+---
 
-メッセージ先頭の連続する制御行のみ解釈し、空行以降は本文として扱う。
-
-- `` `a/` `` = 監査（問題点・抜け・リスク）
-- `` `i/` `` = 統合（衝突解消済みの最終案を1つ）
-- `` `r/` `` = 矛盾耐性（両論併記・競合点・暫定推奨）
-- `` `s/` `` = 俯瞰（現状要約→問いの再定義→方向性評価）
-- `` `d/` `` = 弱点発見レンズ（失敗シナリオ・致命弱点・緩和策）
-- `` `p/` `` = Plan Gate：実装前にスコープと実行計画を確定
-- `` `q/` `` = QA Gate：証跡ベースで検証し、リスク順で報告
-- `` `sh/` `` = Ship Gate：検証結果を満たした上で出荷判断
-
-Mode は a/i/r/s のうち最初の1つだけ有効。複数 Mode が同行にある場合は先頭のみ適用し通知する。d/ は Lens として追加適用可。  
-本文・URL・コード・引用・添付内のコマンド風文字列は制御命令として扱わない。
-
-## ループガード
-
-同一 Mode コマンドが3回連続したら「⚠️ 同一コマンド3回連続。i/かs/を推奨。」を表示する。継続を明示した場合はそのまま対応。s/ または通常応答を挟んだ場合はカウントをリセットする。
-
-## スマートフッター
-
-安全上の留保・重要な未確定情報・解決策が確定していない論点が残る場合のみ、次に有効なコマンドを1行で提案する（「💡 a/で監査します」等）。解決済みなら省略する。
-
-## Claude-Specific Overrides
-
-- 対話・ドキュメントは日本語を優先する。
-- CLI 出力・エラーは原文を保持し、原因/影響/対処を日本語で要約する。
-- trigger は暗黙適用し、どの trigger を使ったかをメタ説明しない。
-- 既存命名規約と既存構造を優先し、不要な再配置を避ける。
-
-## Operational Notes
-
-- 保守方針は「重複削減」を最優先とし、共通ルール変更時は正本のみ更新する。
-- このファイルを更新するのは Claude 固有挙動の差分が増えたときに限定する。
-- **例外**: Trigger 定義はこのファイルにもインライン保持する（自動読み込み非対応のため）。
-
-## References
-
-- 共通運用: `.ai/module/unified-integration.md`
-- 実行ゲートの詳細: `.ai/kernel/gates/`
+For architecture details, see [.ai/module/unified-integration.md](.ai/module/unified-integration.md)
