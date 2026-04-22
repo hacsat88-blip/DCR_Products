@@ -1,10 +1,9 @@
 ---
-description: "product-marketing-context"
+description: When the user wants to create or update their product marketing context document. Also use when the user mentions 'product context,' 'marketing context,' 'set up context,' 'positioning,' or wants to avoid repeating foundational information across marketing tasks. Creates `.claude/product-marketing-context.md` that other marketing skills reference.
 globs: ""
 alwaysApply: false
 ---
 
-<!-- GENERATED: .\tools\deploy-all.ps1 -->
 
 # Product Marketing Context
 
@@ -25,7 +24,7 @@ First, check if `.claude/product-marketing-context.md` already exists.
 
 **If it doesn't exist, offer two options:**
 
-1. **Auto-draft from codebase** (recommended): You'll study the repo窶燃EADME, landing pages, marketing copy, package.json, etc.窶蚤nd draft a V1 of the context document. The user then reviews, corrects, and fills gaps. This is faster than starting from scratch.
+1. **Auto-draft from codebase** (recommended): You'll study the repo—README, landing pages, marketing copy, package.json, etc.—and draft a V1 of the context document. The user then reviews, corrects, and fills gaps. This is faster than starting from scratch.
 
 2. **Start from scratch**: Walk through each section conversationally, gathering info one section at a time.
 
@@ -57,7 +56,7 @@ For each section:
 ### 1. Product Overview
 - One-line description
 - What it does (2-3 sentences)
-- Product category (what "shelf" you sit on窶派ow customers search for you)
+- Product category (what "shelf" you sit on—how customers search for you)
 - Product type (SaaS, marketplace, e-commerce, service, etc.)
 - Business model and pricing
 
@@ -165,9 +164,9 @@ After gathering information, create `.claude/product-marketing-context.md` with 
 **Emotional tension:**
 
 ## Competitive Landscape
-**Direct:** [Competitor] 窶・falls short because...
-**Secondary:** [Approach] 窶・falls short because...
-**Indirect:** [Alternative] 窶・falls short because...
+**Direct:** [Competitor] — falls short because...
+**Secondary:** [Approach] — falls short because...
+**Indirect:** [Alternative] — falls short because...
 
 ## Differentiation
 **Key differentiators:**
@@ -210,7 +209,7 @@ After gathering information, create `.claude/product-marketing-context.md` with 
 **Metrics:**
 **Customers:**
 **Testimonials:**
-> "[quote]" 窶・[who]
+> "[quote]" — [who]
 **Value themes:**
 | Theme | Proof |
 |-------|-------|

@@ -1,16 +1,15 @@
 ---
-description: "subagent-driven-development"
+description: Use when executing implementation plans with independent tasks in the current session, or dispatching parallel agents for concurrent problem-solving
 globs: ""
 alwaysApply: false
 ---
 
-<!-- GENERATED: .\tools\deploy-all.ps1 -->
 
 # Subagent-Driven Development
 
 Execute plan by dispatching fresh subagent per task, with two-stage review after each: spec compliance review first, then code quality review.
 
-**Why subagents:** You delegate tasks to specialized agents with isolated context. By precisely crafting their instructions and context, you ensure they stay focused and succeed at their task. They should never inherit your session's context or history 窶・you construct exactly what they need. This also preserves your own context for coordination work.
+**Why subagents:** You delegate tasks to specialized agents with isolated context. By precisely crafting their instructions and context, you ensure they stay focused and succeed at their task. They should never inherit your session's context or history — you construct exactly what they need. This also preserves your own context for coordination work.
 
 **Core principle:** Fresh subagent per task + two-stage review (spec then quality) = high quality, fast iteration
 
@@ -98,9 +97,9 @@ Use the least powerful model that can handle each role to conserve cost and incr
 **Architecture, design, and review tasks**: use the most capable available model.
 
 **Task complexity signals:**
-- Touches 1-2 files with a complete spec 竊・cheap model
-- Touches multiple files with integration concerns 竊・standard model
-- Requires design judgment or broad codebase understanding 竊・most capable model
+- Touches 1-2 files with a complete spec → cheap model
+- Touches multiple files with integration concerns → standard model
+- Requires design judgment or broad codebase understanding → most capable model
 
 ## Handling Implementer Status
 
@@ -152,7 +151,7 @@ Implementer: "Got it. Implementing now..."
   - Committed
 
 [Dispatch spec compliance reviewer]
-Spec reviewer: 笨・Spec compliant - all requirements met, nothing extra
+Spec reviewer: ✅ Spec compliant - all requirements met, nothing extra
 
 [Get git SHAs, dispatch code quality reviewer]
 Code reviewer: Strengths: Good test coverage, clean. Issues: None. Approved.
@@ -172,7 +171,7 @@ Implementer:
   - Committed
 
 [Dispatch spec compliance reviewer]
-Spec reviewer: 笶・Issues:
+Spec reviewer: ❌ Issues:
   - Missing: Progress reporting (spec says "report every 100 items")
   - Extra: Added --json flag (not requested)
 
@@ -180,7 +179,7 @@ Spec reviewer: 笶・Issues:
 Implementer: Removed --json flag, added progress reporting
 
 [Spec reviewer reviews again]
-Spec reviewer: 笨・Spec compliant now
+Spec reviewer: ✅ Spec compliant now
 
 [Dispatch code quality reviewer]
 Code reviewer: Strengths: Solid. Issues (Important): Magic number (100)
@@ -189,7 +188,7 @@ Code reviewer: Strengths: Solid. Issues (Important): Magic number (100)
 Implementer: Extracted PROGRESS_INTERVAL constant
 
 [Code reviewer reviews again]
-Code reviewer: 笨・Approved
+Code reviewer: ✅ Approved
 
 [Mark Task 2 complete]
 
@@ -222,7 +221,7 @@ When multiple independent problems exist simultaneously, dispatch agents in para
 
 **1. Identify Independent Domains**
 
-Group failures by what's broken 窶・each domain is independent:
+Group failures by what's broken — each domain is independent:
 ```
 Domain A: Tool approval flow (file-a.test.ts)
 Domain B: Batch completion (file-b.test.ts)
@@ -299,7 +298,7 @@ When all agents return:
 - Accept "close enough" on spec compliance (spec reviewer found issues = not done)
 - Skip review loops (reviewer found issues = implementer fixes = review again)
 - Let implementer self-review replace actual review (both are needed)
-- **Start code quality review before spec compliance is 笨・* (wrong order)
+- **Start code quality review before spec compliance is ✅** (wrong order)
 - Move to next task while either review has open issues
 
 **If subagent asks questions:**
@@ -312,14 +311,14 @@ When all agents return:
 - Reviewer reviews again
 - Repeat until approved
 
-## Transparency Report (DCR 貅匁侠)
+## Transparency Report (DCR 準拠)
 
-DCR 縺ｮ縲卦ransparency for delegation縲阪Ν繝ｼ繝ｫ縺ｫ蝓ｺ縺･縺阪√し繝悶お繝ｼ繧ｸ繧ｧ繝ｳ繝医・繝槭Ν繝√お繝ｼ繧ｸ繧ｧ繝ｳ繝育匱轣ｫ蜑阪↓莉･荳九・繝輔か繝ｼ繝槭ャ繝医〒蝣ｱ蜻翫☆繧九・
+DCR の「Transparency for delegation」ルールに基づき、サブエージェント・マルチエージェント発火前に以下のフォーマットで報告する。
 
-### 逋ｺ轣ｫ蜑榊ｱ蜻翫ユ繝ｳ繝励Ξ繝ｼ繝・
+### 発火前報告テンプレート
 
 ```
-搭 繧ｵ繝悶お繝ｼ繧ｸ繧ｧ繝ｳ繝亥ｮ溯｡瑚ｨ育判:
+📋 サブエージェント実行計画:
 | # | Agent | Role | Target |
 |---|-------|------|--------|
 | 1 | [agent-name] | Implementer | [task summary] |
@@ -327,42 +326,42 @@ DCR 縺ｮ縲卦ransparency for delegation縲阪Ν繝ｼ繝ｫ縺ｫ蝓ｺ縺･
 | 3 | [agent-name] | Quality Reviewer | Task 1 review |
 ```
 
-### 螳御ｺ・凾蝣ｱ蜻翫ユ繝ｳ繝励Ξ繝ｼ繝・
+### 完了時報告テンプレート
 
 ```
-笨・繧ｵ繝悶お繝ｼ繧ｸ繧ｧ繝ｳ繝亥ｮ溯｡檎ｵ先棡:
+✅ サブエージェント実行結果:
 | # | Agent | Status | Summary |
 |---|-------|--------|---------|
-| 1 | [agent-name] | DONE / DONE_WITH_CONCERNS / BLOCKED | [1陦瑚ｦ∫ｴЬ |
-| 2 | [agent-name] | 笨・Approved / 笶・Issues found | [1陦瑚ｦ∫ｴЬ |
+| 1 | [agent-name] | DONE / DONE_WITH_CONCERNS / BLOCKED | [1行要約] |
+| 2 | [agent-name] | ✅ Approved / ❌ Issues found | [1行要約] |
 ```
 
-### 蝣ｱ蜻翫Ν繝ｼ繝ｫ
+### 報告ルール
 
-- 蜊倅ｸ繧ｵ繝悶お繝ｼ繧ｸ繧ｧ繝ｳ繝医〒繧ら怐逡･縺励↑縺・
-- 荳ｦ蛻励ョ繧｣繧ｹ繝代ャ繝∵凾縺ｯ蜈ｨ繧ｨ繝ｼ繧ｸ繧ｧ繝ｳ繝医ｒ荳隕ｧ縺ｧ陦ｨ遉ｺ
-- BLOCKED/NEEDS_CONTEXT 縺ｮ蝣ｴ蜷医・逅・罰繧貞ｱ蜻翫↓蜷ｫ繧√ｋ
-- review loop 縺・蝗樔ｻ･荳顔匱逕溘＠縺溷ｴ蜷医・繝ｫ繝ｼ繝怜屓謨ｰ繧定ｨ倩ｼ・
+- 単一サブエージェントでも省略しない
+- 並列ディスパッチ時は全エージェントを一覧で表示
+- BLOCKED/NEEDS_CONTEXT の場合は理由を報告に含める
+- review loop が2回以上発生した場合はループ回数を記載
 
-## team: 繝代う繝励Λ繧､繝ｳ蜿ｯ隕門喧
+## team: パイプライン可視化
 
-`team:` execution mode 菴ｿ逕ｨ譎ゅ・縲√ヱ繧､繝励Λ繧､繝ｳ縺ｮ蜷・ヵ繧ｧ繝ｼ繧ｺ繧呈・遉ｺ縺吶ｋ縲・
+`team:` execution mode 使用時は、パイプラインの各フェーズを明示する。
 
-### 繝輔ぉ繝ｼ繧ｺ驕ｷ遘ｻ陦ｨ遉ｺ
+### フェーズ遷移表示
 
 ```
-売 team: pipeline status
-笏≫煤笏≫煤笏≫煤笏≫煤笏≫煤笏≫煤笏≫煤笏≫煤笏≫煤笏≫煤笏≫煤笏≫煤
-[笨・ plan    窶・繧ｹ繧ｳ繝ｼ繝礼｢ｺ螳壽ｸ医∩
-[売] prd     窶・隕∽ｻｶ隧ｳ邏ｰ蛹紋ｸｭ
-[筮咯 exec    窶・譛ｪ逹謇・
-[筮咯 verify  窶・譛ｪ逹謇・
-[筮咯 fix     窶・譛ｪ逹謇・
-笏≫煤笏≫煤笏≫煤笏≫煤笏≫煤笏≫煤笏≫煤笏≫煤笏≫煤笏≫煤笏≫煤笏≫煤
+🔄 team: pipeline status
+━━━━━━━━━━━━━━━━━━━━━━━━
+[✅] plan    — スコープ確定済み
+[🔄] prd     — 要件詳細化中
+[⬚] exec    — 未着手
+[⬚] verify  — 未着手
+[⬚] fix     — 未着手
+━━━━━━━━━━━━━━━━━━━━━━━━
 ```
 
-- 繝輔ぉ繝ｼ繧ｺ驕ｷ遘ｻ縺斐→縺ｫ繧ｹ繝・・繧ｿ繧ｹ繝舌・繧呈峩譁ｰ陦ｨ遉ｺ縺吶ｋ
-- 蜷・ヵ繧ｧ繝ｼ繧ｺ縺ｮ謇隕√さ繝ｳ繝・く繧ｹ繝域ｶ郁ｲｻ驥上′螟ｧ縺阪＞蝣ｴ蜷医・ strategic-compact 繧呈署譯医☆繧・
+- フェーズ遷移ごとにステータスバーを更新表示する
+- 各フェーズの所要コンテキスト消費量が大きい場合は strategic-compact を提案する
 - Don't skip the re-review
 
 **If subagent fails task:**

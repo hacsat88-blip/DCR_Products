@@ -1,10 +1,9 @@
 ---
-description: "signup-flow-cro"
+description: When the user wants to optimize signup, registration, account creation, or trial activation flows. Also use when the user mentions "signup conversions," "registration friction," "signup form optimization," "free trial signup," "reduce signup dropoff," or "account creation flow." For post-signup onboarding, see onboarding-cro. For lead capture forms (not account creation), see form-cro.
 globs: ""
 alwaysApply: false
 ---
 
-<!-- GENERATED: .\tools\deploy-all.ps1 -->
 
 # Signup Flow CRO
 
@@ -73,7 +72,7 @@ Every field reduces conversion. For each field, ask:
 ### Email Field
 - Single field (no email confirmation field)
 - Inline validation for format
-- Check for common typos (gmial.com 竊・gmail.com)
+- Check for common typos (gmial.com → gmail.com)
 - Clear error messages
 
 ### Password Field
@@ -201,8 +200,8 @@ Every field reduces conversion. For each field, ask:
 ## Measurement
 
 ### Key Metrics
-- Form start rate (landed 竊・started filling)
-- Form completion rate (started 竊・submitted)
+- Form start rate (landed → started filling)
+- Form completion rate (started → submitted)
 - Field-level drop-off (which fields lose people)
 - Time to complete
 - Error rate by field
@@ -244,17 +243,17 @@ Organized by:
 ### B2B SaaS Trial
 1. Email + Password (or Google auth)
 2. Name + Company (optional: role)
-3. 竊・Onboarding flow
+3. → Onboarding flow
 
 ### B2C App
 1. Google/Apple auth OR Email
-2. 竊・Product experience
+2. → Product experience
 3. Profile completion later
 
 ### Waitlist/Early Access
 1. Email only
 2. Optional: Role/use case question
-3. 竊・Waitlist confirmation
+3. → Waitlist confirmation
 
 ### E-commerce Account
 1. Guest checkout as default

@@ -1,84 +1,83 @@
 ---
-description: "eval-harness"
+description: DCR リポジトリの構造品質を validate.ps1 で機械的に検証する Eval Harness スキル。q/ ゲートで validate.ps1 を実行し、rules/skills の frontmatter・H1・body・deploy整合を確認する。Use during q/ QA gate, before ship gate, or to verify structural integrity of rules and skills.
 globs: ""
 alwaysApply: false
 ---
 
-<!-- GENERATED: .\tools\deploy-all.ps1 -->
 
-# Eval Harness 窶・讒矩蜩∬ｳｪ縺ｮ邯咏ｶ壽､懆ｨｼ
+# Eval Harness — 構造品質の継続検証
 
-## 逶ｮ逧・
+## 目的
 
-`validate.ps1` 繧・q/ 繧ｲ繝ｼ繝医・讓呎ｺ匁､懆ｨｼ繧ｹ繝・ャ繝励→縺励※邨・∩霎ｼ縺ｿ縲・
-rules/*.md 縺ｨ skills/*/SKILL.md 縺ｮ讒矩蜩∬ｳｪ繧呈ｩ滓｢ｰ逧・↓菫晁ｨｼ縺吶ｋ縲・
+`validate.ps1` を q/ ゲートの標準検証ステップとして組み込み、
+rules/*.md と skills/*/SKILL.md の構造品質を機械的に保証する。
 
-## 縺・▽菴ｿ縺・°
+## いつ使うか
 
-- q/ 繧ｲ繝ｼ繝医・螳溯｡梧凾・亥ｮ溯｣・ｮ御ｺ・ｾ後・蜩∬ｳｪ遒ｺ隱搾ｼ・
-- sh/ 繧ｲ繝ｼ繝亥燕縺ｮ譛邨ら｢ｺ隱・
-- rules 縺ｾ縺溘・ skills 縺ｫ螟画峩繧貞刈縺医◆縺ｨ縺・
-- deploy.ps1 縺ｮ蜍穂ｽ懃｢ｺ隱阪′蠢・ｦ√↑縺ｨ縺・
+- q/ ゲートの実行時（実装完了後の品質確認）
+- sh/ ゲート前の最終確認
+- rules または skills に変更を加えたとき
+- deploy.ps1 の動作確認が必要なとき
 
-## 讀懆ｨｼ繧ｹ繧ｳ繝ｼ繝・
+## 検証スコープ
 
-| 讀懆ｨｼ鬆・岼 | 蟇ｾ雎｡ | 蜷域ｼ譚｡莉ｶ |
+| 検証項目 | 対象 | 合格条件 |
 |---------|-----|--------|
-| H1 隕句・縺怜ｭ伜惠 | `rules/*.md`・・_*` 髯､螟厄ｼ・| `# 繧ｿ繧､繝医Ν` 蠖｢蠑上〒1陦御ｻ･荳・|
-| frontmatter `name:` | `skills/*/SKILL.md` | `name: <蛟､>` 縺悟ｭ伜惠 |
-| frontmatter `description:` | `skills/*/SKILL.md` | `description: <蛟､>` 縺悟ｭ伜惠 |
-| body 髱樒ｩｺ | `skills/*/SKILL.md` | frontmatter 莉･髯阪↓蜀・ｮｹ縺ゅｊ |
-| deploy DryRun | 蜈ｨ繧ｿ繝ｼ繧ｲ繝・ヨ (vscode/cursor/agents) | exit 0 |
+| H1 見出し存在 | `rules/*.md`（`_*` 除外） | `# タイトル` 形式で1行以上 |
+| frontmatter `name:` | `skills/*/SKILL.md` | `name: <値>` が存在 |
+| frontmatter `description:` | `skills/*/SKILL.md` | `description: <値>` が存在 |
+| body 非空 | `skills/*/SKILL.md` | frontmatter 以降に内容あり |
+| deploy DryRun | 全ターゲット (vscode/cursor/agents) | exit 0 |
 
-## q/ 繧ｲ繝ｼ繝医〒縺ｮ菴ｿ縺・婿
+## q/ ゲートでの使い方
 
 ```powershell
-# 蝓ｺ譛ｬ螳溯｡鯉ｼ・ASS/FAIL 繧ｵ繝槭Μ繝ｼ縺ｮ縺ｿ・・
+# 基本実行（PASS/FAIL サマリーのみ）
 powershell -ExecutionPolicy Bypass -File .\validate.ps1
 
-# 隧ｳ邏ｰ蜃ｺ蜉幢ｼ亥推繝輔ぃ繧､繝ｫ縺ｮ [OK] / [FAIL] 繧定｡ｨ遉ｺ・・
+# 詳細出力（各ファイルの [OK] / [FAIL] を表示）
 powershell -ExecutionPolicy Bypass -File .\validate.ps1 -Verbose
 ```
 
-### 邨先棡縺ｮ隗｣驥・
+### 結果の解釈
 
 ```
-RESULT: 420 passed, 0 failed   竊・泙 q/ 騾夐℃縲Ｔh/ 縺ｸ騾ｲ繧
-RESULT: 415 passed, 5 failed   竊・閥 繝悶Ο繝・き繝ｼ縺ゅｊ縲・AILURES 繝ｪ繧ｹ繝医ｒ菫ｮ豁｣縺励※蜀榊ｮ溯｡・
+RESULT: 420 passed, 0 failed   → 🟢 q/ 通過。sh/ へ進む
+RESULT: 415 passed, 5 failed   → 🔴 ブロッカーあり。FAILURES リストを修正して再実行
 ```
 
-## ECC eval 縺ｨ縺ｮ蟇ｾ蠢・
+## ECC eval との対応
 
-| ECC eval 讎ょｿｵ | DCR 螳溯｣・|
+| ECC eval 概念 | DCR 実装 |
 |---|---|
-| Capability evals | frontmatter / H1 / body 繝√ぉ繝・け |
-| Regression evals | deploy.ps1 -DryRun 蜈ｨ繧ｿ繝ｼ繧ｲ繝・ヨ |
-| pass@3 > 90% | 蜈ｨ鬆・岼 [OK] 縺ｧ縺ｮ縺ｿ exit 0 |
-| `/eval report` | validate.ps1 縺ｮ讓呎ｺ門・蜉・|
-| `.claude/evals/*.md` | validate.ps1 蜀・↓讀懆ｨｼ繝ｫ繝ｼ繝ｫ邨ｱ蜷・|
+| Capability evals | frontmatter / H1 / body チェック |
+| Regression evals | deploy.ps1 -DryRun 全ターゲット |
+| pass@3 > 90% | 全項目 [OK] でのみ exit 0 |
+| `/eval report` | validate.ps1 の標準出力 |
+| `.claude/evals/*.md` | validate.ps1 内に検証ルール統合 |
 
-## 繧医￥縺ゅｋ FAIL 縺ｨ菫ｮ豁｣
+## よくある FAIL と修正
 
-| FAIL 繝｡繝・そ繝ｼ繧ｸ | 蜴溷屏 | 菫ｮ豁｣ |
+| FAIL メッセージ | 原因 | 修正 |
 |---------------|-----|-----|
-| `xxx.md 窶・H1 missing` | rules 繝輔ぃ繧､繝ｫ縺ｫ `# 繧ｿ繧､繝医Ν` 縺後↑縺・| 繝輔ぃ繧､繝ｫ蜀帝ｭ縺ｫ H1 繧定ｿｽ蜉 |
-| `yyy/SKILL.md 窶・'name:' missing` | frontmatter 縺ｫ name 繝輔ぅ繝ｼ繝ｫ繝峨′縺ｪ縺・| `---` 繝悶Ο繝・け縺ｫ `name: xxx` 繧定ｿｽ險・|
-| `yyy/SKILL.md 窶・body empty` | frontmatter 縺縺代〒繧ｳ繝ｳ繝・Φ繝・′縺ｪ縺・| Skill 縺ｮ譛ｬ譁・ｒ霑ｽ蜉 |
-| `deploy -Target xxx 窶・exit 1` | deploy 險ｭ螳壹↓蝠城｡後≠繧・| `deploy.ps1 -DryRun -Target xxx` 繧貞腰菴灘ｮ溯｡後＠縺ｦ蜴溷屏繧堤｢ｺ隱・|
+| `xxx.md — H1 missing` | rules ファイルに `# タイトル` がない | ファイル冒頭に H1 を追加 |
+| `yyy/SKILL.md — 'name:' missing` | frontmatter に name フィールドがない | `---` ブロックに `name: xxx` を追記 |
+| `yyy/SKILL.md — body empty` | frontmatter だけでコンテンツがない | Skill の本文を追加 |
+| `deploy -Target xxx — exit 1` | deploy 設定に問題あり | `deploy.ps1 -DryRun -Target xxx` を単体実行して原因を確認 |
 
-## deploy.ps1 縺ｨ縺ｮ髢｢菫・
+## deploy.ps1 との関係
 
-`validate.ps1` 縺ｯ `deploy.ps1` 縺ｮ**莠句燕蜩∬ｳｪ遒ｺ隱・*縺ｨ縺励※讖溯・縺吶ｋ縲・
-- validate 竊・蜈ｨ OK 竊・deploy 竊・驟榊ｸ・
-- validate 縺ｧ FAIL 縺後≠繧句ｴ蜷医・ deploy 蜑阪↓菫ｮ豁｣縺吶ｋ
+`validate.ps1` は `deploy.ps1` の**事前品質確認**として機能する。
+- validate → 全 OK → deploy → 配布
+- validate で FAIL がある場合は deploy 前に修正する
 
-## 閾ｪ蜍募喧縺ｮ譛ｪ譚･
+## 自動化の未来
 
-CI/CD・・itHub Actions 遲会ｼ峨↓邨・∩霎ｼ繧蝣ｴ蜷・
+CI/CD（GitHub Actions 等）に組み込む場合:
 
 ```yaml
 - name: Validate DCR structure
   run: pwsh -ExecutionPolicy Bypass -File ./validate.ps1
 ```
 
-exit 1 繧偵◎縺ｮ縺ｾ縺ｾ CI 螟ｱ謨励→縺励※謇ｱ縺医ｋ縲・
+exit 1 をそのまま CI 失敗として扱える。
