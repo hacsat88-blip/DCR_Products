@@ -1,10 +1,9 @@
 ---
-description: "paid-ads"
+description: When the user wants help with paid advertising campaigns on Google Ads, Meta (Facebook/Instagram), LinkedIn, Twitter/X, or other ad platforms. Also use when the user mentions 'PPC,' 'paid media,' 'ROAS,' 'CPA,' 'ad campaign,' 'retargeting,' or 'audience targeting.' This skill covers campaign strategy, audience targeting, and optimization. For bulk ad creative generation and iteration, see ad-creative.
 globs: ""
 alwaysApply: false
 ---
 
-<!-- GENERATED: .\tools\deploy-all.ps1 -->
 
 # Paid Ads
 
@@ -59,13 +58,13 @@ Gather this context (ask if not provided):
 
 ```
 Account
-笏懌楳笏 Campaign 1: [Objective] - [Audience/Product]
-笏・  笏懌楳笏 Ad Set 1: [Targeting variation]
-笏・  笏・  笏懌楳笏 Ad 1: [Creative variation A]
-笏・  笏・  笏懌楳笏 Ad 2: [Creative variation B]
-笏・  笏・  笏披楳笏 Ad 3: [Creative variation C]
-笏・  笏披楳笏 Ad Set 2: [Targeting variation]
-笏披楳笏 Campaign 2...
+├── Campaign 1: [Objective] - [Audience/Product]
+│   ├── Ad Set 1: [Targeting variation]
+│   │   ├── Ad 1: [Creative variation A]
+│   │   ├── Ad 2: [Creative variation B]
+│   │   └── Ad 3: [Creative variation C]
+│   └── Ad Set 2: [Targeting variation]
+└── Campaign 2...
 ```
 
 ### Naming Conventions
@@ -97,13 +96,13 @@ LI_LeadGen_CMOs-SaaS_Whitepaper_Mar24
 ### Key Formulas
 
 **Problem-Agitate-Solve (PAS):**
-> [Problem] 竊・[Agitate the pain] 竊・[Introduce solution] 竊・[CTA]
+> [Problem] → [Agitate the pain] → [Introduce solution] → [CTA]
 
 **Before-After-Bridge (BAB):**
-> [Current painful state] 竊・[Desired future state] 竊・[Your product as bridge]
+> [Current painful state] → [Desired future state] → [Your product as bridge]
 
 **Social Proof Lead:**
-> [Impressive stat or testimonial] 竊・[What you do] 竊・[CTA]
+> [Impressive stat or testimonial] → [What you do] → [CTA]
 
 **For detailed templates and headline formulas**: See [references/ad-copy-templates.md](references/ad-copy-templates.md)
 
@@ -179,14 +178,14 @@ LI_LeadGen_CMOs-SaaS_Whitepaper_Mar24
 5. Adjust bid strategy
 
 **If CTR is low:**
-- Creative isn't resonating 竊・test new hooks/angles
-- Audience mismatch 竊・refine targeting
-- Ad fatigue 竊・refresh creative
+- Creative isn't resonating → test new hooks/angles
+- Audience mismatch → refine targeting
+- Ad fatigue → refresh creative
 
 **If CPM is high:**
-- Audience too narrow 竊・expand targeting
-- High competition 竊・try different placements
-- Low relevance score 竊・improve creative fit
+- Audience too narrow → expand targeting
+- High competition → try different placements
+- Low relevance score → improve creative fit
 
 ### Bid Strategy Progression
 1. Start with manual or cost caps
@@ -298,7 +297,7 @@ For implementation, see the [tools registry](../../tools/REGISTRY.md). Key adver
 
 | Platform | Best For | MCP | Guide |
 |----------|----------|:---:|-------|
-| **Google Ads** | Search intent, high-intent traffic | 笨・| [google-ads.md](../../tools/integrations/google-ads.md) |
+| **Google Ads** | Search intent, high-intent traffic | ✓ | [google-ads.md](../../tools/integrations/google-ads.md) |
 | **Meta Ads** | Demand gen, visual products, B2C | - | [meta-ads.md](../../tools/integrations/meta-ads.md) |
 | **LinkedIn Ads** | B2B, job title targeting | - | [linkedin-ads.md](../../tools/integrations/linkedin-ads.md) |
 | **TikTok Ads** | Younger demographics, video | - | [tiktok-ads.md](../../tools/integrations/tiktok-ads.md) |

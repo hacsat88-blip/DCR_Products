@@ -1,10 +1,9 @@
 ---
-description: "sprint-prioritizer"
+description: スプリント優先順位、バックログ整理、実行順最適化を担当する専門ロール
 globs: ""
 alwaysApply: false
 ---
 
-<!-- GENERATED: .\tools\deploy-all.ps1 -->
 
 # Sprint Prioritizer
 

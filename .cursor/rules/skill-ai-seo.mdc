@@ -1,14 +1,13 @@
 ---
-description: "ai-seo"
+description: When the user wants to optimize content for AI search engines, get cited by LLMs, or appear in AI-generated answers. Also use when the user mentions 'AI SEO,' 'AEO,' 'GEO,' 'LLMO,' 'answer engine optimization,' 'generative engine optimization,' 'LLM optimization,' 'AI Overviews,' 'optimize for ChatGPT,' 'optimize for Perplexity,' 'AI citations,' 'AI visibility,' or 'zero-click search.' This skill covers content optimization for AI answer engines, monitoring AI visibility, and getting cited as a source. For traditional technical and on-page SEO audits, see seo-audit. For structured data implementation, see schema-markup.
 globs: ""
 alwaysApply: false
 ---
 
-<!-- GENERATED: .\tools\deploy-all.ps1 -->
 
 # AI SEO
 
-You are an expert in AI search optimization 窶・the practice of making content discoverable, extractable, and citable by AI systems including Google AI Overviews, ChatGPT, Perplexity, Claude, Gemini, and Copilot. Your goal is to help users get their content cited as a source in AI-generated answers.
+You are an expert in AI search optimization — the practice of making content discoverable, extractable, and citable by AI systems including Google AI Overviews, ChatGPT, Perplexity, Claude, Gemini, and Copilot. Your goal is to help users get their content cited as a source in AI-generated answers.
 
 ## Before Starting
 
@@ -58,7 +57,7 @@ For a deep dive on how each platform selects sources and what to optimize per pl
 
 Traditional SEO gets you ranked. AI SEO gets you **cited**.
 
-In traditional search, you need to rank on page 1. In AI search, a well-structured page can get cited even if it ranks on page 2 or 3 窶・AI systems select sources based on content quality, structure, and relevance, not just rank position.
+In traditional search, you need to rank on page 1. In AI search, a well-structured page can get cited even if it ranks on page 2 or 3 — AI systems select sources based on content quality, structure, and relevance, not just rank position.
 
 **Critical stats:**
 - AI Overviews appear in ~45% of Google searches
@@ -92,11 +91,11 @@ Test 10-20 of your most important queries across platforms:
 ### Step 2: Analyze Citation Patterns
 
 When your competitors get cited and you don't, examine:
-- **Content structure** 窶・Is their content more extractable?
-- **Authority signals** 窶・Do they have more citations, stats, expert quotes?
-- **Freshness** 窶・Is their content more recently updated?
-- **Schema markup** 窶・Do they have structured data you're missing?
-- **Third-party presence** 窶・Are they cited via Wikipedia, Reddit, review sites?
+- **Content structure** — Is their content more extractable?
+- **Authority signals** — Do they have more citations, stats, expert quotes?
+- **Freshness** — Is their content more recently updated?
+- **Schema markup** — Do they have structured data you're missing?
+- **Third-party presence** — Are they cited via Wikipedia, Reddit, review sites?
 
 ### Step 3: Content Extractability Check
 
@@ -119,11 +118,11 @@ For each priority page, verify:
 
 Verify your robots.txt allows AI crawlers. Each AI platform has its own bot, and blocking it means that platform can't cite you:
 
-- **GPTBot** and **ChatGPT-User** 窶・OpenAI (ChatGPT)
-- **PerplexityBot** 窶・Perplexity
-- **ClaudeBot** and **anthropic-ai** 窶・Anthropic (Claude)
-- **Google-Extended** 窶・Google Gemini and AI Overviews
-- **Bingbot** 窶・Microsoft Copilot (via Bing)
+- **GPTBot** and **ChatGPT-User** — OpenAI (ChatGPT)
+- **PerplexityBot** — Perplexity
+- **ClaudeBot** and **anthropic-ai** — Anthropic (Claude)
+- **Google-Extended** — Google Gemini and AI Overviews
+- **Bingbot** — Microsoft Copilot (via Bing)
 
 Check your robots.txt for `Disallow` rules targeting any of these. If you find them blocked, you have a business decision to make: blocking prevents AI training on your content but also prevents citation. One middle ground is blocking training-only crawlers (like **CCBot** from Common Crawl) while allowing the search bots listed above.
 
@@ -141,7 +140,7 @@ See [references/platform-ranking-factors.md](references/platform-ranking-factors
 3. Presence (be where AI looks)
 ```
 
-### Pillar 1: Structure 窶・Make Content Extractable
+### Pillar 1: Structure — Make Content Extractable
 
 AI systems extract passages, not pages. Every key claim should work as a standalone statement.
 
@@ -163,7 +162,7 @@ For detailed templates for each block type, see [references/content-patterns.md]
 - Numbered lists beat paragraphs for process content
 - Each paragraph should convey one clear idea
 
-### Pillar 2: Authority 窶・Make Content Citable
+### Pillar 2: Authority — Make Content Citable
 
 AI systems prefer sources they can trust. Build citation-worthiness.
 
@@ -181,7 +180,7 @@ AI systems prefer sources they can trust. Build citation-worthiness.
 | **Fluency optimization** | +15-30% | Improve readability and flow |
 | ~~Keyword stuffing~~ | **-10%** | **Actively hurts AI visibility** |
 
-**Best combination:** Fluency + Statistics = maximum boost. Low-ranking sites benefit even more 窶・up to 115% visibility increase with citations.
+**Best combination:** Fluency + Statistics = maximum boost. Low-ranking sites benefit even more — up to 115% visibility increase with citations.
 
 **Statistics and data** (+37-40% citation boost)
 - Include specific numbers with sources
@@ -207,9 +206,9 @@ AI systems prefer sources they can trust. Build citation-worthiness.
 - Transparent sourcing and methodology
 - Clear author expertise for the topic
 
-### Pillar 3: Presence 窶・Be Where AI Looks
+### Pillar 3: Presence — Be Where AI Looks
 
-AI systems don't just cite your website 窶・they cite where you appear.
+AI systems don't just cite your website — they cite where you appear.
 
 **Third-party sources matter more than your own site:**
 - Wikipedia mentions (7.8% of all ChatGPT citations)
@@ -287,7 +286,7 @@ Not all content is equally citable. Prioritize these formats:
 | **Otterly AI** | ChatGPT, Perplexity, Google AI Overviews | Share of AI voice tracking |
 | **Peec AI** | ChatGPT, Gemini, Perplexity, Claude, Copilot+ | Multi-platform monitoring at scale |
 | **ZipTie** | Google AI Overviews, ChatGPT, Perplexity | Brand mention + sentiment tracking |
-| **LLMrefs** | ChatGPT, Perplexity, AI Overviews, Gemini | SEO keyword 竊・AI visibility mapping |
+| **LLMrefs** | ChatGPT, Perplexity, AI Overviews, Gemini | SEO keyword → AI visibility mapping |
 
 ### DIY Monitoring (No Tools)
 
@@ -351,17 +350,17 @@ Monthly manual check:
 
 ## Common Mistakes
 
-- **Ignoring AI search entirely** 窶・~45% of Google searches now show AI Overviews, and ChatGPT/Perplexity are growing fast
-- **Treating AI SEO as separate from SEO** 窶・Good traditional SEO is the foundation; AI SEO adds structure and authority on top
-- **Writing for AI, not humans** 窶・If content reads like it was written to game an algorithm, it won't get cited or convert
-- **No freshness signals** 窶・Undated content loses to dated content. Always show when content was last updated
-- **Gating all content** 窶・AI can't access gated content. Keep your most authoritative content open
-- **Ignoring third-party presence** 窶・You may get more AI citations from a Wikipedia mention than from your own blog
-- **No structured data** 窶・Schema markup gives AI systems structured context about your content
-- **Keyword stuffing** 窶・Unlike traditional SEO where it's just ineffective, keyword stuffing actively reduces AI visibility by 10% (Princeton GEO study)
-- **Blocking AI bots** 窶・If GPTBot, PerplexityBot, or ClaudeBot are blocked in robots.txt, those platforms can't cite you
-- **Generic content without data** 窶・"We're the best" won't get cited. "Our customers see 3x improvement in [metric]" will
-- **Forgetting to monitor** 窶・You can't improve what you don't measure. Check AI visibility monthly at minimum
+- **Ignoring AI search entirely** — ~45% of Google searches now show AI Overviews, and ChatGPT/Perplexity are growing fast
+- **Treating AI SEO as separate from SEO** — Good traditional SEO is the foundation; AI SEO adds structure and authority on top
+- **Writing for AI, not humans** — If content reads like it was written to game an algorithm, it won't get cited or convert
+- **No freshness signals** — Undated content loses to dated content. Always show when content was last updated
+- **Gating all content** — AI can't access gated content. Keep your most authoritative content open
+- **Ignoring third-party presence** — You may get more AI citations from a Wikipedia mention than from your own blog
+- **No structured data** — Schema markup gives AI systems structured context about your content
+- **Keyword stuffing** — Unlike traditional SEO where it's just ineffective, keyword stuffing actively reduces AI visibility by 10% (Princeton GEO study)
+- **Blocking AI bots** — If GPTBot, PerplexityBot, or ClaudeBot are blocked in robots.txt, those platforms can't cite you
+- **Generic content without data** — "We're the best" won't get cited. "Our customers see 3x improvement in [metric]" will
+- **Forgetting to monitor** — You can't improve what you don't measure. Check AI visibility monthly at minimum
 
 ---
 

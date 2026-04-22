@@ -1,10 +1,9 @@
 ---
-description: "free-tool-strategy"
+description: When the user wants to plan, evaluate, or build a free tool for marketing purposes — lead generation, SEO value, or brand awareness. Also use when the user mentions "engineering as marketing," "free tool," "marketing tool," "calculator," "generator," "interactive tool," "lead gen tool," "build a tool for leads," or "free resource." This skill bridges engineering and marketing — useful for founders and technical marketers.
 globs: ""
 alwaysApply: false
 ---
 
-<!-- GENERATED: .\tools\deploy-all.ps1 -->
 
 # Free Tool Strategy (Engineering as Marketing)
 
@@ -43,7 +42,7 @@ Before designing a tool strategy, understand:
 - Immediate value
 
 ### 4. Worth the Investment
-- Lead value ﾃ・expected leads > build cost + maintenance
+- Lead value × expected leads > build cost + maintenance
 
 ---
 
@@ -134,9 +133,9 @@ When: Something good exists, white-label available, not core differentiator
 ## MVP Scope
 
 ### Minimum Viable Tool
-1. Core functionality only窶播oes the one thing, works reliably
-2. Essential UX窶把lear input, obvious output, mobile works
-3. Basic lead capture窶覇mail collection, leads go somewhere useful
+1. Core functionality only—does the one thing, works reliably
+2. Essential UX—clear input, obvious output, mobile works
+3. Basic lead capture—email collection, leads go somewhere useful
 
 ### What to Skip Initially
 Account creation, saving results, advanced features, perfect design, every edge case
