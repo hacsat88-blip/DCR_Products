@@ -1,10 +1,9 @@
 ---
-description: "verification-before-completion"
+description: Use when about to claim work is complete, fixed, or passing, before committing or creating PRs - requires running verification commands and confirming output before making any success claims; evidence before assertions always
 globs: ""
 alwaysApply: false
 ---
 
-<!-- GENERATED: .\tools\deploy-all.ps1 -->
 
 # Verification Before Completion
 
@@ -68,11 +67,11 @@ Skip any step = lying, not verifying
 | Excuse | Reality |
 |--------|---------|
 | "Should work now" | RUN the verification |
-| "I'm confident" | Confidence 竕 evidence |
+| "I'm confident" | Confidence ≠ evidence |
 | "Just this once" | No exceptions |
-| "Linter passed" | Linter 竕 compiler |
+| "Linter passed" | Linter ≠ compiler |
 | "Agent said success" | Verify independently |
-| "I'm tired" | Exhaustion 竕 excuse |
+| "I'm tired" | Exhaustion ≠ excuse |
 | "Partial check is enough" | Partial proves nothing |
 | "Different words so rule doesn't apply" | Spirit over letter |
 
@@ -80,32 +79,32 @@ Skip any step = lying, not verifying
 
 **Tests:**
 ```
-笨・[Run test command] [See: 34/34 pass] "All tests pass"
-笶・"Should pass now" / "Looks correct"
+✅ [Run test command] [See: 34/34 pass] "All tests pass"
+❌ "Should pass now" / "Looks correct"
 ```
 
 **Regression tests (TDD Red-Green):**
 ```
-笨・Write 竊・Run (pass) 竊・Revert fix 竊・Run (MUST FAIL) 竊・Restore 竊・Run (pass)
-笶・"I've written a regression test" (without red-green verification)
+✅ Write → Run (pass) → Revert fix → Run (MUST FAIL) → Restore → Run (pass)
+❌ "I've written a regression test" (without red-green verification)
 ```
 
 **Build:**
 ```
-笨・[Run build] [See: exit 0] "Build passes"
-笶・"Linter passed" (linter doesn't check compilation)
+✅ [Run build] [See: exit 0] "Build passes"
+❌ "Linter passed" (linter doesn't check compilation)
 ```
 
 **Requirements:**
 ```
-笨・Re-read plan 竊・Create checklist 竊・Verify each 竊・Report gaps or completion
-笶・"Tests pass, phase complete"
+✅ Re-read plan → Create checklist → Verify each → Report gaps or completion
+❌ "Tests pass, phase complete"
 ```
 
 **Agent delegation:**
 ```
-笨・Agent reports success 竊・Check VCS diff 竊・Verify changes 竊・Report actual state
-笶・Trust agent report
+✅ Agent reports success → Check VCS diff → Verify changes → Report actual state
+❌ Trust agent report
 ```
 
 ## Why This Matters
@@ -114,7 +113,7 @@ From 24 failure memories:
 - your human partner said "I don't believe you" - trust broken
 - Undefined functions shipped - would crash
 - Missing requirements shipped - incomplete features
-- Time wasted on false completion 竊・redirect 竊・rework
+- Time wasted on false completion → redirect → rework
 - Violates: "Honesty is a core value. If you lie, you'll be replaced."
 
 ## When To Apply
@@ -153,6 +152,6 @@ If a `progress.md` file exists in the current session directory, verification-be
 5. If all items complete: ALLOW completion, proceed with git commit (if .dcr/config.json: commit_session_files=true)
 
 **User Error Prevention:**
-- Incomplete items show red 笶・with item name
-- Completed items show green 笨・
+- Incomplete items show red ❌ with item name
+- Completed items show green ✅
 - Clear next steps: "Complete [item X] in task_plan.md"

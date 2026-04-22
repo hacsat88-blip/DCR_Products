@@ -1,10 +1,9 @@
 ---
-description: "referral-program"
+description: When the user wants to create, optimize, or analyze a referral program, affiliate program, or word-of-mouth strategy. Also use when the user mentions 'referral,' 'affiliate,' 'ambassador,' 'word of mouth,' 'viral loop,' 'refer a friend,' or 'partner program.' This skill covers program design, incentive structure, and growth optimization.
 globs: ""
 alwaysApply: false
 ---
 
-<!-- GENERATED: .\tools\deploy-all.ps1 -->
 
 # Referral & Affiliate Programs
 
@@ -72,7 +71,7 @@ Gather this context (ask if not provided):
 ### The Referral Loop
 
 ```
-Trigger Moment 竊・Share Action 竊・Convert Referred 竊・Reward 竊・(Loop)
+Trigger Moment → Share Action → Convert Referred → Reward → (Loop)
 ```
 
 ### Step 1: Identify Trigger Moments
@@ -213,7 +212,7 @@ They get [their reward] too.
 - Day 7: Remind about referral program
 - Day 30: "Know anyone who'd benefit?"
 - Day 60: Success story + referral prompt
-- After milestone: "You achieved [X]窶婆now others who'd want this?"
+- After milestone: "You achieved [X]—know others who'd want this?"
 
 ---
 

@@ -1,36 +1,35 @@
 ---
-description: "jira-workflow-steward"
+description: Jira 連携、branch / commit / PR traceability の運用境界を定義する専門ロール
 globs: ""
 alwaysApply: false
 ---
 
-<!-- GENERATED: .\tools\deploy-all.ps1 -->
 
 # Jira Workflow Steward
-Jira-linked delivery 縺ｮ traceability contract 繧貞ｮ夂ｾｩ縺吶ｋ縲・
+Jira-linked delivery の traceability contract を定義する。
 
 ## When to activate
 
-- Jira ticket 縺ｨ branch / commit / PR 縺ｮ邏蝉ｻ倥￠繧呈紛逅・☆繧九→縺・
-- traceability 繧・release-safe branch policy 縺ｮ蛻､譁ｭ縺悟ｿ・ｦ√↑縺ｨ縺・
-- commit hygiene 縺ｨ mixed-scope 蛻・屬繧貞ｼｷ繧√◆縺・→縺・
+- Jira ticket と branch / commit / PR の紐付けを整理するとき
+- traceability や release-safe branch policy の判断が必要なとき
+- commit hygiene と mixed-scope 分離を強めたいとき
 
 ## Core Responsibilities
 
-1. Jira gate: Git-facing artifact 繧貞・縺吝燕縺ｫ Jira anchor 繧定ｦ∵ｱゅ☆繧・
-2. Traceability: branch縲…ommit縲￣R縲〉elease note 縺ｮ邨舌・縺､縺阪ｒ菫昴▽
-3. Scope hygiene: unrelated change 繧貞挨 branch / commit / PR 縺ｸ蛻・屬縺吶ｋ
-4. Security hygiene: branch name縲…ommit縲￣R 譁・擇縺ｫ遘伜ｯ・ュ蝣ｱ繧貞性繧√↑縺・
+1. Jira gate: Git-facing artifact を出す前に Jira anchor を要求する
+2. Traceability: branch、commit、PR、release note の結びつきを保つ
+3. Scope hygiene: unrelated change を別 branch / commit / PR へ分離する
+4. Security hygiene: branch name、commit、PR 文面に秘密情報を含めない
 
 ## Invariants
 
-- Jira ID 縺檎┌縺・∪縺ｾ branch 蜷阪…ommit message縲￣R 譁・擇繧堤｢ｺ螳壹＠縺ｪ縺・
-- commit 縺ｯ atomic 縺ｧ revert 縺励ｄ縺吶＞蜊倅ｽ阪↓菫昴▽
-- `main` 繧・release 邉ｻ縺ｸ縺ｮ驥崎ｦ∝､画峩縺ｯ PR review 繧帝壹☆
-- tested 縺ｨ荳ｻ蠑ｵ縺吶ｋ蜀・ｮｹ縺ｯ verification evidence 縺ｨ荳閾ｴ縺輔○繧・
+- Jira ID が無いまま branch 名、commit message、PR 文面を確定しない
+- commit は atomic で revert しやすい単位に保つ
+- `main` や release 系への重要変更は PR review を通す
+- tested と主張する内容は verification evidence と一致させる
 
 ## Non-Goals
 
-- repository 縺斐→縺ｮ hook script 繧・PR template 繧・rule 蛛ｴ縺ｧ source-of-truth 蛹悶☆繧九％縺ｨ
-- agent persona縲∝哨隱ｿ縲・聞縺・example matrix 繧・rule 縺ｫ蝓九ａ霎ｼ繧縺薙→
-- Jira 繧剃ｽｿ繧上↑縺・request 縺ｫ縺ｾ縺ｧ辟｡譚｡莉ｶ縺ｧ process 繧貞ｼｷ蛻ｶ縺吶ｋ縺薙→
+- repository ごとの hook script や PR template を rule 側で source-of-truth 化すること
+- agent persona、口調、長い example matrix を rule に埋め込むこと
+- Jira を使わない request にまで無条件で process を強制すること

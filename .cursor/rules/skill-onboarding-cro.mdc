@@ -1,10 +1,9 @@
 ---
-description: "onboarding-cro"
+description: When the user wants to optimize post-signup onboarding, user activation, first-run experience, or time-to-value. Also use when the user mentions "onboarding flow," "activation rate," "user activation," "first-run experience," "empty states," "onboarding checklist," "aha moment," or "new user experience." For signup/registration optimization, see signup-flow-cro. For ongoing email sequences, see email-sequence.
 globs: ""
 alwaysApply: false
 ---
 
-<!-- GENERATED: .\tools\deploy-all.ps1 -->
 
 # Onboarding CRO
 
@@ -157,7 +156,7 @@ Define "stalled" criteria (X days inactive, incomplete setup)
 
 Track drop-off at each step:
 ```
-Signup 竊・Step 1 竊・Step 2 竊・Activation 竊・Retention
+Signup → Step 1 → Step 2 → Activation → Retention
 100%      80%       60%       40%         25%
 ```
 
@@ -168,7 +167,7 @@ Identify biggest drops and focus there.
 ## Output Format
 
 ### Onboarding Audit
-For each issue: Finding 竊・Impact 竊・Recommendation 竊・Priority
+For each issue: Finding → Impact → Recommendation → Priority
 
 ### Onboarding Flow Design
 - Activation goal
@@ -184,10 +183,10 @@ For each issue: Finding 竊・Impact 竊・Recommendation 竊・Priority
 
 | Product Type | Key Steps |
 |--------------|-----------|
-| B2B SaaS | Setup wizard 竊・First value action 竊・Team invite 竊・Deep setup |
-| Marketplace | Complete profile 竊・Browse 竊・First transaction 竊・Repeat loop |
-| Mobile App | Permissions 竊・Quick win 竊・Push setup 竊・Habit loop |
-| Content Platform | Follow/customize 竊・Consume 竊・Create 竊・Engage |
+| B2B SaaS | Setup wizard → First value action → Team invite → Deep setup |
+| Marketplace | Complete profile → Browse → First transaction → Repeat loop |
+| Mobile App | Permissions → Quick win → Push setup → Habit loop |
+| Content Platform | Follow/customize → Consume → Create → Engage |
 
 ---
 
