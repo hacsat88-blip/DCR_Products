@@ -1,9 +1,10 @@
 ---
-description: When the user wants to plan a content strategy, decide what content to create, or figure out what topics to cover. Also use when the user mentions "content strategy," "what should I write about," "content ideas," "blog strategy," "topic clusters," or "content planning." For writing individual pieces, see copywriting. For SEO-specific audits, see seo-audit.
+description: "content-strategy"
 globs: ""
 alwaysApply: false
 ---
 
+<!-- GENERATED: .\tools\deploy-all.ps1 -->
 
 # Content Strategy
 
@@ -41,7 +42,7 @@ Gather this context (ask if not provided):
 
 ## Searchable vs Shareable
 
-Every piece of content must be searchable, shareable, or both. Prioritize in that order—search traffic is the foundation.
+Every piece of content must be searchable, shareable, or both. Prioritize in that order窶敗earch traffic is the foundation.
 
 **Searchable content** captures existing demand. Optimized for people actively looking for answers.
 
@@ -50,7 +51,7 @@ Every piece of content must be searchable, shareable, or both. Prioritize in tha
 ### When Writing Searchable Content
 
 - Target a specific keyword or question
-- Match search intent exactly—answer what the searcher wants
+- Match search intent exactly窶蚤nswer what the searcher wants
 - Use clear titles that match search queries
 - Structure with headings that mirror search patterns
 - Place keywords in title, headings, first paragraph, URL
@@ -83,9 +84,9 @@ Formula: [persona] + [use-case]. Targets long-tail keywords.
 Hub = comprehensive overview. Spokes = related subtopics.
 ```
 /topic (hub)
-├── /topic/subtopic-1 (spoke)
-├── /topic/subtopic-2 (spoke)
-└── /topic/subtopic-3 (spoke)
+笏懌楳笏 /topic/subtopic-1 (spoke)
+笏懌楳笏 /topic/subtopic-2 (spoke)
+笏披楳笏 /topic/subtopic-3 (spoke)
 ```
 Create hub first, then build spokes. Interlink strategically.
 
@@ -113,7 +114,7 @@ High-intent keywords + product adoption.
 15-30 experts answering one specific question. Built-in distribution.
 
 **Case Studies**
-Structure: Challenge → Solution → Results → Key learnings
+Structure: Challenge 竊・Solution 竊・Results 竊・Key learnings
 
 **Meta Content**
 Behind-the-scenes transparency. "How We Got Our First $5k MRR," "Why We Chose Debt Over VC."
@@ -139,18 +140,18 @@ Most of the time, all content can live under `/blog` with good internal linking 
 
 ```
 Pillar Topic (Hub)
-├── Subtopic Cluster 1
-│   ├── Article A
-│   ├── Article B
-│   └── Article C
-├── Subtopic Cluster 2
-│   ├── Article D
-│   ├── Article E
-│   └── Article F
-└── Subtopic Cluster 3
-    ├── Article G
-    ├── Article H
-    └── Article I
+笏懌楳笏 Subtopic Cluster 1
+笏・  笏懌楳笏 Article A
+笏・  笏懌楳笏 Article B
+笏・  笏披楳笏 Article C
+笏懌楳笏 Subtopic Cluster 2
+笏・  笏懌楳笏 Article D
+笏・  笏懌楳笏 Article E
+笏・  笏披楳笏 Article F
+笏披楳笏 Subtopic Cluster 3
+    笏懌楳笏 Article G
+    笏懌楳笏 Article H
+    笏披楳笏 Article I
 ```
 
 ### Pillar Criteria
@@ -218,11 +219,11 @@ Output as prioritized table:
 ### 2. Call Transcripts
 
 If user provides sales or customer call transcripts, extract:
-- Questions asked → FAQ content or blog posts
-- Pain points → problems in their own words
-- Objections → content to address proactively
-- Language patterns → exact phrases to use (voice of customer)
-- Competitor mentions → what they compared you to
+- Questions asked 竊・FAQ content or blog posts
+- Pain points 竊・problems in their own words
+- Objections 竊・content to address proactively
+- Language patterns 竊・exact phrases to use (voice of customer)
+- Competitor mentions 竊・what they compared you to
 
 Output content ideas with supporting quotes.
 

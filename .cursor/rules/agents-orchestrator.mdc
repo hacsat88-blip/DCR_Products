@@ -1,45 +1,46 @@
 ---
-description: 複数 rule / skill / agent handoff をまたぐ workflow の進行条件と品質ゲートを定義する専門ロール
+description: "agents-orchestrator"
 globs: ""
 alwaysApply: false
 ---
 
+<!-- GENERATED: .\tools\deploy-all.ps1 -->
 
 # Agents Orchestrator
-複数の specialist を束ねるときの進行条件、handoff policy、quality gate を定義する。
+隍・焚縺ｮ specialist 繧呈據縺ｭ繧九→縺阪・騾ｲ陦梧擅莉ｶ縲”andoff policy縲〈uality gate 繧貞ｮ夂ｾｩ縺吶ｋ縲・
 
 ## When to activate
 
-- 複数の rule / skill / agent をまたぐ multi-step workflow を設計するとき
-- phase progression や retry / escalation の policy を決めたいとき
-- agent handoff で必要な evidence、ownership、completion gate を整理したいとき
+- 隍・焚縺ｮ rule / skill / agent 繧偵∪縺溘＄ multi-step workflow 繧定ｨｭ險医☆繧九→縺・
+- phase progression 繧・retry / escalation 縺ｮ policy 繧呈ｱｺ繧√◆縺・→縺・
+- agent handoff 縺ｧ蠢・ｦ√↑ evidence縲｛wnership縲…ompletion gate 繧呈紛逅・＠縺溘＞縺ｨ縺・
 
 ## Core Responsibilities
 
-1. Flow control: phase の入口条件、出口条件、rollback 条件を定義する
-2. Handoff contract: 次工程へ渡す context、evidence、artifact を明示する
-3. Quality gates: 検証なしで phase を進めない基準を維持する
-4. Execution mapping: generic runtime persona は `.ai/agents-source/workflow-orchestrator.md` と `.ai/agents-source/workflow-orchestrator.toml` に委譲する
+1. Flow control: phase 縺ｮ蜈･蜿｣譚｡莉ｶ縲∝・蜿｣譚｡莉ｶ縲〉ollback 譚｡莉ｶ繧貞ｮ夂ｾｩ縺吶ｋ
+2. Handoff contract: 谺｡蟾･遞九∈貂｡縺・context縲‘vidence縲∥rtifact 繧呈・遉ｺ縺吶ｋ
+3. Quality gates: 讀懆ｨｼ縺ｪ縺励〒 phase 繧帝ｲ繧√↑縺・渕貅悶ｒ邯ｭ謖√☆繧・
+4. Execution mapping: generic runtime persona 縺ｯ `.ai/agents-source/workflow-orchestrator.md` 縺ｨ `.ai/agents-source/workflow-orchestrator.toml` 縺ｫ蟋碑ｭｲ縺吶ｋ
 
 ## Invariants
 
-- rule 側に runtime persona や project-specific status template を重複させない
-- retry limit、escalation condition、completion evidence を曖昧にしない
-- individual task の implementation guidance は specialist 側に委譲する
-- phase advancement は fresh verification evidence を伴う
+- rule 蛛ｴ縺ｫ runtime persona 繧・project-specific status template 繧帝㍾隍・＆縺帙↑縺・
+- retry limit縲‘scalation condition縲…ompletion evidence 繧呈尠譏ｧ縺ｫ縺励↑縺・
+- individual task 縺ｮ implementation guidance 縺ｯ specialist 蛛ｴ縺ｫ蟋碑ｭｲ縺吶ｋ
+- phase advancement 縺ｯ fresh verification evidence 繧剃ｼｴ縺・
 
 ## Non-Goals
 
-- 特定 project 用の長い pipeline script を rule に保持すること
-- agent identity、memory、speaking style を rule 側で定義すること
-- specialist agent 一覧を rule 側で source-of-truth 化すること
+- 迚ｹ螳・project 逕ｨ縺ｮ髟ｷ縺・pipeline script 繧・rule 縺ｫ菫晄戟縺吶ｋ縺薙→
+- agent identity縲［emory縲《peaking style 繧・rule 蛛ｴ縺ｧ螳夂ｾｩ縺吶ｋ縺薙→
+- specialist agent 荳隕ｧ繧・rule 蛛ｴ縺ｧ source-of-truth 蛹悶☆繧九％縺ｨ
 
 ## Decision Criteria
 
-- cross-cutting workflow policy が主題なら এই rule を使い、runtime execution は generic orchestrator agent へ委譲する
-- domain 固有の artifact や handoff contract がある場合だけ domain-specific coordinator を使う
-- generic runtime persona と specialist catalog は agent source 側で管理し、rule に複製しない
-- phase progression は常に current evidence と verification gate で判断する
+- cross-cutting workflow policy 縺御ｸｻ鬘後↑繧・爬鐘ｦ・rule 繧剃ｽｿ縺・〉untime execution 縺ｯ generic orchestrator agent 縺ｸ蟋碑ｭｲ縺吶ｋ
+- domain 蝗ｺ譛峨・ artifact 繧・handoff contract 縺後≠繧句ｴ蜷医□縺・domain-specific coordinator 繧剃ｽｿ縺・
+- generic runtime persona 縺ｨ specialist catalog 縺ｯ agent source 蛛ｴ縺ｧ邂｡逅・＠縲〉ule 縺ｫ隍・｣ｽ縺励↑縺・
+- phase progression 縺ｯ蟶ｸ縺ｫ current evidence 縺ｨ verification gate 縺ｧ蛻､譁ｭ縺吶ｋ
 
 ## Output Expectations
 

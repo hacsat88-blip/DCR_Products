@@ -1,64 +1,65 @@
 ---
-description: project/global スコープと confidence を持つ instinct 運用。学びを status/export/import/evolve/promote で管理し、再利用可能な skill/rule 候補へ昇格する。
+description: "continuous-learning-v2"
 globs: ""
 alwaysApply: false
 ---
 
+<!-- GENERATED: .\tools\deploy-all.ps1 -->
 
 # Continuous Learning v2 (Light)
 
-## v1 との関係
+## v1 縺ｨ縺ｮ髢｢菫・
 
-- `skills/continuous-learning/SKILL.md` を基盤フローとして利用する
-- v2 は既存記録を project/global と confidence で再編成し、昇格判断を追加する拡張レイヤー
-- 初回導入時は v1 の運用を優先し、慣れたら v2 コマンド運用を段階適用する
+- `skills/continuous-learning/SKILL.md` 繧貞渕逶､繝輔Ο繝ｼ縺ｨ縺励※蛻ｩ逕ｨ縺吶ｋ
+- v2 縺ｯ譌｢蟄倩ｨ倬鹸繧・project/global 縺ｨ confidence 縺ｧ蜀咲ｷｨ謌舌＠縲∵・譬ｼ蛻､譁ｭ繧定ｿｽ蜉縺吶ｋ諡｡蠑ｵ繝ｬ繧､繝､繝ｼ
+- 蛻晏屓蟆主・譎ゅ・ v1 縺ｮ驕狗畑繧貞━蜈医＠縲∵・繧後◆繧・v2 繧ｳ繝槭Φ繝蛾°逕ｨ繧呈ｮｵ髫朱←逕ｨ縺吶ｋ
 
-## 目的
+## 逶ｮ逧・
 
-`skills/continuous-learning` の記録を拡張し、知見を次の2層で管理する。
+`skills/continuous-learning` 縺ｮ險倬鹸繧呈僑蠑ｵ縺励∫衍隕九ｒ谺｡縺ｮ2螻､縺ｧ邂｡逅・☆繧九・
 
-- project scope: そのリポジトリだけで有効な知見
-- global scope: 複数リポジトリで再利用可能な知見
+- project scope: 縺昴・繝ｪ繝昴ず繝医Μ縺縺代〒譛牙柑縺ｪ遏･隕・
+- global scope: 隍・焚繝ｪ繝昴ず繝医Μ縺ｧ蜀榊茜逕ｨ蜿ｯ閭ｽ縺ｪ遏･隕・
 
-## データモデル
+## 繝・・繧ｿ繝｢繝・Ν
 
-各 instinct は以下を持つ。
+蜷・instinct 縺ｯ莉･荳九ｒ謖√▽縲・
 
-- `id`: 一意識別子
-- `trigger`: どの状況で発火するか
+- `id`: 荳諢剰ｭ伜挨蟄・
+- `trigger`: 縺ｩ縺ｮ迥ｶ豕√〒逋ｺ轣ｫ縺吶ｋ縺・
 - `confidence`: 0.0-1.0
-- `domain`: workflow/testing/security/docs 等
+- `domain`: workflow/testing/security/docs 遲・
 - `scope`: `project` or `global`
-- `learning`: 学び
-- `action`: 次回アクション
+- `learning`: 蟄ｦ縺ｳ
+- `action`: 谺｡蝗槭い繧ｯ繧ｷ繝ｧ繝ｳ
 
-## コマンド運用
+## 繧ｳ繝槭Φ繝蛾°逕ｨ
 
-この light 版は専用 CLI ではなく、既存 memory を使って運用する。
+縺薙・ light 迚医・蟆ら畑 CLI 縺ｧ縺ｯ縺ｪ縺上∵里蟄・memory 繧剃ｽｿ縺｣縺ｦ驕狗畑縺吶ｋ縲・
 
-- `status`: `/memories/repo/` の instinct を一覧し confidence を確認
-- `export`: 高 confidence instinct を markdown で抽出
-- `import`: 他メモから instinct を取り込み（重複は高 confidence を優先）
-- `evolve`: 似た trigger をクラスタ化して skill/rule 候補化
-- `promote`: project instinct を global へ昇格
+- `status`: `/memories/repo/` 縺ｮ instinct 繧剃ｸ隕ｧ縺・confidence 繧堤｢ｺ隱・
+- `export`: 鬮・confidence instinct 繧・markdown 縺ｧ謚ｽ蜃ｺ
+- `import`: 莉悶Γ繝｢縺九ｉ instinct 繧貞叙繧願ｾｼ縺ｿ・磯㍾隍・・鬮・confidence 繧貞━蜈茨ｼ・
+- `evolve`: 莨ｼ縺・trigger 繧偵け繝ｩ繧ｹ繧ｿ蛹悶＠縺ｦ skill/rule 蛟呵｣懷喧
+- `promote`: project instinct 繧・global 縺ｸ譏・ｼ
 
-## Promote ルール
+## Promote 繝ｫ繝ｼ繝ｫ
 
-以下を満たしたら `global` 昇格候補:
+莉･荳九ｒ貅縺溘＠縺溘ｉ `global` 譏・ｼ蛟呵｣・
 
-- 2回以上、別文脈で再現
-- 平均 confidence が 0.8 以上
-- 特定プロジェクト事情に依存しない
+- 2蝗樔ｻ･荳翫∝挨譁・ц縺ｧ蜀咲樟
+- 蟷ｳ蝮・confidence 縺・0.8 莉･荳・
+- 迚ｹ螳壹・繝ｭ繧ｸ繧ｧ繧ｯ繝井ｺ区ュ縺ｫ萓晏ｭ倥＠縺ｪ縺・
 
-## Evolve ルール
+## Evolve 繝ｫ繝ｼ繝ｫ
 
-以下を満たしたら独立 skill 候補:
+莉･荳九ｒ貅縺溘＠縺溘ｉ迢ｬ遶・skill 蛟呵｣・
 
-- 同一 domain で 3 件以上
-- 同系 trigger で実行手順が定義可能
-- 失敗予防または工数削減の効果が明確
+- 蜷御ｸ domain 縺ｧ 3 莉ｶ莉･荳・
+- 蜷檎ｳｻ trigger 縺ｧ螳溯｡梧焔鬆・′螳夂ｾｩ蜿ｯ閭ｽ
+- 螟ｱ謨嶺ｺ磯亟縺ｾ縺溘・蟾･謨ｰ蜑頑ｸ帙・蜉ｹ譫懊′譏守｢ｺ
 
-## 関連
+## 髢｢騾｣
 
-- `skills/continuous-learning` 記録
-- `skills/rules-distill` rule 昇格
+- `skills/continuous-learning` 險倬鹸
+- `skills/rules-distill` rule 譏・ｼ

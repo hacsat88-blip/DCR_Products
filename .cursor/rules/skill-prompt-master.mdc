@@ -1,54 +1,55 @@
 ---
-description: Use this skill whenever the user asks to create, rewrite, optimize, compare, or systematize prompts for chat-style use, GPTs/custom assistants, project instructions, system prompts, agent prompts, or prompt templates. Trigger on phrases like "prompt generator", "prompt-master", "system prompt", "GPTs", "project prompt", "rewrite this prompt", "improve my prompt", or "prompt template".
+description: "prompt-master"
 globs: ""
 alwaysApply: false
 ---
 
+<!-- GENERATED: .\tools\deploy-all.ps1 -->
 
 # Prompt Master
 
-会話型プロンプト、GPTs/カスタムアシスタント用プロンプト、プロジェクト用インストラクションを統一品質で設計する。
+莨夊ｩｱ蝙九・繝ｭ繝ｳ繝励ヨ縲；PTs/繧ｫ繧ｹ繧ｿ繝繧｢繧ｷ繧ｹ繧ｿ繝ｳ繝育畑繝励Ο繝ｳ繝励ヨ縲√・繝ｭ繧ｸ繧ｧ繧ｯ繝育畑繧､繝ｳ繧ｹ繝医Λ繧ｯ繧ｷ繝ｧ繝ｳ繧堤ｵｱ荳蜩∬ｳｪ縺ｧ險ｭ險医☆繧九・
 
-## いつ使うか
+## 縺・▽菴ｿ縺・°
 
-- プロンプトの新規作成・改善・短縮・再構成を依頼されたとき
-- 「prompt generator」「prompt-master」「system prompt」「GPTs」「project prompt」の語が出たとき
-- 同じ要求を複数環境で使える形に正規化したいとき
+- 繝励Ο繝ｳ繝励ヨ縺ｮ譁ｰ隕丈ｽ懈・繝ｻ謾ｹ蝟・・遏ｭ邵ｮ繝ｻ蜀肴ｧ区・繧剃ｾ晞ｼ縺輔ｌ縺溘→縺・
+- 縲継rompt generator縲阪継rompt-master縲阪茎ystem prompt縲阪隈PTs縲阪継roject prompt縲阪・隱槭′蜃ｺ縺溘→縺・
+- 蜷後§隕∵ｱゅｒ隍・焚迺ｰ蠅・〒菴ｿ縺医ｋ蠖｢縺ｫ豁｣隕丞喧縺励◆縺・→縺・
 
-## 入力チェック
+## 蜈･蜉帙メ繧ｧ繝・け
 
-1. 目的: 何を成功とみなすか
-2. 実行主体: 人間かエージェントか
-3. 実行環境: chat / GPTs / project instructions / coding agent
-4. 制約: 禁止事項、長さ、出力形式、言語
-5. 評価軸: 正確性、再現性、コスト、速度
+1. 逶ｮ逧・ 菴輔ｒ謌仙粥縺ｨ縺ｿ縺ｪ縺吶°
+2. 螳溯｡御ｸｻ菴・ 莠ｺ髢薙°繧ｨ繝ｼ繧ｸ繧ｧ繝ｳ繝医°
+3. 螳溯｡檎腸蠅・ chat / GPTs / project instructions / coding agent
+4. 蛻ｶ邏・ 遖∵ｭ｢莠矩・・聞縺輔∝・蜉帛ｽ｢蠑上∬ｨ隱・
+5. 隧穂ｾ｡霆ｸ: 豁｣遒ｺ諤ｧ縲∝・迴ｾ諤ｧ縲√さ繧ｹ繝医・溷ｺｦ
 
-## 生成フロー
+## 逕滓・繝輔Ο繝ｼ
 
 1. Intent Capture
-   - ユーザーのゴールと非ゴールを分離
+   - 繝ｦ繝ｼ繧ｶ繝ｼ縺ｮ繧ｴ繝ｼ繝ｫ縺ｨ髱槭ざ繝ｼ繝ｫ繧貞・髮｢
 2. Constraint Hardening
-   - 曖昧語を measurable な制約に置換
+   - 譖匁乂隱槭ｒ measurable 縺ｪ蛻ｶ邏・↓鄂ｮ謠・
 3. Structure Build
-   - role, context, task, constraints, output, checks を明示
+   - role, context, task, constraints, output, checks 繧呈・遉ｺ
 4. Variant Build
-   - 用途別に 3 系統を出す（chat / GPTs / project）
+   - 逕ｨ騾泌挨縺ｫ 3 邉ｻ邨ｱ繧貞・縺呻ｼ・hat / GPTs / project・・
 5. Verification Hooks
-   - 想定失敗と修正指示を短く添える
+   - 諠ｳ螳壼､ｱ謨励→菫ｮ豁｣謖・､ｺ繧堤洒縺乗ｷｻ縺医ｋ
 
-## 出力フォーマット
+## 蜃ｺ蜉帙ヵ繧ｩ繝ｼ繝槭ャ繝・
 
 - Analysis
 - Improvement Points
 - Prompt Pack
 
-Prompt Pack には次を必ず含める:
+Prompt Pack 縺ｫ縺ｯ谺｡繧貞ｿ・★蜷ｫ繧√ｋ:
 
-1. Chat Prompt (会話型)
-2. GPTs System Prompt (カスタムGPTs向け)
-3. Project Instruction Prompt (プロジェクト常駐向け)
+1. Chat Prompt (莨夊ｩｱ蝙・
+2. GPTs System Prompt (繧ｫ繧ｹ繧ｿ繝GPTs蜷代￠)
+3. Project Instruction Prompt (繝励Ο繧ｸ繧ｧ繧ｯ繝亥ｸｸ鬧仙髄縺・
 
-## テンプレート
+## 繝・Φ繝励Ξ繝ｼ繝・
 
 ### Chat Prompt
 
@@ -82,10 +83,10 @@ Verification requirements:
 Reporting format:
 ```
 
-## 品質ゲート
+## 蜩∬ｳｪ繧ｲ繝ｼ繝・
 
-- 曖昧語が具体化されている
-- 禁止事項と例外が明確
-- 出力形が固定されている
-- 失敗時の再試行条件がある
-- 対象環境に依存する記述が分離されている
+- 譖匁乂隱槭′蜈ｷ菴灘喧縺輔ｌ縺ｦ縺・ｋ
+- 遖∵ｭ｢莠矩・→萓句､悶′譏守｢ｺ
+- 蜃ｺ蜉帛ｽ｢縺悟崋螳壹＆繧後※縺・ｋ
+- 螟ｱ謨玲凾縺ｮ蜀崎ｩｦ陦梧擅莉ｶ縺後≠繧・
+- 蟇ｾ雎｡迺ｰ蠅・↓萓晏ｭ倥☆繧玖ｨ倩ｿｰ縺悟・髮｢縺輔ｌ縺ｦ縺・ｋ
