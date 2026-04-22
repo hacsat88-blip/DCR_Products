@@ -28,7 +28,7 @@ Utility scripts for build, deployment, and maintenance operations.
 
 ### `manifest-compiler.ps1`
 
-**Purpose:** Compile frontmatter from `rules/*.md`, `skills/*/SKILL.md`, and `.ai/agents-source/` into a unified JSON manifest
+**Purpose:** Compile frontmatter from `.ai/catalog/rules/*.md`, `.ai/catalog/skills/*/SKILL.md`, and `.ai/catalog/agents-source/` into a unified JSON manifest
 
 **Input:** YAML frontmatter with `targets: [vscode, cursor, claude, codex]` field
 
@@ -65,11 +65,11 @@ Generates `AGENTS.md` for Codex (GitHub CLI) environment
 
 ### `generate-routing-index.ps1`
 
-**Purpose:** Auto-generate `rules/_ROUTING_INDEX.md` from rule frontmatter
+**Purpose:** Auto-generate `.ai/catalog/rules/_ROUTING_INDEX.md` from rule frontmatter
 
-**Input:** `rules/*.md` metadata
+**Input:** `.ai/catalog/rules/*.md` metadata
 
-**Output:** `rules/_ROUTING_INDEX.md` (searchable index)
+**Output:** `.ai/catalog/rules/_ROUTING_INDEX.md` (searchable index)
 
 **Called by:** `validate.ps1`
 
@@ -84,7 +84,7 @@ Generates `AGENTS.md` for Codex (GitHub CLI) environment
 
 **Purpose:** Package skills for distribution and versioning
 
-**Input:** `skills/` directory
+**Input:** `.ai/catalog/skills/` directory
 
 **Output:** Versioned package archive (`.zip` or `.tar.gz`)
 
@@ -134,4 +134,4 @@ JSON Schema for validating manifest structure. Used by:
 
 All scripts use UTF-8 encoding and PowerShell 7+.
 
-For updates to adapter logic, see [unified-adapter-system.md](../architecture/unified-adapter-system.md).
+For updates to adapter logic, see [docs/dcr/architecture/unified-adapter-system.md](../docs/dcr/architecture/unified-adapter-system.md).

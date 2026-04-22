@@ -6,7 +6,9 @@ param(
 $ErrorActionPreference = "Stop"
 
 $resolvedRoot = (Resolve-Path $RepoRoot).Path
-$rulesDir = Join-Path $resolvedRoot "rules"
+$CatalogPaths = Join-Path $resolvedRoot "tools\lib\catalog-paths.ps1"
+. $CatalogPaths
+$rulesDir = Resolve-DcrSourcePath -RepoRoot $resolvedRoot -AssetType "rules"
 if (-not (Test-Path $rulesDir)) {
     throw "rules directory not found: $rulesDir"
 }

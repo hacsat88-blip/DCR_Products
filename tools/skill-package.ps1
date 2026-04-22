@@ -34,7 +34,9 @@ param(
 
 $ErrorActionPreference = "Stop"
 $RepoRoot = Split-Path -Parent $PSScriptRoot
-$SkillsDir = Join-Path $RepoRoot "skills"
+$CatalogPaths = Join-Path $RepoRoot "tools\lib\catalog-paths.ps1"
+. $CatalogPaths
+$SkillsDir = Resolve-DcrSourcePath -RepoRoot $RepoRoot -AssetType "skills"
 $RegistryFile = Join-Path $RepoRoot ".dcr\registry.yaml"
 
 # ─────────────────────────────────────────────

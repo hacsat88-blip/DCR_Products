@@ -1,10 +1,9 @@
 ---
-description: "remotion-best-practices"
+description: Best practices for Remotion - Video creation in React
 globs: ""
 alwaysApply: false
 ---
 
-<!-- GENERATED: .\tools\deploy-all.ps1 -->
 
 ## When to use
 

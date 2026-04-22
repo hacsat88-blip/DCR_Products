@@ -1,10 +1,9 @@
 ---
-description: "improve-codebase-architecture"
+description: コードベースの構造改善ポイントを探索し、浅いモジュールを深くし、テスタビリティと変更容易性を高める改善案を提示する。
 globs: ""
 alwaysApply: false
 ---
 
-<!-- GENERATED: .\tools\deploy-all.ps1 -->
 
 # Improve Codebase Architecture
 

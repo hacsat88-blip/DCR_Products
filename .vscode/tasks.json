@@ -1,68 +1,43 @@
 {
-	"version": "2.0.0",
-	"tasks": [
-		{
-			"label": "DCR Deploy",
-			"type": "shell",
-			"command": "powershell",
-			"args": [
-				"-ExecutionPolicy",
-				"Bypass",
-				"-File",
-				"${workspaceFolder}/deploy.ps1"
-			],
-			"group": "build",
-			"presentation": {
-				"reveal": "silent",
-				"panel": "shared"
-			},
-			"runOptions": {
-				"runOn": "folderOpen"
-			},
-			"problemMatcher": []
-		},
-		{
-			"label": "DCR Deploy Check",
-			"type": "shell",
-			"command": "powershell",
-			"args": [
-				"-ExecutionPolicy",
-				"Bypass",
-				"-File",
-				"${workspaceFolder}/deploy.ps1",
-				"-Check"
-			],
-			"group": "test",
-			"presentation": {
-				"reveal": "always",
-				"panel": "shared"
-			},
-			"problemMatcher": []
-		},
-		{
-			"label": "Install autotrader-ui deps",
-			"type": "shell",
-			"command": "powershell",
-			"args": [
-				"-NoProfile",
-				"-ExecutionPolicy",
-				"Bypass",
-				"-Command",
-				"Push-Location \"c:/Users/hacsa/Desktop/サトシ開発/Product/autotrader-suite/ui\"; npm.cmd install --no-audit --no-fund --progress=false"
-			],
-			"isBackground": false
-		},
-		{
-			"label": "autotrader-ui build verify",
-			"type": "shell",
-			"command": "powershell",
-			"args": [
-				"-NoProfile",
-				"-Command",
-				"Push-Location \"c:/Users/hacsa/Desktop/サトシ開発/Product/autotrader-suite/ui\"; .\\node_modules\\.bin\\next.cmd build; $code=$LASTEXITCODE; Pop-Location; exit $code"
-			],
-			"isBackground": false,
-			"group": "test"
-		}
-	]
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "DCR Deploy",
+      "type": "shell",
+      "command": "powershell",
+      "args": [
+        "-ExecutionPolicy",
+        "Bypass",
+        "-File",
+        "${workspaceFolder}/deploy.ps1"
+      ],
+      "group": "build",
+      "presentation": {
+        "reveal": "silent",
+        "panel": "shared"
+      },
+      "runOptions": {
+        "runOn": "folderOpen"
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "DCR Deploy Check",
+      "type": "shell",
+      "command": "powershell",
+      "args": [
+        "-ExecutionPolicy",
+        "Bypass",
+        "-File",
+        "${workspaceFolder}/deploy.ps1",
+        "-Check"
+      ],
+      "group": "test",
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared"
+      },
+      "problemMatcher": []
+    }
+  ]
 }

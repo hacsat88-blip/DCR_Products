@@ -7,38 +7,38 @@
 
 - 環境差分で運用品質がぶれないようにする
 - gstack 的な「計画 → 実装 → レビュー → QA → 出荷」の流れを共通化する
-- 既存の rules/skills を活かし、全面置換ではなく統合で進める
+- 既存の `.ai/catalog/rules/` と `.ai/catalog/skills/` を活かし、全面置換ではなく統合で進める
 
 ## Common Flow
 
 1. `p/` Plan Gate
-   - `skills/writing-plans` を優先
+   - `.ai/catalog/skills/writing-plans` を優先
    - 3ステップ以上は計画を明示してから実装
 2. 実装
    - 既存の skill と rules の優先順位に従う
 3. `a/` Review Gate
    - 既存 review/debug ルールを適用
 4. `q/` QA Gate
-   - `skills/webapp-testing` を優先
+   - `.ai/catalog/skills/webapp-testing` を優先
    - 画面検証は証跡を残す
 5. `sh/` Ship Gate
-   - `skills/verification-before-completion` と
-     `skills/finishing-a-development-branch` を優先
+    - `.ai/catalog/skills/verification-before-completion` と
+       `.ai/catalog/skills/finishing-a-development-branch` を優先
 
 ## Execution Modes (共通定義)
 
 全環境で使用可能なキーワードプレフィクス。tmux 不要、動作戦略の宣言のみ。
 
-| Keyword | Mode | 適用環境 |
-|---------|------|----------|
-| `autopilot:` | 自律実行 | VS Code / Copilot CLI / Claude Code / Codex |
-| `ralph:` | 完了保証ループ | 同上（`ulw` 内包） |
-| `ulw` | 超並列バッチ処理 | 同上 |
-| `ralplan:` | 反復プラン精度向上 | 同上 |
-| `deep-interview:` | ソクラテス式要件整理 | 同上 |
-| `ultrathink:` | 深層推論 | 同上 |
-| `deepsearch:` | コード全域調査 | 同上 |
-| `team:` | チームパイプライン | 同上 |
+| Keyword           | Mode                 | 適用環境                                    |
+| ----------------- | -------------------- | ------------------------------------------- |
+| `autopilot:`      | 自律実行             | VS Code / Copilot CLI / Claude Code / Codex |
+| `ralph:`          | 完了保証ループ       | 同上（`ulw` 内包）                          |
+| `ulw`             | 超並列バッチ処理     | 同上                                        |
+| `ralplan:`        | 反復プラン精度向上   | 同上                                        |
+| `deep-interview:` | ソクラテス式要件整理 | 同上                                        |
+| `ultrathink:`     | 深層推論             | 同上                                        |
+| `deepsearch:`     | コード全域調査       | 同上                                        |
+| `team:`           | チームパイプライン   | 同上                                        |
 
 ## Team Pipeline（チームパイプライン詳細）
 
@@ -48,13 +48,13 @@
 team-plan → team-prd → team-exec → team-verify → team-fix (loop)
 ```
 
-| フェーズ | 内容 | DCR対応 |
-|----------|------|----------|
-| team-plan | 要件分析・依存関係整理 | p/ Plan Gate |
-| team-prd | 実装仕様書（PRD）生成 | writing-plans skill |
-| team-exec | 実装（チャンク分割） | P2実行 |
-| team-verify | 全チェックリスト検証 | q/ QA Gate |
-| team-fix | 不合格項目修正ループ | systematic-debugging skill → re-verify |
+| フェーズ    | 内容                   | DCR対応                                |
+| ----------- | ---------------------- | -------------------------------------- |
+| team-plan   | 要件分析・依存関係整理 | p/ Plan Gate                           |
+| team-prd    | 実装仕様書（PRD）生成  | writing-plans skill                    |
+| team-exec   | 実装（チャンク分割）   | P2実行                                 |
+| team-verify | 全チェックリスト検証   | q/ QA Gate                             |
+| team-fix    | 不合格項目修正ループ   | systematic-debugging skill → re-verify |
 
 ## Canonical Priority
 
@@ -95,7 +95,7 @@ team-plan → team-prd → team-exec → team-verify → team-fix (loop)
 
 ## Notes
 
-- Copilot CLI は `COPILOT_CLI.md` を優先
+- Copilot CLI は `AGENTS.md` を入口とし、CLI 固有差分は `.ai/kernel/environments/copilot-cli.md` を参照する
 - VS Code Copilot は `.github/copilot-instructions.md` を優先
 - Codex は `AGENTS.md` を優先
 - Cursor は `.cursor/rules/`（`deploy.ps1` 生成）を優先

@@ -1,10 +1,9 @@
 ---
-description: "search-first"
+description: Research-before-coding workflow. Search for existing tools, libraries, and patterns before writing custom code.
 globs: ""
 alwaysApply: false
 ---
 
-<!-- GENERATED: .\tools\deploy-all.ps1 -->
 
 # Search First — 実装前に調査する
 

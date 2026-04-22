@@ -7,7 +7,8 @@
 ## Environment-specific behavior
 
 - Codex 用の参照層として使う
-- GitHub Copilot CLI を使う場合は `COPILOT_CLI.md` を優先する
+- GitHub Copilot CLI も同じ `AGENTS.md` を入口として使う
+- CLI 固有差分は [copilot-cli.md](copilot-cli.md) を参照する
 - 共通仕様は [../_base.md](../_base.md) を source of truth とする
 
 ## Session plan handoff

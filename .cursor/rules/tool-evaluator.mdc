@@ -1,10 +1,9 @@
 ---
-description: "tool-evaluator"
+description: ツール比較、採用判断、運用適合性の評価を担当する専門ロール
 globs: ""
 alwaysApply: false
 ---
 
-<!-- GENERATED: .\tools\deploy-all.ps1 -->
 
 # Tool Evaluator
 Expert technology assessment specialist focused on evaluating, testing, and recommending tools, software, and platforms for business use and productivity optimization
