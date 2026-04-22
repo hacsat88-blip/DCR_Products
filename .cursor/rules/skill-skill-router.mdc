@@ -1,482 +1,481 @@
 ---
-description: "skill-router"
+description: タスクに最適なスキルを選定し、Transparency for delegation に則り報告するルーター。Layer 1でカバーできないとき、または「何を使えばいい？」と聞かれたときに自動発火する。
 globs: ""
 alwaysApply: false
 ---
 
-<!-- GENERATED: .\tools\deploy-all.ps1 -->
 
 # Skill Router
 
-繧ｿ繧ｹ繧ｯ縺ｫ譛驕ｩ縺ｪ繧ｹ繧ｭ繝ｫ/繧ｨ繝ｼ繧ｸ繧ｧ繝ｳ繝医ｒ驕ｸ螳壹＠縲ゝransparency for delegation 縺ｫ蜑・▲縺ｦ蝣ｱ蜻翫＠縺ｦ縺九ｉ逋ｺ轣ｫ縺吶ｋ繝ｫ繝ｼ繧ｿ繝ｼ縲・
+タスクに最適なスキル/エージェントを選定し、Transparency for delegation に則って報告してから発火するルーター。
 
-## 繧ｪ繝ｼ繧ｱ繧ｹ繝医Ξ繝ｼ繧ｷ繝ｧ繝ｳ譁ｹ驥・
+## オーケストレーション方針
 
-- 譁ｹ蠑上・繝上う繝悶Μ繝・ラ: 荳ｭ蛻・｡槭Ν繝ｼ繝・ぅ繝ｳ繧ｰ・郁ｦｪ・・+ 蛟句挨繧ｹ繧ｭ繝ｫ螳溯｡鯉ｼ亥ｭ撰ｼ・
-- 隕ｪ縺ｧ蛟呵｣懊ｒ邨槭ｊ縲∵怙邨ら噪縺ｫ縺ｯ蟄舌せ繧ｭ繝ｫ繧帝∈螳壹＠縺ｦ逋ｺ轣ｫ縺吶ｋ
-- 蛟句挨螳溯｡後・蟶ｸ譎りｨｱ蜿ｯ: `/skill-name` 縺ｮ逶ｴ謗･蜻ｼ縺ｳ蜃ｺ縺励ｒ遖∵ｭ｢縺励↑縺・
-- 莠呈鋤諤ｧ蜆ｪ蜈・ 譌｢蟄倥・繧ｹ繧ｭ繝ｫ蜷阪ｒ邯ｭ謖√＠縲∝ｰ守ｷ壹・縺ｿ謨ｴ逅・☆繧・
+- 方式はハイブリッド: 中分類ルーティング（親） + 個別スキル実行（子）
+- 親で候補を絞り、最終的には子スキルを選定して発火する
+- 個別実行は常時許可: `/skill-name` の直接呼び出しを禁止しない
+- 互換性優先: 既存のスキル名を維持し、導線のみ整理する
 
-## 蜍穂ｽ懊ヵ繝ｭ繝ｼ
+## 動作フロー
 
-1. 繝ｦ繝ｼ繧ｶ繝ｼ縺ｮ繧ｿ繧ｹ繧ｯ繧貞・譫舌☆繧・
-2. 荳玖ｨ倥う繝ｳ繝・ャ繧ｯ繧ｹ縺九ｉ繝槭ャ繝√☆繧九せ繧ｭ繝ｫ/繧ｨ繝ｼ繧ｸ繧ｧ繝ｳ繝医ｒ迚ｹ螳壹☆繧・
-3. **逋ｺ轣ｫ蜑阪↓莉･荳九・繝輔か繝ｼ繝槭ャ繝医〒蝣ｱ蜻翫☆繧・*・・CR Transparency for delegation 貅匁侠・・
+1. ユーザーのタスクを分析する
+2. 下記インデックスからマッチするスキル/エージェントを特定する
+3. **発火前に以下のフォーマットで報告する**（DCR Transparency for delegation 準拠）:
 
 ```
-莉･荳九ｒ菴ｿ逕ｨ縺励∪縺・
-- [skill/agent蜷江 ([逶ｮ逧・・1陦瑚ｪｬ譏讃)
+以下を使用します:
+- [skill/agent名] ([目的の1行説明])
 ```
 
-4. 繝ｦ繝ｼ繧ｶ繝ｼ縺ｮ謇ｿ隱榊ｾ鯉ｼ医∪縺溘・譏守､ｺ逧・↑雉ｪ蝠上〒縺ｪ縺代ｌ縺ｰ閾ｪ蜍輔〒・峨～/skill-name` 縺ｧ逋ｺ轣ｫ縺吶ｋ
+4. ユーザーの承認後（または明示的な質問でなければ自動で）、`/skill-name` で発火する
 
-## 蝣ｱ蜻翫Ν繝ｼ繝ｫ
+## 報告ルール
 
-- 蜊倅ｸ繧ｹ繧ｭ繝ｫ縺ｧ繧ら怐逡･縺励↑縺・
-- 繧ｵ繝悶お繝ｼ繧ｸ繧ｧ繝ｳ繝医ｒ菴ｵ逕ｨ縺吶ｋ蝣ｴ蜷医・繧ｨ繝ｼ繧ｸ繧ｧ繝ｳ繝亥錐繧ょ・謖吶☆繧・
-- Layer 1 (蟶ｸ譎ゅΟ繝ｼ繝・ 繧ｹ繧ｭ繝ｫ繧ょｱ蜻雁ｯｾ雎｡縺ｨ縺吶ｋ
-- 隍・焚繧ｹ繧ｭ繝ｫ縺悟呵｣懊・蝣ｴ蜷医・蜆ｪ蜈磯・ｽ阪ｒ莉倥￠縺ｦ譛螟ｧ3縺､謠先｡医☆繧・
+- 単一スキルでも省略しない
+- サブエージェントを併用する場合はエージェント名も列挙する
+- Layer 1 (常時ロード) スキルも報告対象とする
+- 複数スキルが候補の場合は優先順位を付けて最大3つ提案する
 
-## Layer 1: Always-On 繧ｹ繧ｭ繝ｫ・亥ｸｸ譎ゅΟ繝ｼ繝画ｸ医∩ 窶・閾ｪ蜍慕匱轣ｫ蜿ｯ閭ｽ・・
+## Layer 1: Always-On スキル（常時ロード済み — 自動発火可能）
 
-莉･荳九・ description 縺後さ繝ｳ繝・く繧ｹ繝医↓蟶ｸ鬧舌＠縲√Δ繝・Ν縺瑚・蜍輔〒逋ｺ轣ｫ縺ｧ縺阪ｋ:
+以下は description がコンテキストに常駐し、モデルが自動で発火できる:
 
-| 繧ｹ繧ｭ繝ｫ | 逕ｨ騾・|
+| スキル | 用途 |
 |---|---|
-| code-review | 繧ｳ繝ｼ繝峨Ξ繝薙Η繝ｼ縲√Ξ繝薙Η繝ｼ繝輔ぅ繝ｼ繝峨ヰ繝・け蟇ｾ蠢・|
-| systematic-debugging | 繝舌げ縲√ユ繧ｹ繝亥､ｱ謨励∽ｺ域悄縺励↑縺・嫌蜍輔・隱ｿ譟ｻ |
-| verification-before-completion | 螳御ｺ・・菫ｮ豁｣繝ｻ繝代せ荳ｻ蠑ｵ蜑阪・讀懆ｨｼ |
-| writing-plans | 繝槭Ν繝√せ繝・ャ繝励ち繧ｹ繧ｯ縺ｮ險育判菴懈・ |
-| search-first | 螳溯｣・燕縺ｮ譌｢蟄倥ヤ繝ｼ繝ｫ繝ｻ繝ｩ繧､繝悶Λ繝ｪ隱ｿ譟ｻ |
-| continuous-learning | 繧ｻ繝・す繝ｧ繝ｳ荳ｭ縺ｮ蟄ｦ縺ｳ縺ｮ險倬鹸 |
-| continuous-learning-v2 | instinct 縺ｮ邂｡逅・・譏・ｼ |
-| dcr-pipeline | DCR 繧ｲ繝ｼ繝磯｣骼悶・閾ｪ蜍慕ｮ｡逅・|
-| eval-harness | validate.ps1 縺ｧ縺ｮ讒矩蜩∬ｳｪ讀懆ｨｼ |
-| brainstorming | 讖溯・險ｭ險医・蜑ｵ騾逧・ｽ懈･ｭ縺ｮ蜑肴ｮｵ髫・|
-| subagent-driven-development | 迢ｬ遶九ち繧ｹ繧ｯ縺ｮ荳ｦ蛻怜ｮ溯｡・|
-| api-design | REST API 險ｭ險医メ繧ｧ繝・け繝ｪ繧ｹ繝・|
-| prompt-master | 繝励Ο繝ｳ繝励ヨ縺ｮ菴懈・繝ｻ謾ｹ蝟・・譛驕ｩ蛹・|
-| model-route | 繧ｿ繧ｹ繧ｯ髮｣譏灘ｺｦ縺ｫ蠢懊§縺溘Δ繝・Ν驕ｸ謚・|
-| strategic-compact | 繧ｳ繝ｳ繝・く繧ｹ繝亥悸邵ｮ繧ｿ繧､繝溘Φ繧ｰ縺ｮ謠先｡・|
-| tdd-workflow | 繝・せ繝磯ｧ・虚髢狗匱繝ｯ繝ｼ繧ｯ繝輔Ο繝ｼ |
-| prd-to-issues | PRD 繧貞ｮ溯｣・庄閭ｽ縺ｪ Issue 鄒､縺ｫ蛻・ｧ｣ |
-| improve-codebase-architecture | 讒矩謾ｹ蝟・・繧､繝ｳ繝医・謗｢邏｢縺ｨ謠先｡・|
+| code-review | コードレビュー、レビューフィードバック対応 |
+| systematic-debugging | バグ、テスト失敗、予期しない挙動の調査 |
+| verification-before-completion | 完了・修正・パス主張前の検証 |
+| writing-plans | マルチステップタスクの計画作成 |
+| search-first | 実装前の既存ツール・ライブラリ調査 |
+| continuous-learning | セッション中の学びの記録 |
+| continuous-learning-v2 | instinct の管理・昇格 |
+| dcr-pipeline | DCR ゲート連鎖の自動管理 |
+| eval-harness | validate.ps1 での構造品質検証 |
+| brainstorming | 機能設計・創造的作業の前段階 |
+| subagent-driven-development | 独立タスクの並列実行 |
+| api-design | REST API 設計チェックリスト |
+| prompt-master | プロンプトの作成・改善・最適化 |
+| model-route | タスク難易度に応じたモデル選択 |
+| strategic-compact | コンテキスト圧縮タイミングの提案 |
+| tdd-workflow | テスト駆動開発ワークフロー |
+| prd-to-issues | PRD を実装可能な Issue 群に分解 |
+| improve-codebase-architecture | 構造改善ポイントの探索と提案 |
 
-## Layer 3: Manual-Only 繧ｹ繧ｭ繝ｫ・域焔蜍慕匱轣ｫ縺ｮ縺ｿ 窶・繧､繝ｳ繝・ャ繧ｯ繧ｹ・・
+## Layer 3: Manual-Only スキル（手動発火のみ — インデックス）
 
-莉･荳九・ `disable-model-invocation: true` 縺瑚ｨｭ螳壹＆繧後※縺翫ｊ縲～/skill-name` 縺ｧ縺ｮ譏守､ｺ逧・↑蜻ｼ縺ｳ蜃ｺ縺励√∪縺溘・縺薙・ skill-router 邨檎罰縺ｧ縺ｮ縺ｿ逋ｺ轣ｫ縺吶ｋ縲・
+以下は `disable-model-invocation: true` が設定されており、`/skill-name` での明示的な呼び出し、またはこの skill-router 経由でのみ発火する。
 
-## Layer 3A: 荳ｭ蛻・｡槭が繝ｼ繧ｱ繧ｹ繝医Ξ繝ｼ繧ｷ繝ｧ繝ｳ・郁ｦｪ繧ｫ繝・ざ繝ｪ・・
+## Layer 3A: 中分類オーケストレーション（親カテゴリ）
 
-隕ｪ繧ｫ繝・ざ繝ｪ縺ｯ縲後←縺ｮ譚溘ｒ蜈医↓隕九ｋ縺九阪ｒ豎ｺ繧√ｋ縺溘ａ縺ｮ蟆守ｷ壹〒縺ゅｊ縲∝ｮ溯｡悟腰菴阪・蟄舌せ繧ｭ繝ｫ縲・
+親カテゴリは「どの束を先に見るか」を決めるための導線であり、実行単位は子スキル。
 
-| 隕ｪ繧ｫ繝・ざ繝ｪ | 荳ｻ縺ｪ蟇ｾ雎｡ | 莉｣陦ｨ逧・↑蟄舌せ繧ｭ繝ｫ |
+| 親カテゴリ | 主な対象 | 代表的な子スキル |
 |---|---|---|
-| 髮・ｮ｢繝ｻ謌宣聞 | 髮・ｮ｢縲，VR縲∽ｾ｡譬ｼ縲√Ο繝ｼ繝ｳ繝・| `ad-creative`, `copywriting`, `pricing-strategy`, `programmatic-seo` |
-| 譁・嶌繝ｻ雉・侭 | 譁・嶌菴懈・縲∫ｷｨ髮・∝､画鋤縲∫屮譟ｻ | `doc-coauthoring`, `docx`, `pdf`, `pptx`, `xlsx` |
-| UI/菴馴ｨ楢ｨｭ險・| UI險ｭ險医・撕逧・ン繧ｸ繝･繧｢繝ｫ縲√ユ繝ｼ繝樣←逕ｨ | `ui-ux-pro-max`, `canvas-design`, `theme-factory` |
-| 髢狗匱驕狗畑 | 髢狗匱驕狗畑縲√ユ繧ｹ繝医√ョ繝励Ο繧､謌ｦ逡･ | `deployment-patterns`, `webapp-testing`, `using-git-worktrees` |
-| 繝ｫ繝ｼ繝ｫ驕狗畑繝ｻ逶｣譟ｻ | skill驕狗畑縲∫屮譟ｻ縲∵僑蠑ｵ | `harness-audit`, `rules-distill`, `skill-creator`, `mcp-builder` |
+| 集客・成長 | 集客、CVR、価格、ローンチ | `ad-creative`, `copywriting`, `pricing-strategy`, `programmatic-seo` |
+| 文書・資料 | 文書作成、編集、変換、監査 | `doc-coauthoring`, `docx`, `pdf`, `pptx`, `xlsx` |
+| UI/体験設計 | UI設計、静的ビジュアル、テーマ適用 | `ui-ux-pro-max`, `canvas-design`, `theme-factory` |
+| 開発運用 | 開発運用、テスト、デプロイ戦略 | `deployment-patterns`, `webapp-testing`, `using-git-worktrees` |
+| ルール運用・監査 | skill運用、監査、拡張 | `harness-audit`, `rules-distill`, `skill-creator`, `mcp-builder` |
 
-## Layer 3B: 莠呈鋤繝槭ャ繝斐Φ繧ｰ・域立蟆守ｷ・-> 譁ｰ繧ｫ繝・ざ繝ｪ・・
+## Layer 3B: 互換マッピング（旧導線 -> 新カテゴリ）
 
-遘ｻ陦御ｸｭ縺ｮ謗｢邏｢繧ｳ繧ｹ繝医ｒ荳九￡繧九◆繧√∵立蟆守ｷ壹ｒ繧ｫ繝・ざ繝ｪ縺ｫ隱ｭ縺ｿ譖ｿ縺医ｋ縲・
+移行中の探索コストを下げるため、旧導線をカテゴリに読み替える。
 
-| 譌ｧ蟆守ｷ壹・繧ｭ繝ｼ繝ｯ繝ｼ繝・| 譁ｰ繧ｫ繝・ざ繝ｪ |
+| 旧導線・キーワード | 新カテゴリ |
 |---|---|
-| SEO縲∵､懃ｴ｢豬∝・縲∵ｧ矩蛹悶ョ繝ｼ繧ｿ | 髮・ｮ｢繝ｻ謌宣聞 |
-| 謠先｡域嶌縲仝ord/PDF/PPT/Excel | 譁・嶌繝ｻ雉・侭 |
-| UI繝ｬ繝薙Η繝ｼ縲√ョ繧ｶ繧､繝ｳ謾ｹ蝟・| UI/菴馴ｨ楢ｨｭ險・|
-| CI/CD縲『orktree縲・2E | 髢狗匱驕狗畑 |
-| 繝ｫ繝ｼ繝ｫ謨ｴ蛯吶∫屮譟ｻ縲《kill邂｡逅・| 繝ｫ繝ｼ繝ｫ驕狗畑繝ｻ逶｣譟ｻ |
+| SEO、検索流入、構造化データ | 集客・成長 |
+| 提案書、Word/PDF/PPT/Excel | 文書・資料 |
+| UIレビュー、デザイン改善 | UI/体験設計 |
+| CI/CD、worktree、E2E | 開発運用 |
+| ルール整備、監査、skill管理 | ルール運用・監査 |
 
-豕ｨ險・ 荳願ｨ倥・縺ゅ￥縺ｾ縺ｧ蜈･蜿｣謨ｴ逅・ょｿ・ｦ√↑繧臥峩縺｡縺ｫ蟄舌せ繧ｭ繝ｫ繧堤峩謗･螳溯｡後＠縺ｦ繧医＞縲・
+注記: 上記はあくまで入口整理。必要なら直ちに子スキルを直接実行してよい。
 
-## 繝代う繝ｭ繝・ヨ蟆主・謇矩・
+## パイロット導入手順
 
-譛蛻昴°繧牙・繧ｫ繝・ざ繝ｪ縺ｸ蠎・￡縺壹・繧ｫ繝・ざ繝ｪ縺ｧ驕狗畑隧穂ｾ｡縺励※縺九ｉ螻暮幕縺吶ｋ縲・
+最初から全カテゴリへ広げず、1カテゴリで運用評価してから展開する。
 
-### 謗ｨ螂ｨ繝代う繝ｭ繝・ヨ繧ｫ繝・ざ繝ｪ
+### 推奨パイロットカテゴリ
 
-- 隨ｬ荳蛟呵｣・ 譁・嶌繝ｻ雉・侭
-- 逅・罰: 蟇ｾ雎｡繧ｹ繧ｭ繝ｫ縺梧・遒ｺ縺ｧ縲∝・蜃ｺ蜉帙・遞ｮ鬘槭ｂ謨ｴ逅・＠繧・☆縺上∬ｪ､繝ｫ繝ｼ繝・ぅ繝ｳ繧ｰ繧定ｦｳ貂ｬ縺励ｄ縺吶＞
+- 第一候補: 文書・資料
+- 理由: 対象スキルが明確で、入出力の種類も整理しやすく、誤ルーティングを観測しやすい
 
-### 隧穂ｾ｡謇矩・
+### 評価手順
 
-1. 譁・嶌邉ｻ縺ｮ萓晞ｼ繧・莉ｶ髮・ａ繧・
-2. 縺ｾ縺夊ｦｪ繧ｫ繝・ざ繝ｪ `譁・嶌繝ｻ雉・侭` 縺ｧ蛟呵｣憺∈螳壹☆繧・
-3. 豈主屓縲∵怙邨ら噪縺ｫ驕ｸ縺ｰ繧後◆蟄舌せ繧ｭ繝ｫ縺ｨ逅・罰繧定ｨ倬鹸縺吶ｋ
-4. 逶ｴ謗･ `/skill-name` 繧剃ｽｿ縺｣縺溷ｴ蜷医ｂ菴ｵ險倥＠縺ｦ豈碑ｼ・☆繧・
+1. 文書系の依頼を5件集める
+2. まず親カテゴリ `文書・資料` で候補選定する
+3. 毎回、最終的に選ばれた子スキルと理由を記録する
+4. 直接 `/skill-name` を使った場合も併記して比較する
 
-### 隕ｳ貂ｬ謖・ｨ・
+### 観測指標
 
-- 蛻晏屓蛟呵｣懊〒豁｣隗｣縺ｫ蛻ｰ驕斐＠縺溷牡蜷・
-- 蛟呵｣懈署遉ｺ縺九ｉ螳溯｡後∪縺ｧ縺ｮ驕ｸ謚樊凾髢・
-- 隕ｪ繧ｫ繝・ざ繝ｪ繧堤ｵ檎罰縺帙★逶ｴ謗･螳溯｡後＠縺滓ｯ皮紫
-- 諠ｳ螳壼､悶き繝・ざ繝ｪ縺ｸ隱､譯亥・縺励◆莉ｶ謨ｰ
+- 初回候補で正解に到達した割合
+- 候補提示から実行までの選択時間
+- 親カテゴリを経由せず直接実行した比率
+- 想定外カテゴリへ誤案内した件数
 
-### 蜷域ｼ蝓ｺ貅・
+### 合格基準
 
-- 蛻晏屓蛟呵｣懷芦驕皮紫: 80%莉･荳・
-- 隱､譯亥・莉ｶ謨ｰ: 5莉ｶ荳ｭ0縲・莉ｶ
-- 逶ｴ謗･螳溯｡梧ｯ皮紫: 鬮倥￥縺ｦ繧ょ撫鬘後↑縺・′縲∫炊逕ｱ繧定ｨ倬鹸縺吶ｋ
+- 初回候補到達率: 80%以上
+- 誤案内件数: 5件中0〜1件
+- 直接実行比率: 高くても問題ないが、理由を記録する
 
-### 螻暮幕譚｡莉ｶ
+### 展開条件
 
-- 蜷域ｼ蝓ｺ貅悶ｒ貅縺溘＠縺溘ｉ縲∵ｬ｡繧ｫ繝・ざ繝ｪ縺ｸ蜷後§謇矩・ｒ讓ｪ螻暮幕縺吶ｋ
-- 貅縺溘＆縺ｪ縺・ｴ蜷医・縲∬ｦｪ繧ｫ繝・ざ繝ｪ蜷阪°莠呈鋤繝槭ャ繝斐Φ繧ｰ繧貞・縺ｫ菫ｮ豁｣縺吶ｋ
+- 合格基準を満たしたら、次カテゴリへ同じ手順を横展開する
+- 満たさない場合は、親カテゴリ名か互換マッピングを先に修正する
 
-### 驕狗畑險倬鹸繝・Φ繝励Ξ繝ｼ繝・
+### 運用記録テンプレート
 
-繝代う繝ｭ繝・ヨ荳ｭ縺ｯ縲∝推萓晞ｼ繧呈ｬ｡縺ｮ蠖｢蠑上〒邁｡譏楢ｨ倬鹸縺吶ｋ縲・
+パイロット中は、各依頼を次の形式で簡易記録する。
 
 ```md
-- 萓晞ｼ讎りｦ・ [1陦瑚ｦ∫ｴЬ
-- 隕ｪ繧ｫ繝・ざ繝ｪ: [譁・嶌繝ｻ雉・侭 / 髮・ｮ｢繝ｻ謌宣聞 / UI/菴馴ｨ楢ｨｭ險・/ 髢狗匱驕狗畑 / 繝ｫ繝ｼ繝ｫ驕狗畑繝ｻ逶｣譟ｻ]
-- 謠千､ｺ蛟呵｣・ [skill1, skill2, skill3]
-- 譛邨る∈謚・ [skill-name]
-- 螳溯｡檎ｵ瑚ｷｯ: [繧ｪ繝ｼ繧ｱ繧ｹ繝医Ξ繝ｼ繧ｷ繝ｧ繝ｳ / 逶ｴ謗･謖・ｮ咯
-- 驕ｸ謚樊凾髢・ [縺翫♀繧医◎縺ｮ遘呈焚]
-- 隱､譯亥・譛臥┌: [縺ｪ縺・/ 縺ゅｊ]
-- 繝｡繝｢: [霑ｷ縺｣縺溽せ縲√き繝・ざ繝ｪ蜷阪・驕募柱諢溘∵隼蝟・｡・
+- 依頼概要: [1行要約]
+- 親カテゴリ: [文書・資料 / 集客・成長 / UI/体験設計 / 開発運用 / ルール運用・監査]
+- 提示候補: [skill1, skill2, skill3]
+- 最終選択: [skill-name]
+- 実行経路: [オーケストレーション / 直接指定]
+- 選択時間: [おおよその秒数]
+- 誤案内有無: [なし / あり]
+- メモ: [迷った点、カテゴリ名の違和感、改善案]
 ```
 
-### 隕ｪ繧ｫ繝・ざ繝ｪ縺ｮ菴ｿ縺・・縺代Γ繝｢
+### 親カテゴリの使い分けメモ
 
-- 譁・嶌繝ｻ雉・侭: Word縲￣DF縲￣owerPoint縲・xcel縲∵署譯域嶌縲∵ｧ矩蛹悶＆繧後◆譁・嶌菴懈･ｭ
-- 髮・ｮ｢繝ｻ謌宣聞: SEO縲∝ｺ・相縲√さ繝斐・縲∽ｾ｡譬ｼ縲，VR縲∝ｰ守ｷ壽隼蝟・
-- UI/菴馴ｨ楢ｨｭ險・ 逕ｻ髱｢險ｭ險医∬ｦ九◆逶ｮ縲∽ｽ馴ｨ捺隼蝟・√い繧ｯ繧ｻ繧ｷ繝薙Μ繝・ぅ
-- 髢狗匱驕狗畑: 繝・せ繝医√ョ繝励Ο繧､縲『orktree縲・幕逋ｺ繝輔Ο繝ｼ
-- 繝ｫ繝ｼ繝ｫ驕狗畑繝ｻ逶｣譟ｻ: skill/rule菫晏ｮ医∫屮譟ｻ縲｀CP繧・°逕ｨ蝓ｺ逶､縺ｮ謨ｴ蛯・
+- 文書・資料: Word、PDF、PowerPoint、Excel、提案書、構造化された文書作業
+- 集客・成長: SEO、広告、コピー、価格、CVR、導線改善
+- UI/体験設計: 画面設計、見た目、体験改善、アクセシビリティ
+- 開発運用: テスト、デプロイ、worktree、開発フロー
+- ルール運用・監査: skill/rule保守、監査、MCPや運用基盤の整備
 
-## metadata 繝吶・繧ｹ縺ｮ驕ｸ螳壹Ν繝ｼ繝ｫ
+## metadata ベースの選定ルール
 
-`rules/*.md` 縺ｫ `routing_category` 縺後≠繧句ｴ蜷医・縲√ヵ繧｡繧､繝ｫ蜷阪ｄ譛ｬ譁・・蜊ｰ雎｡繧医ｊ蜈医↓ metadata 繧剃ｽｿ縺｣縺ｦ邊励￥謖ｯ繧雁・縺代ｋ縲・
+`rules/*.md` に `routing_category` がある場合は、ファイル名や本文の印象より先に metadata を使って粗く振り分ける。
 
-蜆ｪ蜈磯・ｽ阪・莉･荳九・鬆・
+優先順位は以下の順:
 
-1. 譏守､ｺ謖・ｮ壹＆繧後◆ `/skill-name` 縺ｾ縺溘・ agent 蜷・
-2. `routing_category` 縺ｫ繧医ｋ隕ｪ繧ｫ繝・ざ繝ｪ荳閾ｴ
-3. `keywords` 縺ｮ荳閾ｴ謨ｰ
-4. `domain` 縺ｮ霑代＆
-5. `risk` 縺ｫ繧医ｋ邨槭ｊ霎ｼ縺ｿ
+1. 明示指定された `/skill-name` または agent 名
+2. `routing_category` による親カテゴリ一致
+3. `keywords` の一致数
+4. `domain` の近さ
+5. `risk` による絞り込み
 
-陬懆ｶｳ:
+補足:
 
-- `routing_category` 縺ｯ隕ｪ繧ｫ繝・ざ繝ｪ豎ｺ螳壼ｰら畑縺ｧ縺ゅｊ縲∵怙邨ょｮ溯｡悟ｯｾ雎｡縺ｮ遒ｺ螳壹↓縺ｯ `keywords` 縺ｨ萓晞ｼ譁・・逶ｮ逧・ｒ菴ｵ逕ｨ縺吶ｋ
-- `risk: high` 縺ｯ鬮倥Μ繧ｹ繧ｯ鬆伜沺繧堤､ｺ縺吶よ尠譏ｧ縺ｪ萓晞ｼ縺ｧ縺ｯ low/medium 繧医ｊ蜆ｪ蜈医＠縺ｦ遒ｺ隱榊ｯｾ雎｡縺ｫ蜈･繧後ｋ
-- `avoid_with` 縺後≠繧句ｴ蜷医√◎縺ｮ邨・∩蜷医ｏ縺帙・閾ｪ蜍墓署譯医＠縺ｪ縺・
-- `pair_with` 縺後≠繧句ｴ蜷医〒繧ゅ∝酔譎よ署譯医・譛螟ｧ2莉ｶ縺ｾ縺ｧ縺ｫ謚代∴繧・
+- `routing_category` は親カテゴリ決定専用であり、最終実行対象の確定には `keywords` と依頼文の目的を併用する
+- `risk: high` は高リスク領域を示す。曖昧な依頼では low/medium より優先して確認対象に入れる
+- `avoid_with` がある場合、その組み合わせは自動提案しない
+- `pair_with` がある場合でも、同時提案は最大2件までに抑える
 
-## 隕ｪ繧ｫ繝・ざ繝ｪ -> 蟄仙呵｣懊・蜆ｪ蜈磯・ｽ崎｡ｨ
+## 親カテゴリ -> 子候補の優先順位表
 
-隕ｪ繧ｫ繝・ざ繝ｪ縺梧ｱｺ縺ｾ縺｣縺溘ｉ縲∵ｬ｡縺ｮ鬆・〒蛟呵｣懊ｒ蜃ｺ縺吶・
+親カテゴリが決まったら、次の順で候補を出す。
 
-### 譁・嶌繝ｻ雉・侭
+### 文書・資料
 
-1. 繝輔ぃ繧､繝ｫ蠖｢蠑上′譏守､ｺ縺輔ｌ縺ｦ縺・ｋ: `docx` / `pdf` / `pptx` / `xlsx`
-2. 譁・嶌縺ｮ蝓ｷ遲・・隕∫ｴ・・讒区・縺御ｸｻ逶ｮ逧・ `doc-coauthoring`
-3. 謚陦捺枚譖ｸ繧СEADME/API譁・嶌縺御ｸｻ逶ｮ逧・ `technical-writer` 邉ｻ rule 繧貞━蜈・
-4. 隕冶ｦ夂噪縺ｪ隕九○譁ｹ縺御ｸｻ逶ｮ逧・ `visual-storyteller`
+1. ファイル形式が明示されている: `docx` / `pdf` / `pptx` / `xlsx`
+2. 文書の執筆・要約・構成が主目的: `doc-coauthoring`
+3. 技術文書やREADME/API文書が主目的: `technical-writer` 系 rule を優先
+4. 視覚的な見せ方が主目的: `visual-storyteller`
 
-### 髮・ｮ｢繝ｻ謌宣聞
+### 集客・成長
 
-1. SEO/讀懃ｴ｢豬∝・: `seo-specialist`, `programmatic-seo`, `seo-audit`
-2. 蠎・相/繧ｳ繝斐・: `ad-creative`, `copywriting`, `copy-editing`
-3. 萓｡譬ｼ/CVR/蟆守ｷ・ `pricing-strategy`, `page-cro`, `signup-flow-cro`, `onboarding-cro`
-4. SNS/繧ｳ繝溘Η繝九ユ繧｣: `social-content`, `instagram-curator`, `twitter-engager`, `reddit-community-builder`, `tiktok-strategist`
+1. SEO/検索流入: `seo-specialist`, `programmatic-seo`, `seo-audit`
+2. 広告/コピー: `ad-creative`, `copywriting`, `copy-editing`
+3. 価格/CVR/導線: `pricing-strategy`, `page-cro`, `signup-flow-cro`, `onboarding-cro`
+4. SNS/コミュニティ: `social-content`, `instagram-curator`, `twitter-engager`, `reddit-community-builder`, `tiktok-strategist`
 
-### UI/菴馴ｨ楢ｨｭ險・
+### UI/体験設計
 
-1. UI繝ｬ繝薙Η繝ｼ/逕ｻ髱｢謾ｹ蝟・ `ui-ux-pro-max`, `ui-designer`, `ux-architect`
-2. 隱ｿ譟ｻ/讀懆ｨｼ: `ux-researcher`, `accessibility-auditor`
-3. 繝薙ず繝･繧｢繝ｫ陦ｨ迴ｾ: `canvas-design`, `theme-factory`, `inclusive-visuals-specialist`
-4. 菴馴ｨ捺ｼ泌・: `behavioral-nudge-engine`, `whimsy-injector`
+1. UIレビュー/画面改善: `ui-ux-pro-max`, `ui-designer`, `ux-architect`
+2. 調査/検証: `ux-researcher`, `accessibility-auditor`
+3. ビジュアル表現: `canvas-design`, `theme-factory`, `inclusive-visuals-specialist`
+4. 体験演出: `behavioral-nudge-engine`, `whimsy-injector`
 
-### 髢狗匱驕狗畑
+### 開発運用
 
-1. 繝・せ繝・QA: `webapp-testing`, `qa-reality-checker`, `api-tester`, `test-results-analyzer`
-2. 繝・・繝ｭ繧､/CI/CD/蝓ｺ逶､: `deployment-patterns`, `devops-automator`, `infrastructure-maintainer`
-3. 螳溯｣・髪謠ｴ: `backend-architect`, `frontend-developer`, `senior-developer`
-4. 繝輔Ο繝ｼ謾ｹ蝟・ `workflow-optimizer`, `jira-workflow-steward`, `using-git-worktrees`
-5. 蜿ｯ隕ｳ貂ｬ諤ｧ/諤ｧ閭ｽ: `observability-design`, `performance-profiling`
-6. 繝・・繧ｿ蝓ｺ逶､: `database-schema-design`
+1. テスト/QA: `webapp-testing`, `qa-reality-checker`, `api-tester`, `test-results-analyzer`
+2. デプロイ/CI/CD/基盤: `deployment-patterns`, `devops-automator`, `infrastructure-maintainer`
+3. 実装支援: `backend-architect`, `frontend-developer`, `senior-developer`
+4. フロー改善: `workflow-optimizer`, `jira-workflow-steward`, `using-git-worktrees`
+5. 可観測性/性能: `observability-design`, `performance-profiling`
+6. データ基盤: `database-schema-design`
 
-### 繝ｫ繝ｼ繝ｫ驕狗畑繝ｻ逶｣譟ｻ
+### ルール運用・監査
 
-1. 繧ｻ繧ｭ繝･繝ｪ繝・ぅ/豕募漁/繧ｬ繝舌リ繝ｳ繧ｹ: `security-engineer`, `security-deepdive`, `legal-compliance-checker`, `agentic-identity-trust-architect`
-2. rule/skill謨ｴ蛯・ `rules-distill`, `skill-creator`, `harness-audit`
-3. orchestration/騾ｲ陦檎ｵｱ諡ｬ: `agents-orchestrator`, `senior-project-manager`, `project-shepherd`
-4. 蝓ｺ逶､諡｡蠑ｵ: `mcp-builder`, `tool-evaluator`, `identity-graph-operator`
+1. セキュリティ/法務/ガバナンス: `security-engineer`, `security-deepdive`, `legal-compliance-checker`, `agentic-identity-trust-architect`
+2. rule/skill整備: `rules-distill`, `skill-creator`, `harness-audit`
+3. orchestration/進行統括: `agents-orchestrator`, `senior-project-manager`, `project-shepherd`
+4. 基盤拡張: `mcp-builder`, `tool-evaluator`, `identity-graph-operator`
 
-### 繝槭・繧ｱ繝・ぅ繝ｳ繧ｰ繝ｻ繧ｰ繝ｭ繝ｼ繧ｹ
+### マーケティング・グロース
 
-| 繧ｹ繧ｭ繝ｫ | 縺・▽菴ｿ縺・|
+| スキル | いつ使う |
 |---|---|
-| ad-creative | 蠎・相繧ｳ繝斐・繝ｻ繝倥ャ繝峨Λ繧､繝ｳ繝ｻ繝舌Μ繧ｨ繝ｼ繧ｷ繝ｧ繝ｳ逕滓・ |
-| ai-seo | AI讀懃ｴ｢繧ｨ繝ｳ繧ｸ繝ｳ蜷代￠繧ｳ繝ｳ繝・Φ繝・怙驕ｩ蛹・|
-| analytics-tracking | GA4繝ｻGTM繝ｻ繧ｳ繝ｳ繝舌・繧ｸ繝ｧ繝ｳ霑ｽ霍｡縺ｮ險ｭ螳・|
-| churn-prevention | 隗｣邏・亟豁｢繝ｻ繝ｪ繝・Φ繧ｷ繝ｧ繝ｳ譁ｽ遲・|
-| cold-email | B2B 繧ｳ繝ｼ繝ｫ繝峨Γ繝ｼ繝ｫ繝ｻ繝輔か繝ｭ繝ｼ繧｢繝・・ |
-| competitor-alternatives | 遶ｶ蜷域ｯ碑ｼ・・繝ｼ繧ｸ繝ｻ莉｣譖ｿ繝壹・繧ｸ菴懈・ |
-| content-strategy | 繧ｳ繝ｳ繝・Φ繝・姶逡･繝ｻ繝医ヴ繝・け繧ｯ繝ｩ繧ｹ繧ｿ險育判 |
-| copy-editing | 譌｢蟄倥・繝ｼ繧ｱ繝・ぅ繝ｳ繧ｰ繧ｳ繝斐・縺ｮ邱ｨ髮・・謾ｹ蝟・|
-| copywriting | LP繝ｻHP繝ｻ讖溯・繝壹・繧ｸ縺ｮ繧ｳ繝斐・繝ｩ繧､繝・ぅ繝ｳ繧ｰ |
-| email-sequence | 繝｡繝ｼ繝ｫ繧ｷ繝ｼ繧ｱ繝ｳ繧ｹ繝ｻ繝峨Μ繝・・繧ｭ繝｣繝ｳ繝壹・繝ｳ |
-| form-cro | 繝輔か繝ｼ繝譛驕ｩ蛹厄ｼ医し繧､繝ｳ繧｢繝・・莉･螟厄ｼ・|
-| free-tool-strategy | 繝槭・繧ｱ繝・ぅ繝ｳ繧ｰ逕ｨ繝輔Μ繝ｼ繝・・繝ｫ縺ｮ莨∫判繝ｻ讒狗ｯ・|
-| launch-strategy | 繝励Ο繝繧ｯ繝医Ο繝ｼ繝ｳ繝√・繝ｪ繝ｪ繝ｼ繧ｹ謌ｦ逡･ |
-| marketing-ideas | SaaS/繧ｽ繝輔ヨ繧ｦ繧ｧ繧｢縺ｮ繝槭・繧ｱ繝・ぅ繝ｳ繧ｰ繧｢繧､繝・い |
-| marketing-psychology | 陦悟虚蠢・炊蟄ｦ縺ｮ繝槭・繧ｱ繝・ぅ繝ｳ繧ｰ蠢懃畑 |
-| onboarding-cro | 繧ｵ繧､繝ｳ繧｢繝・・蠕後・繧ｪ繝ｳ繝懊・繝・ぅ繝ｳ繧ｰ譛驕ｩ蛹・|
-| page-cro | 繝槭・繧ｱ繝・ぅ繝ｳ繧ｰ繝壹・繧ｸ縺ｮCRO |
-| paid-ads | PPC繝ｻ譛画侭蠎・相繧ｭ繝｣繝ｳ繝壹・繝ｳ謌ｦ逡･ |
-| paywall-upgrade-cro | 繧｢繝励Μ蜀・い繝・・繧ｰ繝ｬ繝ｼ繝峨・繝壹う繧ｦ繧ｩ繝ｼ繝ｫ譛驕ｩ蛹・|
-| popup-cro | 繝昴ャ繝励い繝・・繝ｻ繝｢繝ｼ繝繝ｫ繝ｻ繧ｪ繝ｼ繝舌・繝ｬ繧､譛驕ｩ蛹・|
-| pricing-strategy | 萓｡譬ｼ險ｭ螳壹・繝代ャ繧ｱ繝ｼ繧ｸ繝ｳ繧ｰ繝ｻ繝槭ロ繧ｿ繧､繧ｺ謌ｦ逡･ |
-| product-marketing-context | 繝励Ο繝繧ｯ繝医・繝ｼ繧ｱ繝・ぅ繝ｳ繧ｰ繧ｳ繝ｳ繝・く繧ｹ繝域枚譖ｸ |
-| programmatic-seo | 繝・Φ繝励Ξ繝ｼ繝暗励ョ繝ｼ繧ｿ縺ｮ螟ｧ驥輯EO繝壹・繧ｸ逕滓・ |
-| referral-program | 邏ｹ莉九・繝ｭ繧ｰ繝ｩ繝繝ｻ繧｢繝輔ぅ繝ｪ繧ｨ繧､繝郁ｨｭ險・|
-| signup-flow-cro | 繧ｵ繧､繝ｳ繧｢繝・・繝ｻ逋ｻ骭ｲ繝輔Ο繝ｼ譛驕ｩ蛹・|
-| social-content | SNS繧ｳ繝ｳ繝・Φ繝・ｽ懈・繝ｻ繧ｹ繧ｱ繧ｸ繝･繝ｼ繝ｫ譛驕ｩ蛹・|
+| ad-creative | 広告コピー・ヘッドライン・バリエーション生成 |
+| ai-seo | AI検索エンジン向けコンテンツ最適化 |
+| analytics-tracking | GA4・GTM・コンバージョン追跡の設定 |
+| churn-prevention | 解約防止・リテンション施策 |
+| cold-email | B2B コールドメール・フォローアップ |
+| competitor-alternatives | 競合比較ページ・代替ページ作成 |
+| content-strategy | コンテンツ戦略・トピッククラスタ計画 |
+| copy-editing | 既存マーケティングコピーの編集・改善 |
+| copywriting | LP・HP・機能ページのコピーライティング |
+| email-sequence | メールシーケンス・ドリップキャンペーン |
+| form-cro | フォーム最適化（サインアップ以外） |
+| free-tool-strategy | マーケティング用フリーツールの企画・構築 |
+| launch-strategy | プロダクトローンチ・リリース戦略 |
+| marketing-ideas | SaaS/ソフトウェアのマーケティングアイデア |
+| marketing-psychology | 行動心理学のマーケティング応用 |
+| onboarding-cro | サインアップ後のオンボーディング最適化 |
+| page-cro | マーケティングページのCRO |
+| paid-ads | PPC・有料広告キャンペーン戦略 |
+| paywall-upgrade-cro | アプリ内アップグレード・ペイウォール最適化 |
+| popup-cro | ポップアップ・モーダル・オーバーレイ最適化 |
+| pricing-strategy | 価格設定・パッケージング・マネタイズ戦略 |
+| product-marketing-context | プロダクトマーケティングコンテキスト文書 |
+| programmatic-seo | テンプレート×データの大量SEOページ生成 |
+| referral-program | 紹介プログラム・アフィリエイト設計 |
+| signup-flow-cro | サインアップ・登録フロー最適化 |
+| social-content | SNSコンテンツ作成・スケジュール最適化 |
 
-### 繝峨く繝･繝｡繝ｳ繝医・繝輔ぃ繧､繝ｫ
+### ドキュメント・ファイル
 
-| 繧ｹ繧ｭ繝ｫ | 縺・▽菴ｿ縺・|
+| スキル | いつ使う |
 |---|---|
-| doc-coauthoring | 繝峨く繝･繝｡繝ｳ繝医・謠先｡域嶌縺ｮ蜈ｱ蜷悟濤遲・|
-| docx | Word譁・嶌縺ｮ菴懈・繝ｻ邱ｨ髮・・謫堺ｽ・|
-| pdf | PDF縺ｮ隱ｭ縺ｿ蜿悶ｊ繝ｻ邨仙粋繝ｻ蛻・牡繝ｻ菴懈・ |
-| pptx | PowerPoint縺ｮ菴懈・繝ｻ邱ｨ髮・|
-| xlsx | 繧ｹ繝励Ξ繝・ラ繧ｷ繝ｼ繝医・菴懈・繝ｻ邱ｨ髮・・螟画鋤 |
-| schema-markup | 讒矩蛹悶ョ繝ｼ繧ｿ繝ｻJSON-LD 縺ｮ霑ｽ蜉繝ｻ菫ｮ豁｣ |
-| seo-audit | 謚陦鍋噪SEO繝ｻ繧ｪ繝ｳ繝壹・繧ｸSEO逶｣譟ｻ |
+| doc-coauthoring | ドキュメント・提案書の共同執筆 |
+| docx | Word文書の作成・編集・操作 |
+| pdf | PDFの読み取り・結合・分割・作成 |
+| pptx | PowerPointの作成・編集 |
+| xlsx | スプレッドシートの作成・編集・変換 |
+| schema-markup | 構造化データ・JSON-LD の追加・修正 |
+| seo-audit | 技術的SEO・オンページSEO監査 |
 
-### UI繝ｻ繝・じ繧､繝ｳ
+### UI・デザイン
 
-| 繧ｹ繧ｭ繝ｫ | 縺・▽菴ｿ縺・|
+| スキル | いつ使う |
 |---|---|
-| canvas-design | 繝昴せ繧ｿ繝ｼ繝ｻ繧｢繝ｼ繝医↑縺ｩ縺ｮ髱咏噪繝薙ず繝･繧｢繝ｫ菴懈・ |
-| theme-factory | 謌先棡迚ｩ縺ｸ縺ｮ繝・・繝槭・繧ｹ繧ｿ繧､繝ｫ驕ｩ逕ｨ |
-| ui-ux-pro-max | UI/UX險ｭ險医・繝ｬ繝薙Η繝ｼ繝ｻ繧｢繧ｯ繧ｻ繧ｷ繝薙Μ繝・ぅ |
-| web-artifacts-builder | 隍・尅縺ｪHTML/React/Tailwind繧｢繝ｼ繝・ぅ繝輔ぃ繧ｯ繝・|
-| remotion-best-practices | Remotion縺ｧ縺ｮ繝薙ョ繧ｪ逕滓・ |
+| canvas-design | ポスター・アートなどの静的ビジュアル作成 |
+| theme-factory | 成果物へのテーマ・スタイル適用 |
+| ui-ux-pro-max | UI/UX設計・レビュー・アクセシビリティ |
+| web-artifacts-builder | 複雑なHTML/React/Tailwindアーティファクト |
+| remotion-best-practices | Remotionでのビデオ生成 |
 
-### 迚ｹ蛹悶Ρ繝ｼ繧ｯ繝輔Ο繝ｼ
+### 特化ワークフロー
 
-| 繧ｹ繧ｭ繝ｫ | 縺・▽菴ｿ縺・|
+| スキル | いつ使う |
 |---|---|
-| deployment-patterns | CI/CD繝ｻ繝ｭ繝ｼ繝ｫ繝舌ャ繧ｯ繝ｻ谿ｵ髫弱Μ繝ｪ繝ｼ繧ｹ繝代ち繝ｼ繝ｳ |
-| finishing-a-development-branch | 螳溯｣・ｮ御ｺ・ｾ後・繝槭・繧ｸ繝ｻPR繝ｻ繧ｯ繝ｪ繝ｼ繝ｳ繧｢繝・・蛻､譁ｭ |
-| using-git-worktrees | feature逕ｨ縺ｮgit worktree蛻・屬 |
-| webapp-testing | Playwright縺ｧ縺ｮ繝ｭ繝ｼ繧ｫ繝ｫ繧ｦ繧ｧ繝悶い繝励Μ繝・せ繝・|
-| vercel-composition-patterns | React繧ｳ繝ｳ繝昴・繝阪Φ繝郁ｨｭ險医ヱ繧ｿ繝ｼ繝ｳ |
-| prd-to-issues | PRD 繧堤峡遶・Issue 縺ｸ蛻・ｧ｣ |
-| improve-codebase-architecture | 繝・せ繧ｿ繝薙Μ繝・ぅ驥崎ｦ悶・讒矩謾ｹ蝟・署譯・|
-| observability-design | 繝｡繝医Μ繧ｯ繧ｹ繝ｻ繝ｭ繧ｰ繝ｻ繝医Ξ繝ｼ繧ｹ縺ｮ蜿ｯ隕ｳ貂ｬ諤ｧ險ｭ險・|
-| database-schema-design | 繧ｹ繧ｭ繝ｼ繝櫁ｨｭ險医・繝槭う繧ｰ繝ｬ繝ｼ繧ｷ繝ｧ繝ｳ繝ｻ繧､繝ｳ繝・ャ繧ｯ繧ｹ謌ｦ逡･ |
-| security-deepdive | OWASP Top 10 豺ｱ謗倥ｊ繝ｻ證怜捷驕ｸ螳壹・繧ｳ繝ｳ繝励Λ繧､繧｢繝ｳ繧ｹ |
-| performance-profiling | 險隱槫挨繝励Ο繝輔ぃ繧､繝ｪ繝ｳ繧ｰ繝ｻ繝懊ヨ繝ｫ繝阪ャ繧ｯ蛻・梵 |
+| deployment-patterns | CI/CD・ロールバック・段階リリースパターン |
+| finishing-a-development-branch | 実装完了後のマージ・PR・クリーンアップ判断 |
+| using-git-worktrees | feature用のgit worktree分離 |
+| webapp-testing | Playwrightでのローカルウェブアプリテスト |
+| vercel-composition-patterns | Reactコンポーネント設計パターン |
+| prd-to-issues | PRD を独立 Issue へ分解 |
+| improve-codebase-architecture | テスタビリティ重視の構造改善提案 |
+| observability-design | メトリクス・ログ・トレースの可観測性設計 |
+| database-schema-design | スキーマ設計・マイグレーション・インデックス戦略 |
+| security-deepdive | OWASP Top 10 深掘り・暗号選定・コンプライアンス |
+| performance-profiling | 言語別プロファイリング・ボトルネック分析 |
 
-### 繝｡繧ｿ繝ｻ逶｣譟ｻ
+### メタ・監査
 
-| 繧ｹ繧ｭ繝ｫ | 縺・▽菴ｿ縺・|
+| スキル | いつ使う |
 |---|---|
-| find-skills | 繧ｹ繧ｭ繝ｫ縺ｮ讀懃ｴ｢繝ｻ繧､繝ｳ繧ｹ繝医・繝ｫ (npx skills) |
-| harness-audit | harness 蛛･蜈ｨ諤ｧ縺ｮ逶｣譟ｻ |
-| rules-distill | 螳溯ｷｵ遏･縺ｮ謚ｽ蜃ｺ繝ｻrule 譏・ｼ蛻､螳・|
-| security-scan | agent險ｭ螳壹・繧ｻ繧ｭ繝･繝ｪ繝・ぅ逶｣譟ｻ |
-| skill-creator | 繧ｹ繧ｭ繝ｫ縺ｮ譁ｰ隕丈ｽ懈・繝ｻ謾ｹ蝟・・隧穂ｾ｡ |
-| mcp-builder | MCP繧ｵ繝ｼ繝舌・縺ｮ讒狗ｯ峨ぎ繧､繝・|
+| find-skills | スキルの検索・インストール (npx skills) |
+| harness-audit | harness 健全性の監査 |
+| rules-distill | 実践知の抽出・rule 昇格判定 |
+| security-scan | agent設定のセキュリティ監査 |
+| skill-creator | スキルの新規作成・改善・評価 |
+| mcp-builder | MCPサーバーの構築ガイド |
 
-## 繝槭ャ繝√Φ繧ｰ繧ｬ繧､繝峨Λ繧､繝ｳ
+## マッチングガイドライン
 
-繧ｿ繧ｹ繧ｯ縺ｮ蜀・ｮｹ縺九ｉ莉･荳九・蜆ｪ蜈亥ｺｦ縺ｧ蛻､螳壹☆繧・
+タスクの内容から以下の優先度で判定する:
 
-1. **譏守､ｺ謖・ｮ壼━蜈・*: 繝ｦ繝ｼ繧ｶ繝ｼ縺・`/skill-name` 繧呈欠螳壹＠縺溘ｉ縺昴・縺ｾ縺ｾ螳溯｡後☆繧・
-2. **metadata 荳閾ｴ**: `routing_category` 縺後≠繧後・隕ｪ繧ｫ繝・ざ繝ｪ豎ｺ螳壹↓菴ｿ縺・
-3. **繧ｭ繝ｼ繝ｯ繝ｼ繝牙ｮ悟・荳閾ｴ**: 縲悟ｺ・相繧ｳ繝斐・縲坂・ `ad-creative`
-4. **荳ｭ蛻・｡樔ｸ閾ｴ**: 縺ｾ縺夊ｦｪ繧ｫ繝・ざ繝ｪ繧呈ｱｺ繧√√◎縺ｮ荳ｭ縺ｧ蟄舌せ繧ｭ繝ｫ/role 繧呈怙螟ｧ3縺､謠先｡医☆繧・
-5. **繝輔ぃ繧､繝ｫ蠖｢蠑丈ｸ閾ｴ**: `.docx` 竊・`docx`, `.pdf` 竊・`pdf`, `.pptx` 竊・`pptx`, `.xlsx` 竊・`xlsx`
-6. **隍・粋繧ｿ繧ｹ繧ｯ**: 隍・焚繧ｫ繝・ざ繝ｪ縺ｫ縺ｾ縺溘′繧句ｴ蜷医・繧ｫ繝・ざ繝ｪ縺斐→縺ｫ1縺､縺壹▽縲∝粋險域怙螟ｧ3蛟呵｣懊ｒ謠先｡・
+1. **明示指定優先**: ユーザーが `/skill-name` を指定したらそのまま実行する
+2. **metadata 一致**: `routing_category` があれば親カテゴリ決定に使う
+3. **キーワード完全一致**: 「広告コピー」→ `ad-creative`
+4. **中分類一致**: まず親カテゴリを決め、その中で子スキル/role を最大3つ提案する
+5. **ファイル形式一致**: `.docx` → `docx`, `.pdf` → `pdf`, `.pptx` → `pptx`, `.xlsx` → `xlsx`
+6. **複合タスク**: 複数カテゴリにまたがる場合はカテゴリごとに1つずつ、合計最大3候補を提案
 
-### 驥阪∩莉倥″繧ｹ繧ｳ繧｢譁ｹ蠑・
+### 重み付きスコア方式
 
-蛟呵｣懊・鬆・ｺ上ｒ螳牙ｮ壹＆縺帙ｋ縺溘ａ縲∵ｬ｡縺ｮ驟咲せ縺ｧ繧ｹ繧ｳ繧｢繝ｪ繝ｳ繧ｰ縺吶ｋ縲・
+候補の順序を安定させるため、次の配点でスコアリングする。
 
-| 蛻､螳夊ｦ∫ｴ | 譚｡莉ｶ | 轤ｹ謨ｰ |
+| 判定要素 | 条件 | 点数 |
 |---|---|---|
-| 譏守､ｺ謖・ｮ・| `/skill-name` 縺ｾ縺溘・ agent 蜷阪′譏守､ｺ縺輔ｌ縺ｦ縺・ｋ | 蜊ｳ譎ら｢ｺ螳・|
-| 隕ｪ繧ｫ繝・ざ繝ｪ荳閾ｴ | `routing_category` 縺御ｸ閾ｴ | +5 |
-| 繧ｭ繝ｼ繝ｯ繝ｼ繝我ｸ閾ｴ | `keywords` 縺・莉ｶ荳閾ｴ縺斐→ | +2 |
-| 繝峨Γ繧､繝ｳ荳閾ｴ | `domain` 縺御ｾ晞ｼ縺ｮ荳ｻ隱槭→荳閾ｴ | +2 |
-| 蠖｢蠑丈ｸ閾ｴ | 諡｡蠑ｵ蟄舌ｄ謌先棡迚ｩ蠖｢蠑上′荳閾ｴ | +1 |
-| 繝ｪ繧ｹ繧ｯ謨ｴ蜷・| 鬮倥Μ繧ｹ繧ｯ萓晞ｼ縺ｧ `risk: high` 蛟呵｣・| +1 |
-| 遶ｶ蜷域椛蛻ｶ | `avoid_with` 縺ｫ陦晉ｪ√≠繧・| -4 |
+| 明示指定 | `/skill-name` または agent 名が明示されている | 即時確定 |
+| 親カテゴリ一致 | `routing_category` が一致 | +5 |
+| キーワード一致 | `keywords` が1件一致ごと | +2 |
+| ドメイン一致 | `domain` が依頼の主語と一致 | +2 |
+| 形式一致 | 拡張子や成果物形式が一致 | +1 |
+| リスク整合 | 高リスク依頼で `risk: high` 候補 | +1 |
+| 競合抑制 | `avoid_with` に衝突あり | -4 |
 
-謗｡逕ｨ繝ｫ繝ｼ繝ｫ:
+採用ルール:
 
-- 荳贋ｽ阪せ繧ｳ繧｢縺九ｉ譛螟ｧ3蛟呵｣懊ｒ謠千､ｺ縺吶ｋ
-- 蜷檎せ縺ｪ繧・`keywords` 荳閾ｴ謨ｰ縺悟､壹＞譁ｹ繧貞━蜈医☆繧・
-- 縺昴ｌ縺ｧ繧ょ酔轤ｹ縺ｪ繧・`risk` 縺御ｾ晞ｼ縺ｫ霑代＞蛟呵｣懊ｒ蜆ｪ蜈医☆繧・
-- 譛邨ょ呵｣懊↓ `avoid_with` 縺ｮ陦晉ｪ√′縺ゅｋ蝣ｴ蜷医・谺｡轤ｹ縺ｫ蟾ｮ縺玲崛縺医ｋ
+- 上位スコアから最大3候補を提示する
+- 同点なら `keywords` 一致数が多い方を優先する
+- それでも同点なら `risk` が依頼に近い候補を優先する
+- 最終候補に `avoid_with` の衝突がある場合は次点に差し替える
 
-繝輔か繝ｼ繝ｫ繝舌ャ繧ｯ:
+フォールバック:
 
-- 蜈ｨ蛟呵｣懊′ 3 轤ｹ譛ｪ貅縺ｪ繧峨後き繝・ざ繝ｪ譛ｪ遒ｺ螳壹阪→縺励※逶ｴ謗･遒ｺ隱崎ｳｪ蝠上ｒ1縺､霑斐☆
-- 遒ｺ菫｡縺御ｽ弱＞蝣ｴ蜷医〒繧ゅ∫┌逅・↓1莉ｶ縺ｸ遒ｺ螳壹○縺・蛟呵｣懊∪縺ｧ菴ｵ險倥＠縺ｦ繝ｦ繝ｼ繧ｶ繝ｼ縺ｫ驕ｸ謚槭＠縺ｦ繧ゅｉ縺・
+- 全候補が 3 点未満なら「カテゴリ未確定」として直接確認質問を1つ返す
+- 確信が低い場合でも、無理に1件へ確定せず2候補まで併記してユーザーに選択してもらう
 
-## role 縺ｨ skill 縺ｮ菴ｿ縺・・縺・
+## role と skill の使い分け
 
-- 謇矩・ｄ繝・・繝ｫ縺梧・遒ｺ縺ｪ菴懈･ｭ縺ｯ skill 繧貞━蜈医☆繧・
-- 蟆る摩逧・↑蛻､譁ｭ繧・Ξ繝薙Η繝ｼ隕ｳ轤ｹ縺悟ｿ・ｦ√↑菴懈･ｭ縺ｯ rule/agent 繧貞━蜈医☆繧・
-- 萓晞ｼ縺後御ｽ懊ｋ縲堺ｸｭ蠢・↑繧・skill 蟇・ｊ縲√瑚ｩ穂ｾ｡縺吶ｋ/險ｭ險医☆繧・逶｣譟ｻ縺吶ｋ縲堺ｸｭ蠢・↑繧・rule/agent 蟇・ｊ
-- 霑ｷ縺・ｴ蜷医・ skill 1莉ｶ + rule 1莉ｶ縺ｾ縺ｧ縺ｮ菴ｵ逕ｨ縺ｫ逡吶ａ繧・
+- 手順やツールが明確な作業は skill を優先する
+- 専門的な判断やレビュー観点が必要な作業は rule/agent を優先する
+- 依頼が「作る」中心なら skill 寄り、「評価する/設計する/監査する」中心なら rule/agent 寄り
+- 迷う場合は skill 1件 + rule 1件までの併用に留める
 
-## 螳溯｡後Δ繝ｼ繝・
+## 実行モード
 
-- 繧ｪ繝ｼ繧ｱ繧ｹ繝医Ξ繝ｼ繧ｷ繝ｧ繝ｳ繝｢繝ｼ繝・ 隕ｪ繧ｫ繝・ざ繝ｪ -> 蟄舌せ繧ｭ繝ｫ繧定・蜍暮∈螳壹＠縺ｦ螳溯｡・
-- 蛟句挨繝｢繝ｼ繝・ `/skill-name` 繧堤峩謗･謖・ｮ壹＠縺ｦ蜊ｳ譎ょｮ溯｡・
-- 謗ｨ螂ｨ: 荳咲｢ｺ螳溘↑繧峨が繝ｼ繧ｱ繧ｹ繝医Ξ繝ｼ繧ｷ繝ｧ繝ｳ縲∝ｯｾ雎｡縺梧・遒ｺ縺ｪ繧牙句挨繝｢繝ｼ繝・
+- オーケストレーションモード: 親カテゴリ -> 子スキルを自動選定して実行
+- 個別モード: `/skill-name` を直接指定して即時実行
+- 推奨: 不確実ならオーケストレーション、対象が明確なら個別モード
 
-## 蛟呵｣懊↑縺励・蝣ｴ蜷・
+## 候補なしの場合
 
-繧､繝ｳ繝・ャ繧ｯ繧ｹ縺ｫ隧ｲ蠖薙せ繧ｭ繝ｫ縺後↑縺・ｴ蜷医・:
-- 縲瑚ｩｲ蠖薙☆繧九せ繧ｭ繝ｫ縺ｯ縺ゅｊ縺ｾ縺帙ｓ縲ら峩謗･蟇ｾ蠢懊＠縺ｾ縺吶ゅ阪→蝣ｱ蜻・
-- 蠢・ｦ√↓蠢懊§縺ｦ `find-skills` 縺ｧ繝槭・繧ｱ繝・ヨ繝励Ξ繧､繧ｹ繧呈､懃ｴ｢縺吶ｋ謠先｡医ｒ縺吶ｋ
+インデックスに該当スキルがない場合は:
+- 「該当するスキルはありません。直接対応します。」と報告
+- 必要に応じて `find-skills` でマーケットプレイスを検索する提案をする
 
 ---
 
-## Trait Inheritance・医Ν繝ｼ繝ｫ縺ｮ邯呎価・・
+## Trait Inheritance（ルールの継承）
 
-`rules/*.md` 縺ｫ `inherits:` frontmatter 縺後≠繧句ｴ蜷医√◎縺ｮ繝ｫ繝ｼ繝ｫ縺ｯ `rules/_<trait>.md` 縺ｮ蝓ｺ貅悶ｒ蜑肴署縺ｨ縺励※蜍穂ｽ懊☆繧九・
+`rules/*.md` に `inherits:` frontmatter がある場合、そのルールは `rules/_<trait>.md` の基準を前提として動作する。
 
-### 繝ｫ繝ｼ繧ｿ繝ｼ縺ｮ謖ｯ繧玖・縺・
+### ルーターの振る舞い
 
-1. rule 繧帝∈螳壹＠縺滄圀縲～inherits:` 繧定ｪｭ縺ｿ蜿悶ｋ
-2. 邯呎価蜈医・ trait 繝輔ぃ繧､繝ｫ蜷阪ｒ蜿ら・諠・ｱ縺ｨ縺励※蝣ｱ蜻翫☆繧・
-3. rule 縺ｮ螳溯｡御ｸｭ縺ｯ縲》rait 縺ｮ蝓ｺ貅悶ｂ證鈴ｻ吶↓驕ｩ逕ｨ縺輔ｌ繧・
-4. trait 髢薙〒遏帷崟縺後≠繧句ｴ蜷医・ `inherits:` 縺ｮ險倩ｼ蛾・〒蜈医・繧ゅ・繧貞━蜈医☆繧・
+1. rule を選定した際、`inherits:` を読み取る
+2. 継承先の trait ファイル名を参照情報として報告する
+3. rule の実行中は、trait の基準も暗黙に適用される
+4. trait 間で矛盾がある場合は `inherits:` の記載順で先のものを優先する
 
-## Deprecated / Prefer・磯撼謗ｨ螂ｨ縺ｨ蠕檎ｶ呎欠螳夲ｼ・
+## Deprecated / Prefer（非推奨と後継指定）
 
-`rules/*.md` 縺ｾ縺溘・ `skills/*/SKILL.md` 縺ｮ frontmatter 縺ｫ莉･荳九・繝輔ぅ繝ｼ繝ｫ繝峨′縺ゅｋ蝣ｴ蜷医√Ν繝ｼ繧ｿ繝ｼ縺ｯ縺昴ｌ繧貞ｰ企㍾縺吶ｋ縲・
+`rules/*.md` または `skills/*/SKILL.md` の frontmatter に以下のフィールドがある場合、ルーターはそれを尊重する。
 
-### 繝輔ぅ繝ｼ繝ｫ繝牙ｮ夂ｾｩ
+### フィールド定義
 
 ```yaml
-deprecated: true          # 縺薙・繧ｹ繧ｭ繝ｫ/繝ｫ繝ｼ繝ｫ縺ｯ髱樊耳螂ｨ
-prefer: "new-skill-name"  # 莉｣繧上ｊ縺ｫ菴ｿ縺・∋縺阪せ繧ｭ繝ｫ/繝ｫ繝ｼ繝ｫ蜷・
-sunset_date: "2025-09-01" # 蟒・ｭ｢莠亥ｮ壽律・井ｻｻ諢擾ｼ・
+deprecated: true          # このスキル/ルールは非推奨
+prefer: "new-skill-name"  # 代わりに使うべきスキル/ルール名
+sunset_date: "2025-09-01" # 廃止予定日（任意）
 ```
 
-### 繝ｫ繝ｼ繧ｿ繝ｼ縺ｮ謖ｯ繧玖・縺・
+### ルーターの振る舞い
 
-1. `deprecated: true` 縺ｮ繧ｹ繧ｭ繝ｫ/繝ｫ繝ｼ繝ｫ縺ｯ蛟呵｣懊°繧芽・蜍暮勁螟悶☆繧・
-2. `prefer` 縺梧欠螳壹＆繧後※縺・ｌ縺ｰ縲∽ｻ｣繧上ｊ縺ｫ蠕檎ｶ吶ｒ蛟呵｣懊↓蜷ｫ繧√ｋ
-3. 繝ｦ繝ｼ繧ｶ繝ｼ縺梧・遉ｺ逧・↓ `/deprecated-skill` 繧呈欠螳壹＠縺溷ｴ蜷医・螳溯｡後☆繧九′縲∬ｭｦ蜻翫ｒ陦ｨ遉ｺ縺吶ｋ:
+1. `deprecated: true` のスキル/ルールは候補から自動除外する
+2. `prefer` が指定されていれば、代わりに後継を候補に含める
+3. ユーザーが明示的に `/deprecated-skill` を指定した場合は実行するが、警告を表示する:
    ```
-   笞・・[skill-name] 縺ｯ髱樊耳螂ｨ縺ｧ縺吶ゆｻ｣繧上ｊ縺ｫ [prefer] 縺ｮ菴ｿ逕ｨ繧呈耳螂ｨ縺励∪縺吶・
+   ⚠️ [skill-name] は非推奨です。代わりに [prefer] の使用を推奨します。
    ```
-4. `sunset_date` 繧帝℃縺弱◆蝣ｴ蜷医・譏守､ｺ謖・ｮ壹〒繧ゅヶ繝ｭ繝・け縺励∝ｾ檎ｶ吶∈縺ｮ遘ｻ陦後ｒ譯亥・縺吶ｋ
+4. `sunset_date` を過ぎた場合は明示指定でもブロックし、後継への移行を案内する
 
-### 蝣ｱ蜻翫ヵ繧ｩ繝ｼ繝槭ャ繝・
-
-```
-莉･荳九ｒ菴ｿ逕ｨ縺励∪縺・
-- frontend-developer (UI螳溯｣・・蟆る摩繝ｭ繝ｼ繝ｫ)
-  邯呎価: coding-standards, typescript-standards, testing-standards, git-conventions
-```
-
-### 蟇ｾ雎｡螟・
-
-- `inherits:` 縺後↑縺・rule 縺ｯ縺昴・縺ｾ縺ｾ蜊倡峡縺ｧ蜍穂ｽ懊☆繧・
-- trait 繝輔ぃ繧､繝ｫ閾ｪ菴難ｼ・_*.md`・峨・逶ｴ謗･驕ｸ螳壼ｯｾ雎｡縺ｫ縺ｪ繧峨↑縺・
-- `deploy.ps1` 縺ｯ inheritance 繧定ｧ｣豎ｺ縺励↑縺・ｼ亥ｮ溯｡梧凾縺ｫ繝｢繝・Ν縺悟盾辣ｧ縺吶ｋ・・
-
-## Skill Contract・医せ繧ｭ繝ｫ縺ｮ蜈･蜃ｺ蜉帛･醍ｴ・ｼ・
-
-`skills/*/SKILL.md` 縺ｫ `contract:` 縺後≠繧句ｴ蜷医√Ν繝ｼ繧ｿ繝ｼ縺ｯ驕ｸ螳壽凾縺ｫ precondition 繧呈､懆ｨｼ縺吶ｋ縲・
-
-### 莠句燕讀懆ｨｼ繝輔Ο繝ｼ
-
-1. 蛟呵｣懊せ繧ｭ繝ｫ縺ｮ `contract.preconditions` 繧定ｪｭ縺ｿ蜿悶ｋ
-2. 迴ｾ蝨ｨ縺ｮ繧ｳ繝ｳ繝・く繧ｹ繝茨ｼ井ｾ晞ｼ蜀・ｮｹ縲∵里蟄俶・譫懃黄・峨→辣ｧ蜷医☆繧・
-3. precondition 縺梧ｺ縺溘＆繧後※縺・↑縺・ｴ蜷・
-   - 繝ｦ繝ｼ繧ｶ繝ｼ縺ｫ荳崎ｶｳ諠・ｱ繧・縺､縺ｮ雉ｪ蝠上〒遒ｺ隱阪☆繧・
-   - 縺ｾ縺溘・ precondition 繧呈ｺ縺溘☆蛻･縺ｮ繧ｹ繧ｭ繝ｫ繧貞・縺ｫ謠先｡医☆繧・
-
-### 繝代う繝励Λ繧､繝ｳ繝√ぉ繝ｼ繝ｳ讀懆ｨｼ
-
-隍・焚繧ｹ繧ｭ繝ｫ繧帝｣骼悶＆縺帙ｋ蝣ｴ蜷・
+### 報告フォーマット
 
 ```
-brainstorming 竊・writing-plans 竊・[implementation] 竊・verification-before-completion
+以下を使用します:
+- frontend-developer (UI実装の専門ロール)
+  継承: coding-standards, typescript-standards, testing-standards, git-conventions
 ```
 
-蜷・磁邯夂せ縺ｧ縲悟燕繧ｹ繧ｭ繝ｫ縺ｮ postcondition 竓・谺｡繧ｹ繧ｭ繝ｫ縺ｮ precondition縲阪ｒ遒ｺ隱阪☆繧九・
-荳肴紛蜷医′縺ゅｌ縺ｰ縲・俣縺ｫ陬懷ｮ後せ繧ｭ繝ｫ繧呈諺蜈･縺吶ｋ縺九√Θ繝ｼ繧ｶ繝ｼ縺ｫ遒ｺ隱阪☆繧九・
+### 対象外
 
-### 蝣ｱ蜻翫ヵ繧ｩ繝ｼ繝槭ャ繝・
+- `inherits:` がない rule はそのまま単独で動作する
+- trait ファイル自体（`_*.md`）は直接選定対象にならない
+- `deploy.ps1` は inheritance を解決しない（実行時にモデルが参照する）
+
+## Skill Contract（スキルの入出力契約）
+
+`skills/*/SKILL.md` に `contract:` がある場合、ルーターは選定時に precondition を検証する。
+
+### 事前検証フロー
+
+1. 候補スキルの `contract.preconditions` を読み取る
+2. 現在のコンテキスト（依頼内容、既存成果物）と照合する
+3. precondition が満たされていない場合:
+   - ユーザーに不足情報を1つの質問で確認する
+   - または precondition を満たす別のスキルを先に提案する
+
+### パイプラインチェーン検証
+
+複数スキルを連鎖させる場合:
 
 ```
-莉･荳九ｒ菴ｿ逕ｨ縺励∪縺・
-- writing-plans (螳溯｣・ｨ育判縺ｮ菴懈・)
-  笨・蜑肴署譚｡莉ｶ: spec 縺ｾ縺溘・隕∽ｻｶ縺悟ｭ伜惠縺吶ｋ 竊・蜈・ｶｳ
+brainstorming → writing-plans → [implementation] → verification-before-completion
 ```
 
-precondition 荳崎ｶｳ譎・
+各接続点で「前スキルの postcondition ⊇ 次スキルの precondition」を確認する。
+不整合があれば、間に補完スキルを挿入するか、ユーザーに確認する。
+
+### 報告フォーマット
 
 ```
-- writing-plans (螳溯｣・ｨ育判縺ｮ菴懈・)
-  笞・・蜑肴署譚｡莉ｶ荳崎ｶｳ: "spec, requirements, or user request with clear goal exists"
-  竊・蜈医↓ brainstorming 縺ｧ隕∽ｻｶ繧呈紛逅・＠縺ｾ縺吶°・・
+以下を使用します:
+- writing-plans (実装計画の作成)
+  ✅ 前提条件: spec または要件が存在する → 充足
 ```
 
-## Temporal Phase Modifier・域凾髢楢ｪ崎ｭ伜梛繧ｹ繧ｭ繝ｫ豢ｻ諤ｧ蛹厄ｼ・
+precondition 不足時:
 
-`.dcr/phase.yaml` 縺ｫ繝励Ο繧ｸ繧ｧ繧ｯ繝医ヵ繧ｧ繝ｼ繧ｺ縺悟ｮ夂ｾｩ縺輔ｌ縺ｦ縺・ｋ蝣ｴ蜷医√せ繧ｳ繧｢繝ｪ繝ｳ繧ｰ縺ｫ phase modifier 繧帝←逕ｨ縺吶ｋ縲・
+```
+- writing-plans (実装計画の作成)
+  ⚠️ 前提条件不足: "spec, requirements, or user request with clear goal exists"
+  → 先に brainstorming で要件を整理しますか？
+```
 
-### 驕ｩ逕ｨ繝ｫ繝ｼ繝ｫ
+## Temporal Phase Modifier（時間認識型スキル活性化）
 
-1. `.dcr/phase.yaml` 縺ｮ `current_phase` 繧定ｪｭ縺ｿ蜿悶ｋ
-2. 隧ｲ蠖薙ヵ繧ｧ繝ｼ繧ｺ縺ｮ `boost` 繝ｪ繧ｹ繝医↓蜷ｫ縺ｾ繧後ｋ繧ｹ繧ｭ繝ｫ 竊・**+3 轤ｹ**
-3. 隧ｲ蠖薙ヵ繧ｧ繝ｼ繧ｺ縺ｮ `suppress` 繝ｪ繧ｹ繝医↓蜷ｫ縺ｾ繧後ｋ繧ｹ繧ｭ繝ｫ 竊・**-3 轤ｹ**
-4. `restrict_to_p3` 縺後≠繧句ｴ蜷医∬ｩｲ蠖捺桃菴懊・讓ｩ髯舌ｒ P3 縺ｫ蠑輔″荳翫￡繧・
+`.dcr/phase.yaml` にプロジェクトフェーズが定義されている場合、スコアリングに phase modifier を適用する。
 
-### 繝輔ぉ繝ｼ繧ｺ荳隕ｧ
+### 適用ルール
 
-| 繝輔ぉ繝ｼ繧ｺ | 逕ｨ騾・| boost 蟇ｾ雎｡ |
+1. `.dcr/phase.yaml` の `current_phase` を読み取る
+2. 該当フェーズの `boost` リストに含まれるスキル → **+3 点**
+3. 該当フェーズの `suppress` リストに含まれるスキル → **-3 点**
+4. `restrict_to_p3` がある場合、該当操作の権限を P3 に引き上げる
+
+### フェーズ一覧
+
+| フェーズ | 用途 | boost 対象 |
 |---|---|---|
-| `sprint-start` | 險育判繝ｻ險ｭ險・| writing-plans, brainstorming, prd-to-issues |
-| `sprint-mid` | 螳溯｣・ｼ医ョ繝輔か繝ｫ繝茨ｼ・| tdd-workflow, systematic-debugging, code-review |
-| `sprint-end` | 繝ｬ繝薙Η繝ｼ繝ｻ螳御ｺ・| code-review, verification-before-completion |
-| `release-prep` | 繝ｪ繝ｪ繝ｼ繧ｹ貅門ｙ | verification-before-completion, security-scan |
-| `code-freeze` | 邱頑･菫ｮ豁｣縺ｮ縺ｿ | systematic-debugging, security-scan |
-| `hotfix` | 譛蟆乗怙騾滉ｿｮ豁｣ | systematic-debugging, verification-before-completion |
-| `exploration` | PoC繝ｻ謗｢邏｢ | brainstorming, search-first |
+| `sprint-start` | 計画・設計 | writing-plans, brainstorming, prd-to-issues |
+| `sprint-mid` | 実装（デフォルト） | tdd-workflow, systematic-debugging, code-review |
+| `sprint-end` | レビュー・完了 | code-review, verification-before-completion |
+| `release-prep` | リリース準備 | verification-before-completion, security-scan |
+| `code-freeze` | 緊急修正のみ | systematic-debugging, security-scan |
+| `hotfix` | 最小最速修正 | systematic-debugging, verification-before-completion |
+| `exploration` | PoC・探索 | brainstorming, search-first |
 
-### 繝輔ぉ繝ｼ繧ｺ讀懷・繝偵Η繝ｼ繝ｪ繧ｹ繝・ぅ繝・け
+### フェーズ検出ヒューリスティック
 
-phase.yaml 縺ｮ `current_phase` 繧呈焔蜍戊ｨｭ螳壹☆繧九・縺悟渕譛ｬ縺縺後∽ｻ･荳九°繧芽・蜍墓耳螳壹ｂ蜿ｯ閭ｽ:
+phase.yaml の `current_phase` を手動設定するのが基本だが、以下から自動推定も可能:
 
-- 繝悶Λ繝ｳ繝∝錐縺ｫ `release/` 竊・`release-prep`
-- 繝悶Λ繝ｳ繝∝錐縺ｫ `hotfix/` 竊・`hotfix`
-- 繧ｿ繧ｰ `code-freeze` 縺・HEAD 縺ｫ縺ゅｋ 竊・`code-freeze`
-- 荳願ｨ倥↓隧ｲ蠖薙＠縺ｪ縺・竊・`phase.yaml` 縺ｮ蛟､繧偵◎縺ｮ縺ｾ縺ｾ菴ｿ逕ｨ
+- ブランチ名に `release/` → `release-prep`
+- ブランチ名に `hotfix/` → `hotfix`
+- タグ `code-freeze` が HEAD にある → `code-freeze`
+- 上記に該当しない → `phase.yaml` の値をそのまま使用
 
-## Intent-Based Dynamic Weights・井ｽｿ逕ｨ螳溽ｸｾ繝吶・繧ｹ縺ｮ蜍慕噪驥阪∩・・
+## Intent-Based Dynamic Weights（使用実績ベースの動的重み）
 
-`.dcr/intent-log.jsonl` 縺ｫ繝ｫ繝ｼ繝・ぅ繝ｳ繧ｰ豎ｺ螳壹・繝ｭ繧ｰ縺瑚塘遨阪＆繧後※縺・ｋ蝣ｴ蜷医∫ｵｱ險医・繝ｼ繧ｹ縺ｮ驥阪∩隱ｿ謨ｴ繧帝←逕ｨ縺吶ｋ縲・
+`.dcr/intent-log.jsonl` にルーティング決定のログが蓄積されている場合、統計ベースの重み調整を適用する。
 
-### 繝ｭ繧ｰ險倬鹸繧ｿ繧､繝溘Φ繧ｰ
+### ログ記録タイミング
 
-繝ｫ繝ｼ繧ｿ繝ｼ縺後せ繧ｭ繝ｫ/繝ｫ繝ｼ繝ｫ繧帝∈螳壹＠縺ｦ螳溯｡後′螳御ｺ・＠縺溷ｾ後∽ｻ･荳九ｒ險倬鹸縺吶ｋ:
+ルーターがスキル/ルールを選定して実行が完了した後、以下を記録する:
 
 ```jsonc
 {
   "ts": "2026-04-10T14:30:00+09:00",
-  "intent": "萓晞ｼ縺ｮ1陦瑚ｦ∫ｴ・,
+  "intent": "依頼の1行要約",
   "category": "ui-ux",
   "selected": "frontend-developer",
   "route": "orchestration",
@@ -486,117 +485,117 @@ phase.yaml 縺ｮ `current_phase` 繧呈焔蜍戊ｨｭ螳壹☆繧九・縺悟�
 }
 ```
 
-### 蜍慕噪驥阪∩縺ｮ驕ｩ逕ｨ
+### 動的重みの適用
 
-`tools/aggregate-intent.ps1` 縺悟・蜉帙☆繧・`.dcr/intent-weights.md` 縺ｮ adjustment 蛟､繧偵∝渕譛ｬ繧ｹ繧ｳ繧｢縺ｫ蜉邂励☆繧九・
+`tools/aggregate-intent.ps1` が出力する `.dcr/intent-weights.md` の adjustment 値を、基本スコアに加算する。
 
-| 謖・ｨ・| 險育ｮ・|
+| 指標 | 計算 |
 |---|---|
-| 謌仙粥邇・| (success_rate - 0.5) ﾃ・4 |
-| 繧ｪ繝ｼ繝舌・繝ｩ繧､繝峨・繝翫Ν繝・ぅ | -override_rate ﾃ・3 |
-| 隱ｿ謨ｴ蛟､ | 荳願ｨ伜粋險医ｒ [-3, +3] 縺ｫ繧ｯ繝ｩ繝ｳ繝・|
-| 驕ｩ逕ｨ譚｡莉ｶ | 繧ｵ繝ｳ繝励Ν謨ｰ 竕･ 5 |
+| 成功率 | (success_rate - 0.5) × 4 |
+| オーバーライドペナルティ | -override_rate × 3 |
+| 調整値 | 上記合計を [-3, +3] にクランプ |
+| 適用条件 | サンプル数 ≥ 5 |
 
-### 邨ｱ蜷医せ繧ｳ繧｢險育ｮ怜ｼ・
+### 統合スコア計算式
 
 ```
-譛邨ゅせ繧ｳ繧｢ = 蝓ｺ譛ｬ繧ｹ繧ｳ繧｢
+最終スコア = 基本スコア
            + phase_modifier     (boost: +3 / suppress: -3)
-           + intent_adjustment  ([-3, +3], 繧ｵ繝ｳ繝励Ν竕･5縺ｮ縺ｿ)
+           + intent_adjustment  ([-3, +3], サンプル≥5のみ)
            + avoid_with penalty (-4)
 ```
 
-蝓ｺ譛ｬ繧ｹ繧ｳ繧｢縺ｮ蜀・ｨｳ縺ｯ譌｢蟄倥・驥阪∩莉倥″譁ｹ蠑・
+基本スコアの内訳は既存の重み付き方式:
 
-| 蛻､螳夊ｦ∫ｴ | 轤ｹ謨ｰ |
+| 判定要素 | 点数 |
 |---|---|
-| 隕ｪ繧ｫ繝・ざ繝ｪ荳閾ｴ | +5 |
-| 繧ｭ繝ｼ繝ｯ繝ｼ繝我ｸ閾ｴ (蜷・ | +2 |
-| 繝峨Γ繧､繝ｳ荳閾ｴ | +2 |
-| 蠖｢蠑丈ｸ閾ｴ | +1 |
-| 繝ｪ繧ｹ繧ｯ謨ｴ蜷・| +1 |
+| 親カテゴリ一致 | +5 |
+| キーワード一致 (各) | +2 |
+| ドメイン一致 | +2 |
+| 形式一致 | +1 |
+| リスク整合 | +1 |
 
-### 繝輔か繝ｼ繝ｫ繝舌ャ繧ｯ
+### フォールバック
 
-- intent-log 縺悟ｭ伜惠縺励↑縺・ｴ蜷・ 蝓ｺ譛ｬ繧ｹ繧ｳ繧｢ + phase_modifier 縺ｮ縺ｿ縺ｧ驕ｸ螳・
-- 繧ｵ繝ｳ繝励Ν荳崎ｶｳ縺ｮ蝣ｴ蜷・ adjustment = 0 縺ｨ縺励※謇ｱ縺・
-- intent-weights.md 縺悟商縺・ｴ蜷・ 蝓ｺ譛ｬ繧ｹ繧ｳ繧｢縺ｫ繝輔か繝ｼ繝ｫ繝舌ャ繧ｯ・郁ｭｦ蜻翫↑縺暦ｼ・
+- intent-log が存在しない場合: 基本スコア + phase_modifier のみで選定
+- サンプル不足の場合: adjustment = 0 として扱う
+- intent-weights.md が古い場合: 基本スコアにフォールバック（警告なし）
 
-## Compositional Skill Algebra・医せ繧ｭ繝ｫ蜷域・莉｣謨ｰ・・
+## Compositional Skill Algebra（スキル合成代数）
 
-`skills/*/SKILL.md` 縺ｫ `composable:` frontmatter 縺後≠繧句ｴ蜷医√Ν繝ｼ繧ｿ繝ｼ縺ｯ繧ｹ繧ｭ繝ｫ繧偵メ繧ｧ繝ｼ繝ｳ螳溯｡後〒縺阪ｋ縲・
+`skills/*/SKILL.md` に `composable:` frontmatter がある場合、ルーターはスキルをチェーン実行できる。
 
-### 蜷域・繧ｪ繝壹Ξ繝ｼ繧ｿ
+### 合成オペレータ
 
-| 繧ｪ繝壹Ξ繝ｼ繧ｿ | 陦ｨ險・| 諢丞袖 |
+| オペレータ | 表記 | 意味 |
 |---|---|---|
-| Sequence | `A 竊・B` | A 螳御ｺ・ｾ後∝・蜉帙ｒ B 縺ｫ貂｡縺・|
-| Parallel | `A \|\| B` | A 縺ｨ B 繧堤峡遶句ｮ溯｡後＠縲∫ｵ先棡繧偵・繝ｼ繧ｸ |
-| Conditional | `A ? B : C` | A 謌仙粥縺ｪ繧・B縲∝､ｱ謨励↑繧・C |
+| Sequence | `A → B` | A 完了後、出力を B に渡す |
+| Parallel | `A \|\| B` | A と B を独立実行し、結果をマージ |
+| Conditional | `A ? B : C` | A 成功なら B、失敗なら C |
 
-### 蝙倶ｺ呈鋤繝槭ヨ繝ｪ繧ｯ繧ｹ
+### 型互換マトリクス
 
-蜷域・譎ゅ∝燕繧ｹ繧ｭ繝ｫ縺ｮ `output_type` 縺梧ｬ｡繧ｹ繧ｭ繝ｫ縺ｮ `input_type` 縺ｨ莠呈鋤縺ｧ縺ゅｋ蠢・ｦ√′縺ゅｋ縲・
+合成時、前スキルの `output_type` が次スキルの `input_type` と互換である必要がある。
 
-| output 竊・竊・input 竊・| intent | spec | code | review | artifact |
+| output ↓ → input → | intent | spec | code | review | artifact |
 |---|---|---|---|---|---|
-| intent | 笨・| 笨・| 窶・| 窶・| 窶・|
-| spec | 窶・| 笨・| 笨・| 窶・| 窶・|
-| code | 窶・| 窶・| 笨・| 笨・| 笨・|
-| review | 窶・| 笨・| 笨・| 窶・| 窶・|
-| artifact | 窶・| 窶・| 窶・| 笨・| 笨・|
+| intent | ✅ | ✅ | — | — | — |
+| spec | — | ✅ | ✅ | — | — |
+| code | — | — | ✅ | ✅ | ✅ |
+| review | — | ✅ | ✅ | — | — |
+| artifact | — | — | — | ✅ | ✅ |
 
-### 蜷域・讀懷・繝偵Η繝ｼ繝ｪ繧ｹ繝・ぅ繝・け
+### 合成検出ヒューリスティック
 
-繝ｫ繝ｼ繧ｿ繝ｼ縺ｯ莉･荳九・謇九′縺九ｊ縺ｧ閾ｪ蜍募粋謌舌ｒ謠先｡医☆繧・
+ルーターは以下の手がかりで自動合成を提案する:
 
-1. 繝ｦ繝ｼ繧ｶ繝ｼ縺ｮ萓晞ｼ縺瑚､・焚繧ｹ繝・ャ繝励ｒ證礼､ｺ・医瑚ｨｭ險医＠縺ｦ螳溯｣・＠縺ｦ縲咲ｭ会ｼ・
-2. 驕ｸ螳壹せ繧ｭ繝ｫ縺ｮ `contract.postconditions` 縺悟挨繧ｹ繧ｭ繝ｫ縺ｮ `preconditions` 繧貞・雜ｳ縺吶ｋ
-3. `.dcr/compositions.yaml` 縺ｫ螳夂ｾｩ貂医∩繝√ぉ繝ｼ繝ｳ縺後・繝・メ縺吶ｋ
+1. ユーザーの依頼が複数ステップを暗示（「設計して実装して」等）
+2. 選定スキルの `contract.postconditions` が別スキルの `preconditions` を充足する
+3. `.dcr/compositions.yaml` に定義済みチェーンがマッチする
 
-### 螳夂ｾｩ貂医∩繝√ぉ繝ｼ繝ｳ・・.dcr/compositions.yaml`・・
+### 定義済みチェーン（`.dcr/compositions.yaml`）
 
-| 繝√ぉ繝ｼ繝ｳ蜷・| 繝輔Ο繝ｼ | 逕ｨ騾・|
+| チェーン名 | フロー | 用途 |
 |---|---|---|
-| `feature-pipeline` | brainstorming 竊・writing-plans 竊・螳溯｣・竊・verification | 譁ｰ讖溯・縺ｮ螳悟・髢狗匱 |
-| `quality-pipeline` | code-review 竊・systematic-debugging 竊・verification | 蜩∬ｳｪ謾ｹ蝟・|
-| `debug-verify` | systematic-debugging 竊・verification | 繝舌げ菫ｮ豁｣ |
-| `plan-pipeline` | brainstorming 竊・writing-plans | 險育判遶区｡・|
-| `tdd-feature` | brainstorming 竊・writing-plans 竊・tdd-workflow 竊・verification | TDD髢狗匱 |
+| `feature-pipeline` | brainstorming → writing-plans → 実装 → verification | 新機能の完全開発 |
+| `quality-pipeline` | code-review → systematic-debugging → verification | 品質改善 |
+| `debug-verify` | systematic-debugging → verification | バグ修正 |
+| `plan-pipeline` | brainstorming → writing-plans | 計画立案 |
+| `tdd-feature` | brainstorming → writing-plans → tdd-workflow → verification | TDD開発 |
 
-### 蝣ｱ蜻翫ヵ繧ｩ繝ｼ繝槭ャ繝・
+### 報告フォーマット
 
 ```
-莉･荳九・蜷域・繝ｯ繝ｼ繧ｯ繝輔Ο繝ｼ繧剃ｽｿ逕ｨ縺励∪縺・
-盗 feature-pipeline: brainstorming 竊・writing-plans 竊・[螳溯｣・ 竊・verification-before-completion
-  蝙九ヵ繝ｭ繝ｼ: intent 竊・spec 竊・spec 竊・code 竊・report
+以下の合成ワークフローを使用します:
+📐 feature-pipeline: brainstorming → writing-plans → [実装] → verification-before-completion
+  型フロー: intent → spec → spec → code → report
 ```
 
-### 蜷域・繝懊・繝翫せ
+### 合成ボーナス
 
-繝槭Ν繝√せ繝・ャ繝嶺ｾ晞ｼ縺ｧ螳夂ｾｩ貂医∩繝√ぉ繝ｼ繝ｳ縺後・繝・メ縺励◆蝣ｴ蜷医√メ繧ｧ繝ｼ繝ｳ蜀・・蜷・せ繧ｭ繝ｫ縺ｫ **+2 轤ｹ** 縺ｮ繝懊・繝翫せ繧貞刈邂励☆繧九・
+マルチステップ依頼で定義済みチェーンがマッチした場合、チェーン内の各スキルに **+2 点** のボーナスを加算する。
 
-### 繝輔か繝ｼ繝ｫ繝舌ャ繧ｯ
+### フォールバック
 
-- `composable:` 縺後↑縺・せ繧ｭ繝ｫ縺ｯ繝√ぉ繝ｼ繝ｳ縺ｫ蜷ｫ繧√↑縺・ｼ亥腰迢ｬ螳溯｡後・縺ｿ・・
-- 蝙倶ｺ呈鋤縺御ｸ肴・遶九・蝣ｴ蜷医・俣縺ｫ陬懷ｮ後せ繧ｭ繝ｫ繧呈諺蜈･謠先｡医☆繧・
-- 繝√ぉ繝ｼ繝ｳ縺ｮ髟ｷ縺輔′ 4 繧定ｶ・∴繧句ｴ蜷医√Θ繝ｼ繧ｶ繝ｼ縺ｫ遒ｺ隱阪＠縺ｦ縺九ｉ螳溯｡後☆繧・
+- `composable:` がないスキルはチェーンに含めない（単独実行のみ）
+- 型互換が不成立の場合、間に補完スキルを挿入提案する
+- チェーンの長さが 4 を超える場合、ユーザーに確認してから実行する
 
-## Adversarial Review・亥ｯｾ謚励Ξ繝薙Η繝ｼ・・
+## Adversarial Review（対抗レビュー）
 
-`rules/*.md` 縺ｫ `challenge:` frontmatter 縺後≠繧句ｴ蜷医√Ν繝ｼ繧ｿ繝ｼ縺ｯ繝励Λ繧､繝槭Μ螳溯｡悟ｾ後↓閾ｪ蜍輔〒繝√Ε繝ｬ繝ｳ繧ｸ繝｣繝ｼ繧堤匱轣ｫ縺ｧ縺阪ｋ縲・
+`rules/*.md` に `challenge:` frontmatter がある場合、ルーターはプライマリ実行後に自動でチャレンジャーを発火できる。
 
-### 蟇ｾ謚励Ξ繝薙Η繝ｼ繝輔Ο繝ｼ
+### 対抗レビューフロー
 
-1. 繝励Λ繧､繝槭Μ繧ｨ繝ｼ繧ｸ繧ｧ繝ｳ繝茨ｼ井ｾ・ `backend-architect`・峨′繧ｿ繧ｹ繧ｯ繧貞ｮ御ｺ・
-2. 繝ｫ繝ｼ繧ｿ繝ｼ縺・`.dcr/adversarial-pairs.yaml` 繧貞盾辣ｧ
-3. `auto_trigger` 譚｡莉ｶ縺ｫ荳閾ｴ縺吶ｋ繝√Ε繝ｬ繝ｳ繧ｸ繝｣繝ｼ繧呈怙螟ｧ2莉ｶ驕ｸ螳・
-4. 繝√Ε繝ｬ繝ｳ繧ｸ繝｣繝ｼ縺後・繝ｩ繧､繝槭Μ縺ｮ蜃ｺ蜉帙ｒ繝ｬ繝薙Η繝ｼ
-5. 邨先棡繧・`笞費ｸ汁 繝励Ξ繝輔ぅ繝・け繧ｹ莉倥″縺ｧ蝣ｱ蜻・
+1. プライマリエージェント（例: `backend-architect`）がタスクを完了
+2. ルーターが `.dcr/adversarial-pairs.yaml` を参照
+3. `auto_trigger` 条件に一致するチャレンジャーを最大2件選定
+4. チャレンジャーがプライマリの出力をレビュー
+5. 結果を `⚔️` プレフィックス付きで報告
 
-### 蟇ｾ謚励・繧｢荳隕ｧ
+### 対抗ペア一覧
 
-| 繝√Ε繝ｬ繝ｳ繧ｸ繝｣繝ｼ | 繧ｿ繝ｼ繧ｲ繝・ヨ | 隕ｳ轤ｹ | 繝医Μ繧ｬ繝ｼ |
+| チャレンジャー | ターゲット | 観点 | トリガー |
 |---|---|---|---|
 | security-engineer | backend-architect, frontend-developer, senior-developer | security, architecture | on-completion |
 | performance-benchmarker | backend-architect, frontend-developer | performance | on-completion |
@@ -604,69 +603,69 @@ phase.yaml 縺ｮ `current_phase` 繧呈焔蜍戊ｨｭ螳壹☆繧九・縺悟�
 | qa-reality-checker | senior-developer, rapid-prototyper | correctness | on-completion |
 | evidence-collector | senior-developer, frontend-developer, backend-architect | correctness | on-pr |
 
-### 蝣ｱ蜻翫ヵ繧ｩ繝ｼ繝槭ャ繝・
+### 報告フォーマット
 
 ```
-笞費ｸ・蟇ｾ謚励Ξ繝薙Η繝ｼ:
-- security-engineer 縺後Ξ繝薙Η繝ｼ縺励∪縺・(繧ｻ繧ｭ繝･繝ｪ繝・ぅ繝ｻ繧｢繝ｼ繧ｭ繝・け繝√Ε隕ｳ轤ｹ)
-  蟇ｾ雎｡: backend-architect 縺ｮ螳溯｣・ｵ先棡
+⚔️ 対抗レビュー:
+- security-engineer がレビューします (セキュリティ・アーキテクチャ観点)
+  対象: backend-architect の実装結果
 ```
 
-### 繧ｨ繧ｹ繧ｫ繝ｬ繝ｼ繧ｷ繝ｧ繝ｳ
+### エスカレーション
 
-- 繝√Ε繝ｬ繝ｳ繧ｸ繝｣繝ｼ縺・severity: high 莉･荳翫・蝠城｡後ｒ讀懷・ 竊・P3 謇ｿ隱阪ｒ隕∵ｱ・
-- 蜷御ｸ繧ｿ繧ｹ繧ｯ縺ｸ縺ｮ繝√Ε繝ｬ繝ｳ繧ｸ繝｣繝ｼ荳企剞: **2莉ｶ**
-- 繝√Ε繝ｬ繝ｳ繧ｸ繝｣繝ｼ縺ｮ謇隕九・繝励Λ繧､繝槭Μ繧偵ヶ繝ｭ繝・け縺励↑縺・ｼ・dvisory report・・
+- チャレンジャーが severity: high 以上の問題を検出 → P3 承認を要求
+- 同一タスクへのチャレンジャー上限: **2件**
+- チャレンジャーの所見はプライマリをブロックしない（advisory report）
 
-### 蟇ｾ謚励Ξ繝薙Η繝ｼ謚大宛
+### 対抗レビュー抑制
 
-莉･荳九・蝣ｴ蜷医・蟇ｾ謚励Ξ繝薙Η繝ｼ繧定・蜍慕匱轣ｫ縺励↑縺・
+以下の場合は対抗レビューを自動発火しない:
 
-- `auto_trigger: manual` 縺ｮ繝√Ε繝ｬ繝ｳ繧ｸ繝｣繝ｼ
-- phase 縺・`hotfix` 縺ｾ縺溘・ `code-freeze`・域怙蟆乗怙騾溘ｒ蜆ｪ蜈茨ｼ・
-- 繝ｦ繝ｼ繧ｶ繝ｼ縺梧・遉ｺ逧・↓縲後Ξ繝薙Η繝ｼ荳崎ｦ√阪→謖・､ｺ縺励◆蝣ｴ蜷・
+- `auto_trigger: manual` のチャレンジャー
+- phase が `hotfix` または `code-freeze`（最小最速を優先）
+- ユーザーが明示的に「レビュー不要」と指示した場合
 
-## Federated Skill Marketplace・磯｣蜷医せ繧ｭ繝ｫ繝槭・繧ｱ繝・ヨ・・
+## Federated Skill Marketplace（連合スキルマーケット）
 
-`skills/*/SKILL.md` 縺ｫ `package:` frontmatter 縺後≠繧句ｴ蜷医√◎縺ｮ繧ｹ繧ｭ繝ｫ縺ｯ `.dcr/registry.yaml` 縺ｫ逋ｻ骭ｲ縺輔ｌ縲√け繝ｭ繧ｹ繝ｪ繝昴ず繝医Μ縺ｧ蜈ｱ譛牙庄閭ｽ縺ｫ縺ｪ繧九・
+`skills/*/SKILL.md` に `package:` frontmatter がある場合、そのスキルは `.dcr/registry.yaml` に登録され、クロスリポジトリで共有可能になる。
 
-### 繝ｬ繧ｸ繧ｹ繝医Μ蜿ら・
+### レジストリ参照
 
-繝ｫ繝ｼ繧ｿ繝ｼ縺悟呵｣懊↑縺励・迥ｶ諷九↓蛻ｰ驕斐＠縺溷ｴ蜷・
+ルーターが候補なしの状態に到達した場合:
 
-1. `registry.yaml` 縺ｮ `tags` 縺ｨ `input_type/output_type` 縺ｧ讀懃ｴ｢縺吶ｋ
-2. 隧ｲ蠖薙せ繧ｭ繝ｫ縺後≠繧後・縲√う繝ｳ繧ｹ繝医・繝ｫ貂医∩縺狗｢ｺ隱阪☆繧・
-3. 譛ｪ繧､繝ｳ繧ｹ繝医・繝ｫ縺ｪ繧峨後％縺ｮ繧ｹ繧ｭ繝ｫ縺ｮ繧､繝ｳ繧ｹ繝医・繝ｫ繧呈署譯医＠縺ｾ縺吶°・溘阪→霑斐☆
+1. `registry.yaml` の `tags` と `input_type/output_type` で検索する
+2. 該当スキルがあれば、インストール済みか確認する
+3. 未インストールなら「このスキルのインストールを提案しますか？」と返す
 
-### 繧ｹ繧ｭ繝ｫ縺ｮ繧ｨ繧ｯ繧ｹ繝昴・繝・
+### スキルのエクスポート
 
 ```powershell
 .\tools\skill-package.ps1 -Export -SkillName brainstorming
 ```
 
-`export/<skill-name>/` 縺ｫ manifest.json 縺ｨ SKILL.md 縺悟・蜉帙＆繧後ｋ縲・
-莉悶・繝ｪ繝昴ず繝医Μ縺ｧ `skills/` 縺ｫ繧ｳ繝斐・縺励※蛻ｩ逕ｨ縺吶ｋ縲・
+`export/<skill-name>/` に manifest.json と SKILL.md が出力される。
+他のリポジトリで `skills/` にコピーして利用する。
 
-### 繝ｬ繧ｸ繧ｹ繝医Μ縺ｮ閾ｪ蜍墓峩譁ｰ
+### レジストリの自動更新
 
 ```powershell
 .\tools\skill-package.ps1 -GenerateRegistry
 ```
 
-`package:` 莉倥″縺ｮ蜈ｨ繧ｹ繧ｭ繝ｫ縺九ｉ `.dcr/registry.yaml` 繧貞・逕滓・縺吶ｋ縲・
+`package:` 付きの全スキルから `.dcr/registry.yaml` を再生成する。
 
-### 繝舌・繧ｸ繝ｧ繝ｳ莠呈鋤繝√ぉ繝・け
+### バージョン互換チェック
 
-- `package.compat` 繝輔ぅ繝ｼ繝ｫ繝峨〒 DCR 繝輔Ξ繝ｼ繝繝ｯ繝ｼ繧ｯ縺ｮ譛菴弱ヰ繝ｼ繧ｸ繝ｧ繝ｳ繧貞ｮ｣險縺吶ｋ
-- `package.dependencies` 縺悟・縺ｦ蟄伜惠縺吶ｋ縺薙→繧・`validate.ps1` 縺ｧ讀懆ｨｼ縺吶ｋ
-- 萓晏ｭ倥せ繧ｭ繝ｫ縺ｮ繝舌・繧ｸ繝ｧ繝ｳ荳肴紛蜷医・隴ｦ蜻翫→縺励※蝣ｱ蜻翫☆繧具ｼ医ヶ繝ｭ繝・け縺ｯ縺励↑縺・ｼ・
+- `package.compat` フィールドで DCR フレームワークの最低バージョンを宣言する
+- `package.dependencies` が全て存在することを `validate.ps1` で検証する
+- 依存スキルのバージョン不整合は警告として報告する（ブロックはしない）
 
-### 邨ｱ蜷医せ繧ｳ繧｢險育ｮ怜ｼ擾ｼ域怙邨ら沿・・
+### 統合スコア計算式（最終版）
 
 ```
-譛邨ゅせ繧ｳ繧｢ = 蝓ｺ譛ｬ繧ｹ繧ｳ繧｢
+最終スコア = 基本スコア
            + phase_modifier       (boost: +3 / suppress: -3)
-           + intent_adjustment    ([-3, +3], 繧ｵ繝ｳ繝励Ν竕･5縺ｮ縺ｿ)
-           + composition_bonus    (螳夂ｾｩ貂医∩繝√ぉ繝ｼ繝ｳ繝槭ャ繝・ +2)
+           + intent_adjustment    ([-3, +3], サンプル≥5のみ)
+           + composition_bonus    (定義済みチェーンマッチ: +2)
            + avoid_with penalty   (-4)
 ```

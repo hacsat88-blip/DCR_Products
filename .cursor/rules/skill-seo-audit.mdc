@@ -1,10 +1,9 @@
 ---
-description: "seo-audit"
+description: When the user wants to audit, review, or diagnose SEO issues on their site. Also use when the user mentions "SEO audit," "technical SEO," "why am I not ranking," "SEO issues," "on-page SEO," "meta tags review," or "SEO health check." For building pages at scale to target keywords, see programmatic-seo. For adding structured data, see schema-markup.
 globs: ""
 alwaysApply: false
 ---
 
-<!-- GENERATED: .\tools\deploy-all.ps1 -->
 
 # SEO Audit
 
@@ -36,16 +35,16 @@ Before auditing, understand:
 
 ## Audit Framework
 
-### 笞・・Important: Schema Markup Detection Limitation
+### ⚠️ Important: Schema Markup Detection Limitation
 
 **`web_fetch` and `curl` cannot reliably detect structured data / schema markup.**
 
-Many CMS plugins (AIOSEO, Yoast, RankMath) inject JSON-LD via client-side JavaScript 窶・it won't appear in static HTML or `web_fetch` output (which strips `<script>` tags during conversion).
+Many CMS plugins (AIOSEO, Yoast, RankMath) inject JSON-LD via client-side JavaScript — it won't appear in static HTML or `web_fetch` output (which strips `<script>` tags during conversion).
 
 **To accurately check for schema markup, use one of these methods:**
-1. **Browser tool** 窶・render the page and run: `document.querySelectorAll('script[type="application/ld+json"]')`
-2. **Google Rich Results Test** 窶・https://search.google.com/test/rich-results
-3. **Screaming Frog export** 窶・if the client provides one, use it (SF renders JavaScript)
+1. **Browser tool** — render the page and run: `document.querySelectorAll('script[type="application/ld+json"]')`
+2. **Google Rich Results Test** — https://search.google.com/test/rich-results
+3. **Screaming Frog export** — if the client provides one, use it (SF renders JavaScript)
 
 **Never report "no schema found" based solely on `web_fetch` or `curl`.** This has led to false audit findings in production.
 
@@ -103,7 +102,7 @@ Many CMS plugins (AIOSEO, Yoast, RankMath) inject JSON-LD via client-side JavaSc
 **Canonicalization**
 - All pages have canonical tags
 - Self-referencing canonicals on unique pages
-- HTTP 竊・HTTPS canonicals
+- HTTP → HTTPS canonicals
 - www vs. non-www consistency
 - Trailing slash consistency
 
@@ -143,7 +142,7 @@ Many CMS plugins (AIOSEO, Yoast, RankMath) inject JSON-LD via client-side JavaSc
 - HTTPS across entire site
 - Valid SSL certificate
 - No mixed content
-- HTTP 竊・HTTPS redirects
+- HTTP → HTTPS redirects
 - HSTS header (bonus)
 
 ### URL Structure
@@ -194,13 +193,13 @@ Many CMS plugins (AIOSEO, Yoast, RankMath) inject JSON-LD via client-side JavaSc
 **Check for:**
 - One H1 per page
 - H1 contains primary keyword
-- Logical hierarchy (H1 竊・H2 竊・H3)
+- Logical hierarchy (H1 → H2 → H3)
 - Headings describe content
 - Not just for styling
 
 **Common issues:**
 - Multiple H1s
-- Skip levels (H1 竊・H3)
+- Skip levels (H1 → H3)
 - Headings used for styling only
 - No H1 on page
 
@@ -379,7 +378,7 @@ Same format as above
 - Google Search Console (essential)
 - Google PageSpeed Insights
 - Bing Webmaster Tools
-- Rich Results Test (**use this for schema validation 窶・it renders JavaScript**)
+- Rich Results Test (**use this for schema validation — it renders JavaScript**)
 - Mobile-Friendly Test
 - Schema Validator
 

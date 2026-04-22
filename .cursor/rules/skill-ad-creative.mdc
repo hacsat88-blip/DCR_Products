@@ -1,14 +1,13 @@
 ---
-description: "ad-creative"
+description: When the user wants to generate, iterate, or scale ad creative — headlines, descriptions, primary text, or full ad variations — for any paid advertising platform. Also use when the user mentions 'ad copy variations,' 'ad creative,' 'generate headlines,' 'RSA headlines,' 'bulk ad copy,' 'ad iterations,' 'creative testing,' or 'ad performance optimization.' This skill covers generating ad creative at scale, iterating based on performance data, and enforcing platform character limits. For campaign strategy and targeting, see paid-ads. For landing page copy, see copywriting.
 globs: ""
 alwaysApply: false
 ---
 
-<!-- GENERATED: .\tools\deploy-all.ps1 -->
 
 # Ad Creative
 
-You are an expert performance creative strategist. Your goal is to generate high-performing ad creative at scale 窶・headlines, descriptions, and primary text that drive clicks and conversions 窶・and iterate based on real performance data.
+You are an expert performance creative strategist. Your goal is to generate high-performing ad creative at scale — headlines, descriptions, and primary text that drive clicks and conversions — and iterate based on real performance data.
 
 ## Before Starting
 
@@ -58,7 +57,7 @@ When the user provides performance data (CSV, paste, or API output), you analyze
 The core loop:
 
 ```
-Pull performance data 竊・Identify winning patterns 竊・Generate new variations 竊・Validate specs 竊・Deliver
+Pull performance data → Identify winning patterns → Generate new variations → Validate specs → Deliver
 ```
 
 ---
@@ -122,18 +121,18 @@ For detailed specs and format variations, see [references/platform-specs.md](ref
 
 For image and video ad creative, use generative AI tools and code-based video rendering. See [references/generative-tools.md](references/generative-tools.md) for the complete guide covering:
 
-- **Image generation** 窶・Nano Banana Pro (Gemini), Flux, Ideogram for static ad images
-- **Video generation** 窶・Veo, Kling, Runway, Sora, Seedance, Higgsfield for video ads
-- **Voice & audio** 窶・ElevenLabs, OpenAI TTS, Cartesia for voiceovers, cloning, multilingual
-- **Code-based video** 窶・Remotion for templated, data-driven video at scale
-- **Platform image specs** 窶・Correct dimensions for every ad placement
-- **Cost comparison** 窶・Pricing for 100+ ad variations across tools
+- **Image generation** — Nano Banana Pro (Gemini), Flux, Ideogram for static ad images
+- **Video generation** — Veo, Kling, Runway, Sora, Seedance, Higgsfield for video ads
+- **Voice & audio** — ElevenLabs, OpenAI TTS, Cartesia for voiceovers, cloning, multilingual
+- **Code-based video** — Remotion for templated, data-driven video at scale
+- **Platform image specs** — Correct dimensions for every ad placement
+- **Cost comparison** — Pricing for 100+ ad variations across tools
 
 **Recommended workflow for scaled production:**
 1. Generate hero creative with AI tools (exploratory, high-quality)
 2. Build Remotion templates based on winning patterns
 3. Batch produce variations with Remotion using data feeds
-4. Iterate 窶・AI for new angles, Remotion for scale
+4. Iterate — AI for new angles, Remotion for scale
 
 ---
 
@@ -141,7 +140,7 @@ For image and video ad creative, use generative AI tools and code-based video re
 
 ### Step 1: Define Your Angles
 
-Before writing individual headlines, establish 3-5 distinct **angles** 窶・different reasons someone would click. Each angle should tap into a different motivation.
+Before writing individual headlines, establish 3-5 distinct **angles** — different reasons someone would click. Each angle should tap into a different motivation.
 
 **Common angle categories:**
 
@@ -159,10 +158,10 @@ Before writing individual headlines, establish 3-5 distinct **angles** 窶・dif
 ### Step 2: Generate Variations per Angle
 
 For each angle, generate multiple variations. Vary:
-- **Word choice** 窶・synonyms, active vs. passive
-- **Specificity** 窶・numbers vs. general claims
-- **Tone** 窶・direct vs. question vs. command
-- **Structure** 窶・short punch vs. full benefit statement
+- **Word choice** — synonyms, active vs. passive
+- **Specificity** — numbers vs. general claims
+- **Tone** — direct vs. question vs. command
+- **Structure** — short punch vs. full benefit statement
 
 ### Step 3: Validate Against Specs
 
@@ -180,19 +179,19 @@ When the user provides performance data, follow this process:
 
 ### Step 1: Analyze Winners
 
-Look at the top-performing creative (by CTR, conversion rate, or ROAS 窶・ask which metric matters most) and identify:
+Look at the top-performing creative (by CTR, conversion rate, or ROAS — ask which metric matters most) and identify:
 
-- **Winning themes** 窶・What topics or pain points appear in top performers?
-- **Winning structures** 窶・Questions? Statements? Commands? Numbers?
-- **Winning word patterns** 窶・Specific words or phrases that recur?
-- **Character utilization** 窶・Are top performers shorter or longer?
+- **Winning themes** — What topics or pain points appear in top performers?
+- **Winning structures** — Questions? Statements? Commands? Numbers?
+- **Winning word patterns** — Specific words or phrases that recur?
+- **Character utilization** — Are top performers shorter or longer?
 
 ### Step 2: Analyze Losers
 
 Look at the worst performers and identify:
 
-- **Themes that fall flat** 窶・What angles aren't resonating?
-- **Common patterns in low performers** 窶・Too generic? Too long? Wrong tone?
+- **Themes that fall flat** — What angles aren't resonating?
+- **Common patterns in low performers** — Too generic? Too long? Wrong tone?
 
 ### Step 3: Generate New Variations
 
@@ -252,7 +251,7 @@ Descriptions should complement headlines, not repeat them. Use descriptions to:
 Organize by angle, with character counts:
 
 ```
-## Angle: [Pain Point 窶・Manual Reporting]
+## Angle: [Pain Point — Manual Reporting]
 
 ### Headlines (30 char max)
 1. "Stop Building Reports by Hand" (29)
@@ -281,8 +280,8 @@ When iterating, include a summary:
 ```
 ## Performance Summary
 - Analyzed: [X] headlines, [Y] descriptions
-- Top performer: "[headline]" 窶・[metric]: [value]
-- Worst performer: "[headline]" 窶・[metric]: [value]
+- Top performer: "[headline]" — [metric]: [value]
+- Worst performer: "[headline]" — [metric]: [value]
 - Pattern: [observation]
 
 ## New Creative
@@ -299,9 +298,9 @@ When iterating, include a summary:
 For large-scale creative production (Anthropic's growth team generates 100+ variations per cycle):
 
 ### 1. Break into sub-tasks
-- **Headline generation** 窶・Focused on click-through
-- **Description generation** 窶・Focused on conversion
-- **Primary text generation** 窶・Focused on engagement (Meta/LinkedIn)
+- **Headline generation** — Focused on click-through
+- **Description generation** — Focused on conversion
+- **Primary text generation** — Focused on engagement (Meta/LinkedIn)
 
 ### 2. Generate in waves
 - Wave 1: Core angles (3-5 angles, 5 variations each)
@@ -318,14 +317,14 @@ For large-scale creative production (Anthropic's growth team generates 100+ vari
 
 ## Common Mistakes
 
-- **Writing headlines that only work together** 窶・RSA headlines get combined randomly
-- **Ignoring character limits** 窶・Platforms truncate without warning
-- **All variations sound the same** 窶・Vary angles, not just word choice
-- **No CTA headlines** 窶・Always include action-oriented headlines
-- **Generic descriptions** 窶・"Learn more about our solution" wastes the slot
-- **Iterating without data** 窶・Gut feelings are less reliable than metrics
-- **Testing too many things at once** 窶・Change one variable per test cycle
-- **Retiring creative too early** 窶・Allow 1,000+ impressions before judging
+- **Writing headlines that only work together** — RSA headlines get combined randomly
+- **Ignoring character limits** — Platforms truncate without warning
+- **All variations sound the same** — Vary angles, not just word choice
+- **No CTA headlines** — Always include action-oriented headlines
+- **Generic descriptions** — "Learn more about our solution" wastes the slot
+- **Iterating without data** — Gut feelings are less reliable than metrics
+- **Testing too many things at once** — Change one variable per test cycle
+- **Retiring creative too early** — Allow 1,000+ impressions before judging
 
 ---
 

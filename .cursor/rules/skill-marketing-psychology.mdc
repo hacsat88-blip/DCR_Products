@@ -1,10 +1,9 @@
 ---
-description: "marketing-psychology"
+description: When the user wants to apply psychological principles, mental models, or behavioral science to marketing. Also use when the user mentions 'psychology,' 'mental models,' 'cognitive bias,' 'persuasion,' 'behavioral science,' 'why people buy,' 'decision-making,' or 'consumer behavior.' Covers foundational thinking, buyer psychology, persuasion, and pricing psychology.
 globs: ""
 alwaysApply: false
 ---
 
-<!-- GENERATED: .\tools\deploy-all.ps1 -->
 
 # Marketing Psychology & Mental Models
 
@@ -34,9 +33,9 @@ Break problems down to basic truths and build solutions from there. Instead of c
 **Marketing application**: Don't assume you need content marketing because competitors do. Ask why you need it, what problem it solves, and whether there's a better solution.
 
 ### Jobs to Be Done
-People don't buy products窶杯hey "hire" them to get a job done. Focus on the outcome customers want, not features.
+People don't buy products—they "hire" them to get a job done. Focus on the outcome customers want, not features.
 
-**Marketing application**: A drill buyer doesn't want a drill窶杯hey want a hole. Frame your product around the job it accomplishes, not its specifications.
+**Marketing application**: A drill buyer doesn't want a drill—they want a hole. Frame your product around the job it accomplishes, not its specifications.
 
 ### Circle of Competence
 Know what you're good at and stay within it. Venture outside only with proper learning or expert help.
@@ -46,7 +45,7 @@ Know what you're good at and stay within it. Venture outside only with proper le
 ### Inversion
 Instead of asking "How do I succeed?", ask "What would guarantee failure?" Then avoid those things.
 
-**Marketing application**: List everything that would make your campaign fail窶把onfusing messaging, wrong audience, slow landing page窶杯hen systematically prevent each.
+**Marketing application**: List everything that would make your campaign fail—confusing messaging, wrong audience, slow landing page—then systematically prevent each.
 
 ### Occam's Razor
 The simplest explanation is usually correct. Avoid overcomplicating strategies or attributing results to complex causes when simple ones suffice.
@@ -69,7 +68,7 @@ Every system has one bottleneck limiting throughput. Find and fix that constrain
 **Marketing application**: If your funnel converts well but traffic is low, more conversion optimization won't help. Fix the traffic bottleneck first.
 
 ### Opportunity Cost
-Every choice has a cost窶背hat you give up by not choosing alternatives. Consider what you're saying no to.
+Every choice has a cost—what you give up by not choosing alternatives. Consider what you're saying no to.
 
 **Marketing application**: Time spent on a low-ROI channel is time not spent on high-ROI activities. Always compare against alternatives.
 
@@ -83,7 +82,7 @@ Consider not just immediate effects, but the effects of those effects.
 
 **Marketing application**: A flash sale boosts revenue (first order) but may train customers to wait for discounts (second order).
 
-### Map 竕 Territory
+### Map ≠ Territory
 Models and data represent reality but aren't reality itself. Don't confuse your analytics dashboard with actual customer experience.
 
 **Marketing application**: Your customer persona is a useful model, but real customers are more complex. Stay in touch with actual users.
@@ -150,7 +149,7 @@ People value things more when they've put effort into creating them.
 **Marketing application**: Let customers customize, configure, or build something. Their investment increases perceived value and commitment.
 
 ### Zero-Price Effect
-Free isn't just a low price窶琶t's psychologically different. "Free" triggers irrational preference.
+Free isn't just a low price—it's psychologically different. "Free" triggers irrational preference.
 
 **Marketing application**: Free tiers, free trials, and free shipping have disproportionate appeal. The jump from $1 to $0 is bigger than $2 to $1.
 
@@ -253,7 +252,7 @@ Limited availability increases perceived value. Scarcity signals desirability.
 ### Foot-in-the-Door Technique
 Start with a small request, then escalate. Compliance with small requests leads to compliance with larger ones.
 
-**Marketing application**: Free trial 竊・paid plan 竊・annual plan 竊・enterprise. Each step builds on the last.
+**Marketing application**: Free trial → paid plan → annual plan → enterprise. Each step builds on the last.
 
 ### Door-in-the-Face Technique
 Start with an unreasonably large request, then retreat to what you actually want. The contrast makes the second request seem reasonable.
@@ -328,7 +327,7 @@ Decision time increases with the number and complexity of choices. More options 
 **Marketing application**: Simplify choices. One clear CTA beats three. Fewer form fields beat more.
 
 ### AIDA Funnel
-Attention 竊・Interest 竊・Desire 竊・Action. The classic customer journey model.
+Attention → Interest → Desire → Action. The classic customer journey model.
 
 **Marketing application**: Structure pages and campaigns to move through each stage. Capture attention before building desire.
 
@@ -343,7 +342,7 @@ Small changes in how choices are presented significantly influence decisions.
 **Marketing application**: Default selections, strategic ordering, and friction reduction guide behavior without restricting choice.
 
 ### BJ Fogg Behavior Model
-Behavior = Motivation ﾃ・Ability ﾃ・Prompt. All three must be present for action.
+Behavior = Motivation × Ability × Prompt. All three must be present for action.
 
 **Marketing application**: High motivation but hard to do = won't happen. Easy to do but no prompt = won't happen. Design for all three.
 
@@ -381,7 +380,7 @@ These models explain how marketing compounds and scales.
 ### Feedback Loops
 Output becomes input, creating cycles. Positive loops accelerate growth; negative loops create decline.
 
-**Marketing application**: Build virtuous cycles: more users 竊・more content 竊・better SEO 竊・more users. Identify and strengthen positive loops.
+**Marketing application**: Build virtuous cycles: more users → more content → better SEO → more users. Identify and strengthen positive loops.
 
 ### Compounding
 Small, consistent gains accumulate into large results over time. Early gains matter most.
@@ -396,7 +395,7 @@ A product becomes more valuable as more people use it.
 ### Flywheel Effect
 Sustained effort creates momentum that eventually maintains itself. Hard to start, easy to maintain.
 
-**Marketing application**: Content 竊・traffic 竊・leads 竊・customers 竊・case studies 竊・more content. Each element powers the next.
+**Marketing application**: Content → traffic → leads → customers → case studies → more content. Each element powers the next.
 
 ### Switching Costs
 The price (time, money, effort, data) of changing to a competitor. High switching costs create retention.
@@ -441,7 +440,7 @@ When facing a marketing challenge, consider:
 
 1. What specific behavior are you trying to influence?
 2. What does your customer believe before encountering your marketing?
-3. Where in the journey (awareness 竊・consideration 竊・decision) is this?
+3. Where in the journey (awareness → consideration → decision) is this?
 4. What's currently preventing the desired action?
 5. Have you tested this with real customers?
 

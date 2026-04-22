@@ -1,10 +1,9 @@
 ---
-description: "finishing-a-development-branch"
+description: Use when implementation is complete, all tests pass, and you need to decide how to integrate the work - guides completion of development work by presenting structured options for merge, PR, or cleanup
 globs: ""
 alwaysApply: false
 ---
 
-<!-- GENERATED: .\tools\deploy-all.ps1 -->
 
 # Finishing a Development Branch
 
@@ -12,7 +11,7 @@ alwaysApply: false
 
 Guide completion of development work by presenting clear options and handling chosen workflow.
 
-**Core principle:** Verify tests 竊・Present options 竊・Execute choice 竊・Clean up.
+**Core principle:** Verify tests → Present options → Execute choice → Clean up.
 
 **Announce at start:** "I'm using the finishing-a-development-branch skill to complete this work."
 
@@ -156,10 +155,10 @@ git worktree remove <worktree-path>
 
 | Option | Merge | Push | Keep Worktree | Cleanup Branch |
 |--------|-------|------|---------------|----------------|
-| 1. Merge locally | 笨・| - | - | 笨・|
-| 2. Create PR | - | 笨・| 笨・| - |
-| 3. Keep as-is | - | - | 笨・| - |
-| 4. Discard | - | - | - | 笨・(force) |
+| 1. Merge locally | ✓ | - | - | ✓ |
+| 2. Create PR | - | ✓ | ✓ | - |
+| 3. Keep as-is | - | - | ✓ | - |
+| 4. Discard | - | - | - | ✓ (force) |
 
 ## Common Mistakes
 
@@ -168,7 +167,7 @@ git worktree remove <worktree-path>
 - **Fix:** Always verify tests before offering options
 
 **Open-ended questions**
-- **Problem:** "What should I do next?" 竊・ambiguous
+- **Problem:** "What should I do next?" → ambiguous
 - **Fix:** Present exactly 4 structured options
 
 **Automatic worktree cleanup**
