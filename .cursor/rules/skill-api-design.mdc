@@ -1,24 +1,25 @@
 ---
-description: REST API 設計の実務チェックリスト。命名、HTTP semantics、エラー形式、認可、レート制限、バージョニングを定義する。
+description: "api-design"
 globs: ""
 alwaysApply: false
 ---
 
+<!-- GENERATED: .\tools\deploy-all.ps1 -->
 
 # API Design
 
-## チェックリスト
+## 繝√ぉ繝・け繝ｪ繧ｹ繝・
 
-- URL は resource 名詞、複数形、kebab-case
-- HTTP method と status code を正しく使う
-- 入力バリデーションを schema で実装
-- エラー応答は code/message を統一
-- 認証と認可を分離して確認
-- 一覧 API は pagination 必須
-- レート制限と監査ログを定義
+- URL 縺ｯ resource 蜷崎ｩ槭∬､・焚蠖｢縲〔ebab-case
+- HTTP method 縺ｨ status code 繧呈ｭ｣縺励￥菴ｿ縺・
+- 蜈･蜉帙ヰ繝ｪ繝・・繧ｷ繝ｧ繝ｳ繧・schema 縺ｧ螳溯｣・
+- 繧ｨ繝ｩ繝ｼ蠢懃ｭ斐・ code/message 繧堤ｵｱ荳
+- 隱崎ｨｼ縺ｨ隱榊庄繧貞・髮｢縺励※遒ｺ隱・
+- 荳隕ｧ API 縺ｯ pagination 蠢・・
+- 繝ｬ繝ｼ繝亥宛髯舌→逶｣譟ｻ繝ｭ繧ｰ繧貞ｮ夂ｾｩ
 
-## バージョニング
+## 繝舌・繧ｸ繝ｧ繝九Φ繧ｰ
 
-- 非破壊変更は同バージョン
-- 破壊変更は新バージョン
-- Sunset と移行期間を明示
+- 髱樒ｴ螢雁､画峩縺ｯ蜷後ヰ繝ｼ繧ｸ繝ｧ繝ｳ
+- 遐ｴ螢雁､画峩縺ｯ譁ｰ繝舌・繧ｸ繝ｧ繝ｳ
+- Sunset 縺ｨ遘ｻ陦梧悄髢薙ｒ譏守､ｺ

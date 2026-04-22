@@ -1,9 +1,10 @@
 ---
-description: When the user wants to create competitor comparison or alternative pages for SEO and sales enablement. Also use when the user mentions 'alternative page,' 'vs page,' 'competitor comparison,' 'comparison page,' '[Product] vs [Product],' '[Product] alternative,' or 'competitive landing pages.' Covers four formats: singular alternative, plural alternatives, you vs competitor, and competitor vs competitor. Emphasizes deep research, modular content architecture, and varied section types beyond feature tables.
+description: "competitor-alternatives"
 globs: ""
 alwaysApply: false
 ---
 
+<!-- GENERATED: .\tools\deploy-all.ps1 -->
 
 # Competitor & Alternative Pages
 
@@ -43,7 +44,7 @@ Before creating competitor pages, understand:
 - Acknowledge competitor strengths
 - Be accurate about your limitations
 - Don't misrepresent competitor features
-- Readers are comparing—they'll verify claims
+- Readers are comparing窶杯hey'll verify claims
 
 ### 2. Depth Over Surface
 - Go beyond feature checklists
@@ -147,7 +148,7 @@ Before creating competitor pages, understand:
 ## Essential Sections
 
 ### TL;DR Summary
-Start every page with a quick summary for scanners—key differences in 2-3 sentences.
+Start every page with a quick summary for scanners窶婆ey differences in 2-3 sentences.
 
 ### Paragraph Comparisons
 Go beyond tables. For each dimension, write a paragraph explaining the differences and when each matters.

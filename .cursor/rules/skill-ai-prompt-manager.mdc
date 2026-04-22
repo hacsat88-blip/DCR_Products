@@ -1,35 +1,36 @@
 ---
-description: Chrome拡張 Product/ai-prompt-manager の開発・改修・検証を行う専用スキル。manifest v3、sidepanel、content script、AIチャットDOM差分吸収を含む。
+description: "ai-prompt-manager"
 globs: ""
 alwaysApply: false
 ---
 
+<!-- GENERATED: .\tools\deploy-all.ps1 -->
 
 # AI Prompt Manager Skill
 
-`Product/ai-prompt-manager` の変更を安全に進めるための実装ガイド。
+`Product/ai-prompt-manager` 縺ｮ螟画峩繧貞ｮ牙・縺ｫ騾ｲ繧√ｋ縺溘ａ縺ｮ螳溯｣・ぎ繧､繝峨・
 
 ## When to Use
 
-- 拡張機能の UI (`sidepanel.html`, `sidepanel.css`, `options.html`) を変更するとき
-- 挿入ロジック (`content.js`, `ai-service.js`) を変更するとき
-- コンテキストメニューや background 処理 (`background.js`) を変更するとき
-- `manifest.json` の権限や host 設定を調整するとき
+- 諡｡蠑ｵ讖溯・縺ｮ UI (`sidepanel.html`, `sidepanel.css`, `options.html`) 繧貞､画峩縺吶ｋ縺ｨ縺・
+- 謖ｿ蜈･繝ｭ繧ｸ繝・け (`content.js`, `ai-service.js`) 繧貞､画峩縺吶ｋ縺ｨ縺・
+- 繧ｳ繝ｳ繝・く繧ｹ繝医Γ繝九Η繝ｼ繧・background 蜃ｦ逅・(`background.js`) 繧貞､画峩縺吶ｋ縺ｨ縺・
+- `manifest.json` 縺ｮ讓ｩ髯舌ｄ host 險ｭ螳壹ｒ隱ｿ謨ｴ縺吶ｋ縺ｨ縺・
 
 ## Working Rules
 
-1. 変更前に `manifest.json` の `permissions` と `host_permissions` への影響を確認する。
-2. チャットサービス固有ロジックは `ai-service.js` に閉じ込め、UI からは抽象化した API 経由で呼ぶ。
-3. DOM セレクタはハードコードを避け、フォールバック候補を持つ。
-4. 入力補完は destructive にならないよう、既存入力を上書きする前に選択的挿入を優先する。
-5. 変更後は少なくとも以下を手動確認する:
-   - サイドパネル起動
-   - プロンプト一覧の追加・編集・削除
-   - ChatGPT / Claude / Gemini への挿入動作
+1. 螟画峩蜑阪↓ `manifest.json` 縺ｮ `permissions` 縺ｨ `host_permissions` 縺ｸ縺ｮ蠖ｱ髻ｿ繧堤｢ｺ隱阪☆繧九・
+2. 繝√Ε繝・ヨ繧ｵ繝ｼ繝薙せ蝗ｺ譛峨Ο繧ｸ繝・け縺ｯ `ai-service.js` 縺ｫ髢峨§霎ｼ繧√ゞI 縺九ｉ縺ｯ謚ｽ雎｡蛹悶＠縺・API 邨檎罰縺ｧ蜻ｼ縺ｶ縲・
+3. DOM 繧ｻ繝ｬ繧ｯ繧ｿ縺ｯ繝上・繝峨さ繝ｼ繝峨ｒ驕ｿ縺代√ヵ繧ｩ繝ｼ繝ｫ繝舌ャ繧ｯ蛟呵｣懊ｒ謖√▽縲・
+4. 蜈･蜉幄｣懷ｮ後・ destructive 縺ｫ縺ｪ繧峨↑縺・ｈ縺・∵里蟄伜・蜉帙ｒ荳頑嶌縺阪☆繧句燕縺ｫ驕ｸ謚樒噪謖ｿ蜈･繧貞━蜈医☆繧九・
+5. 螟画峩蠕後・蟆代↑縺上→繧ゆｻ･荳九ｒ謇句虚遒ｺ隱阪☆繧・
+   - 繧ｵ繧､繝峨ヱ繝阪Ν襍ｷ蜍・
+   - 繝励Ο繝ｳ繝励ヨ荳隕ｧ縺ｮ霑ｽ蜉繝ｻ邱ｨ髮・・蜑企勁
+   - ChatGPT / Claude / Gemini 縺ｸ縺ｮ謖ｿ蜈･蜍穂ｽ・
 
 ## Minimal Verification Checklist
 
-- `manifest.json` の構文が妥当
-- 追加権限が最小化されている
-- 主要 3 サイトで致命的エラーなく動作する
-- 既存のショートカット (`Ctrl+Shift+L`) が維持される
+- `manifest.json` 縺ｮ讒区枚縺悟ｦ･蠖・
+- 霑ｽ蜉讓ｩ髯舌′譛蟆丞喧縺輔ｌ縺ｦ縺・ｋ
+- 荳ｻ隕・3 繧ｵ繧､繝医〒閾ｴ蜻ｽ逧・お繝ｩ繝ｼ縺ｪ縺丞虚菴懊☆繧・
+- 譌｢蟄倥・繧ｷ繝ｧ繝ｼ繝医き繝・ヨ (`Ctrl+Shift+L`) 縺檎ｶｭ謖√＆繧後ｋ
