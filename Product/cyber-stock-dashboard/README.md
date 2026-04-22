@@ -22,16 +22,16 @@ npm run dev
 
 ## スクリプト
 
-| コマンド | 用途 |
-| --- | --- |
-| `npm run dev` | 開発サーバ起動 |
-| `npm run build` | 本番ビルド (webpack 固定。Windows 日本語パスでの Turbopack panic 回避) |
-| `npm run build:turbo` | Turbopack ビルド (ASCII パス環境向け) |
-| `npm run start` | 本番サーバ起動 |
-| `npm run lint` | ESLint |
-| `npm run typecheck` | `tsc --noEmit` |
-| `npm run test` | Vitest 一回実行 (125 tests) |
-| `npm run test:watch` | Vitest watch |
+| コマンド              | 用途                                                                   |
+| --------------------- | ---------------------------------------------------------------------- |
+| `npm run dev`         | 開発サーバ起動                                                         |
+| `npm run build`       | 本番ビルド (webpack 固定。Windows 日本語パスでの Turbopack panic 回避) |
+| `npm run build:turbo` | Turbopack ビルド (ASCII パス環境向け)                                  |
+| `npm run start`       | 本番サーバ起動                                                         |
+| `npm run lint`        | ESLint                                                                 |
+| `npm run typecheck`   | `tsc --noEmit`                                                         |
+| `npm run test`        | Vitest 一回実行 (125 tests)                                            |
+| `npm run test:watch`  | Vitest watch                                                           |
 
 ## 環境変数
 
@@ -59,7 +59,18 @@ npm run dev
 - `src/components/{ui,dashboard,cards,charts,chat}/` — UI 構成
 - `src/lib/{providers,llm,services,db}/` — データ層 + LLM + DB
 - `src/test/` — テストセットアップ
+- `docs/` — product-local の設計メモと runbook
+- `.ai/` — product-local overlay 用の rule / skill / agent source
 - alias: `@/*` → `src/*`
+
+## Product Local Boundaries
+
+- shared DCR asset は root の `.ai/catalog/` と `docs/dcr/` を正本にする
+- Cyber Stock Dashboard 固有の運用メモは `docs/` に置く
+- Cyber Stock Dashboard 固有の AI overlay は `.ai/` に置く
+- ただし現時点の root `deploy.ps1` は `Product/cyber-stock-dashboard/.ai/` を自動読込しないため、このディレクトリは reserved overlay lane として扱う
+- 現在 `.ai/` 配下に active な rule / skill / agent source は置いていない
+- shared 化が必要な asset だけ root 正本へ昇格する
 
 ## 既知制約
 - Turbopack は Windows + 日本語パスで panic (`build` は webpack 固定で回避)

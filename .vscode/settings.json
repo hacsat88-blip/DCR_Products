@@ -2,11 +2,34 @@
   "github.copilot.chat.codeGeneration.useInstructionFiles": true,
   "editor.inlineSuggest.enabled": true,
   "redhat.telemetry.enabled": true,
-  "python.defaultInterpreterPath": "${workspaceFolder}/Product/autotrader-suite/backend/.venv/Scripts/python.exe",
-  "typescript.tsdk": "Product/dexter-jp/node_modules/typescript/lib",
-  "typescript.enablePromptUseWorkspaceTsdk": false,
-  "markdownlint.ignore": [
-    ".cursor/rules/**/*.mdc"
-],
-"editor.formatOnSave": true
+  "markdownlint.ignore": [".cursor/rules/**/*.mdc"],
+  "editor.formatOnSave": true,
+  "search.exclude": {
+    ".cursor/rules/**": true,
+    ".claude/agents/**": true,
+    ".codex/agents/**": true,
+    "docs/dcr/plans/archive/**": true,
+    "docs/dcr/specs/archive/**": true,
+    "Product/dexter-jp/**": true,
+    "**/.dexter/**": true,
+    "**/.superpowers/**": true,
+    "**/.next/**": true,
+    "**/node_modules/**": true
+  },
+  "files.exclude": {
+    ".cursor/rules/**": true,
+    ".claude/agents/**": true,
+    ".codex/agents/**": true,
+    "docs/dcr/plans/archive": true,
+    "docs/dcr/specs/archive": true,
+    "Product/dexter-jp": true
+  },
+  "files.watcherExclude": {
+    ".cursor/rules/**": true,
+    ".claude/agents/**": true,
+    ".codex/agents/**": true,
+    "Product/dexter-jp/**": true,
+    "**/.next/**": true,
+    "**/node_modules/**": true
+  }
 }

@@ -1,5 +1,11 @@
 param([string]$RepoRoot = ".")
 
+$CatalogPaths = Join-Path (Split-Path $PSScriptRoot -Parent) "lib\catalog-paths.ps1"
+. $CatalogPaths
+
+$rulesDir = Resolve-DcrSourcePath -RepoRoot $RepoRoot -AssetType "rules"
+$skillsDir = Resolve-DcrSourcePath -RepoRoot $RepoRoot -AssetType "skills"
+
 Write-Host "[cursor] Generating .cursor/rules/*.mdc..." -ForegroundColor Cyan
 
 $outDir = Join-Path $RepoRoot ".cursor/rules"
@@ -17,7 +23,7 @@ function Get-Targets($file) {
 $utf8 = New-Object System.Text.UTF8Encoding $false
 
 # Convert rules to .mdc
-foreach ($f in Get-ChildItem "$RepoRoot/rules" -Filter "*.md" | Where-Object { -not $_.BaseName.StartsWith("_") }) {
+foreach ($f in Get-ChildItem $rulesDir -Filter "*.md" | Where-Object { -not $_.BaseName.StartsWith("_") }) {
     $targets = Get-Targets $f
     if (-not $targets) { $targets = @("vscode", "cursor", "claude", "codex") }
     
@@ -37,7 +43,7 @@ foreach ($f in Get-ChildItem "$RepoRoot/rules" -Filter "*.md" | Where-Object { -
 }
 
 # Convert skills to .mdc (prefixed skill-)
-foreach ($dir in Get-ChildItem "$RepoRoot/skills" -Directory | Where-Object { -not $_.Name.StartsWith("_") }) {
+foreach ($dir in Get-ChildItem $skillsDir -Directory | Where-Object { -not $_.Name.StartsWith("_") }) {
     $sf = Join-Path $dir.FullName "SKILL.md"
     if (-not (Test-Path $sf)) { continue }
     

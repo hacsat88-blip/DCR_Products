@@ -1,28 +1,33 @@
+<#
+.SYNOPSIS
+    Legacy agent sync shim
+
+.DESCRIPTION
+    Backward-compatible entrypoint retained for existing habits and external references.
+    The canonical path is now deploy.ps1 -Target agents.
+
+.PARAMETER RepoRoot
+    Repository root that contains deploy.ps1.
+
+.PARAMETER DryRun
+    Show what would be synced without writing files.
+
+.PARAMETER Check
+    Run drift check instead of syncing.
+#>
+
 param(
-    [string]$RepoRoot = $PSScriptRoot
+    [string]$RepoRoot = $PSScriptRoot,
+    [switch]$DryRun,
+    [switch]$Check
 )
 
 $ErrorActionPreference = 'Stop'
 
-$sourceRoot = Join-Path $RepoRoot '.ai\agents-source'
-$codexDest = Join-Path $RepoRoot '.codex\agents'
-$claudeDest = Join-Path $RepoRoot '.claude\agents'
-
-if (-not (Test-Path $sourceRoot)) {
-    throw "Source folder not found: $sourceRoot"
+$deployScript = Join-Path $RepoRoot 'deploy.ps1'
+if (-not (Test-Path $deployScript)) {
+    throw "deploy.ps1 not found under RepoRoot: $RepoRoot"
 }
 
-New-Item -ItemType Directory -Force -Path $codexDest, $claudeDest | Out-Null
-
-$tomlFiles = Get-ChildItem -Path $sourceRoot -File -Filter '*.toml'
-$mdFiles = Get-ChildItem -Path $sourceRoot -File -Filter '*.md' | Where-Object { $_.Name -ne 'README.md' }
-
-foreach ($file in $tomlFiles) {
-    Copy-Item -Path $file.FullName -Destination (Join-Path $codexDest $file.Name) -Force
-}
-
-foreach ($file in $mdFiles) {
-    Copy-Item -Path $file.FullName -Destination (Join-Path $claudeDest $file.Name) -Force
-}
-
-Write-Host "Synced $($tomlFiles.Count) Codex agent file(s) and $($mdFiles.Count) Claude agent file(s)."
+Write-Host "sync-agents.ps1 is legacy. Delegating to deploy.ps1 -Target agents." -ForegroundColor Yellow
+& $deployScript -Target agents -DryRun:$DryRun -Check:$Check

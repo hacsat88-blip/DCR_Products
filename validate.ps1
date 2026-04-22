@@ -1,24 +1,26 @@
 <#
 .SYNOPSIS
   DCR Products — Validate script
-  rules/*.md と skills/*/SKILL.md の構造品質を検証し、
+    .ai/catalog/rules/*.md と .ai/catalog/skills/*/SKILL.md の構造品質を検証し、
   deploy.ps1 の全ターゲット DryRun を確認する
 
 .DESCRIPTION
   検証内容:
-    1. rules/*.md (アンダースコアプレフィクス除外) — H1 見出しが存在するか
-    2. skills/*/SKILL.md — YAML frontmatter に name: と description: が存在するか
-    3. skills/*/SKILL.md — frontmatter 以外の本文が存在するか
-        4. deploy.ps1 -DryRun が exit 0 で完了するか
-        5. rules/_ROUTING_INDEX.md が生成結果と一致するか
-    6. rules/*.md の inherits: が実在する _*.md trait を参照しているか
-    7. skills/*/SKILL.md の contract: 構造が有効か
-    8. skills/*/SKILL.md の composable: chains_with が実在するスキルを参照しているか
-    9. rules/*.md の challenge: targets が実在するルールを参照しているか
-   10. skills/*/SKILL.md の package: dependencies が実在するスキルを参照しているか
-   11. skills/*/SKILL.md — name: の重複がないか
-   12. .ai/agents-source/*.toml — version フィールドが存在するか
-   13. rules/*.md — description: が空でないか・最低限の品質があるか
+    1. .ai/catalog/rules/*.md (アンダースコアプレフィクス除外) — H1 見出しが存在するか
+    2. .ai/catalog/skills/*/SKILL.md — YAML frontmatter に name: と description: が存在するか
+    3. .ai/catalog/skills/*/SKILL.md — frontmatter 以外の本文が存在するか
+    4. deploy.ps1 -DryRun が exit 0 で完了するか
+       5. catalog rules の _ROUTING_INDEX.md が生成結果と一致するか
+    6. .ai/catalog/rules/*.md の inherits: が実在する _*.md trait を参照しているか
+    7. .ai/catalog/skills/*/SKILL.md の contract: 構造が有効か
+    8. .ai/catalog/skills/*/SKILL.md の composable: chains_with が実在するスキルを参照しているか
+    9. .ai/catalog/rules/*.md の challenge: targets が実在するルールを参照しているか
+   10. .ai/catalog/skills/*/SKILL.md の package: dependencies が実在するスキルを参照しているか
+   11. .ai/catalog/skills/*/SKILL.md — name: の重複がないか
+   12. .ai/catalog/rules/*.md と .ai/catalog/skills/*/SKILL.md の basename collision がないか
+   13. .ai/catalog/rules/*.md の routing_category が許可集合に含まれるか
+   14. catalog agents-source/*.toml — version フィールドが存在するか
+    15. .ai/catalog/rules/*.md — description: が空でないか・最低限の品質があるか
 
 .EXAMPLE
   .\validate.ps1
@@ -30,22 +32,26 @@ param(
 )
 
 $ErrorActionPreference = "Stop"
-$RepoRoot  = $PSScriptRoot
-$SourceRules  = Join-Path $RepoRoot "rules"
-$SourceSkills = Join-Path $RepoRoot "skills"
+$RepoRoot = $PSScriptRoot
+$CatalogPaths = Join-Path $RepoRoot "tools\lib\catalog-paths.ps1"
+. $CatalogPaths
+$SourceRules = Resolve-DcrSourcePath -RepoRoot $RepoRoot -AssetType "rules"
+$SourceSkills = Resolve-DcrSourcePath -RepoRoot $RepoRoot -AssetType "skills"
 $KernelRoot = Join-Path $RepoRoot ".ai\kernel"
-$AgentsSource = Join-Path $RepoRoot ".ai\agents-source"
+$AgentsSource = Resolve-DcrSourcePath -RepoRoot $RepoRoot -AssetType "agents-source"
 $DeployScript = Join-Path $RepoRoot "deploy.ps1"
 $RoutingIndexScript = Join-Path $RepoRoot "tools\generate-routing-index.ps1"
-$RoutingIndexFile = Join-Path $RepoRoot "rules\_ROUTING_INDEX.md"
+$RoutingIndexFile = Join-Path $SourceRules "_ROUTING_INDEX.md"
 $PowerShellExe = (Get-Process -Id $PID).Path
 
 $passed = 0
 $failed = 0
 $errors = @()
+$AllowedRuleSkillBasenameCollisions = @()
+$AllowedRoutingCategories = @("growth", "documents", "ui-ux", "devops", "governance")
 
-function Write-Ok   { param($msg) Write-Host "[OK]   $msg" -ForegroundColor Green;  $script:passed++ }
-function Write-Fail { param($msg) Write-Host "[FAIL] $msg" -ForegroundColor Red;    $script:failed++; $script:errors += $msg }
+function Write-Ok { param($msg) Write-Host "[OK]   $msg" -ForegroundColor Green; $script:passed++ }
+function Write-Fail { param($msg) Write-Host "[FAIL] $msg" -ForegroundColor Red; $script:failed++; $script:errors += $msg }
 
 Write-Host ""
 Write-Host "DCR Products Validate" -ForegroundColor Cyan
@@ -53,32 +59,33 @@ Write-Host "Source: $RepoRoot"
 Write-Host ""
 
 # ─────────────────────────────────────────────
-# 1. rules/*.md — H1 見出し検証
+# 1. catalog rules/*.md — H1 見出し検証
 # ─────────────────────────────────────────────
-Write-Host "== 1. rules/*.md H1 check ======================"
+Write-Host "== 1. catalog rules/*.md H1 check =============="
 $ruleFiles = Get-ChildItem -Path $SourceRules -File -Filter *.md |
-    Where-Object { $_.BaseName -notlike "_*" } |
-    Sort-Object Name
+Where-Object { $_.BaseName -notlike "_*" } |
+Sort-Object Name
 
 foreach ($file in $ruleFiles) {
     $content = Get-Content -Path $file.FullName -Raw -Encoding utf8
     if ($content -match '(?m)^# .+') {
         if ($Verbose) { Write-Ok "$($file.Name) — H1 found" }
         else { $script:passed++ }
-    } else {
+    }
+    else {
         Write-Fail "$($file.Name) — H1 missing"
     }
 }
 Write-Host "  rules processed: $($ruleFiles.Count)" -ForegroundColor DarkGray
 
 # ─────────────────────────────────────────────
-# 2 & 3. skills/*/SKILL.md — frontmatter + body 検証
+# 2 & 3. catalog skills/*/SKILL.md — frontmatter + body 検証
 # ─────────────────────────────────────────────
 Write-Host ""
-Write-Host "== 2. skills/*/SKILL.md frontmatter + body check =="
+Write-Host "== 2. catalog skills/*/SKILL.md check =========="
 $skillDirs = Get-ChildItem -Path $SourceSkills -Directory |
-    Where-Object { $_.Name -notlike "_*" } |
-    Sort-Object Name
+Where-Object { $_.Name -notlike "_*" } |
+Sort-Object Name
 
 foreach ($dir in $skillDirs) {
     $skillFile = Join-Path $dir.FullName "SKILL.md"
@@ -90,13 +97,15 @@ foreach ($dir in $skillDirs) {
     $content = Get-Content -Path $skillFile -Raw -Encoding utf8
 
     # frontmatter チェック
-    $hasName        = $content -match '(?m)^name:\s*.+'
+    $hasName = $content -match '(?m)^name:\s*.+'
     $hasDescription = $content -match '(?m)^description:\s*.+'
     if (-not $hasName) {
         Write-Fail "$($dir.Name)/SKILL.md — 'name:' missing in frontmatter"
-    } elseif (-not $hasDescription) {
+    }
+    elseif (-not $hasDescription) {
         Write-Fail "$($dir.Name)/SKILL.md — 'description:' missing in frontmatter"
-    } else {
+    }
+    else {
         if ($Verbose) { Write-Ok "$($dir.Name)/SKILL.md — frontmatter OK" }
         else { $script:passed++ }
     }
@@ -105,7 +114,8 @@ foreach ($dir in $skillDirs) {
     $bodyMatch = $content -match '(?s)^---.*?---\s*\n(.+)'
     if (-not $bodyMatch -or [string]::IsNullOrWhiteSpace($Matches[1])) {
         Write-Fail "$($dir.Name)/SKILL.md — body empty"
-    } else {
+    }
+    else {
         if ($Verbose) { Write-Ok "$($dir.Name)/SKILL.md — body OK" }
         else { $script:passed++ }
     }
@@ -127,7 +137,8 @@ foreach ($file in $kernelFiles) {
     if ($content -match '(?m)^# .+') {
         if ($Verbose) { Write-Ok "$($file.FullName.Replace($RepoRoot + '\\', '')) — H1 found" }
         else { $script:passed++ }
-    } else {
+    }
+    else {
         Write-Fail "$($file.FullName.Replace($RepoRoot + '\\', '')) — H1 missing"
     }
 }
@@ -142,13 +153,15 @@ $isWindowsPlatform = ($env:OS -eq "Windows_NT")
 if (-not $isWindowsPlatform) {
     Write-Host "  [SKIP] deploy DryRun: Windows-only script (non-Windows CI skipped)" -ForegroundColor DarkGray
     $script:passed += 3
-} else {
+}
+else {
     foreach ($target in @("vscode", "cursor", "agents")) {
         $result = & $PowerShellExe -ExecutionPolicy Bypass -File $DeployScript -DryRun -Target $target 2>&1
         if ($LASTEXITCODE -eq 0) {
             if ($Verbose) { Write-Ok "deploy -Target $target — exit 0" }
             else { $script:passed++ }
-        } else {
+        }
+        else {
             Write-Fail "deploy -Target $target — exit $LASTEXITCODE"
             if ($Verbose -and $result) { Write-Host "  $result" -ForegroundColor DarkGray }
         }
@@ -162,26 +175,31 @@ Write-Host ""
 Write-Host "== 5. routing index freshness check ============"
 if (-not (Test-Path $RoutingIndexScript)) {
     Write-Fail "tools/generate-routing-index.ps1 — file not found"
-} elseif (-not (Test-Path $RoutingIndexFile)) {
-    Write-Fail "rules/_ROUTING_INDEX.md — file not found"
-} else {
+}
+elseif (-not (Test-Path $RoutingIndexFile)) {
+    Write-Fail ".ai/catalog/rules/_ROUTING_INDEX.md — file not found"
+}
+else {
     $tempIndex = Join-Path ([System.IO.Path]::GetTempPath()) ("routing-index-" + [System.Guid]::NewGuid().ToString("N") + ".md")
     try {
         $result = & $PowerShellExe -ExecutionPolicy Bypass -File $RoutingIndexScript -RepoRoot $RepoRoot -OutputPath $tempIndex 2>&1
         if ($LASTEXITCODE -ne 0) {
             Write-Fail "routing index generation — exit $LASTEXITCODE"
             if ($Verbose -and $result) { Write-Host "  $result" -ForegroundColor DarkGray }
-        } else {
+        }
+        else {
             $existing = (Get-Content -Path $RoutingIndexFile -Raw -Encoding utf8) -replace "`r`n", "`n"
             $generated = (Get-Content -Path $tempIndex -Raw -Encoding utf8) -replace "`r`n", "`n"
             if ($existing -ceq $generated) {
-                if ($Verbose) { Write-Ok "rules/_ROUTING_INDEX.md — up to date" }
+                if ($Verbose) { Write-Ok ".ai/catalog/rules/_ROUTING_INDEX.md — up to date" }
                 else { $script:passed++ }
-            } else {
-                Write-Fail "rules/_ROUTING_INDEX.md — out of date (run tools/generate-routing-index.ps1)"
+            }
+            else {
+                Write-Fail ".ai/catalog/rules/_ROUTING_INDEX.md — out of date (run tools/generate-routing-index.ps1)"
             }
         }
-    } finally {
+    }
+    finally {
         if (Test-Path $tempIndex) {
             Remove-Item -Path $tempIndex -Force -ErrorAction SilentlyContinue
         }
@@ -189,13 +207,13 @@ if (-not (Test-Path $RoutingIndexScript)) {
 }
 
 # ─────────────────────────────────────────────
-# 6. rules/*.md — inherits: trait 参照整合チェック
+# 6. catalog rules/*.md — inherits: trait 参照整合チェック
 # ─────────────────────────────────────────────
 Write-Host ""
-Write-Host "== 6. rules/*.md inherits: trait check =========="
+Write-Host "== 6. catalog rules/*.md trait check =========="
 $traitFiles = Get-ChildItem -Path $SourceRules -File -Filter "_*.md" |
-    Where-Object { $_.BaseName -ne "_METADATA" -and $_.BaseName -ne "_ROUTING_INDEX" } |
-    ForEach-Object { $_.BaseName.TrimStart("_") }
+Where-Object { $_.BaseName -ne "_METADATA" -and $_.BaseName -ne "_ROUTING_INDEX" } |
+ForEach-Object { $_.BaseName.TrimStart("_") }
 $traitCheckCount = 0
 
 foreach ($file in $ruleFiles) {
@@ -211,7 +229,8 @@ foreach ($file in $ruleFiles) {
         if ($inInherits) {
             if ($trimmed -match '^\-\s+(.+)$') {
                 $traits += $Matches[1].Trim()
-            } else {
+            }
+            else {
                 break
             }
         }
@@ -222,18 +241,19 @@ foreach ($file in $ruleFiles) {
         if ($trait -in $traitFiles) {
             if ($Verbose) { Write-Ok "$($file.Name) — inherits '$trait' OK" }
             else { $script:passed++ }
-        } else {
-            Write-Fail "$($file.Name) — inherits '$trait' not found (no _$trait.md in rules/)"
+        }
+        else {
+            Write-Fail "$($file.Name) — inherits '$trait' not found (no _$trait.md in .ai/catalog/rules/)"
         }
     }
 }
 Write-Host "  trait references checked: $traitCheckCount" -ForegroundColor DarkGray
 
 # ─────────────────────────────────────────────
-# 7. skills/*/SKILL.md — contract: 構造チェック
+# 7. catalog skills/*/SKILL.md — contract: 構造チェック
 # ─────────────────────────────────────────────
 Write-Host ""
-Write-Host "== 7. skills/*/SKILL.md contract: check ========="
+Write-Host "== 7. catalog skills/*/SKILL.md contract ======"
 $contractCheckCount = 0
 $allowedContractKeys = @("preconditions", "postconditions", "invariants")
 
@@ -282,9 +302,11 @@ foreach ($dir in $skillDirs) {
     $invalidKeys = $contractKeys | Where-Object { $_ -notin $allowedContractKeys }
     if ($invalidKeys.Count -gt 0) {
         Write-Fail "$($dir.Name)/SKILL.md — contract has invalid keys: $($invalidKeys -join ', ')"
-    } elseif ($contractKeys.Count -eq 0) {
+    }
+    elseif ($contractKeys.Count -eq 0) {
         Write-Fail "$($dir.Name)/SKILL.md — contract block is empty"
-    } else {
+    }
+    else {
         if ($Verbose) { Write-Ok "$($dir.Name)/SKILL.md — contract OK ($($contractKeys -join ', '))" }
         else { $script:passed++ }
     }
@@ -292,10 +314,10 @@ foreach ($dir in $skillDirs) {
 Write-Host "  skills with contract: $contractCheckCount" -ForegroundColor DarkGray
 
 # ─────────────────────────────────────────────
-# 8. skills/*/SKILL.md — composable: chains_with 参照チェック
+# 8. catalog skills/*/SKILL.md — composable: chains_with 参照チェック
 # ─────────────────────────────────────────────
 Write-Host ""
-Write-Host "== 8. skills/*/SKILL.md composable: check ======="
+Write-Host "== 8. catalog skills/*/SKILL.md compose ======"
 $composableCheckCount = 0
 $allSkillNames = $skillDirs | ForEach-Object { $_.Name }
 
@@ -326,7 +348,8 @@ foreach ($dir in $skillDirs) {
             if ($inChainsW) {
                 if ($trimmed -match '^\-\s+(.+)$') {
                     $chains += $Matches[1].Trim()
-                } else { $inChainsW = $false }
+                }
+                else { $inChainsW = $false }
             }
             if ($line -notmatch '^\s' -and $trimmed -ne '') { $inComposable = $false }
         }
@@ -336,18 +359,19 @@ foreach ($dir in $skillDirs) {
         if ($chain -in $allSkillNames) {
             if ($Verbose) { Write-Ok "$($dir.Name)/SKILL.md — chains_with '$chain' OK" }
             else { $script:passed++ }
-        } else {
-            Write-Fail "$($dir.Name)/SKILL.md — chains_with '$chain' not found in skills/"
+        }
+        else {
+            Write-Fail "$($dir.Name)/SKILL.md — chains_with '$chain' not found in .ai/catalog/skills/"
         }
     }
 }
 Write-Host "  skills with composable: $composableCheckCount" -ForegroundColor DarkGray
 
 # ─────────────────────────────────────────────
-# 9. rules/*.md — challenge: targets 参照チェック
+# 9. catalog rules/*.md — challenge: targets 参照チェック
 # ─────────────────────────────────────────────
 Write-Host ""
-Write-Host "== 9. rules/*.md challenge: targets check ======="
+Write-Host "== 9. catalog rules/*.md challenge check ======"
 $challengeCheckCount = 0
 $allRuleNames = $ruleFiles | ForEach-Object { $_.BaseName }
 
@@ -370,7 +394,8 @@ foreach ($file in $ruleFiles) {
             if ($inTargets) {
                 if ($trimmed -match '^\-\s+(.+)$') {
                     $targets += $Matches[1].Trim()
-                } else { $inTargets = $false }
+                }
+                else { $inTargets = $false }
             }
             if ($line -notmatch '^\s' -and $trimmed -ne '' -and $trimmed -ne 'challenge:') { $inChallenge = $false }
         }
@@ -380,18 +405,19 @@ foreach ($file in $ruleFiles) {
         if ($target -in $allRuleNames) {
             if ($Verbose) { Write-Ok "$($file.Name) — challenge target '$target' OK" }
             else { $script:passed++ }
-        } else {
-            Write-Fail "$($file.Name) — challenge target '$target' not found in rules/"
+        }
+        else {
+            Write-Fail "$($file.Name) — challenge target '$target' not found in .ai/catalog/rules/"
         }
     }
 }
 Write-Host "  rules with challenge: $challengeCheckCount" -ForegroundColor DarkGray
 
 # ─────────────────────────────────────────────
-# 10. skills/*/SKILL.md — package: dependencies 参照チェック
+# 10. catalog skills/*/SKILL.md — package: dependencies 参照チェック
 # ─────────────────────────────────────────────
 Write-Host ""
-Write-Host "== 10. skills/*/SKILL.md package: deps check ===="
+Write-Host "== 10. catalog skills/*/SKILL.md package ====="
 $packageCheckCount = 0
 
 foreach ($dir in $skillDirs) {
@@ -422,7 +448,8 @@ foreach ($dir in $skillDirs) {
             if ($inDeps) {
                 if ($trimmed -match '^\-\s+(.+)$') {
                     $deps += $Matches[1].Trim()
-                } else { $inDeps = $false }
+                }
+                else { $inDeps = $false }
             }
             if ($line -notmatch '^\s' -and $trimmed -ne '') { $inPackage = $false }
         }
@@ -431,13 +458,15 @@ foreach ($dir in $skillDirs) {
     if ($deps.Count -eq 0) {
         if ($Verbose) { Write-Ok "$($dir.Name)/SKILL.md — package OK (no deps)" }
         else { $script:passed++ }
-    } else {
+    }
+    else {
         foreach ($dep in $deps) {
             if ($dep -in $allSkillNames) {
                 if ($Verbose) { Write-Ok "$($dir.Name)/SKILL.md — package dep '$dep' OK" }
                 else { $script:passed++ }
-            } else {
-                Write-Fail "$($dir.Name)/SKILL.md — package dep '$dep' not found in skills/"
+            }
+            else {
+                Write-Fail "$($dir.Name)/SKILL.md — package dep '$dep' not found in .ai/catalog/skills/"
             }
         }
     }
@@ -445,10 +474,10 @@ foreach ($dir in $skillDirs) {
 Write-Host "  skills with package: $packageCheckCount" -ForegroundColor DarkGray
 
 # ─────────────────────────────────────────────
-# 11. skills/*/SKILL.md — name: 重複チェック
+# 11. catalog skills/*/SKILL.md — name: 重複チェック
 # ─────────────────────────────────────────────
 Write-Host ""
-Write-Host "== 11. skills/*/SKILL.md duplicate name check ===="
+Write-Host "== 11. catalog skills/*/SKILL.md names ======"
 $skillNames = @{}
 $dupCheckCount = 0
 
@@ -462,7 +491,8 @@ foreach ($dir in $skillDirs) {
         $dupCheckCount++
         if ($skillNames.ContainsKey($name)) {
             Write-Fail "$($dir.Name)/SKILL.md — duplicate name '$name' (also in $($skillNames[$name]))"
-        } else {
+        }
+        else {
             $skillNames[$name] = $dir.Name
             if ($Verbose) { Write-Ok "$($dir.Name)/SKILL.md — unique name '$name'" }
             else { $script:passed++ }
@@ -472,10 +502,61 @@ foreach ($dir in $skillDirs) {
 Write-Host "  skill names checked: $dupCheckCount" -ForegroundColor DarkGray
 
 # ─────────────────────────────────────────────
-# 12. .ai/agents-source/*.toml — version フィールドチェック
+# 12. catalog rules/*.md / skills/*/SKILL.md — basename collision チェック
 # ─────────────────────────────────────────────
 Write-Host ""
-Write-Host "== 12. agents-source/*.toml version check ======="
+Write-Host "== 12. rule/skill basename collision check ===="
+$basenameCollisionCheckCount = 0
+$ruleBasenames = $ruleFiles | ForEach-Object { $_.BaseName }
+$skillBasenames = $skillDirs | ForEach-Object { $_.Name }
+$collisions = $ruleBasenames | Where-Object { $_ -in $skillBasenames } | Sort-Object -Unique
+
+if ($collisions.Count -eq 0) {
+    if ($Verbose) { Write-Ok ".ai/catalog/rules/ and .ai/catalog/skills/ — no basename collisions" }
+    else { $script:passed++ }
+}
+else {
+    foreach ($name in $collisions) {
+        $basenameCollisionCheckCount++
+        if ($name -in $AllowedRuleSkillBasenameCollisions) {
+            if ($Verbose) { Write-Ok "basename '$name' — allowlisted collision" }
+            else { $script:passed++ }
+        }
+        else {
+            Write-Fail "basename '$name' exists in both .ai/catalog/rules/ and .ai/catalog/skills/"
+        }
+    }
+}
+Write-Host "  basename collisions checked: $($basenameCollisionCheckCount)" -ForegroundColor DarkGray
+
+# ─────────────────────────────────────────────
+# 13. catalog rules/*.md — routing_category 許可値チェック
+# ─────────────────────────────────────────────
+Write-Host ""
+Write-Host "== 13. catalog rules/*.md routing check ====="
+$routingCategoryCheckCount = 0
+
+foreach ($file in $ruleFiles) {
+    $content = Get-Content -Path $file.FullName -Raw -Encoding utf8
+    if ($content -match '(?m)^routing_category:\s*(.+)$') {
+        $routingCategoryCheckCount++
+        $routingCategory = $Matches[1].Trim().Trim([char]34, [char]39)
+        if ($routingCategory -in $AllowedRoutingCategories) {
+            if ($Verbose) { Write-Ok "$($file.Name) — routing_category '$routingCategory' OK" }
+            else { $script:passed++ }
+        }
+        else {
+            Write-Fail "$($file.Name) — routing_category '$routingCategory' is not in allowed set: $($AllowedRoutingCategories -join ', ')"
+        }
+    }
+}
+Write-Host "  rule routing categories checked: $routingCategoryCheckCount" -ForegroundColor DarkGray
+
+# ─────────────────────────────────────────────
+# 14. .ai/catalog/agents-source/*.toml — version フィールドチェック
+# ─────────────────────────────────────────────
+Write-Host ""
+Write-Host "== 14. agents-source/*.toml version check ======="
 $agentVersionCheckCount = 0
 
 if (Test-Path $AgentsSource) {
@@ -486,7 +567,8 @@ if (Test-Path $AgentsSource) {
         if ($content -match '(?m)^version\s*=') {
             if ($Verbose) { Write-Ok "$($file.Name) — version field found" }
             else { $script:passed++ }
-        } else {
+        }
+        else {
             Write-Fail "$($file.Name) — version field missing"
         }
     }
@@ -494,10 +576,10 @@ if (Test-Path $AgentsSource) {
 Write-Host "  agent toml files checked: $agentVersionCheckCount" -ForegroundColor DarkGray
 
 # ─────────────────────────────────────────────
-# 13. rules/*.md — description: 品質チェック
+# 15. catalog rules/*.md — description: 品質チェック
 # ─────────────────────────────────────────────
 Write-Host ""
-Write-Host "== 13. rules/*.md description quality check ====="
+Write-Host "== 15. catalog rules/*.md descriptions ====="
 $descCheckCount = 0
 
 foreach ($file in $ruleFiles) {
@@ -507,9 +589,11 @@ foreach ($file in $ruleFiles) {
         $descCheckCount++
         if ([string]::IsNullOrWhiteSpace($desc)) {
             Write-Fail "$($file.Name) — description is empty"
-        } elseif ($desc.Length -lt 10) {
+        }
+        elseif ($desc.Length -lt 10) {
             Write-Fail "$($file.Name) — description too short ($($desc.Length) chars, min 10)"
-        } else {
+        }
+        else {
             if ($Verbose) { Write-Ok "$($file.Name) — description OK ($($desc.Length) chars)" }
             else { $script:passed++ }
         }

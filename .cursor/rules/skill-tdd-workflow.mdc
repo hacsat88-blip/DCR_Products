@@ -1,10 +1,9 @@
 ---
-description: "tdd-workflow"
+description: Test-driven development workflow. Write tests first, then implement, with 80%+ coverage target. Use when implementing any feature or bugfix, before writing implementation code.
 globs: ""
 alwaysApply: false
 ---
 
-<!-- GENERATED: .\tools\deploy-all.ps1 -->
 
 # TDD Workflow — テスト駆動開発
 

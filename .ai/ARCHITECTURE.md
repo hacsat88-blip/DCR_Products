@@ -6,7 +6,7 @@ DCR (Dynamic Context Router) は、5つの AI 開発環境に統一的なルー�
 
 ## システム構成図
 
-```
+```text
                    ┌─────────────────────┐
                    │   .ai/kernel/        │
                    │   (Source of Truth)   │
@@ -20,15 +20,15 @@ DCR (Dynamic Context Router) は、5つの AI 開発環境に統一的なルー�
               ┌───────────────┼───────────────┐
               │               │               │
         ┌─────┴─────┐  ┌─────┴─────┐  ┌─────┴─────┐
-        │  rules/    │  │  skills/   │  │  agents-  │
-        │  (80+)     │  │  (76)      │  │  source/  │
-        │  *.md      │  │  */SKILL.md│  │  *.toml   │
+        │ .ai/catalog│  │ .ai/catalog│  │ .ai/catalog│
+        │ /rules/    │  │ /skills/   │  │ /agents-   │
+        │ *.md       │  │ */SKILL.md │  │ source/*   │
         └─────┬──────┘  └─────┬──────┘  └─────┬─────┘
               │               │               │
               └───────┬───────┘               │
                       │                       │
               ┌───────┴───────┐       ┌───────┴────────┐
-              │  deploy.ps1   │       │ sync-agents.ps1│
+              │  deploy.ps1   │       │ deploy.ps1 (*) │
               └───────┬───────┘       └───────┬────────┘
                       │                       │
          ┌────────────┼────────────┐          │
@@ -38,6 +38,8 @@ DCR (Dynamic Context Router) は、5つの AI 開発環境に統一的なルー�
     │ Copilot │  │ .mdc    │  │ Codex  │  │ .claude/    │
     └─────────┘  └─────────┘  └────────┘  └─────────────┘
 ```
+
+`(*)` `.ai/catalog/agents-source/` を `.codex/agents/` / `.claude/agents/` へ配布する経路。`sync-agents.ps1` はこの処理を呼び出す legacy shim として残します。
 
 ## レイヤー構造
 
@@ -58,9 +60,9 @@ DCR (Dynamic Context Router) は、5つの AI 開発環境に統一的なルー�
 
 編集対象のカノニカルアセット。
 
-- **rules/** — 専門ロール定義 (YAML frontmatter + Markdown body)
-- **skills/** — 実行可能なワークフロー定義 (SKILL.md)
-- **.ai/agents-source/** — エージェント定義 (TOML + MD)
+- **.ai/catalog/rules/** — 専門ロール定義 (YAML frontmatter + Markdown body)
+- **.ai/catalog/skills/** — 実行可能なワークフロー定義 (SKILL.md)
+- **.ai/catalog/agents-source/** — エージェント定義 (TOML + MD)
 
 ### 3. Runtime Layer
 
@@ -76,17 +78,17 @@ DCR (Dynamic Context Router) は、5つの AI 開発環境に統一的なルー�
 
 ### 4. Generated Layer
 
-`deploy.ps1` / `sync-agents.ps1` が自動生成。手編集禁止。
+`deploy.ps1` が自動生成。手編集禁止。`sync-agents.ps1` は `deploy.ps1 -Target agents` を呼ぶ互換 shim。
 
 - `.cursor/rules/*.mdc` — Cursor rules (deploy.ps1 生成)
-- `.codex/agents/` — Codex agent files (sync-agents.ps1 生成)
-- `.claude/agents/` — Claude agent files (sync-agents.ps1 生成)
+- `.codex/agents/` — Codex agent files (deploy.ps1 -Target agents 生成)
+- `.claude/agents/` — Claude agent files (deploy.ps1 -Target agents 生成)
 
 ## ルーティングアーキテクチャ
 
 ### Skill Router (Layer 1 + Layer 3)
 
-```
+```text
 ユーザーリクエスト
     │
     ├─ 明示指定 (/skill-name) → 即時実行
@@ -103,16 +105,16 @@ DCR (Dynamic Context Router) は、5つの AI 開発環境に統一的なルー�
 
 ### Rule Routing
 
-```
+```text
 1. ユーザー指定の role/skill (最優先)
-2. skills/* の一致
-3. rules/*.md の強一致 (最大2件)
+2. .ai/catalog/skills/* の一致
+3. .ai/catalog/rules/*.md の強一致 (最大2件)
 4. 直接処理 (デフォルト)
 ```
 
 ## Gate Chain
 
-```
+```text
 p/ (Plan) ──→ 実装 ──→ q/ (QA) ──→ sh/ (Ship)
     │                      │              │
     │ plan_approved: true   │ qa_passed    │ hard block

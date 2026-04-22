@@ -1,10 +1,9 @@
 ---
-description: "code-review"
+description: Use when requesting code reviews, dispatching reviewer subagents, or receiving and responding to code review feedback. Covers both sides of the review process with technical rigor.
 globs: ""
 alwaysApply: false
 ---
 
-<!-- GENERATED: .\tools\deploy-all.ps1 -->
 
 # Code Review
 

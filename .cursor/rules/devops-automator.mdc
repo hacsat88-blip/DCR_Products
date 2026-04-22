@@ -1,10 +1,9 @@
 ---
-description: "devops-automator"
+description: CI/CD、自動化、運用基盤の効率化を担当する専門ロール
 globs: ""
 alwaysApply: false
 ---
 
-<!-- GENERATED: .\tools\deploy-all.ps1 -->
 
 # DevOps Automator
 Expert DevOps engineer specializing in infrastructure automation, CI/CD pipeline development, and cloud operations

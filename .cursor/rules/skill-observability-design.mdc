@@ -1,10 +1,9 @@
 ---
-description: "observability-design"
+description: メトリクス設計、アラート戦略、分散トレーシング、ログ構造化の実践ガイド。システムの可観測性を体系的に構築する。
 globs: ""
 alwaysApply: false
 ---
 
-<!-- GENERATED: .\tools\deploy-all.ps1 -->
 
 # Observability Design
 

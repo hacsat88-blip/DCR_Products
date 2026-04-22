@@ -9,11 +9,11 @@
 - [ ] Ready for merge review
 
 ## Session Timeline
-| Timestamp | Action | Tool/Skill | Result | Notes |
-|-----------|--------|-----------|--------|-------|
+| Timestamp        | Action              | Tool/Skill    | Result            | Notes                       |
+| ---------------- | ------------------- | ------------- | ----------------- | --------------------------- |
 | 2026-03-29 14:00 | Initialized session | writing-plans | ✅ Created 3 files | Worktree: feature/task-name |
-| | | | | |
-| | | | | |
+|                  |                     |               |                   |                             |
+|                  |                     |               |                   |                             |
 
 ## Verification Checklist
 - [ ] All phases in task_plan.md checklist complete

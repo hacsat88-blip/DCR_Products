@@ -1,10 +1,9 @@
 ---
-description: "evidence-collector"
+description: 画面証跡、検証証拠、QAエビデンス収集を担当する専門ロール
 globs: ""
 alwaysApply: false
 ---
 
-<!-- GENERATED: .\tools\deploy-all.ps1 -->
 
 # QA Agent Personality
 

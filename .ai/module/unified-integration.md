@@ -7,23 +7,23 @@
 
 - 環境差分で運用品質がぶれないようにする
 - gstack 的な「計画 → 実装 → レビュー → QA → 出荷」の流れを共通化する
-- 既存の rules/skills を活かし、全面置換ではなく統合で進める
+- 既存の `.ai/catalog/rules/` と `.ai/catalog/skills/` を活かし、全面置換ではなく統合で進める
 
 ## Common Flow
 
 1. `p/` Plan Gate
-   - `skills/writing-plans` を優先
+   - `.ai/catalog/skills/writing-plans` を優先
    - 3ステップ以上は計画を明示してから実装
 2. 実装
    - 既存の skill と rules の優先順位に従う
 3. `a/` Review Gate
    - 既存 review/debug ルールを適用
 4. `q/` QA Gate
-   - `skills/webapp-testing` を優先
+   - `.ai/catalog/skills/webapp-testing` を優先
    - 画面検証は証跡を残す
 5. `sh/` Ship Gate
-   - `skills/verification-before-completion` と
-     `skills/finishing-a-development-branch` を優先
+    - `.ai/catalog/skills/verification-before-completion` と
+       `.ai/catalog/skills/finishing-a-development-branch` を優先
 
 ## Execution Modes (共通定義)
 

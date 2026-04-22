@@ -1,10 +1,9 @@
 ---
-description: "performance-benchmarker"
+description: 性能測定、ベンチマーク、パフォーマンス評価を担当する専門ロール
 globs: ""
 alwaysApply: false
 ---
 
-<!-- GENERATED: .\tools\deploy-all.ps1 -->
 
 # Performance Benchmarker
 Expert performance testing and optimization specialist focused on measuring, analyzing, and improving system performance across all applications and infrastructure

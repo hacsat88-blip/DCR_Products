@@ -6,8 +6,8 @@
 .DESCRIPTION
   対象エディタと同期先:
     VS Code Copilot : ~/.agents/skills/
-    Cursor          : ~/.cursor/rules/  (rules/ から .mdc を生成して同期)
-    Agents          : .ai/agents-source/ → .codex/agents/ (toml) + .claude/agents/ (md)
+    Cursor          : ~/.cursor/rules/  (.ai/catalog/rules/ と .ai/catalog/skills/ から .mdc を生成して同期)
+    Agents          : .ai/catalog/agents-source/ → .codex/agents/ (toml) + .claude/agents/ (md)
 
 .PARAMETER Target
   同期先を指定: all | vscode | cursor | agents | dcr
@@ -39,6 +39,8 @@ param(
 $ErrorActionPreference = "Stop"
 $RepoRoot = $PSScriptRoot
 $UserHome = $env:USERPROFILE
+$CatalogPaths = Join-Path $RepoRoot "tools\lib\catalog-paths.ps1"
+. $CatalogPaths
 
 # ── Unified Adapter Framework (new) ──
 $DeployAll = Join-Path $RepoRoot "tools\deploy-all.ps1"
@@ -48,23 +50,24 @@ if ((Test-Path $DeployAll) -and -not $Check -and ($Target -in @("all", "vscode",
     $targetArg = if ($Target -eq "all") { "all" } else { $Target }
     if ($DryRun) {
         & $DeployAll -Target $targetArg -DryRun
-    } else {
+    }
+    else {
         & $DeployAll -Target $targetArg
     }
     Write-Host ""
 }
 
 # ── Paths ──
-$SourceSkills = Join-Path $RepoRoot "skills"
-$SourceRules  = Join-Path $RepoRoot "rules"
+$SourceSkills = Resolve-DcrSourcePath -RepoRoot $RepoRoot -AssetType "skills"
+$SourceRules = Resolve-DcrSourcePath -RepoRoot $RepoRoot -AssetType "rules"
 $SourceCursorKernel = Join-Path $RepoRoot ".cursor\rules\dcr-kernel.md"
-$SourceAgents = Join-Path $RepoRoot ".ai\agents-source"
+$SourceAgents = Resolve-DcrSourcePath -RepoRoot $RepoRoot -AssetType "agents-source"
 
 $DestVSCodeSkills = Join-Path $UserHome ".agents\skills"
-$DestCursorRules  = Join-Path $UserHome ".cursor\rules"
+$DestCursorRules = Join-Path $UserHome ".cursor\rules"
 $DestCursorManifest = Join-Path $DestCursorRules ".dcr-managed-files.json"
 $DestProjectCursorRules = Join-Path $RepoRoot ".cursor\rules"
-$DestCodexAgents  = Join-Path $RepoRoot ".codex\agents"
+$DestCodexAgents = Join-Path $RepoRoot ".codex\agents"
 $DestClaudeAgents = Join-Path $RepoRoot ".claude\agents"
 
 function Get-TempDirectory {
@@ -174,7 +177,8 @@ function Get-ManagedFileNames {
     try {
         $manifestContent = Get-Content -Path $ManifestPath -Raw -Encoding utf8 | ConvertFrom-Json
         return @($manifestContent) | ForEach-Object { "$($_)" } | Sort-Object -Unique
-    } catch {
+    }
+    catch {
         Write-Warning "Managed file manifest is invalid and will be rebuilt: $ManifestPath"
         return @()
     }
@@ -198,8 +202,8 @@ function New-CursorRulePackage {
 
     # Rules → .mdc
     $ruleFiles = Get-ChildItem -Path $RulesSource -File -Filter *.md |
-        Where-Object { $_.BaseName -notlike "_*" } |
-        Sort-Object Name
+    Where-Object { $_.BaseName -notlike "_*" } |
+    Sort-Object Name
     foreach ($ruleFile in $ruleFiles) {
         $description = Get-RuleDescription -Path $ruleFile.FullName
         $body = Get-Content -Path $ruleFile.FullName -Raw -Encoding utf8
@@ -222,8 +226,8 @@ function New-CursorRulePackage {
     # Skills → .mdc (prefixed with "skill-")
     if (Test-Path $SkillsSource) {
         $skillDirs = Get-ChildItem -Path $SkillsSource -Directory |
-            Where-Object { $_.Name -notlike "_*" } |
-            Sort-Object Name
+        Where-Object { $_.Name -notlike "_*" } |
+        Sort-Object Name
         foreach ($skillDir in $skillDirs) {
             $skillFile = Join-Path $skillDir.FullName "SKILL.md"
             if (Test-Path $skillFile) {
@@ -308,7 +312,8 @@ function Sync-DCRConfig {
         New-Item -ItemType Directory -Force -Path $dcrConfigDest | Out-Null
         Copy-Item -Path $ConfigPath -Destination (Join-Path $dcrConfigDest "config.json") -Force
         Write-Host "[OK] .dcr config : config.json → $dcrConfigDest" -ForegroundColor Green
-    } catch {
+    }
+    catch {
         Write-Warning "Failed to sync .dcr config: $_"
     }
 }
@@ -326,7 +331,7 @@ function Sync-Directory {
     }
 
     $sourceItems = Get-ChildItem $Source -Directory |
-        Where-Object { $_.Name -notlike "_*" }
+    Where-Object { $_.Name -notlike "_*" }
     $count = $sourceItems.Count
 
     if ($DryRun) {
@@ -376,7 +381,8 @@ function Sync-Files {
             $staleItems = $destItems | Where-Object {
                 $_.Name -in $managedNames -and $_.Name -notin $sourceNames
             }
-        } else {
+        }
+        else {
             $staleItems = $destItems | Where-Object { $_.Name -notin $sourceNames }
         }
     }
@@ -412,6 +418,161 @@ function Sync-Files {
 }
 
 # ── Diff Check ──
+function Get-DirectoryDrift {
+    param(
+        [string]$Source,
+        [string]$Destination,
+        [string[]]$IgnoreNames = @()
+    )
+
+    $diffs = @()
+
+    if (-not (Test-Path $Source)) {
+        $diffs += "[SOURCE_MISSING] $Source"
+        return $diffs
+    }
+
+    if (-not (Test-Path $Destination)) {
+        $diffs += "[DESTINATION_MISSING] $Destination"
+        return $diffs
+    }
+
+    $destFiles = Get-ChildItem $Destination -Recurse -File | Where-Object { $_.Name -notin $IgnoreNames }
+    foreach ($df in $destFiles) {
+        $relativePath = $df.FullName.Substring($Destination.Length + 1)
+        $sourceFile = Join-Path $Source $relativePath
+        if (-not (Test-Path $sourceFile)) {
+            $diffs += "[EXTRA] $relativePath (exists only in destination)"
+        }
+        else {
+            $sourceHash = (Get-FileHash $sourceFile -Algorithm MD5).Hash
+            $destHash = (Get-FileHash $df.FullName -Algorithm MD5).Hash
+            if ($sourceHash -ne $destHash) {
+                $diffs += "[MODIFIED] $relativePath (destination differs from source)"
+            }
+        }
+    }
+
+    $sourceFiles = Get-ChildItem $Source -Recurse -File | Where-Object { $_.Name -notin $IgnoreNames }
+    foreach ($sf in $sourceFiles) {
+        $relativePath = $sf.FullName.Substring($Source.Length + 1)
+        $destFile = Join-Path $Destination $relativePath
+        if (-not (Test-Path $destFile)) {
+            $diffs += "[MISSING] $relativePath (not deployed to destination)"
+        }
+    }
+
+    return $diffs
+}
+
+function Get-FlatFileDrift {
+    param(
+        [string]$Source,
+        [string]$Destination,
+        [string]$Filter,
+        [string[]]$IgnoreNames = @()
+    )
+
+    $diffs = @()
+
+    if (-not (Test-Path $Source)) {
+        $diffs += "[SOURCE_MISSING] $Source"
+        return $diffs
+    }
+
+    if (-not (Test-Path $Destination)) {
+        $diffs += "[DESTINATION_MISSING] $Destination"
+        return $diffs
+    }
+
+    $sourceFiles = Get-ChildItem $Source -File -Filter $Filter | Where-Object { $_.Name -notin $IgnoreNames }
+    $destFiles = Get-ChildItem $Destination -File -Filter $Filter | Where-Object { $_.Name -notin $IgnoreNames }
+
+    foreach ($sf in $sourceFiles) {
+        $destFile = Join-Path $Destination $sf.Name
+        if (-not (Test-Path $destFile)) {
+            $diffs += "[MISSING] $($sf.Name)"
+        }
+        elseif ((Get-FileHash $sf.FullName -Algorithm MD5).Hash -ne (Get-FileHash $destFile -Algorithm MD5).Hash) {
+            $diffs += "[MODIFIED] $($sf.Name)"
+        }
+    }
+
+    $sourceNames = $sourceFiles | Select-Object -ExpandProperty Name
+    foreach ($df in $destFiles) {
+        if ($df.Name -notin $sourceNames) {
+            $diffs += "[EXTRA] $($df.Name)"
+        }
+    }
+
+    return $diffs
+}
+
+function Get-FileDrift {
+    param(
+        [string]$SourcePath,
+        [string]$DestinationPath,
+        [string]$Label
+    )
+
+    $diffs = @()
+
+    if (-not (Test-Path $SourcePath)) {
+        $diffs += "[SOURCE_MISSING] $Label"
+        return $diffs
+    }
+
+    if (-not (Test-Path $DestinationPath)) {
+        $diffs += "[MISSING] $Label"
+        return $diffs
+    }
+
+    if ((Get-FileHash $SourcePath -Algorithm MD5).Hash -ne (Get-FileHash $DestinationPath -Algorithm MD5).Hash) {
+        $diffs += "[MODIFIED] $Label"
+    }
+
+    return $diffs
+}
+
+function Write-PrecheckSummary {
+    param(
+        [string]$Label,
+        [string[]]$Diffs
+    )
+
+    if ($Diffs.Count -eq 0) {
+        Write-Host "[PRECHECK] $Label : already in sync" -ForegroundColor DarkGray
+    }
+    else {
+        Write-Host "[PRECHECK] $Label : $($Diffs.Count) differences will be reconciled" -ForegroundColor Yellow
+    }
+}
+
+function Assert-NoDrift {
+    param(
+        [string]$Label,
+        [string[]]$Diffs
+    )
+
+    if ($Diffs.Count -eq 0) {
+        Write-Host "[VERIFY] $Label : in sync" -ForegroundColor Green
+        return
+    }
+
+    Write-Host "[VERIFY] $Label : drift remains after deploy" -ForegroundColor Red
+    $Diffs | ForEach-Object { Write-Host "  $_" -ForegroundColor Yellow }
+    throw "Deploy verification failed for $Label"
+}
+
+function Write-ManagedTargetNotice {
+    param(
+        [string]$Label,
+        [string]$Destination
+    )
+
+    Write-Host "[MANAGED] $Label : $Destination is deploy-managed. Local edits here may be overwritten." -ForegroundColor DarkYellow
+}
+
 function Compare-Directories {
     param(
         [string]$Source,
@@ -420,42 +581,12 @@ function Compare-Directories {
         [string[]]$IgnoreNames = @()
     )
 
-    if (-not (Test-Path $Source) -or -not (Test-Path $Destination)) {
-        Write-Warning "$Label : source or destination missing"
-        return
-    }
-
-    $diffs = @()
-
-    # Files only in destination (edited outside repo)
-    $destFiles = Get-ChildItem $Destination -Recurse -File | Where-Object { $_.Name -notin $IgnoreNames }
-    foreach ($df in $destFiles) {
-        $relativePath = $df.FullName.Substring($Destination.Length + 1)
-        $sourceFile = Join-Path $Source $relativePath
-        if (-not (Test-Path $sourceFile)) {
-            $diffs += "[EXTRA] $relativePath (exists only in editor)"
-        } else {
-            $sourceHash = (Get-FileHash $sourceFile -Algorithm MD5).Hash
-            $destHash   = (Get-FileHash $df.FullName -Algorithm MD5).Hash
-            if ($sourceHash -ne $destHash) {
-                $diffs += "[MODIFIED] $relativePath (editor differs from repo)"
-            }
-        }
-    }
-
-    # Files only in source (not yet deployed)
-    $sourceFiles = Get-ChildItem $Source -Recurse -File | Where-Object { $_.Name -notin $IgnoreNames }
-    foreach ($sf in $sourceFiles) {
-        $relativePath = $sf.FullName.Substring($Source.Length + 1)
-        $destFile = Join-Path $Destination $relativePath
-        if (-not (Test-Path $destFile)) {
-            $diffs += "[MISSING] $relativePath (not deployed to editor)"
-        }
-    }
+    $diffs = Get-DirectoryDrift -Source $Source -Destination $Destination -IgnoreNames $IgnoreNames
 
     if ($diffs.Count -eq 0) {
         Write-Host "[OK] $Label : in sync" -ForegroundColor Green
-    } else {
+    }
+    else {
         Write-Host "[DRIFT] $Label : $($diffs.Count) differences found" -ForegroundColor Red
         $diffs | ForEach-Object { Write-Host "  $_" -ForegroundColor Yellow }
     }
@@ -510,80 +641,47 @@ if ($Check) {
             New-CursorRulePackage -RulesSource $SourceRules -SkillsSource $SourceSkills -KernelSource $SourceCursorKernel -OutputDir $cursorTempDir
             Compare-Directories -Source $cursorTempDir -Destination $DestCursorRules -Label "Cursor rules (user)" -IgnoreNames @('.dcr-managed-files.json')
             Compare-Directories -Source $cursorTempDir -Destination $DestProjectCursorRules -Label "Cursor rules (project)"
-        } finally {
+        }
+        finally {
             if (Test-Path $cursorTempDir) {
                 Remove-Item -Path $cursorTempDir -Recurse -Force
             }
         }
     }
     if ($Target -eq "all" -or $Target -eq "agents") {
-        # Codex agents: compare .toml files
-        if ((Test-Path $SourceAgents) -and (Test-Path $DestCodexAgents)) {
-            $codexDiffs = @()
-            $srcToml = Get-ChildItem $SourceAgents -File -Filter '*.toml'
-            foreach ($sf in $srcToml) {
-                $destFile = Join-Path $DestCodexAgents $sf.Name
-                if (-not (Test-Path $destFile)) {
-                    $codexDiffs += "[MISSING] $($sf.Name)"
-                } elseif ((Get-FileHash $sf.FullName -Algorithm MD5).Hash -ne (Get-FileHash $destFile -Algorithm MD5).Hash) {
-                    $codexDiffs += "[MODIFIED] $($sf.Name)"
-                }
-            }
-            $srcTomlNames = $srcToml | Select-Object -ExpandProperty BaseName
-            $destToml = Get-ChildItem $DestCodexAgents -File -Filter '*.toml' -ErrorAction SilentlyContinue
-            foreach ($df in $destToml) {
-                if ($df.BaseName -notin $srcTomlNames) {
-                    $codexDiffs += "[EXTRA] $($df.Name)"
-                }
-            }
-            if ($codexDiffs.Count -eq 0) {
-                Write-Host "[OK] Codex agents : in sync" -ForegroundColor Green
-            } else {
-                Write-Host "[DRIFT] Codex agents : $($codexDiffs.Count) differences" -ForegroundColor Red
-                $codexDiffs | ForEach-Object { Write-Host "  $_" -ForegroundColor Yellow }
-            }
+        $codexDiffs = Get-FlatFileDrift -Source $SourceAgents -Destination $DestCodexAgents -Filter '*.toml'
+        if ($codexDiffs.Count -eq 0) {
+            Write-Host "[OK] Codex agents : in sync" -ForegroundColor Green
         }
-        # Claude agents: compare .md files
-        if ((Test-Path $SourceAgents) -and (Test-Path $DestClaudeAgents)) {
-            $claudeDiffs = @()
-            $srcMd = Get-ChildItem $SourceAgents -File -Filter '*.md' | Where-Object { $_.Name -ne 'README.md' }
-            foreach ($sf in $srcMd) {
-                $destFile = Join-Path $DestClaudeAgents $sf.Name
-                if (-not (Test-Path $destFile)) {
-                    $claudeDiffs += "[MISSING] $($sf.Name)"
-                } elseif ((Get-FileHash $sf.FullName -Algorithm MD5).Hash -ne (Get-FileHash $destFile -Algorithm MD5).Hash) {
-                    $claudeDiffs += "[MODIFIED] $($sf.Name)"
-                }
-            }
-            $srcMdNames = $srcMd | Select-Object -ExpandProperty BaseName
-            $destMd = Get-ChildItem $DestClaudeAgents -File -Filter '*.md' -ErrorAction SilentlyContinue
-            foreach ($df in $destMd) {
-                if ($df.BaseName -notin $srcMdNames) {
-                    $claudeDiffs += "[EXTRA] $($df.Name)"
-                }
-            }
-            if ($claudeDiffs.Count -eq 0) {
-                Write-Host "[OK] Claude agents : in sync" -ForegroundColor Green
-            } else {
-                Write-Host "[DRIFT] Claude agents : $($claudeDiffs.Count) differences" -ForegroundColor Red
-                $claudeDiffs | ForEach-Object { Write-Host "  $_" -ForegroundColor Yellow }
-            }
+        else {
+            Write-Host "[DRIFT] Codex agents : $($codexDiffs.Count) differences" -ForegroundColor Red
+            $codexDiffs | ForEach-Object { Write-Host "  $_" -ForegroundColor Yellow }
+        }
+
+        $claudeDiffs = Get-FlatFileDrift -Source $SourceAgents -Destination $DestClaudeAgents -Filter '*.md' -IgnoreNames @('README.md')
+        if ($claudeDiffs.Count -eq 0) {
+            Write-Host "[OK] Claude agents : in sync" -ForegroundColor Green
+        }
+        else {
+            Write-Host "[DRIFT] Claude agents : $($claudeDiffs.Count) differences" -ForegroundColor Red
+            $claudeDiffs | ForEach-Object { Write-Host "  $_" -ForegroundColor Yellow }
         }
     }
     if ($Target -eq "all" -or $Target -eq "dcr") {
-        # .dcr config check
         $dcrConfigPath = Join-Path $RepoRoot ".dcr\config.json"
         $dcrConfigDest = Join-Path $HOME ".config\dcr\config.json"
-        if (Test-Path $dcrConfigPath) {
-            if (-not (Test-Path $dcrConfigDest)) {
-                Write-Host "[MISSING] .dcr config : $dcrConfigDest" -ForegroundColor Red
-            } elseif ((Get-FileHash $dcrConfigPath -Algorithm MD5).Hash -ne (Get-FileHash $dcrConfigDest -Algorithm MD5).Hash) {
-                Write-Host "[DRIFT] .dcr config : config.json out of sync" -ForegroundColor Red
-            } else {
+        if (-not (Test-Path $dcrConfigPath)) {
+            Write-Host "[SKIP] .dcr config : not found" -ForegroundColor Yellow
+        }
+        else {
+            $dcrDiffs = Get-FileDrift -SourcePath $dcrConfigPath -DestinationPath $dcrConfigDest -Label "config.json"
+            if ($dcrDiffs.Count -eq 0) {
                 Write-Host "[OK] .dcr config : in sync" -ForegroundColor Green
             }
-        } else {
-            Write-Host "[SKIP] .dcr config : not found" -ForegroundColor Yellow
+            else {
+                Write-Host "[DRIFT] .dcr config : $($dcrDiffs.Count) differences" -ForegroundColor Red
+                $dcrDiffs | ForEach-Object { Write-Host "  $_" -ForegroundColor Yellow }
+            }
         }
     }
     Write-Host ""
@@ -593,17 +691,36 @@ if ($Check) {
 
 if ($Target -eq "all" -or $Target -eq "vscode") {
     if ($Backup) { Backup-DeployTarget -TargetPath $DestVSCodeSkills -Label "VS Code Copilot skills" }
+    if (-not $DryRun) {
+        Write-ManagedTargetNotice -Label "VS Code Copilot skills" -Destination $DestVSCodeSkills
+        Write-PrecheckSummary -Label "VS Code Copilot skills" -Diffs (Get-DirectoryDrift -Source $SourceSkills -Destination $DestVSCodeSkills)
+    }
     Sync-Directory -Source $SourceSkills -Destination $DestVSCodeSkills -Label "VS Code Copilot skills"
+    if (-not $DryRun) {
+        Assert-NoDrift -Label "VS Code Copilot skills" -Diffs (Get-DirectoryDrift -Source $SourceSkills -Destination $DestVSCodeSkills)
+    }
 }
 
 if ($Target -eq "all" -or $Target -eq "cursor") {
     if ($Backup) { Backup-DeployTarget -TargetPath $DestCursorRules -Label "Cursor rules (user)" }
+    if (-not $DryRun) {
+        Write-ManagedTargetNotice -Label "Cursor rules (user)" -Destination $DestCursorRules
+    }
     $cursorTempDir = Get-TempDirectory
     try {
         New-CursorRulePackage -RulesSource $SourceRules -SkillsSource $SourceSkills -KernelSource $SourceCursorKernel -OutputDir $cursorTempDir
+        if (-not $DryRun) {
+            Write-PrecheckSummary -Label "Cursor rules (user)" -Diffs (Get-DirectoryDrift -Source $cursorTempDir -Destination $DestCursorRules -IgnoreNames @('.dcr-managed-files.json'))
+            Write-PrecheckSummary -Label "Cursor rules (project)" -Diffs (Get-DirectoryDrift -Source $cursorTempDir -Destination $DestProjectCursorRules)
+        }
         Sync-Files -Source $cursorTempDir -Destination $DestCursorRules -Label "Cursor rules (user)" -Prune -PruneManifestPath $DestCursorManifest
         Sync-Files -Source $cursorTempDir -Destination $DestProjectCursorRules -Label "Cursor rules (project)" -Prune
-    } finally {
+        if (-not $DryRun) {
+            Assert-NoDrift -Label "Cursor rules (user)" -Diffs (Get-DirectoryDrift -Source $cursorTempDir -Destination $DestCursorRules -IgnoreNames @('.dcr-managed-files.json'))
+            Assert-NoDrift -Label "Cursor rules (project)" -Diffs (Get-DirectoryDrift -Source $cursorTempDir -Destination $DestProjectCursorRules)
+        }
+    }
+    finally {
         if (Test-Path $cursorTempDir) {
             Remove-Item -Path $cursorTempDir -Recurse -Force
         }
@@ -611,25 +728,41 @@ if ($Target -eq "all" -or $Target -eq "cursor") {
 }
 
 if ($Target -eq "all" -or $Target -eq "agents") {
+    if (-not $DryRun) {
+        Write-PrecheckSummary -Label "Codex agents" -Diffs (Get-FlatFileDrift -Source $SourceAgents -Destination $DestCodexAgents -Filter '*.toml')
+        Write-PrecheckSummary -Label "Claude agents" -Diffs (Get-FlatFileDrift -Source $SourceAgents -Destination $DestClaudeAgents -Filter '*.md' -IgnoreNames @('README.md'))
+    }
     Sync-Agents -Source $SourceAgents -CodexDest $DestCodexAgents -ClaudeDest $DestClaudeAgents
+    if (-not $DryRun) {
+        Assert-NoDrift -Label "Codex agents" -Diffs (Get-FlatFileDrift -Source $SourceAgents -Destination $DestCodexAgents -Filter '*.toml')
+        Assert-NoDrift -Label "Claude agents" -Diffs (Get-FlatFileDrift -Source $SourceAgents -Destination $DestClaudeAgents -Filter '*.md' -IgnoreNames @('README.md'))
+    }
 }
 
 if ($Target -eq "all" -or $Target -eq "dcr") {
     $dcrConfigPath = Join-Path $RepoRoot ".dcr/config.json"
+    if ((-not $DryRun) -and (Test-Path $dcrConfigPath)) {
+        Write-ManagedTargetNotice -Label ".dcr config" -Destination (Join-Path $HOME ".config\dcr\config.json")
+        Write-PrecheckSummary -Label ".dcr config" -Diffs (Get-FileDrift -SourcePath $dcrConfigPath -DestinationPath (Join-Path $HOME ".config\dcr\config.json") -Label "config.json")
+    }
     Sync-DCRConfig -Source $SourceRules -ConfigPath $dcrConfigPath
+    if ((-not $DryRun) -and (Test-Path $dcrConfigPath)) {
+        Assert-NoDrift -Label ".dcr config" -Diffs (Get-FileDrift -SourcePath $dcrConfigPath -DestinationPath (Join-Path $HOME ".config\dcr\config.json") -Label "config.json")
+    }
 }
 
 Write-Host ""
 if ($DryRun) {
     Write-Host "Dry run complete. No files were copied." -ForegroundColor Yellow
-} else {
+}
+else {
     Write-Host "Deploy complete." -ForegroundColor Green
 }
 
 # ── Watch Mode ──
 if ($Watch) {
     Write-Host ""
-    Write-Host "Watch mode active. Monitoring rules/, skills/, .ai/agents-source/ for changes..." -ForegroundColor Cyan
+    Write-Host "Watch mode active. Monitoring source catalog paths for changes..." -ForegroundColor Cyan
     Write-Host "Press Ctrl+C to stop." -ForegroundColor DarkGray
     Write-Host ""
 
@@ -674,7 +807,8 @@ if ($Watch) {
                         New-CursorRulePackage -RulesSource $SourceRules -SkillsSource $SourceSkills -KernelSource $SourceCursorKernel -OutputDir $cursorWatchDir
                         Sync-Files -Source $cursorWatchDir -Destination $DestCursorRules -Label "Cursor rules (user)" -Prune -PruneManifestPath $DestCursorManifest
                         Sync-Files -Source $cursorWatchDir -Destination $DestProjectCursorRules -Label "Cursor rules (project)" -Prune
-                    } finally {
+                    }
+                    finally {
                         if (Test-Path $cursorWatchDir) { Remove-Item -Path $cursorWatchDir -Recurse -Force }
                     }
                 }
@@ -685,7 +819,8 @@ if ($Watch) {
                 Write-Host "[WATCH] Deploy complete. Watching..." -ForegroundColor Green
             }
         }
-    } finally {
+    }
+    finally {
         foreach ($w in $watchers) {
             $w.EnableRaisingEvents = $false
             $w.Dispose()

@@ -31,11 +31,15 @@ npm-debug.log*
 *.pem
 
 # Runtime artifacts (not source of truth)
+**/.dexter/
 **/.superpowers/
 /autotrader.xlsm
 /~$autotrader.xlsm
 /Product/autotrader-suite/backend/state.json
 /Product/autotrader-suite/backend/settings.json
+
+# External standalone product clones (kept outside DCR source-of-truth)
+/Product/dexter-jp/
 
 # Generated adapter outputs (Cursor rules, etc.)
 .cursor/rules/*.mdc

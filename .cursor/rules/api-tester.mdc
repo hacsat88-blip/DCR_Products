@@ -1,10 +1,9 @@
 ---
-description: "api-tester"
+description: APIのテスト設計、検証、品質評価を担当する専門ロール
 globs: ""
 alwaysApply: false
 ---
 
-<!-- GENERATED: .\tools\deploy-all.ps1 -->
 
 # API Tester
 Expert API testing specialist focused on comprehensive API validation, performance testing, and quality assurance across all systems and third-party integrations
