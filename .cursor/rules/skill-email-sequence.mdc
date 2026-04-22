@@ -1,9 +1,10 @@
 ---
-description: When the user wants to create or optimize an email sequence, drip campaign, automated email flow, or lifecycle email program. Also use when the user mentions "email sequence," "drip campaign," "nurture sequence," "onboarding emails," "welcome sequence," "re-engagement emails," "email automation," or "lifecycle emails." For in-app onboarding, see onboarding-cro.
+description: "email-sequence"
 globs: ""
 alwaysApply: false
 ---
 
+<!-- GENERATED: .\tools\deploy-all.ps1 -->
 
 # Email Sequence Design
 
@@ -152,7 +153,7 @@ Key emails:
 ### Onboarding Sequence (Product Users)
 **Length**: 5-7 emails over 14 days
 **Goal**: Activate, drive to aha moment, upgrade
-**Note**: Coordinate with in-app onboarding—email supports, doesn't duplicate
+**Note**: Coordinate with in-app onboarding窶覇mail supports, doesn't duplicate
 
 Key emails:
 1. Welcome + first step (immediate)
@@ -230,7 +231,7 @@ Key emails:
 - Conversational, not formal
 - First-person (I/we) and second-person (you)
 - Active voice
-- Read it out loud—does it sound human?
+- Read it out loud窶播oes it sound human?
 
 ### Length
 - 50-125 words for transactional
@@ -266,7 +267,7 @@ Send: [Timing]
 Subject: [Subject line]
 Preview: [Preview text]
 Body: [Full copy]
-CTA: [Button text] → [Link destination]
+CTA: [Button text] 竊・[Link destination]
 Segment/Conditions: [If applicable]
 ```
 
@@ -292,8 +293,8 @@ For implementation, see the [tools registry](../../tools/REGISTRY.md). Key email
 | Tool | Best For | MCP | Guide |
 |------|----------|:---:|-------|
 | **Customer.io** | Behavior-based automation | - | [customer-io.md](../../tools/integrations/customer-io.md) |
-| **Mailchimp** | SMB email marketing | ✓ | [mailchimp.md](../../tools/integrations/mailchimp.md) |
-| **Resend** | Developer-friendly transactional | ✓ | [resend.md](../../tools/integrations/resend.md) |
+| **Mailchimp** | SMB email marketing | 笨・| [mailchimp.md](../../tools/integrations/mailchimp.md) |
+| **Resend** | Developer-friendly transactional | 笨・| [resend.md](../../tools/integrations/resend.md) |
 | **SendGrid** | Transactional email at scale | - | [sendgrid.md](../../tools/integrations/sendgrid.md) |
 | **Kit** | Creator/newsletter focused | - | [kit.md](../../tools/integrations/kit.md) |
 

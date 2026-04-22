@@ -1,9 +1,10 @@
 ---
-description: Use when: designing UI, building landing pages, dashboards, reviewing code for UX issues, checking accessibility, auditing design systems. Generates design system recommendations, suggests styles/colors/typography by product type, provides stack-specific guidelines (React, Next.js, Vue, Svelte, Tailwind, shadcn, mobile). Actions: plan, build, create, design, implement, review, fix, improve, check accessibility. Also use when asked 'review my UI', 'design system', 'should this be accessible', 'pick a style'.
+description: "ui-ux-pro-max"
 globs: ""
 alwaysApply: false
 ---
 
+<!-- GENERATED: .\tools\deploy-all.ps1 -->
 
 # UI/UX Pro Max - Design Intelligence
 
@@ -162,8 +163,8 @@ python3 skills/ui-ux-pro-max/scripts/search.py "<query>" --design-system --persi
 ```
 
 This creates:
-- `design-system/MASTER.md` — Global Source of Truth with all design rules
-- `design-system/pages/` — Folder for page-specific overrides
+- `design-system/MASTER.md` 窶・Global Source of Truth with all design rules
+- `design-system/pages/` 窶・Folder for page-specific overrides
 
 **With page-specific override:**
 ```bash
@@ -171,7 +172,7 @@ python3 skills/ui-ux-pro-max/scripts/search.py "<query>" --design-system --persi
 ```
 
 This also creates:
-- `design-system/pages/dashboard.md` — Page-specific deviations from Master
+- `design-system/pages/dashboard.md` 窶・Page-specific deviations from Master
 
 **How hierarchical retrieval works:**
 1. When building a specific page (e.g., "Checkout"), first check `design-system/pages/checkout.md`
@@ -253,7 +254,7 @@ Available stacks: `html-tailwind`, `react`, `nextjs`, `vue`, `svelte`, `swiftui`
 
 ## Example Workflow
 
-**User request:** "Làm landing page cho dịch vụ chăm sóc da chuyên nghiệp"
+**User request:** "Lﾃm landing page cho d盻議h v盻･ chﾄノ sﾃｳc da chuyﾃｪn nghi盻㎝"
 
 ### Step 1: Analyze Requirements
 - Product type: Beauty/Spa service
@@ -322,7 +323,7 @@ These are frequently overlooked issues that make UI look unprofessional:
 
 | Rule | Do | Don't |
 |------|----|----- |
-| **No emoji icons** | Use SVG icons (Heroicons, Lucide, Simple Icons) | Use emojis like 🎨 🚀 ⚙️ as UI icons |
+| **No emoji icons** | Use SVG icons (Heroicons, Lucide, Simple Icons) | Use emojis like 耳 噫 笞呻ｸ・as UI icons |
 | **Stable hover states** | Use color/opacity transitions on hover | Use scale transforms that shift layout |
 | **Correct brand logos** | Research official SVG from Simple Icons | Guess or use incorrect logo paths |
 | **Consistent icon sizing** | Use fixed viewBox (24x24) with w-6 h-6 | Mix different icon sizes randomly |
@@ -396,7 +397,7 @@ Before delivering UI code, verify these items:
 Before coding, commit to a BOLD aesthetic direction:
 
 - **Purpose**: What problem does this interface solve? Who uses it?
-- **Tone**: Pick an extreme — brutally minimal, maximalist chaos, retro-futuristic, organic/natural, luxury/refined, playful/toy-like, editorial/magazine, brutalist/raw, art deco/geometric, soft/pastel, industrial/utilitarian
+- **Tone**: Pick an extreme 窶・brutally minimal, maximalist chaos, retro-futuristic, organic/natural, luxury/refined, playful/toy-like, editorial/magazine, brutalist/raw, art deco/geometric, soft/pastel, industrial/utilitarian
 - **Differentiation**: What makes this UNFORGETTABLE? What's the one thing someone will remember?
 
 ### Anti-Patterns (Never Use)
@@ -436,8 +437,8 @@ https://raw.githubusercontent.com/vercel-labs/web-interface-guidelines/main/comm
 
 ### Local Scope
 This SKILL.md describes **local workspace configuration only**. Do not cite internal section numbers or feature counts as authoritative across contexts. The skill is driven by:
-- `skills/ui-ux-pro-max/scripts/search.py` — Search and design system engine
-- `skills/ui-ux-pro-max/data/` — CSV data files (styles, colors, typography, charts, etc.)
+- `skills/ui-ux-pro-max/scripts/search.py` 窶・Search and design system engine
+- `skills/ui-ux-pro-max/data/` 窶・CSV data files (styles, colors, typography, charts, etc.)
 
 Actual capability depends on what's in these folders, not on this documentation.
 
@@ -452,10 +453,10 @@ The original repository is [nextlevelbuilder/ui-ux-pro-max-skill](https://github
 Before committing changes to this skill:
 ```bash
 # Verify scripts exist
-test -f skills/ui-ux-pro-max/scripts/search.py && echo "✓ Script found"
+test -f skills/ui-ux-pro-max/scripts/search.py && echo "笨・Script found"
 
 # Verify data folder exists
-test -d skills/ui-ux-pro-max/data && echo "✓ Data folder found"
+test -d skills/ui-ux-pro-max/data && echo "笨・Data folder found"
 
 # Quick test: generate a design system
 python3 skills/ui-ux-pro-max/scripts/search.py "SaaS beauty minimal" --design-system 2>&1 | head -20
@@ -465,7 +466,7 @@ If any check fails, rollback changes before merge.
 
 ---
 
-## Related Rules — Division of Responsibility
+## Related Rules 窶・Division of Responsibility
 
 This skill generates **design systems and recommendations**. Other UI/UX rules handle complementary aspects:
 
@@ -478,10 +479,10 @@ This skill generates **design systems and recommendations**. Other UI/UX rules h
 
 ### Practical Discrimination
 
-- 🟢 **ui-ux-pro-max**: "I'm building a SaaS landing page — help me decide on a style/color/typography"
-- 🟢 **ui-designer**: "I've chosen a style — now design the actual component library and make it pixel-perfect"
-- 🟢 **ux-architect**: "I have the design comps — how do I structure CSS and build the layout system?"
-- 🟢 **brand-guardian**: "Ensure all our UI aligns with our brand color palette and tone"
+- 泙 **ui-ux-pro-max**: "I'm building a SaaS landing page 窶・help me decide on a style/color/typography"
+- 泙 **ui-designer**: "I've chosen a style 窶・now design the actual component library and make it pixel-perfect"
+- 泙 **ux-architect**: "I have the design comps 窶・how do I structure CSS and build the layout system?"
+- 泙 **brand-guardian**: "Ensure all our UI aligns with our brand color palette and tone"
 
 When a user request spans multiple roles, agent invocation should:
 1. Start with **ui-ux-pro-max** to generate design system

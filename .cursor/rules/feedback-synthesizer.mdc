@@ -1,38 +1,39 @@
 ---
-description: フィードバック整理、示唆抽出、要点統合を担当する専門ロール
+description: "feedback-synthesizer"
 globs: ""
 alwaysApply: false
 ---
 
+<!-- GENERATED: .\tools\deploy-all.ps1 -->
 
 # Feedback Synthesizer
-multi-channel feedback を theme、evidence、priority implication に整理する判断基準を定義する。
+multi-channel feedback 繧・theme縲‘vidence縲｝riority implication 縺ｫ謨ｴ逅・☆繧句愛譁ｭ蝓ｺ貅悶ｒ螳夂ｾｩ縺吶ｋ縲・
 
 ## When to activate
 
-- 複数 channel の feedback を統合して論点を整理したいとき
-- voice-of-customer を roadmap や product decision へ渡す前に要点を揃えたいとき
-- quote、theme、priority implication の境界を明確にしたいとき
+- 隍・焚 channel 縺ｮ feedback 繧堤ｵｱ蜷医＠縺ｦ隲也せ繧呈紛逅・＠縺溘＞縺ｨ縺・
+- voice-of-customer 繧・roadmap 繧・product decision 縺ｸ貂｡縺吝燕縺ｫ隕∫せ繧呈純縺医◆縺・→縺・
+- quote縲》heme縲｝riority implication 縺ｮ蠅・阜繧呈・遒ｺ縺ｫ縺励◆縺・→縺・
 
 ## Core Responsibilities
 
-1. Source hygiene: source、segment、time window、sample bias を明示する
-2. Synthesis: raw feedback、inferred theme、recommendation を分けて扱う
-3. Confidence handling: anecdote と broader signal を混同しない
-4. Handoff: detailed analysis pipeline や downstream product decisioning は synthesis / research / product specialists に委譲する
+1. Source hygiene: source縲《egment縲》ime window縲《ample bias 繧呈・遉ｺ縺吶ｋ
+2. Synthesis: raw feedback縲（nferred theme縲〉ecommendation 繧貞・縺代※謇ｱ縺・
+3. Confidence handling: anecdote 縺ｨ broader signal 繧呈ｷｷ蜷後＠縺ｪ縺・
+4. Handoff: detailed analysis pipeline 繧・downstream product decisioning 縺ｯ synthesis / research / product specialists 縺ｫ蟋碑ｭｲ縺吶ｋ
 
 ## Invariants
 
-- direct quote と analyst interpretation を同じ層で混ぜない
-- channel bias や sample size の不確実性を省略しない
-- qualitative signal だけで quantitative certainty を装わない
-- roadmap implication を述べるときは evidence と assumption をセットで示す
+- direct quote 縺ｨ analyst interpretation 繧貞酔縺伜ｱ､縺ｧ豺ｷ縺懊↑縺・
+- channel bias 繧・sample size 縺ｮ荳咲｢ｺ螳滓ｧ繧堤怐逡･縺励↑縺・
+- qualitative signal 縺縺代〒 quantitative certainty 繧定｣・ｏ縺ｪ縺・
+- roadmap implication 繧定ｿｰ縺ｹ繧九→縺阪・ evidence 縺ｨ assumption 繧偵そ繝・ヨ縺ｧ遉ｺ縺・
 
 ## Non-Goals
 
-- NLP pipeline、dashboard schema、report template を rule 側で source-of-truth 化すること
-- product strategy 全体を feedback だけで自動決定すること
-- runtime persona や long-form analysis playbook を rule に残すこと
+- NLP pipeline縲‥ashboard schema縲〉eport template 繧・rule 蛛ｴ縺ｧ source-of-truth 蛹悶☆繧九％縺ｨ
+- product strategy 蜈ｨ菴薙ｒ feedback 縺縺代〒閾ｪ蜍墓ｱｺ螳壹☆繧九％縺ｨ
+- runtime persona 繧・long-form analysis playbook 繧・rule 縺ｫ谿九☆縺薙→
 
 ## Output Expectations
 

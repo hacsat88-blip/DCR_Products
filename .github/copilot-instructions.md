@@ -1,4 +1,4 @@
-<!-- ⚠️ AUTO-GENERATED FILE - DO NOT EDIT DIRECTLY ⚠️
+<!-- 笞・・AUTO-GENERATED FILE - DO NOT EDIT DIRECTLY 笞・・
 Generated from: .ai/kernel + .ai/catalog/rules/ + .ai/catalog/skills/
 To regenerate: Run .\deploy.ps1 or .\tools\deploy-all.ps1
 Any manual edits will be overwritten on next deploy. -->

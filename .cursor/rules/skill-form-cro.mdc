@@ -1,9 +1,10 @@
 ---
-description: When the user wants to optimize any form that is NOT signup/registration — including lead capture forms, contact forms, demo request forms, application forms, survey forms, or checkout forms. Also use when the user mentions "form optimization," "lead form conversions," "form friction," "form fields," "form completion rate," or "contact form." For signup/registration forms, see signup-flow-cro. For popups containing forms, see popup-cro.
+description: "form-cro"
 globs: ""
 alwaysApply: false
 ---
 
+<!-- GENERATED: .\tools\deploy-all.ps1 -->
 
 # Form CRO
 
@@ -73,7 +74,7 @@ For each field, ask:
 - Proper mobile keyboard
 
 ### Name Fields
-- Single "Name" vs. First/Last — test this
+- Single "Name" vs. First/Last 窶・test this
 - Single field reduces friction
 - Split needed only if personalization requires it
 
@@ -132,7 +133,7 @@ Email
 
 **Bad:**
 ```
-[Enter your email address]  ← Disappears on focus
+[Enter your email address]  竊・Disappears on focus
 ```
 
 ### Visual Design
@@ -291,8 +292,8 @@ Examples:
 ## Measurement
 
 ### Key Metrics
-- **Form start rate**: Page views → Started form
-- **Completion rate**: Started → Submitted
+- **Form start rate**: Page views 竊・Started form
+- **Completion rate**: Started 竊・Submitted
 - **Field drop-off**: Which fields lose people
 - **Error rate**: By field
 - **Time to complete**: Total and by field
