@@ -1,9 +1,10 @@
 ---
-description: When the user wants to write, rewrite, or improve marketing copy for any page — including homepage, landing pages, pricing pages, feature pages, about pages, or product pages. Also use when the user says "write copy for," "improve this copy," "rewrite this page," "marketing copy," "headline help," or "CTA copy." For email copy, see email-sequence. For popup copy, see popup-cro.
+description: "copywriting"
 globs: ""
 alwaysApply: false
 ---
 
+<!-- GENERATED: .\tools\deploy-all.ps1 -->
 
 # Copywriting
 
@@ -62,12 +63,12 @@ Each section should advance one argument. Build a logical flow down the page.
 
 ### Core Principles
 
-1. **Simple over complex** — "Use" not "utilize," "help" not "facilitate"
-2. **Specific over vague** — Avoid "streamline," "optimize," "innovative"
-3. **Active over passive** — "We generate reports" not "Reports are generated"
-4. **Confident over qualified** — Remove "almost," "very," "really"
-5. **Show over tell** — Describe the outcome instead of using adverbs
-6. **Honest over sensational** — Never fabricate statistics or testimonials
+1. **Simple over complex** 窶・"Use" not "utilize," "help" not "facilitate"
+2. **Specific over vague** 窶・Avoid "streamline," "optimize," "innovative"
+3. **Active over passive** 窶・"We generate reports" not "Reports are generated"
+4. **Confident over qualified** 窶・Remove "almost," "very," "really"
+5. **Show over tell** 窶・Describe the outcome instead of using adverbs
+6. **Honest over sensational** 窶・Never fabricate statistics or testimonials
 
 ### Quick Quality Check
 
@@ -86,9 +87,9 @@ For thorough line-by-line review, use the **copy-editing** skill after your draf
 ### Be Direct
 Get to the point. Don't bury the value in qualifications.
 
-❌ Slack lets you share files instantly, from documents to images, directly in your conversations
+笶・Slack lets you share files instantly, from documents to images, directly in your conversations
 
-✅ Need to share a screenshot? Send as many documents, images, and audio files as your heart desires.
+笨・Need to share a screenshot? Send as many documents, images, and audio files as your heart desires.
 
 ### Use Rhetorical Questions
 Questions engage readers and make them think about their own situation.
@@ -99,7 +100,7 @@ Questions engage readers and make them think about their own situation.
 Analogies make abstract concepts concrete and memorable.
 
 ### Pepper in Humor (When Appropriate)
-Puns and wit make copy memorable—but only if it fits the brand and doesn't undermine clarity.
+Puns and wit make copy memorable窶巴ut only if it fits the brand and doesn't undermine clarity.
 
 ---
 
@@ -185,7 +186,7 @@ Examples:
 - Make recommended plan obvious
 
 ### Feature Page
-- Connect feature → benefit → outcome
+- Connect feature 竊・benefit 竊・outcome
 - Show use cases and examples
 - Clear path to try or buy
 
@@ -234,8 +235,8 @@ For key elements, explain:
 
 ### Alternatives
 For headlines and CTAs, provide 2-3 options:
-- Option A: [copy] — [rationale]
-- Option B: [copy] — [rationale]
+- Option A: [copy] 窶・[rationale]
+- Option B: [copy] 窶・[rationale]
 
 ### Meta Content (if relevant)
 - Page title (for SEO)

@@ -1,9 +1,10 @@
 ---
-description: Use when you have a spec or requirements for a multi-step task, before touching code, or when executing a written plan in the current session
+description: "writing-plans"
 globs: ""
 alwaysApply: false
 ---
 
+<!-- GENERATED: .\tools\deploy-all.ps1 -->
 
 # Writing Plans
 
@@ -23,7 +24,7 @@ Assume they are a skilled developer, but know almost nothing about our toolset o
 
 ## Scope Check
 
-If the spec covers multiple independent subsystems, it should have been broken into sub-project specs during brainstorming. If it wasn't, suggest breaking this into separate plans — one per subsystem. Each plan should produce working, testable software on its own.
+If the spec covers multiple independent subsystems, it should have been broken into sub-project specs during brainstorming. If it wasn't, suggest breaking this into separate plans 窶・one per subsystem. Each plan should produce working, testable software on its own.
 
 ## File Structure
 
@@ -120,16 +121,16 @@ git commit -m "feat: add specific feature"
 
 After writing the complete plan:
 
-1. Dispatch a single plan-document-reviewer subagent (see plan-document-reviewer-prompt.md) with precisely crafted review context — never your session history. This keeps the reviewer focused on the plan, not your thought process.
+1. Dispatch a single plan-document-reviewer subagent (see plan-document-reviewer-prompt.md) with precisely crafted review context 窶・never your session history. This keeps the reviewer focused on the plan, not your thought process.
    - Provide: path to the plan document, path to spec document
-2. If ❌ Issues Found: fix the issues, re-dispatch reviewer for the whole plan
-3. If ✅ Approved: proceed to execution handoff
+2. If 笶・Issues Found: fix the issues, re-dispatch reviewer for the whole plan
+3. If 笨・Approved: proceed to execution handoff
 
 **Review loop guidance:**
 
 - Same agent that wrote the plan fixes it (preserves context)
 - If loop exceeds 3 iterations, surface to human for guidance
-- Reviewers are advisory — explain disagreements if you believe feedback is incorrect
+- Reviewers are advisory 窶・explain disagreements if you believe feedback is incorrect
 
 ## Execution Handoff
 
@@ -157,7 +158,7 @@ When executing a plan without subagent support:
 ### Step 1: Load and Review Plan
 
 1. Read plan file
-2. Review critically — identify any questions or concerns
+2. Review critically 窶・identify any questions or concerns
 3. If concerns: Raise them with your human partner before starting
 4. If no concerns: Create TodoWrite and proceed
 
@@ -190,7 +191,7 @@ After all tasks complete and verified:
 ### Execution Safety Rules
 
 - Never start implementation on main/master branch without explicit user consent
-- Follow plan steps exactly — don't improvise
+- Follow plan steps exactly 窶・don't improvise
 - Don't skip verifications
 - Reference skills when plan says to
 
@@ -200,13 +201,13 @@ If working in a Git worktree (created by `using-git-worktrees` skill), `writing-
 
 **Automatic Initialization:**
 
-- `task_plan.md` — Goal, Scope, Phases, Success Criteria, Blockers
-- `findings.md` — Decisions, Research, Error Patterns
-- `progress.md` — Checklist, Session Timeline, Verification Status
+- `task_plan.md` 窶・Goal, Scope, Phases, Success Criteria, Blockers
+- `findings.md` 窶・Decisions, Research, Error Patterns
+- `progress.md` 窶・Checklist, Session Timeline, Verification Status
 
 **Location:** `~/.config/dcr/worktrees/<project>/<task-name>/`
 
-**Control:** `.dcr/config.json` — Set `commit_session_files: true/false` per project
+**Control:** `.dcr/config.json` 窶・Set `commit_session_files: true/false` per project
 
 **Workflow:**
 

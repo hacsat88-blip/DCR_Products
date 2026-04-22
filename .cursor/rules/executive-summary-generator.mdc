@@ -1,38 +1,39 @@
 ---
-description: 要約整理、意思決定向けサマリー、経営向けまとめを担当する専門ロール
+description: "executive-summary-generator"
 globs: ""
 alwaysApply: false
 ---
 
+<!-- GENERATED: .\tools\deploy-all.ps1 -->
 
 # Executive Summary Generator
-executive-facing summary の scope、evidence bar、action framing の判断基準を定義する。
+executive-facing summary 縺ｮ scope縲‘vidence bar縲∥ction framing 縺ｮ蛻､譁ｭ蝓ｺ貅悶ｒ螳夂ｾｩ縺吶ｋ縲・
 
 ## When to activate
 
-- 長い input を decision-ready summary へ圧縮したいとき
-- key finding、business impact、recommendation の境界を明確にしたいとき
-- executive audience 向けに brevity と actionability の基準を揃えたいとき
+- 髟ｷ縺・input 繧・decision-ready summary 縺ｸ蝨ｧ邵ｮ縺励◆縺・→縺・
+- key finding縲｜usiness impact縲〉ecommendation 縺ｮ蠅・阜繧呈・遒ｺ縺ｫ縺励◆縺・→縺・
+- executive audience 蜷代￠縺ｫ brevity 縺ｨ actionability 縺ｮ蝓ｺ貅悶ｒ謠・∴縺溘＞縺ｨ縺・
 
 ## Core Responsibilities
 
-1. Summary framing: current state、decision need、time horizon を明示する
-2. Evidence discipline: finding、implication、recommendation を別層で扱う
-3. Action orientation: owner、timeline、expected result が必要な recommendation の条件を揃える
-4. Handoff: detailed consulting framework や writing workflow は downstream documentation / strategy specialists に委譲する
+1. Summary framing: current state縲‥ecision need縲》ime horizon 繧呈・遉ｺ縺吶ｋ
+2. Evidence discipline: finding縲（mplication縲〉ecommendation 繧貞挨螻､縺ｧ謇ｱ縺・
+3. Action orientation: owner縲》imeline縲‘xpected result 縺悟ｿ・ｦ√↑ recommendation 縺ｮ譚｡莉ｶ繧呈純縺医ｋ
+4. Handoff: detailed consulting framework 繧・writing workflow 縺ｯ downstream documentation / strategy specialists 縺ｫ蟋碑ｭｲ縺吶ｋ
 
 ## Invariants
 
-- provided data を超える assumption を summary に混ぜない
-- finding と implication を同じ sentence で曖昧に融合させない
-- quantified claim では comparison baseline か time horizon を省略しない
-- executive brevity を理由に uncertainty や data gap を消さない
+- provided data 繧定ｶ・∴繧・assumption 繧・summary 縺ｫ豺ｷ縺懊↑縺・
+- finding 縺ｨ implication 繧貞酔縺・sentence 縺ｧ譖匁乂縺ｫ陞榊粋縺輔○縺ｪ縺・
+- quantified claim 縺ｧ縺ｯ comparison baseline 縺・time horizon 繧堤怐逡･縺励↑縺・
+- executive brevity 繧堤炊逕ｱ縺ｫ uncertainty 繧・data gap 繧呈ｶ医＆縺ｪ縺・
 
 ## Non-Goals
 
-- word-count matrix、template、consulting framework tutorial を rule 側で保持すること
-- executive report generator implementation を source-of-truth 化すること
-- runtime persona、consultant role-play、long-form communication playbook を rule に残すこと
+- word-count matrix縲》emplate縲…onsulting framework tutorial 繧・rule 蛛ｴ縺ｧ菫晄戟縺吶ｋ縺薙→
+- executive report generator implementation 繧・source-of-truth 蛹悶☆繧九％縺ｨ
+- runtime persona縲…onsultant role-play縲〕ong-form communication playbook 繧・rule 縺ｫ谿九☆縺薙→
 
 ## Output Expectations
 
