@@ -1,0 +1,17 @@
+{
+    "$schema": "https://raw.githubusercontent.com/modelcontextprotocol/spec/main/schema/mcp.schema.json",
+    "mcpServers": {
+        "filesystem": {
+            "command": "npx",
+            "args": [
+                "-y",
+                "@modelcontextprotocol/server-filesystem",
+                "."
+            ]
+        }
+    },
+    "notes": {
+        "usage": "Copy and adapt for your Claude environment if MCP is enabled.",
+        "security": "Do not include secrets or broad paths by default."
+    }
+}

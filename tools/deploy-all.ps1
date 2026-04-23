@@ -1,5 +1,5 @@
 param(
-    [ValidateSet("all", "vscode", "cursor", "claude", "codex")]
+    [ValidateSet("all", "vscode", "cursor", "claude", "codex", "windsurf")]
     [string]$Target = "all",
     [switch]$DryRun
 )
@@ -11,28 +11,37 @@ Write-Host ""
 Write-Host "=== Unified Deployment Orchestrator ===" -ForegroundColor Cyan
 Write-Host ""
 
-$adapters = @("vscode", "cursor", "claude", "codex")
+$adapters = @("vscode", "cursor", "claude", "codex", "windsurf")
+$requestedAdapters = @(
+    $adapters | Where-Object { $Target -eq "all" -or $Target -eq $_ }
+)
+$total = $requestedAdapters.Count
 $count = 0
+$missingAdapters = @()
 
-foreach ($adapter in $adapters) {
-    if ($Target -ne "all" -and $Target -ne $adapter) { continue }
-    
+foreach ($adapter in $requestedAdapters) {
     $count++
-    Write-Host "[$count/4] Running $adapter adapter..." -ForegroundColor Yellow
-    
+    Write-Host "[$count/$total] Running $adapter adapter..." -ForegroundColor Yellow
+
     $adapterScript = Join-Path $PSScriptRoot "adapters\$adapter.ps1"
     if (-not (Test-Path $adapterScript)) {
-        Write-Warning "  Adapter not found: $adapterScript"
+        $missingAdapters += $adapter
+        Write-Error "Adapter not found: $adapterScript"
         continue
     }
-    
+
     if ($DryRun) {
         Write-Host "  [DRY RUN] Would run: .\adapters\$adapter.ps1" -ForegroundColor DarkYellow
-    } else {
+    }
+    else {
         & $adapterScript -RepoRoot $RepoRoot
     }
 }
 
+if ($missingAdapters.Count -gt 0) {
+    throw "Missing deployment adapter script(s): $($missingAdapters -join ', ')"
+}
+
 Write-Host ""
-Write-Host "✓ Deployment complete!" -ForegroundColor Green
+Write-Host "[OK] Deployment complete!" -ForegroundColor Green
 Write-Host ""

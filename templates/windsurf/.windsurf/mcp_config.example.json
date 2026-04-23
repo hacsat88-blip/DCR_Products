@@ -1,0 +1,17 @@
+{
+    "$schema": "https://raw.githubusercontent.com/codeium/windsurf/main/schema/mcp_config.schema.json",
+    "mcpServers": {
+        "filesystem": {
+            "command": "npx",
+            "args": [
+                "-y",
+                "@modelcontextprotocol/server-filesystem",
+                "."
+            ]
+        }
+    },
+    "notes": {
+        "usage": "Copy this file to ~/.codeium/windsurf/mcp_config.json and customize.",
+        "security": "Do not add broad filesystem paths or secrets by default."
+    }
+}

@@ -10,7 +10,7 @@
     Agents          : .ai/catalog/agents-source/ → .codex/agents/ (toml) + .claude/agents/ (md)
 
 .PARAMETER Target
-  同期先を指定: all | vscode | cursor | agents | dcr
+    同期先を指定: all | vscode | cursor | windsurf | agents | dcr
   デフォルト: all
 
 .PARAMETER DryRun
@@ -28,7 +28,7 @@
 #>
 
 param(
-    [ValidateSet("all", "vscode", "cursor", "agents", "dcr")]
+    [ValidateSet("all", "vscode", "cursor", "windsurf", "agents", "dcr")]
     [string]$Target = "all",
     [switch]$DryRun,
     [switch]$Check,
@@ -44,7 +44,8 @@ $CatalogPaths = Join-Path $RepoRoot "tools\lib\catalog-paths.ps1"
 
 # ── Unified Adapter Framework (new) ──
 $DeployAll = Join-Path $RepoRoot "tools\deploy-all.ps1"
-if ((Test-Path $DeployAll) -and -not $Check -and ($Target -in @("all", "vscode", "cursor"))) {
+$WindsurfAdapter = Join-Path $RepoRoot "tools\adapters\windsurf.ps1"
+if ((Test-Path $DeployAll) -and -not $Check -and ($Target -in @("all", "vscode", "cursor", "windsurf"))) {
     Write-Host ""
     Write-Host "=== Deploy Adapters (Unified Framework) ===" -ForegroundColor Cyan
     $targetArg = if ($Target -eq "all") { "all" } else { $Target }
@@ -74,6 +75,31 @@ function Get-TempDirectory {
     $tempDir = Join-Path ([System.IO.Path]::GetTempPath()) ("dcr-cursor-rules-" + [System.Guid]::NewGuid().ToString("N"))
     New-Item -ItemType Directory -Path $tempDir -Force | Out-Null
     return $tempDir
+}
+
+function Get-WindsurfDrift {
+    param(
+        [string]$RepoRootPath,
+        [string]$DestinationPath,
+        [string]$AdapterScriptPath
+    )
+
+    if (-not (Test-Path $AdapterScriptPath)) {
+        throw "Windsurf adapter not found: $AdapterScriptPath"
+    }
+
+    $tempDir = Get-TempDirectory
+    $tempOutputRoot = Join-Path $tempDir ".windsurf"
+
+    try {
+        & $AdapterScriptPath -RepoRoot $RepoRootPath -OutputRoot $tempOutputRoot -Quiet -InformationAction Ignore
+        return Get-DirectoryDrift -Source $tempOutputRoot -Destination $DestinationPath
+    }
+    finally {
+        if (Test-Path $tempDir) {
+            Remove-Item -Path $tempDir -Recurse -Force
+        }
+    }
 }
 
 function Get-RuleDescription {
@@ -646,6 +672,16 @@ if ($Check) {
             if (Test-Path $cursorTempDir) {
                 Remove-Item -Path $cursorTempDir -Recurse -Force
             }
+        }
+    }
+    if ($Target -eq "all" -or $Target -eq "windsurf") {
+        $windsurfDiffs = Get-WindsurfDrift -RepoRootPath $RepoRoot -DestinationPath (Join-Path $RepoRoot ".windsurf") -AdapterScriptPath $WindsurfAdapter
+        if ($windsurfDiffs.Count -eq 0) {
+            Write-Host "[OK] Windsurf rules/workflows/config : in sync" -ForegroundColor Green
+        }
+        else {
+            Write-Host "[DRIFT] Windsurf rules/workflows/config : $($windsurfDiffs.Count) differences" -ForegroundColor Red
+            $windsurfDiffs | ForEach-Object { Write-Host "  $_" -ForegroundColor Yellow }
         }
     }
     if ($Target -eq "all" -or $Target -eq "agents") {

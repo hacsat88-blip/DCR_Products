@@ -150,12 +150,13 @@ Write-Host "  kernel docs processed: $($kernelFiles.Count)" -ForegroundColor Dar
 Write-Host ""
 Write-Host "== 4. deploy.ps1 -DryRun check =================="
 $isWindowsPlatform = ($env:OS -eq "Windows_NT")
+$deployDryRunTargets = @("vscode", "cursor", "windsurf", "agents")
 if (-not $isWindowsPlatform) {
     Write-Host "  [SKIP] deploy DryRun: Windows-only script (non-Windows CI skipped)" -ForegroundColor DarkGray
-    $script:passed += 3
+    $script:passed += $deployDryRunTargets.Count
 }
 else {
-    foreach ($target in @("vscode", "cursor", "agents")) {
+    foreach ($target in $deployDryRunTargets) {
         $result = & $PowerShellExe -ExecutionPolicy Bypass -File $DeployScript -DryRun -Target $target 2>&1
         if ($LASTEXITCODE -eq 0) {
             if ($Verbose) { Write-Ok "deploy -Target $target — exit 0" }
@@ -270,8 +271,6 @@ foreach ($dir in $skillDirs) {
     $inContract = $false
     $inFrontmatter = $false
     $contractKeys = @()
-    $currentKey = $null
-    $hasValues = $true
 
     foreach ($line in (Get-Content -Path $skillFile -Encoding utf8)) {
         $trimmed = $line.Trim()
@@ -290,7 +289,6 @@ foreach ($dir in $skillDirs) {
             if ($trimmed -match '^(\w+):$') {
                 $key = $Matches[1]
                 $contractKeys += $key
-                $currentKey = $key
                 continue
             }
             # Detect list item under a sub-key
