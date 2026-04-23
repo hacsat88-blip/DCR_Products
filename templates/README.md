@@ -6,12 +6,13 @@
 
 ## 構成
 
-| ディレクトリ | 内容 | 生成先 |
-|---|---|---|
-| `claude-code/` | Claude Code 用テンプレート | `<project>/.claude/CLAUDE.md` |
-| `codex/` | Codex 用テンプレート | `<project>/AGENTS.md` |
-| `vscode-copilot/` | VS Code Copilot 用テンプレート | `<project>/.github/copilot-instructions.md` |
-| `project-context.md` | プレースホルダーのキー一覧サンプル | プロジェクトごとにコピーして編集 |
+| ディレクトリ                    | 内容                                       | 生成先                                      |
+| ------------------------------- | ------------------------------------------ | ------------------------------------------- |
+| `claude-code/`                  | Claude Code 用テンプレート                 | `<project>/.claude/CLAUDE.md`               |
+| `codex/`                        | Codex 用テンプレート                       | `<project>/AGENTS.md`                       |
+| `vscode-copilot/`               | VS Code Copilot 用テンプレート             | `<project>/.github/copilot-instructions.md` |
+| `project-context.md`            | プレースホルダーのキー一覧サンプル         | プロジェクトごとにコピーして編集            |
+| `supermemory-project-policy.md` | project 単位の memory 運用方針テンプレート | プロジェクトごとにコピーして編集            |
 
 ## ルール
 

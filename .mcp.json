@@ -9,6 +9,30 @@
       "env": {
         "GITHUB_PERSONAL_ACCESS_TOKEN": "SET_IN_LOCAL_ENV"
       }
+    },
+    "supermemory-satoshi-dev": {
+      "url": "https://mcp.supermemory.ai/mcp",
+      "headers": {
+        "x-sm-project": "satoshi-dev"
+      }
+    },
+    "supermemory-dcr-core": {
+      "url": "https://mcp.supermemory.ai/mcp",
+      "headers": {
+        "x-sm-project": "dcr-core"
+      }
+    },
+    "supermemory-product-cyber-stock-dashboard": {
+      "url": "https://mcp.supermemory.ai/mcp",
+      "headers": {
+        "x-sm-project": "product-cyber-stock-dashboard"
+      }
+    },
+    "supermemory-product-dexter-jp": {
+      "url": "https://mcp.supermemory.ai/mcp",
+      "headers": {
+        "x-sm-project": "product-dexter-jp"
+      }
     }
   }
 }
