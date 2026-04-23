@@ -1,0 +1,15 @@
+{
+    "$schema": "https://raw.githubusercontent.com/codeium/windsurf/main/schema/hooks.schema.json",
+    "hooks": {
+        "post_setup_worktree": [
+            {
+                "name": "Install dependencies if needed",
+                "command": "if (Test-Path package.json) { npm install }"
+            },
+            {
+                "name": "Run deploy check",
+                "command": "powershell -ExecutionPolicy Bypass -File .\\deploy.ps1 -Check"
+            }
+        ]
+    }
+}

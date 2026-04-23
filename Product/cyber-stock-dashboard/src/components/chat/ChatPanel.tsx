@@ -135,7 +135,7 @@ export function ChatPanel({
   }, [context]);
 
   React.useEffect(() => {
-    if (!enablePortfolioContext) return;
+    if (!enablePortfolioContext || collapsed || portfolioState !== null) return;
 
     let active = true;
     async function hydratePortfolioContext() {
@@ -150,7 +150,7 @@ export function ChatPanel({
     return () => {
       active = false;
     };
-  }, [enablePortfolioContext, loadPortfolioContext]);
+  }, [collapsed, enablePortfolioContext, loadPortfolioContext, portfolioState]);
 
   const send = React.useCallback(
     async (text: string) => {

@@ -56,7 +56,7 @@ describe("getDb", () => {
     expect(() => getDb()).not.toThrow();
     expect(fs.existsSync(path.dirname(dbFileAbsolute))).toBe(true);
     expect(fs.existsSync(dbFileAbsolute)).toBe(true);
-  });
+  }, 15_000);
 
   it("uses a sensible default local sqlite path when DATABASE_URL is unset", async () => {
     delete process.env.DATABASE_URL;

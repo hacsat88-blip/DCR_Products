@@ -14,6 +14,7 @@ Utility scripts for build, deployment, and maintenance operations.
 - `adapters/cursor.ps1` → `.cursor/rules/*.mdc`
 - `adapters/claude.ps1` → `CLAUDE.md`
 - `adapters/codex.ps1` → `AGENTS.md`
+- `adapters/windsurf.ps1` → `.windsurf/rules/*.md` + `.windsurf/workflows/*.md` + `.windsurf/hooks.json` + `.windsurf/mcp_config.example.json`
 
 **Usage:**
 ```powershell
@@ -58,6 +59,13 @@ Generates `CLAUDE.md` for Claude Code environment
 
 #### `adapters/codex.ps1`
 Generates `AGENTS.md` for Codex (GitHub CLI) environment
+
+#### `adapters/windsurf.ps1`
+Generates `.windsurf/rules/*.md`, `.windsurf/workflows/*.md`, `.windsurf/hooks.json`, and `.windsurf/mcp_config.example.json` for Windsurf Cascade.
+
+Workflow sources:
+- `.claude/commands/*.md`
+- `templates/windsurf/.windsurf/workflows/*.md`
 
 ---
 
