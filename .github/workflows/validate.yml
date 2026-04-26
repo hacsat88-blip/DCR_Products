@@ -16,3 +16,16 @@ jobs:
       - name: Run validate script
         shell: pwsh
         run: pwsh -ExecutionPolicy Bypass -File ./validate.ps1
+
+      - name: Run routing accuracy eval
+        shell: pwsh
+        run: pwsh -ExecutionPolicy Bypass -File ./tools/eval-routing-accuracy.ps1
+
+      - name: Deprecation status snapshot (informational)
+        shell: pwsh
+        continue-on-error: true
+        run: |
+          pwsh -ExecutionPolicy Bypass -File ./tools/deprecation-dashboard.ps1 -OutputJson
+          if (Test-Path docs/deprecation-status.json) {
+            Write-Host "Snapshot generated (informational, not gating)"
+          }

@@ -112,6 +112,30 @@ research-analyst.absorbs = [docs-researcher, market-researcher, competitive-anal
 }
 ```
 
+## ユーザー個人設定（CLAUDE.local.md / AGENTS.local.md）の優先関係
+
+ローカル個人設定はチームのカタログより **常に優先** される。具体的には：
+
+```
+優先度（高 → 低）:
+  1. CLAUDE.local.md / AGENTS.local.md / GEMINI.local.md（gitignored ローカル）
+  2. ユーザーの当該ターン明示指定（"/skill X" "use agent Y"）
+  3. unified-router 決定木 Step 0（alias 解決）
+  4. unified-router 決定木 Step 1-6（routing_category 〜 phase 整合）
+  5. デフォルト動作（kernel/gates/ 系）
+```
+
+ローカル設定の解釈ルール：
+- **「常に X を使え」型の指示** → router の Step 1-6 をオーバーライド、Step 0（alias 解決）は維持
+- **「Y を使うな」型の指示** → router 候補から該当エントリを除外、信頼度を 0.0 にする
+- **「日本語で答えろ」「コミット粒度」型の作業スタイル** → router の選定には影響しない、応答生成にのみ反映
+- **矛盾する指示**（CLAUDE.local.md と当該ターン発話） → 当該ターン発話を優先（より新しい意図）
+
+ローカル設定の **検出ポイント**：
+- セッション開始時に CLAUDE.local.md / AGENTS.local.md を読み込み、`Local Preferences` セクションをパース
+- pied-piper は決定木の Step 0 の **前** に「ローカル明示指定」のチェックを入れる
+- 該当時は `via_local_override: true` を decisions log に記録（観測性のため）
+
 ## 関係ファイル
 
 - 実体 agent: [pied-piper](../catalog/agents-source/pied-piper.md)
@@ -119,6 +143,8 @@ research-analyst.absorbs = [docs-researcher, market-researcher, competitive-anal
 - インデックス: `.ai/catalog/rules/_ROUTING_INDEX.md` (auto-generated)
 - ゲート状態: `.ai/kernel/gate-state.json` (Phase B-4)
 - 決定ログ: `.ai/kernel/router-decisions.jsonl` (中期-C, gitignored)
+- ハブ判定: [hub-promotion-criteria.md](hub-promotion-criteria.md)
+- 削除サイクル: [deprecation-lifecycle.md](deprecation-lifecycle.md)
 
 ## 決定ログ書き込み義務（Mandatory）
 

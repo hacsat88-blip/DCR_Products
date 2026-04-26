@@ -55,3 +55,78 @@ Add an opt-out hint if alternatives exist.
 - Concise actionable output
 - State assumptions before proceeding when ambiguous
 - Always honor `deprecated` frontmatter — route old names to their `successor`
+
+## Worked Examples (canonical routing scenarios)
+
+These illustrate how the decision tree applies in practice. Pied-piper should
+match this pattern of report → execute when invoked.
+
+### Example 1 — High-confidence hub match
+**Input**: "LP のCV改善を考えて"
+
+```
+🎯 採用：conversion-optimization-hub → page-cro variant（信頼度 0.92）
+📌 理由：keywords[CRO, LP, CV] が hub の routing_category=growth と一致、
+       入力に "LP" / "ページ" シグナルあり → page variant 自動分岐
+✨ 期待効果：構造化された CRO 提案（価値提案・摩擦軽減・社会的証明・CTA 規律）
+```
+
+### Example 2 — Step 0 alias resolution
+**Input**: "skill-router を使ってルーティング判断したい"
+
+```
+🎯 採用：pied-piper（信頼度 1.00, 旧名 skill-router → 統合先）
+📌 理由：明示指定された skill-router は deprecated、successor=unified-router
+       module へのナビは pied-piper agent が実行
+✨ 期待効果：本決定木でルーティング判定 + 報告 → 該当 asset 起動
+```
+
+(decisions log には `via_alias_from: "skill-router"` を記録)
+
+### Example 3 — Low-confidence: candidate presentation
+**Input**: "エンゲージメント上げたい"（曖昧）
+
+```
+🎯 採用：候補提示モード（信頼度 0.55, 自動採用しない）
+📌 理由：keywords[engagement] が複数候補にマッチ：
+   - growth-hacker rule（実験設計）
+   - social-media-strategist rule（SNS 配信）
+   - email-marketing-flow skill（メール nurture）
+✨ 確認：どの導線で施策を考えますか？（実験/SNS/メール）
+```
+
+### Example 4 — Process skill before implementation
+**Input**: "新機能を作りたい"
+
+```
+🎯 採用：brainstorming skill（信頼度 0.95, process-first 規則）
+📌 理由：creative work の前は brainstorming を必ず通す（using-superpowers 原則）。
+       実装スキル（writing-plans / tdd-workflow）は brainstorm 完了後に連鎖
+✨ 期待効果：intent / requirements / design を確定 → 次フェーズで writing-plans
+```
+
+### Example 5 — Bug fix routing
+**Input**: "テスト落ちてるけど原因分からない"
+
+```
+🎯 採用：systematic-debugging skill（信頼度 0.93）
+📌 理由：keywords[test, falling, 原因不明] が systematic-debugging の
+       トリガー（bug, test failure, unexpected behavior）に一致
+✨ 期待効果：4-phase 体系的デバッグ（再現 → hypothesis → 検証 → 修正）。
+   完了後 verification-before-completion で claim ゲート
+```
+
+### Local override（CLAUDE.local.md）の例
+
+ユーザーの CLAUDE.local.md に「TDD は使わない」と書いてある場合：
+
+**Input**: "新機能を実装"
+
+```
+🎯 採用：writing-plans skill（信頼度 0.85, ローカル設定により tdd-workflow を除外）
+📌 理由：通常は brainstorm → writing-plans → tdd-workflow → 実装 だが、
+       CLAUDE.local.md の "TDD は使わない" 指示で tdd-workflow をスキップ
+✨ 期待効果：plan→直接実装→verification-before-completion で品質担保
+```
+
+(decisions log には `via_local_override: true` を記録)
