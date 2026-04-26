@@ -130,3 +130,63 @@ match this pattern of report → execute when invoked.
 ```
 
 (decisions log には `via_local_override: true` を記録)
+
+## Runtime Telemetry (Mandatory)
+
+After every routing decision — regardless of confidence level — pied-piper **must** call
+`Write-RouterDecision` in `tools/lib/gate-state.ps1` to persist the decision for offline
+accuracy measurement and deprecation tracking.
+
+### Standard routing call
+
+```powershell
+# After choosing an asset, always log before executing:
+. "$RepoRoot/tools/lib/gate-state.ps1"
+
+Write-RouterDecision `
+    -RepoRoot $RepoRoot `
+    -UserInput "LP のCV改善を考えて" `
+    -Kind     "skill" `
+    -Name     "conversion-optimization-hub" `
+    -Confidence 0.92 `
+    -Reason   "routing_category=growth, keywords[CRO,LP,CV] match" `
+    -ExpectedEffect "CRO 構造化提案 (page variant)"
+```
+
+### Alias resolution call (Step 0)
+
+When a deprecated name is resolved via `successor`, pass the **original** name in
+`-ViaAliasFrom`:
+
+```powershell
+Write-RouterDecision `
+    -RepoRoot $RepoRoot `
+    -UserInput "skill-router を使ってルーティング判断したい" `
+    -Kind     "agent" `
+    -Name     "pied-piper" `
+    -Confidence 1.00 `
+    -Reason   "explicit reference; skill-router deprecated -> pied-piper" `
+    -ExpectedEffect "pied-piper 自身のルーティングフロー起動" `
+    -ViaAliasFrom "skill-router"
+```
+
+### Local override call
+
+When CLAUDE.local.md (or user instruction) overrides the default selection, set
+`-ViaLocalOverride`:
+
+```powershell
+Write-RouterDecision `
+    -RepoRoot $RepoRoot `
+    -UserInput "新機能を実装" `
+    -Kind     "skill" `
+    -Name     "writing-plans" `
+    -Confidence 0.85 `
+    -Reason   "CLAUDE.local.md: TDD は使わない -> tdd-workflow excluded" `
+    -ExpectedEffect "plan -> 直接実装 -> verification-before-completion" `
+    -ViaLocalOverride
+```
+
+> **Note:** The log file (`.ai/kernel/router-decisions.jsonl`) is gitignored.
+> Aggregate stats are surfaced by `tools/deprecation-dashboard.ps1` and checked in
+> the CI routing accuracy step (`.github/workflows/validate.yml`).

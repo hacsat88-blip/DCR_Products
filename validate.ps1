@@ -150,7 +150,7 @@ Write-Host "  kernel docs processed: $($kernelFiles.Count)" -ForegroundColor Dar
 Write-Host ""
 Write-Host "== 4. deploy.ps1 -DryRun check =================="
 $isWindowsPlatform = ($env:OS -eq "Windows_NT")
-$deployDryRunTargets = @("vscode", "cursor", "windsurf", "agents")
+$deployDryRunTargets = @("vscode", "cursor", "agents")
 if (-not $isWindowsPlatform) {
     Write-Host "  [SKIP] deploy DryRun: Windows-only script (non-Windows CI skipped)" -ForegroundColor DarkGray
     $script:passed += $deployDryRunTargets.Count

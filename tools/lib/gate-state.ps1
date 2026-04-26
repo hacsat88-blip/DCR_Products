@@ -185,6 +185,7 @@ function Write-RouterDecision {
         [string]$Reason = "",
         [string]$ExpectedEffect = "",
         [string]$ViaAliasFrom = "",
+        [switch]$ViaLocalOverride,
         [string]$Phase = ""
     )
     $path = Get-RouterDecisionsPath -RepoRoot $RepoRoot
@@ -196,6 +197,7 @@ function Write-RouterDecision {
         kind = $Kind
         name = $Name
         via_alias_from = $ViaAliasFrom
+        via_local_override = [bool]$ViaLocalOverride
         confidence = $Confidence
         reason = $Reason
         expected_effect = $ExpectedEffect
@@ -229,6 +231,7 @@ function Get-RouterDecisionStats {
     $confidences = @($entries | ForEach-Object { $_.confidence })
     $high = @($confidences | Where-Object { $_ -gt 0.8 }).Count
     $aliasUsage = @($entries | Where-Object { $_.via_alias_from -and ([string]$_.via_alias_from).Length -gt 0 }).Count
+    $localOverrides = @($entries | Where-Object { $_.via_local_override -eq $true }).Count
     $topAssets = $entries | Group-Object -Property name | Sort-Object Count -Descending | Select-Object -First 10 Name, Count
     $aliasMap = $entries | Where-Object { $_.via_alias_from } | Group-Object -Property via_alias_from | ForEach-Object {
         [pscustomobject]@{ Old = $_.Name; Count = $_.Count }
@@ -239,6 +242,8 @@ function Get-RouterDecisionStats {
         pct_high_confidence = [math]::Round(($high / $total) * 100, 1)
         alias_usage_count = $aliasUsage
         alias_usage_pct = [math]::Round(($aliasUsage / $total) * 100, 1)
+        local_override_count = $localOverrides
+        local_override_pct = [math]::Round(($localOverrides / $total) * 100, 1)
         top_10_assets = $topAssets
         deprecated_calls_by_oldname = $aliasMap
     }

@@ -17,10 +17,6 @@
         .github/prompts/*.prompt.md       (VS Code Copilot)
         .vscode/mcp.json                  (VS Code Copilot)
         .vscode/tasks.hooks.json          (VS Code Copilot)
-        .windsurf/rules/dcr-kernel.md      (Windsurf)
-        .windsurf/hooks.json               (Windsurf)
-        .windsurf/mcp_config.example.json  (Windsurf)
-        .windsurf/workflows/*.md           (Windsurf)
 
   共有リソース（-SkipShared で省略可）:
     .ai/kernel.md                   (DCR Kernel)
@@ -37,7 +33,7 @@
   project-context.md のパス。省略時は ProjectPath 直下を探す
 
 .PARAMETER Target
-    生成対象: all | claude | codex | copilot | windsurf
+    生成対象: all | claude | codex | copilot
 
 .PARAMETER SkipShared
   共有リソース（.ai/kernel.md, .ai/module/, .ai/kernel/gates/）のコピーをスキップ
@@ -57,7 +53,7 @@ param(
     [Parameter(Mandatory = $true)]
     [string]$ProjectPath,
     [string]$ContextFile,
-    [ValidateSet("all", "claude", "codex", "copilot", "windsurf")]
+    [ValidateSet("all", "claude", "codex", "copilot")]
     [string]$Target = "all",
     [switch]$SkipShared,
     [switch]$DryRun
@@ -93,10 +89,6 @@ $Templates = @{
     copilot  = @{
         Source = Join-Path $RepoRoot "templates\vscode-copilot\.github\copilot-instructions.md"
         Dest   = Join-Path $ProjectPath ".github\copilot-instructions.md"
-    }
-    windsurf = @{
-        Source = Join-Path $RepoRoot "templates\windsurf\.windsurf\rules\dcr-kernel.md"
-        Dest   = Join-Path $ProjectPath ".windsurf\rules\dcr-kernel.md"
     }
 }
 
@@ -180,7 +172,7 @@ function Expand-Template {
 
 # ── Generate files ──
 
-$targets = if ($Target -eq "all") { @("claude", "codex", "copilot", "windsurf") } else { @($Target) }
+$targets = if ($Target -eq "all") { @("claude", "codex", "copilot") } else { @($Target) }
 $generated = 0
 
 foreach ($t in $targets) {
@@ -320,39 +312,6 @@ foreach ($t in $targets) {
             }
         }
 
-        if ($t -eq "windsurf") {
-            $windsurfExtraFiles = @(
-                @{ Source = Join-Path $RepoRoot "templates\windsurf\.windsurf\hooks.json"; Dest = Join-Path $ProjectPath ".windsurf\hooks.json" },
-                @{ Source = Join-Path $RepoRoot "templates\windsurf\.windsurf\mcp_config.example.json"; Dest = Join-Path $ProjectPath ".windsurf\mcp_config.example.json" }
-            )
-
-            foreach ($extra in $windsurfExtraFiles) {
-                if (Test-Path $extra.Source) {
-                    $extraDestDir = Split-Path $extra.Dest -Parent
-                    if (-not (Test-Path $extraDestDir)) {
-                        New-Item -ItemType Directory -Path $extraDestDir -Force | Out-Null
-                    }
-                    Copy-Item -Path $extra.Source -Destination $extra.Dest -Force
-                    Write-Host "[OK] $($extra.Dest)" -ForegroundColor Green
-                    $generated++
-                }
-            }
-
-            $windsurfWorkflowsSourceDir = Join-Path $RepoRoot "templates\windsurf\.windsurf\workflows"
-            if (Test-Path $windsurfWorkflowsSourceDir) {
-                $windsurfWorkflowsDestDir = Join-Path $ProjectPath ".windsurf\workflows"
-                if (-not (Test-Path $windsurfWorkflowsDestDir)) {
-                    New-Item -ItemType Directory -Path $windsurfWorkflowsDestDir -Force | Out-Null
-                }
-
-                Get-ChildItem -Path $windsurfWorkflowsSourceDir -File -Filter *.md | ForEach-Object {
-                    $workflowDest = Join-Path $windsurfWorkflowsDestDir $_.Name
-                    Copy-Item -Path $_.FullName -Destination $workflowDest -Force
-                    Write-Host "[OK] $workflowDest" -ForegroundColor Green
-                    $generated++
-                }
-            }
-        }
     }
 
     if ($DryRun -and $t -eq "claude") {
@@ -417,25 +376,6 @@ foreach ($t in $targets) {
         }
     }
 
-    if ($DryRun -and $t -eq "windsurf") {
-        $windsurfExtras = @(
-            (Join-Path $RepoRoot "templates\windsurf\.windsurf\hooks.json"),
-            (Join-Path $RepoRoot "templates\windsurf\.windsurf\mcp_config.example.json")
-        )
-
-        foreach ($extraPath in $windsurfExtras) {
-            if (Test-Path $extraPath) {
-                Write-Host "[DryRun] .windsurf/$([IO.Path]::GetFileName($extraPath))" -ForegroundColor Yellow
-            }
-        }
-
-        $windsurfWorkflowsSourceDir = Join-Path $RepoRoot "templates\windsurf\.windsurf\workflows"
-        if (Test-Path $windsurfWorkflowsSourceDir) {
-            Get-ChildItem -Path $windsurfWorkflowsSourceDir -File -Filter *.md | ForEach-Object {
-                Write-Host "[DryRun] .windsurf/workflows/$($_.Name)" -ForegroundColor Yellow
-            }
-        }
-    }
 }
 
 # ── Copy shared resources ──
