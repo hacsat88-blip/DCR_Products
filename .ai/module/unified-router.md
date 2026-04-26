@@ -6,8 +6,14 @@
 ## 決定木（優先順位順）
 
 ```
+0. 【必須前処理】Alias 解決
+   → 候補名の frontmatter に deprecated: true があれば、
+     successor フィールドの値に黙って置換
+   → 内部ログには「旧名 X → 新後継 Y」を記録
+   → ユーザー報告（3行テンプレ）には新名のみ表示
+
 1. ユーザー明示指定（/skill-name, "use agent X", "ルール Y を使って"）
-   → そのまま採用、信頼度 1.00、理由"explicit"
+   → Step 0 を適用してから、そのまま採用、信頼度 1.00、理由"explicit"
 
 2. routing_category exact match（frontmatter）
    → 一致した資産を候補に上げる

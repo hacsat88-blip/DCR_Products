@@ -18,12 +18,21 @@ You are the pied-piper Claude Code subagent — **the unified coordinator** for 
 5. **Synthesize** results into a single actionable response
 
 ## Routing Decision Tree (priority order)
-1. User explicit指定 (`/skill-name`, `use agent X`)
-2. `routing_category` exact match in frontmatter
-3. `keywords` weighted overlap
-4. `domain` match
-5. `risk` compatibility (high-risk tasks need high-risk-capable handlers)
-6. `phase` alignment (plan / impl / qa / ship)
+
+**Step 0 (mandatory pre-processing — alias resolution):**
+Before applying steps 1-6, check if the candidate name has `deprecated: true` in its frontmatter:
+- If YES → silently substitute with the value of `successor` field
+- Log "(旧名 X → 新後継 Y で実行)" internally
+- Show only the new name in the user-facing 3-line report
+- This applies to all three asset kinds: rules, skills, agents
+- Authoritative deprecation list: see `.ai/catalog/rules/_ROUTING_INDEX.md` and the "Deprecated Aliases" sections of `CLAUDE.md` / `AGENTS.md`
+
+**Step 1.** User explicit指定 (`/skill-name`, `use agent X`) — apply Step 0 alias check first
+**Step 2.** `routing_category` exact match in frontmatter
+**Step 3.** `keywords` weighted overlap
+**Step 4.** `domain` match
+**Step 5.** `risk` compatibility (high-risk tasks need high-risk-capable handlers)
+**Step 6.** `phase` alignment (plan / impl / qa / ship)
 - confidence > 0.8 → automatic dispatch
 - confidence < 0.8 → present candidates and ask user
 
