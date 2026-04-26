@@ -281,6 +281,54 @@ function New-CursorRulePackage {
     Copy-Item -Path $KernelSource -Destination (Join-Path $OutputDir "dcr-kernel.md") -Force
 }
 
+function Get-DeprecationReport {
+    param([string]$CatalogRoot)
+
+    $report = @{ rules = @(); skills = @(); agents = @() }
+    $patterns = @(
+        @{ Kind = 'rules'; Path = Join-Path $CatalogRoot 'rules'; Filter = '*.md' }
+        @{ Kind = 'agents'; Path = Join-Path $CatalogRoot 'agents-source'; Filter = '*.md' }
+        @{ Kind = 'skills'; Path = Join-Path $CatalogRoot 'skills'; Filter = 'SKILL.md'; Recurse = $true }
+    )
+    foreach ($p in $patterns) {
+        if (-not (Test-Path $p.Path)) { continue }
+        $params = @{ Path = $p.Path; File = $true; Filter = $p.Filter }
+        if ($p.Recurse) { $params.Recurse = $true }
+        $files = Get-ChildItem @params
+        foreach ($f in $files) {
+            $head = Get-Content -Path $f.FullName -TotalCount 20 -Encoding utf8
+            $isDep = $head | Where-Object { $_ -match '^\s*deprecated\s*:\s*true\s*$' }
+            if ($isDep) {
+                $succ = ($head | Where-Object { $_ -match '^\s*successor\s*:' } | Select-Object -First 1) -replace '^\s*successor\s*:\s*', ''
+                $name = $f.BaseName
+                if ($p.Kind -eq 'skills') { $name = (Split-Path $f.DirectoryName -Leaf) }
+                $report[$p.Kind] += [pscustomobject]@{ Name = $name; Successor = $succ.Trim() }
+            }
+        }
+    }
+    return $report
+}
+
+function Write-DeprecationSummary {
+    param([string]$CatalogRoot)
+
+    $report = Get-DeprecationReport -CatalogRoot $CatalogRoot
+    $total = $report.rules.Count + $report.skills.Count + $report.agents.Count
+    if ($total -eq 0) { return }
+
+    Write-Host ""
+    Write-Host "=== Deprecation Aliases (旧名 → 新後継) ===" -ForegroundColor Cyan
+    foreach ($kind in @('rules', 'skills', 'agents')) {
+        if ($report[$kind].Count -gt 0) {
+            Write-Host "  [$kind] $($report[$kind].Count) deprecated:" -ForegroundColor Yellow
+            foreach ($entry in $report[$kind]) {
+                Write-Host "    $($entry.Name) → $($entry.Successor)" -ForegroundColor DarkGray
+            }
+        }
+    }
+    Write-Host ""
+}
+
 function Sync-Agents {
     param(
         [string]$Source,
@@ -793,6 +841,12 @@ if ($DryRun) {
 }
 else {
     Write-Host "Deploy complete." -ForegroundColor Green
+}
+
+# ── Deprecation Aliases Summary (Phase A/B/C consolidation) ──
+$catalogRoot = Join-Path $RepoRoot ".ai\catalog"
+if (Test-Path $catalogRoot) {
+    Write-DeprecationSummary -CatalogRoot $catalogRoot
 }
 
 # ── Watch Mode ──

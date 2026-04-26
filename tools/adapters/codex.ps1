@@ -17,35 +17,71 @@ function Get-Targets($file) {
     return @()
 }
 
+function Get-DeprecationInfo($file) {
+    $text = Get-Content $file.FullName -Raw
+    if ($text -match '(?ms)^---(.*?)^---') {
+        $fm = $Matches[1]
+        if ($fm -match '(?m)^\s*deprecated\s*:\s*true\s*$') {
+            $succ = $null
+            if ($fm -match '(?m)^\s*successor\s*:\s*(\S+)') { $succ = $Matches[1].Trim() }
+            return @{ Deprecated = $true; Successor = $succ }
+        }
+    }
+    return @{ Deprecated = $false; Successor = $null }
+}
+
 $rules = @()
 $skills = @()
 $agents = @()
+$deprecatedRules = @()
+$deprecatedSkills = @()
+$deprecatedAgents = @()
 
 # Collect codex-targeted items
 foreach ($f in Get-ChildItem $rulesDir -Filter "*.md" | Where-Object { -not $_.BaseName.StartsWith("_") }) {
     $targets = Get-Targets $f
     if (-not $targets) { $targets = @("vscode", "cursor", "claude", "codex") }
-    if ($targets -contains "codex") { $rules += $f.BaseName }
+    if ($targets -contains "codex") {
+        $dep = Get-DeprecationInfo $f
+        if ($dep.Deprecated) { $deprecatedRules += [pscustomobject]@{ Name = $f.BaseName; Successor = $dep.Successor } } else { $rules += $f.BaseName }
+    }
 }
 
 foreach ($dir in Get-ChildItem $skillsDir -Directory | Where-Object { -not $_.Name.StartsWith("_") }) {
     $sf = Join-Path $dir.FullName "SKILL.md"
     if (Test-Path $sf) {
-        $targets = Get-Targets (Get-Item $sf)
+        $sfItem = Get-Item $sf
+        $targets = Get-Targets $sfItem
         if (-not $targets) { $targets = @("vscode", "cursor", "claude", "codex") }
-        if ($targets -contains "codex") { $skills += $dir.Name }
+        if ($targets -contains "codex") {
+            $dep = Get-DeprecationInfo $sfItem
+            if ($dep.Deprecated) { $deprecatedSkills += [pscustomobject]@{ Name = $dir.Name; Successor = $dep.Successor } } else { $skills += $dir.Name }
+        }
     }
 }
 
 foreach ($f in Get-ChildItem $agentsDir -Filter "*.md" | Where-Object { $_.Name -ne "README.md" }) {
     $targets = Get-Targets $f
     if (-not $targets) { $targets = @("codex", "claude") }
-    if ($targets -contains "codex") { $agents += $f.BaseName }
+    if ($targets -contains "codex") {
+        $dep = Get-DeprecationInfo $f
+        if ($dep.Deprecated) { $deprecatedAgents += [pscustomobject]@{ Name = $f.BaseName; Successor = $dep.Successor } } else { $agents += $f.BaseName }
+    }
 }
 
 $ruleList = if ($rules) { (($rules | ForEach-Object { "- [$_](.ai/catalog/rules/$_.md)" }) -join "`n") } else { "(none)" }
 $skillList = if ($skills) { (($skills | ForEach-Object { "- [$_](.ai/catalog/skills/$_/SKILL.md)" }) -join "`n") } else { "(none)" }
 $agentList = if ($agents) { (($agents | ForEach-Object { "- [$_](.ai/catalog/agents-source/$_.md)" }) -join "`n") } else { "(none)" }
+
+$deprecatedSection = ""
+$totalDep = $deprecatedRules.Count + $deprecatedSkills.Count + $deprecatedAgents.Count
+if ($totalDep -gt 0) {
+    $lines = @("", "## Deprecated Aliases", "", "These names are kept as aliases that route to their successor:", "")
+    foreach ($e in $deprecatedRules) { $lines += "- ~~$($e.Name)~~ → [$($e.Successor)](.ai/catalog/rules/$($e.Successor).md) _(rule)_" }
+    foreach ($e in $deprecatedSkills) { $lines += "- ~~$($e.Name)~~ → [$($e.Successor)](.ai/catalog/skills/$($e.Successor)/SKILL.md) _(skill)_" }
+    foreach ($e in $deprecatedAgents) { $lines += "- ~~$($e.Name)~~ → [$($e.Successor)](.ai/catalog/agents-source/$($e.Successor).md) _(agent)_" }
+    $deprecatedSection = ($lines -join "`n") + "`n"
+}
 
 $content = @"
 <!-- ⚠️ AUTO-GENERATED FILE - DO NOT EDIT DIRECTLY ⚠️
@@ -70,10 +106,17 @@ $skillList
 ## Included Agents
 
 $agentList
-
+$deprecatedSection
 ---
 
-For architecture details, see [.ai/module/unified-integration.md](.ai/module/unified-integration.md)
+## Unified Coordinator
+
+全タスクの単一入口は **pied-piper** agent。Rule/Skill/Agent 選定は決定木に従い、採用前に3行報告（採用名・理由・期待効果）を出す。
+
+詳細：
+- [.ai/module/unified-coordinator.md](.ai/module/unified-coordinator.md)
+- [.ai/module/unified-router.md](.ai/module/unified-router.md)
+- [.ai/module/unified-integration.md](.ai/module/unified-integration.md)
 "@
 
 $utf8 = New-Object System.Text.UTF8Encoding $false

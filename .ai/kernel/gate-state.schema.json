@@ -1,0 +1,95 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "DCR Gate State",
+  "description": "p/ → q/ → sh/ ゲート連鎖の永続状態。Unified Coordinator (pied-piper) が読み書きし、deploy.ps1 が検証する。",
+  "type": "object",
+  "required": ["session_id", "phase", "gates"],
+  "properties": {
+    "session_id": {
+      "type": "string",
+      "description": "セッション識別子（worktree 名や日時など）"
+    },
+    "phase": {
+      "type": "string",
+      "enum": ["plan", "impl", "review", "qa", "ship"],
+      "description": "現在のフェーズ"
+    },
+    "gates": {
+      "type": "object",
+      "required": ["plan_passed", "qa_passed"],
+      "properties": {
+        "plan_passed": {
+          "type": "boolean",
+          "description": "p/ Plan Gate 通過済み"
+        },
+        "review_passed": {
+          "type": "boolean",
+          "description": "a/ Review Gate 通過済み"
+        },
+        "qa_passed": {
+          "type": "boolean",
+          "description": "q/ QA Gate 通過済み（sh/ 進行に必須）"
+        },
+        "ship_ready": {
+          "type": "boolean",
+          "description": "sh/ Ship Gate ready"
+        }
+      }
+    },
+    "findings": {
+      "type": "object",
+      "properties": {
+        "critical": {
+          "type": "integer",
+          "description": "重大issue 数。0 でないと ship 不可"
+        },
+        "high": { "type": "integer" },
+        "medium": { "type": "integer" },
+        "low": { "type": "integer" }
+      }
+    },
+    "selected_assets": {
+      "type": "array",
+      "description": "Unified Router が選定した Rule/Skill/Agent の履歴",
+      "items": {
+        "type": "object",
+        "required": ["kind", "name", "confidence"],
+        "properties": {
+          "kind": { "type": "string", "enum": ["rule", "skill", "agent"] },
+          "name": { "type": "string" },
+          "via_alias_from": { "type": "string", "description": "旧名 alias で呼ばれた場合のみ" },
+          "confidence": { "type": "number", "minimum": 0, "maximum": 1 },
+          "reason": { "type": "string" },
+          "expected_effect": { "type": "string" }
+        }
+      }
+    },
+    "updated_at": {
+      "type": "string",
+      "format": "date-time"
+    }
+  },
+  "examples": [
+    {
+      "session_id": "sweet-beaver-f51534",
+      "phase": "qa",
+      "gates": {
+        "plan_passed": true,
+        "review_passed": true,
+        "qa_passed": false,
+        "ship_ready": false
+      },
+      "findings": { "critical": 0, "high": 1, "medium": 3, "low": 5 },
+      "selected_assets": [
+        {
+          "kind": "agent",
+          "name": "pied-piper",
+          "confidence": 1.0,
+          "reason": "explicit unified coordinator",
+          "expected_effect": "全タスクの単一入口"
+        }
+      ],
+      "updated_at": "2026-04-26T12:00:00Z"
+    }
+  ]
+}

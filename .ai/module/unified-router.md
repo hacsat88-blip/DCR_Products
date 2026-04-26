@@ -1,0 +1,119 @@
+# Unified Router Module
+
+`pied-piper`（Unified Coordinator）が参照する **ルーティング決定木の正本**。
+旧 `skill-router` skill の責務を吸収し、Rule + Skill + Agent の3資産横断で同じロジックを適用する。
+
+## 決定木（優先順位順）
+
+```
+1. ユーザー明示指定（/skill-name, "use agent X", "ルール Y を使って"）
+   → そのまま採用、信頼度 1.00、理由"explicit"
+
+2. routing_category exact match（frontmatter）
+   → 一致した資産を候補に上げる
+
+3. keywords 一致数（重み付け）
+   → 名詞ヒットは2点、動詞ヒットは1点、descriptionヒットは1点
+
+4. domain match
+   → 同一 domain の資産を優先
+
+5. risk 整合
+   → high-risk タスク（destructive ops, 金融, 法務, prod 影響）は
+     risk:high を持つ資産でないと却下
+
+6. phase 整合
+   → plan/impl/qa/ship のうち現在の phase に合うもの
+   → phase は kernel/gate-state.json から取得
+```
+
+## confidence 計算
+
+```
+confidence = 0.5
+  + (routing_category match ? 0.20 : 0)
+  + (keywords match score / max possible) * 0.15
+  + (domain match ? 0.10 : 0)
+  + (risk 整合 ? 0.05 : -0.30)
+```
+
+- `>= 0.8` → automatic dispatch
+- `0.5 - 0.8` → 候補2-3件をユーザー提示
+- `< 0.5` → 「該当スキル/ルールを特定できません」と申告し質問で絞り込む
+
+## 親ハブ優先ルール
+
+以下の親ハブが存在する場合、variant 直接指定でない限り **親を優先選定**：
+
+| 親ハブ | 内部 variant |
+|---|---|
+| [conversion-optimization-hub](../catalog/skills/conversion-optimization-hub/SKILL.md) | page / popup / form / signup-flow / onboarding / paywall-upgrade |
+| [strategic-messaging](../catalog/skills/strategic-messaging/SKILL.md) | content-strategy / marketing-psychology |
+
+親が選定されたあと、親 SKILL.md 内の variant 判定表で内部分岐する（router の関心外）。
+
+## 後継の自動転送（alias）
+
+frontmatter に `deprecated: true` がある場合：
+1. 旧名で呼ばれても、`successor` フィールドの新名に **黙って** 転送
+2. ログにのみ「旧名 X → 新名 Y で実行」を記録
+3. ユーザーへの報告 (3行テンプレ) では新名のみを表示
+
+これにより、CLAUDE.md / AGENTS.md / 既存ドキュメント中の旧名参照が壊れずに移行できる。
+
+## 親 → 子の階層解決
+
+`absorbs` フィールドに名前が並ぶ場合、親が選定されると子は **暗黙的に内部利用可能** になる。例：
+
+```
+research-analyst.absorbs = [docs-researcher, market-researcher, competitive-analyst, ...]
+```
+
+→ ユーザーが「市場調査」と言ったとき、router は research-analyst を選ぶが、
+研究内部では competitive-analyst の手法を呼び出して良い。
+
+## 同一 phase での並列ルーティング
+
+`pied-piper` は最大2件まで採用する。例：
+- 「ログイン機能のセキュリティを見たい」
+  → primary: `security-auditor` (audit)
+  → secondary: `code-reviewer` (auth code path)
+
+3件以上必要と判断された場合は、ユーザーに「並列でX件動かしますか？」と確認する。
+
+## ルーティング結果のスキーマ
+
+```json
+{
+  "input": "<元ユーザー発話>",
+  "classification": {
+    "intent": "implementation|research|review|qa|...",
+    "domain": "frontend|security|...",
+    "risk": "low|medium|high",
+    "phase": "plan|impl|qa|ship"
+  },
+  "selected": [
+    {
+      "kind": "skill|rule|agent",
+      "name": "<採用名>",
+      "via_alias_from": "<旧名 if applicable>",
+      "confidence": 0.85,
+      "reason": "routing_category=growth + keywords[CRO,LP] hit",
+      "expected_effect": "LP CVR +X% を狙う構造化提案"
+    }
+  ],
+  "phase_modifier": "<from gate-state.json>"
+}
+```
+
+## 関係ファイル
+
+- 実体 agent: [pied-piper](../catalog/agents-source/pied-piper.md)
+- 統合層: [unified-coordinator.md](unified-coordinator.md)
+- インデックス: `.ai/catalog/rules/_ROUTING_INDEX.md` (auto-generated)
+- ゲート状態: `.ai/kernel/gate-state.json` (Phase B-4)
+
+## Migration Note
+
+旧 `skill-router` skill は Phase C で deprecated → 削除予定。
+本モジュールが正本として完全に代替する。
