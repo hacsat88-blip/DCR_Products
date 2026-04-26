@@ -118,6 +118,26 @@ research-analyst.absorbs = [docs-researcher, market-researcher, competitive-anal
 - 統合層: [unified-coordinator.md](unified-coordinator.md)
 - インデックス: `.ai/catalog/rules/_ROUTING_INDEX.md` (auto-generated)
 - ゲート状態: `.ai/kernel/gate-state.json` (Phase B-4)
+- 決定ログ: `.ai/kernel/router-decisions.jsonl` (中期-C, gitignored)
+
+## 決定ログ書き込み義務（Mandatory）
+
+選定が確定したら、`tools/lib/gate-state.ps1` の `Write-RouterDecision` を呼んで
+JSONL に1行追記する。これにより精度測定・alias 使用頻度・低信頼ケースの
+事後レビューが可能になる：
+
+```powershell
+. .\tools\lib\gate-state.ps1
+Write-RouterDecision -RepoRoot $RepoRoot `
+  -Input "<元ユーザー発話>" `
+  -Kind skill -Name conversion-optimization-hub -Confidence 0.92 `
+  -Reason "routing_category=growth + keywords[CRO,LP] match" `
+  -ExpectedEffect "page-cro variant で構造化提案" `
+  -Phase impl
+```
+
+旧名で呼ばれて Step 0 で置換した場合は `-ViaAliasFrom <旧名>` を必ず添える。
+集計は `Get-RouterDecisionStats` で確認できる（top10/平均信頼度/alias 使用率）。
 
 ## Migration Note
 

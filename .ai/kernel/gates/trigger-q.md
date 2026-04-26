@@ -43,3 +43,19 @@
 - テスト実行結果（コマンド + 出力）
 - lint/build 結果
 - 目視確認の場合はスクリーンショットまたは具体的な確認手順と結果
+
+## Mandatory: structured gate-state write
+
+q/ 実行完了時、`tools/lib/gate-state.ps1` の `Update-GateState` を呼び、
+`.ai/kernel/gate-state.json` に findings 内訳と qa_passed を **必ず** 記録する：
+
+```powershell
+. .\tools\lib\gate-state.ps1
+Update-GateState -RepoRoot $RepoRoot -Phase 'qa' `
+  -GateUpdate @{ qa_passed = $true } `
+  -FindingsUpdate @{ critical = 0; high = 1; medium = 3; low = 5 }
+```
+
+🔴 critical > 0 が残存する場合は `qa_passed = $false` で書き込む。
+deploy.ps1 -EnforceGate はこの JSON を読み、qa_passed != true または
+findings.critical > 0 の場合に sh/ deploy を hard-block する。

@@ -42,3 +42,21 @@ sh/ 通過時、以下を確認して報告する:
 3. git status がクリーン（未コミットの変更なし）
 4. セキュリティ上の懸念がないこと
 5. コミットメッセージが規約に従っていること
+
+## Mandatory: structured gate-state write + hard-block check
+
+sh/ 実行直前に `Test-GateReady` で `qa_passed = true` && `critical = 0`
+を **必ず** 確認する：
+
+```powershell
+. .\tools\lib\gate-state.ps1
+if (-not (Test-GateReady -RepoRoot $RepoRoot -RequireGate 'qa_passed')) {
+    Write-Host "🔴 Stop — q/ QA Gate を通過していません。"
+    return
+}
+Update-GateState -RepoRoot $RepoRoot -Phase 'ship' -GateUpdate @{ ship_ready = $true }
+```
+
+`deploy.ps1 -EnforceGate` 実行時はこのチェックが自動適用される。
+ヒューマン操作で sh/ を回す場合も、Update-GateState の呼び出しを
+怠らないこと（次のセッション以降のゲート連鎖が壊れる）。

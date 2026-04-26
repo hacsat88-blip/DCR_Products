@@ -146,3 +146,100 @@ function Assert-GateReady {
         throw "Gate '$RequireGate' is not ready. Aborting. Update via Update-GateState or run the q/ trigger first."
     }
 }
+
+# ── Router Decisions Log ──
+function Get-RouterDecisionsPath {
+    param([Parameter(Mandatory)][string]$RepoRoot)
+    return Join-Path $RepoRoot ".ai/kernel/router-decisions.jsonl"
+}
+
+function Write-RouterDecision {
+    <#
+    .DESCRIPTION
+      Append a single routing decision to .ai/kernel/router-decisions.jsonl
+      (gitignored). One JSON object per line. Used by pied-piper / unified-router
+      to log every selection for offline accuracy measurement.
+
+    .PARAMETER Kind
+      'rule' | 'skill' | 'agent'
+
+    .PARAMETER Confidence
+      0.0 - 1.0
+
+    .PARAMETER ViaAliasFrom
+      If the user requested a deprecated name and Step 0 substituted to successor,
+      pass the original name here. Empty if no alias substitution happened.
+
+    .EXAMPLE
+      Write-RouterDecision -RepoRoot $RepoRoot -Input "LPのCV改善" `
+        -Kind skill -Name conversion-optimization-hub -Confidence 0.92 `
+        -Reason "routing_category=growth + keywords[CRO,LP] hit" `
+        -ExpectedEffect "page-cro variant で構造化提案"
+    #>
+    param(
+        [Parameter(Mandatory)][string]$RepoRoot,
+        [Parameter(Mandatory)][Alias('Input')][string]$UserInput,
+        [Parameter(Mandatory)][ValidateSet('rule','skill','agent')][string]$Kind,
+        [Parameter(Mandatory)][string]$Name,
+        [Parameter(Mandatory)][double]$Confidence,
+        [string]$Reason = "",
+        [string]$ExpectedEffect = "",
+        [string]$ViaAliasFrom = "",
+        [string]$Phase = ""
+    )
+    $path = Get-RouterDecisionsPath -RepoRoot $RepoRoot
+    $dir = Split-Path $path -Parent
+    if (-not (Test-Path $dir)) { New-Item -ItemType Directory -Path $dir -Force | Out-Null }
+    $entry = [pscustomobject]@{
+        timestamp = (Get-Date).ToUniversalTime().ToString("yyyy-MM-ddTHH:mm:ssZ")
+        input = $UserInput
+        kind = $Kind
+        name = $Name
+        via_alias_from = $ViaAliasFrom
+        confidence = $Confidence
+        reason = $Reason
+        expected_effect = $ExpectedEffect
+        phase = $Phase
+    }
+    $line = ($entry | ConvertTo-Json -Compress -Depth 5)
+    $utf8 = New-Object System.Text.UTF8Encoding($false)
+    [System.IO.File]::AppendAllText($path, $line + [Environment]::NewLine, $utf8)
+}
+
+function Get-RouterDecisionStats {
+    <#
+    .DESCRIPTION
+      Read router-decisions.jsonl and return aggregate stats:
+      - total decisions
+      - confidence distribution (avg, median, % >0.8)
+      - alias usage count (deprecated name calls)
+      - top 10 most-used assets
+    #>
+    param([Parameter(Mandatory)][string]$RepoRoot)
+    $path = Get-RouterDecisionsPath -RepoRoot $RepoRoot
+    if (-not (Test-Path $path)) {
+        return [pscustomobject]@{ total = 0; message = "no decisions logged yet" }
+    }
+    $entries = Get-Content -Path $path -Encoding utf8 | Where-Object { $_ } | ForEach-Object { $_ | ConvertFrom-Json }
+    if (-not $entries) {
+        return [pscustomobject]@{ total = 0; message = "log empty" }
+    }
+    $entries = @($entries)
+    $total = $entries.Count
+    $confidences = @($entries | ForEach-Object { $_.confidence })
+    $high = @($confidences | Where-Object { $_ -gt 0.8 }).Count
+    $aliasUsage = @($entries | Where-Object { $_.via_alias_from -and ([string]$_.via_alias_from).Length -gt 0 }).Count
+    $topAssets = $entries | Group-Object -Property name | Sort-Object Count -Descending | Select-Object -First 10 Name, Count
+    $aliasMap = $entries | Where-Object { $_.via_alias_from } | Group-Object -Property via_alias_from | ForEach-Object {
+        [pscustomobject]@{ Old = $_.Name; Count = $_.Count }
+    } | Sort-Object Count -Descending
+    return [pscustomobject]@{
+        total = $total
+        avg_confidence = [math]::Round(($confidences | Measure-Object -Average).Average, 3)
+        pct_high_confidence = [math]::Round(($high / $total) * 100, 1)
+        alias_usage_count = $aliasUsage
+        alias_usage_pct = [math]::Round(($aliasUsage / $total) * 100, 1)
+        top_10_assets = $topAssets
+        deprecated_calls_by_oldname = $aliasMap
+    }
+}

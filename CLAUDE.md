@@ -152,10 +152,8 @@ Unified entry point for Claude Code environment.
 - [agent-installer](.ai/catalog/agents-source/agent-installer.md)
 - [agent-organizer](.ai/catalog/agents-source/agent-organizer.md)
 - [ai-engineer](.ai/catalog/agents-source/ai-engineer.md)
-- [ai-prompt-manager-orchestrator](.ai/catalog/agents-source/ai-prompt-manager-orchestrator.md)
 - [angular-architect](.ai/catalog/agents-source/angular-architect.md)
 - [architect-reviewer](.ai/catalog/agents-source/architect-reviewer.md)
-- [architecture-diagram-orchestrator](.ai/catalog/agents-source/architecture-diagram-orchestrator.md)
 - [azure-infra-engineer](.ai/catalog/agents-source/azure-infra-engineer.md)
 - [backend-developer](.ai/catalog/agents-source/backend-developer.md)
 - [blockchain-developer](.ai/catalog/agents-source/blockchain-developer.md)
@@ -281,8 +279,10 @@ These names are kept as aliases that route to their successor (Phase A/B/C conso
 - ~~schema-markup~~ 竊・[seo-audit](.ai/catalog/skills/seo-audit/SKILL.md) _(skill)_
 - ~~skill-router~~ 竊・[unified-router](.ai/catalog/skills/unified-router/SKILL.md) _(skill)_
 - ~~ad-security-reviewer~~ 竊・[security-auditor](.ai/catalog/agents-source/security-auditor.md) _(agent)_
+- ~~ai-prompt-manager-orchestrator~~ 竊・[pied-piper](.ai/catalog/agents-source/pied-piper.md) _(agent)_
 - ~~api-designer~~ 竊・[backend-developer](.ai/catalog/agents-source/backend-developer.md) _(agent)_
 - ~~api-documenter~~ 竊・[documentation-engineer](.ai/catalog/agents-source/documentation-engineer.md) _(agent)_
+- ~~architecture-diagram-orchestrator~~ 竊・[pied-piper](.ai/catalog/agents-source/pied-piper.md) _(agent)_
 - ~~browser-debugger~~ 竊・[debugger](.ai/catalog/agents-source/debugger.md) _(agent)_
 - ~~data-researcher~~ 竊・[research-analyst](.ai/catalog/agents-source/research-analyst.md) _(agent)_
 - ~~database-optimizer~~ 竊・[database-administrator](.ai/catalog/agents-source/database-administrator.md) _(agent)_
