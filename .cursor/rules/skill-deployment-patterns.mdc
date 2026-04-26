@@ -1,27 +1,28 @@
 ---
-description: CI/CD、ヘルスチェック、ロールバック、段階リリースの標準パターン。運用前提の安全なデプロイを定義する。
+description: "deployment-patterns"
 globs: ""
 alwaysApply: false
 ---
 
+<!-- GENERATED: .\tools\deploy-all.ps1 -->
 
 # Deployment Patterns
 
-## 基本原則
+## 蝓ｺ譛ｬ蜴溷援
 
-- デプロイは再現可能で idempotent
-- 段階リリース（canary/blue-green）を優先
-- 失敗時ロールバックを事前定義
+- 繝・・繝ｭ繧､縺ｯ蜀咲樟蜿ｯ閭ｽ縺ｧ idempotent
+- 谿ｵ髫弱Μ繝ｪ繝ｼ繧ｹ・・anary/blue-green・峨ｒ蜆ｪ蜈・
+- 螟ｱ謨玲凾繝ｭ繝ｼ繝ｫ繝舌ャ繧ｯ繧剃ｺ句燕螳夂ｾｩ
 
-## リリース前チェック
+## 繝ｪ繝ｪ繝ｼ繧ｹ蜑阪メ繧ｧ繝・け
 
-- build/test/lint/typecheck が全通過
-- 監視・アラートが有効
-- DB migration の後方互換性確認
-- 依存サービス障害時の挙動確認
+- build/test/lint/typecheck 縺悟・騾夐℃
+- 逶｣隕悶・繧｢繝ｩ繝ｼ繝医′譛牙柑
+- DB migration 縺ｮ蠕梧婿莠呈鋤諤ｧ遒ｺ隱・
+- 萓晏ｭ倥し繝ｼ繝薙せ髫懷ｮｳ譎ゅ・謖吝虚遒ｺ隱・
 
-## ロールバックチェック
+## 繝ｭ繝ｼ繝ｫ繝舌ャ繧ｯ繝√ぉ繝・け
 
-- 直前 artifact が参照可能
-- 切り戻し手順が 1 コマンドで実行可能
-- 切り戻し後の検証手順が定義済み
+- 逶ｴ蜑・artifact 縺悟盾辣ｧ蜿ｯ閭ｽ
+- 蛻・ｊ謌ｻ縺玲焔鬆・′ 1 繧ｳ繝槭Φ繝峨〒螳溯｡悟庄閭ｽ
+- 蛻・ｊ謌ｻ縺怜ｾ後・讀懆ｨｼ謇矩・′螳夂ｾｩ貂医∩

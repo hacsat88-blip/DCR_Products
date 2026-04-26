@@ -1,7 +1,10 @@
 ---
 trigger: model_decision
-description: UIデザイン、コンポーネント設計、視覚整合を担当する専門ロール
+description: UI/UX設計、コンポーネント・体験構造・視覚整合を一貫して担当する統合ロール
 ---
+
+
+> **NOTE**: 旧 `ux-architect`（体験構造・CSS基盤）と `inclusive-visuals-specialist`（視覚表現の包摂性）はこのルールに統合されました。技術アーキテクチャ寄りの責務、フロー設計、視覚バイアス抑制をすべて含みます。
 
 
 # UI Designer

@@ -44,6 +44,16 @@ function Get-Targets {
     return @()
 }
 
+function Test-DeprecatedFile {
+    param([string]$Path)
+    $text = Get-Content -Path $Path -Raw -Encoding utf8
+    if ($text -match '(?ms)^---(.*?)^---') {
+        $fm = $Matches[1]
+        if ($fm -match '(?m)^\s*deprecated\s*:\s*true\s*$') { return $true }
+    }
+    return $false
+}
+
 function Get-FrontmatterField {
     param(
         [string]$Path,
@@ -136,8 +146,9 @@ if (Test-Path $cursorKernel) {
     Write-WindsurfStatus -Message "  [OK] rules/dcr-kernel.md"
 }
 
-# 2) Catalog rules -> Windsurf rules (model_decision)
+# 2) Catalog rules -> Windsurf rules (model_decision); skip deprecated
 $ruleFiles = Get-ChildItem -Path $rulesDir -File -Filter *.md | Where-Object { -not $_.BaseName.StartsWith("_") } | Sort-Object Name
+$skippedDeprecated = 0
 foreach ($ruleFile in $ruleFiles) {
     $targets = @(Get-Targets -Path $ruleFile.FullName)
     if ($targets.Count -eq 0) {
@@ -145,6 +156,11 @@ foreach ($ruleFile in $ruleFiles) {
     }
 
     if (-not ($targets -contains "windsurf")) {
+        continue
+    }
+
+    if (Test-DeprecatedFile -Path $ruleFile.FullName) {
+        $skippedDeprecated++
         continue
     }
 
@@ -245,4 +261,7 @@ foreach ($old in $previous) {
 
 Write-Utf8NoBom -Path $manifestPath -Content ((@($managedFiles) | Sort-Object -Unique | ConvertTo-Json -Depth 3))
     Write-WindsurfStatus -Message "  [OK] .windsurf/.dcr-managed-files.json"
+if ($skippedDeprecated -gt 0) {
+    Write-WindsurfStatus -Message "  (skipped $skippedDeprecated deprecated rules — see CLAUDE.md Deprecated Aliases)" -Color "DarkGray"
+}
 Write-WindsurfStatus -Message "" -Color "Green"

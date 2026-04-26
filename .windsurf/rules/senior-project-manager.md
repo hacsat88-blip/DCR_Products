@@ -1,6 +1,6 @@
 ---
 trigger: model_decision
-description: プロジェクト計画、進行管理、優先順位整理を担当する専門ロール
+description: プロジェクト計画、進行管理、優先順位整理、スプリント運営を一貫して担当する統合ロール
 ---
 
 

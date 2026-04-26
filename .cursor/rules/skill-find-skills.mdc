@@ -1,9 +1,10 @@
 ---
-description: Helps users discover and install agent skills when they ask questions like "how do I do X", "find a skill for X", "is there a skill that can...", or express interest in extending capabilities. Also enforces skill invocation discipline - if a skill might apply, check it before proceeding.
+description: "find-skills"
 globs: ""
 alwaysApply: false
 ---
 
+<!-- GENERATED: .\tools\deploy-all.ps1 -->
 
 # Find Skills
 
@@ -13,8 +14,8 @@ This skill helps you discover and install skills from the open agent skills ecos
 
 Before responding to any task, check whether an existing skill applies:
 
-1. **Process skills first** (brainstorming, debugging) — these determine HOW to approach the task
-2. **Implementation skills second** (frontend-design, mcp-builder) — these guide execution
+1. **Process skills first** (brainstorming, debugging) 窶・these determine HOW to approach the task
+2. **Implementation skills second** (frontend-design, mcp-builder) 窶・these guide execution
 
 | Rationalization | Reality |
 |-----------------|---------|
@@ -71,9 +72,9 @@ npx skills find [query]
 
 For example:
 
-- User asks "how do I make my React app faster?" → `npx skills find react performance`
-- User asks "can you help me with PR reviews?" → `npx skills find pr review`
-- User asks "I need to create a changelog" → `npx skills find changelog`
+- User asks "how do I make my React app faster?" 竊・`npx skills find react performance`
+- User asks "can you help me with PR reviews?" 竊・`npx skills find pr review`
+- User asks "I need to create a changelog" 竊・`npx skills find changelog`
 
 The command will return results like:
 
@@ -81,7 +82,7 @@ The command will return results like:
 Install with npx skills add <owner/repo@skill>
 
 vercel-labs/agent-skills@vercel-react-best-practices
-└ https://skills.sh/vercel-labs/agent-skills/vercel-react-best-practices
+笏・https://skills.sh/vercel-labs/agent-skills/vercel-react-best-practices
 ```
 
 ### Step 3: Present Options to the User

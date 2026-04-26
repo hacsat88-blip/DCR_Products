@@ -1,179 +1,180 @@
 ---
-description: システムアーキテクチャ図・インフラ構成図・データフロー図・デプロイメント図・ネットワーク図を、ダークテーマの美しいインタラクティブHTMLファイルとして生成するスキル。「アーキテクチャ図を作って」「構成図を描いて」「システム構成を可視化して」「インフラ図」「AWS/GCP/Azure構成図」「マイクロサービス図」「データフロー図」「CI/CDパイプライン図」「ネットワークトポロジ」「シーケンス図（簡易）」などのキーワードが出た場合、また設計レビュー・ドキュメント作成・技術共有のために図解が必要な場面では積極的にこのスキルを使用する。コードベースの分析結果から図を生成することも得意。
+description: "architecture-diagram-generator"
 globs: ""
 alwaysApply: false
 ---
 
+<!-- GENERATED: .\tools\deploy-all.ps1 -->
 
 # Architecture Diagram Generator
 
-テキスト記述からプロフェッショナルなシステムアーキテクチャ図を生成する。  
-`assets/template.html` を読み込み、プレースホルダーを置換してスタンドアロンHTMLファイルを出力する。
+繝・く繧ｹ繝郁ｨ倩ｿｰ縺九ｉ繝励Ο繝輔ぉ繝・す繝ｧ繝翫Ν縺ｪ繧ｷ繧ｹ繝・Β繧｢繝ｼ繧ｭ繝・け繝√Ε蝗ｳ繧堤函謌舌☆繧九・ 
+`assets/template.html` 繧定ｪｭ縺ｿ霎ｼ縺ｿ縲√・繝ｬ繝ｼ繧ｹ繝帙Ν繝繝ｼ繧堤ｽｮ謠帙＠縺ｦ繧ｹ繧ｿ繝ｳ繝峨い繝ｭ繝ｳHTML繝輔ぃ繧､繝ｫ繧貞・蜉帙☆繧九・
 
 ---
 
-## Step 0: テンプレートの読み込み
+## Step 0: 繝・Φ繝励Ξ繝ｼ繝医・隱ｭ縺ｿ霎ｼ縺ｿ
 
-**必ず最初に** `assets/template.html` を `view` ツールで読み込む。  
-CSS変数・SVGデfs・プレースホルダー名を確認してから生成に入る。
+**蠢・★譛蛻昴↓** `assets/template.html` 繧・`view` 繝・・繝ｫ縺ｧ隱ｭ縺ｿ霎ｼ繧縲・ 
+CSS螟画焚繝ｻSVG繝㌶s繝ｻ繝励Ξ繝ｼ繧ｹ繝帙Ν繝繝ｼ蜷阪ｒ遒ｺ隱阪＠縺ｦ縺九ｉ逕滓・縺ｫ蜈･繧九・
 
 ---
 
-## 対応図タイプ
+## 蟇ｾ蠢懷峙繧ｿ繧､繝・
 
-| タイプ | 用途 | レイアウト |
+| 繧ｿ繧､繝・| 逕ｨ騾・| 繝ｬ繧､繧｢繧ｦ繝・|
 |--------|------|----------|
-| `architecture` | システム全体構成（デフォルト） | 階層型（上→下） |
-| `dataflow` | データ処理・ETLパイプライン | 左→右フロー |
-| `deployment` | インフラ/クラウド配置 | ゾーン型（入れ子） |
-| `network` | ネットワークトポロジ | 自由配置 |
-| `pipeline` | CI/CDパイプライン | 左→右時系列 |
+| `architecture` | 繧ｷ繧ｹ繝・Β蜈ｨ菴捺ｧ区・・医ョ繝輔か繝ｫ繝茨ｼ・| 髫主ｱ､蝙具ｼ井ｸ岩・荳具ｼ・|
+| `dataflow` | 繝・・繧ｿ蜃ｦ逅・・ETL繝代う繝励Λ繧､繝ｳ | 蟾ｦ竊貞承繝輔Ο繝ｼ |
+| `deployment` | 繧､繝ｳ繝輔Λ/繧ｯ繝ｩ繧ｦ繝蛾・鄂ｮ | 繧ｾ繝ｼ繝ｳ蝙具ｼ亥・繧悟ｭ撰ｼ・|
+| `network` | 繝阪ャ繝医Ρ繝ｼ繧ｯ繝医・繝ｭ繧ｸ | 閾ｪ逕ｱ驟咲ｽｮ |
+| `pipeline` | CI/CD繝代う繝励Λ繧､繝ｳ | 蟾ｦ竊貞承譎らｳｻ蛻・|
 
 ---
 
-## コンポーネントタクソノミー
+## 繧ｳ繝ｳ繝昴・繝阪Φ繝医ち繧ｯ繧ｽ繝弱Α繝ｼ
 
-| タイプ | CSSクラス | 色 | アイコン | 用途 |
+| 繧ｿ繧､繝・| CSS繧ｯ繝ｩ繧ｹ | 濶ｲ | 繧｢繧､繧ｳ繝ｳ | 逕ｨ騾・|
 |--------|-----------|-----|---------|------|
-| frontend | `comp-frontend` | Cyan #06b6d4 | 🖥 | Webアプリ・モバイル・CDN・Edge |
-| backend | `comp-backend` | Emerald #10b981 | ⚙️ | API・サーバー・マイクロサービス |
-| database | `comp-database` | Violet #8b5cf6 | 🗄 | DB・キャッシュ・ストレージ・ML |
-| cloud | `comp-cloud` | Amber #f59e0b | ☁️ | クラウドサービス・インフラ・K8s |
-| security | `comp-security` | Rose #f43f5e | 🔒 | 認証・暗号化・WAF・セキュリティ |
-| queue | `comp-queue` | Orange #f97316 | 📨 | メッセージキュー・Kafka・EventBus |
-| monitor | `comp-monitor` | Sky #38bdf8 | 📊 | 監視・ロギング・アラート・APM |
-| external | `comp-external` | Slate #64748b | 🔌 | 外部API・サードパーティ・ユーザー |
+| frontend | `comp-frontend` | Cyan #06b6d4 | 箕 | Web繧｢繝励Μ繝ｻ繝｢繝舌う繝ｫ繝ｻCDN繝ｻEdge |
+| backend | `comp-backend` | Emerald #10b981 | 笞呻ｸ・| API繝ｻ繧ｵ繝ｼ繝舌・繝ｻ繝槭う繧ｯ繝ｭ繧ｵ繝ｼ繝薙せ |
+| database | `comp-database` | Violet #8b5cf6 | 淀 | DB繝ｻ繧ｭ繝｣繝・す繝･繝ｻ繧ｹ繝医Ξ繝ｼ繧ｸ繝ｻML |
+| cloud | `comp-cloud` | Amber #f59e0b | 笘・ｸ・| 繧ｯ繝ｩ繧ｦ繝峨し繝ｼ繝薙せ繝ｻ繧､繝ｳ繝輔Λ繝ｻK8s |
+| security | `comp-security` | Rose #f43f5e | 白 | 隱崎ｨｼ繝ｻ證怜捷蛹悶・WAF繝ｻ繧ｻ繧ｭ繝･繝ｪ繝・ぅ |
+| queue | `comp-queue` | Orange #f97316 | 鐙 | 繝｡繝・そ繝ｼ繧ｸ繧ｭ繝･繝ｼ繝ｻKafka繝ｻEventBus |
+| monitor | `comp-monitor` | Sky #38bdf8 | 投 | 逶｣隕悶・繝ｭ繧ｮ繝ｳ繧ｰ繝ｻ繧｢繝ｩ繝ｼ繝医・APM |
+| external | `comp-external` | Slate #64748b | 伯 | 螟夜ΚAPI繝ｻ繧ｵ繝ｼ繝峨ヱ繝ｼ繝・ぅ繝ｻ繝ｦ繝ｼ繧ｶ繝ｼ |
 
 ---
 
-## レイアウトガイドライン
+## 繝ｬ繧､繧｢繧ｦ繝医ぎ繧､繝峨Λ繧､繝ｳ
 
-### 階層型（architecture / deployment）
-
-```
-Y=60   [ユーザー / クライアント]  (external / frontend)
-Y=180  [エッジ / セキュリティ]   (security / cloud)
-Y=300  [アプリケーション / API]  (backend)
-Y=420  [データ / ストレージ]     (database)
-Y=540  [監視 / ログ]             (monitor) — 水平に並べる
-```
-
-- 各層内のコンポーネントはX方向に均等分散
-- SVG viewBox: `0 0 1100 700`（コンポーネントが10超なら`1400 800`）
-
-### フロー型（dataflow / pipeline）
+### 髫主ｱ､蝙具ｼ・rchitecture / deployment・・
 
 ```
-X=80  [ソース]  →  X=260 [処理1]  →  X=440 [処理2]  →  X=620 [シンク]
-                         ↓                   ↓
-                   X=260,Y+140        X=440,Y+140   (サイドカー/ストレージ)
+Y=60   [繝ｦ繝ｼ繧ｶ繝ｼ / 繧ｯ繝ｩ繧､繧｢繝ｳ繝・  (external / frontend)
+Y=180  [繧ｨ繝・ず / 繧ｻ繧ｭ繝･繝ｪ繝・ぅ]   (security / cloud)
+Y=300  [繧｢繝励Μ繧ｱ繝ｼ繧ｷ繝ｧ繝ｳ / API]  (backend)
+Y=420  [繝・・繧ｿ / 繧ｹ繝医Ξ繝ｼ繧ｸ]     (database)
+Y=540  [逶｣隕・/ 繝ｭ繧ｰ]             (monitor) 窶・豌ｴ蟷ｳ縺ｫ荳ｦ縺ｹ繧・
 ```
 
-- 主フローはY=200固定、サブフローはY=340
+- 蜷・ｱ､蜀・・繧ｳ繝ｳ繝昴・繝阪Φ繝医・X譁ｹ蜷代↓蝮・ｭ牙・謨｣
+- SVG viewBox: `0 0 1100 700`・医さ繝ｳ繝昴・繝阪Φ繝医′10雜・↑繧荏1400 800`・・
+
+### 繝輔Ο繝ｼ蝙具ｼ・ataflow / pipeline・・
+
+```
+X=80  [繧ｽ繝ｼ繧ｹ]  竊・ X=260 [蜃ｦ逅・]  竊・ X=440 [蜃ｦ逅・]  竊・ X=620 [繧ｷ繝ｳ繧ｯ]
+                         竊・                  竊・
+                   X=260,Y+140        X=440,Y+140   (繧ｵ繧､繝峨き繝ｼ/繧ｹ繝医Ξ繝ｼ繧ｸ)
+```
+
+- 荳ｻ繝輔Ο繝ｼ縺ｯY=200蝗ｺ螳壹√し繝悶ヵ繝ｭ繝ｼ縺ｯY=340
 - SVG viewBox: `0 0 1100 500`
 
-### 座標ルール
+### 蠎ｧ讓吶Ν繝ｼ繝ｫ
 
-- コンポーネント矩形: 幅=140px, 高さ=62px（技術名ありは70px）
-- 水平間隔: 最小180px
-- 垂直間隔: 最小130px
-- ゾーン余白: 内包コンポーネントより上下左右 +25px
+- 繧ｳ繝ｳ繝昴・繝阪Φ繝育洸蠖｢: 蟷・140px, 鬮倥＆=62px・域橿陦灘錐縺ゅｊ縺ｯ70px・・
+- 豌ｴ蟷ｳ髢馴囈: 譛蟆・80px
+- 蝙ら峩髢馴囈: 譛蟆・30px
+- 繧ｾ繝ｼ繝ｳ菴咏區: 蜀・桁繧ｳ繝ｳ繝昴・繝阪Φ繝医ｈ繧贋ｸ贋ｸ句ｷｦ蜿ｳ +25px
 
 ---
 
-## SVG描画仕様
+## SVG謠冗判莉墓ｧ・
 
-### コンポーネント
+### 繧ｳ繝ｳ繝昴・繝阪Φ繝・
 
 ```svg
-<g class="component" data-type="backend" data-name="API Gateway" data-tech="Node.js/Express" data-desc="RESTful APIエンドポイント" transform="translate(480, 290)">
+<g class="component" data-type="backend" data-name="API Gateway" data-tech="Node.js/Express" data-desc="RESTful API繧ｨ繝ｳ繝峨・繧､繝ｳ繝・ transform="translate(480, 290)">
   <rect width="140" height="62" rx="8" class="comp-backend"/>
-  <text x="70" y="20" class="comp-icon">⚙️</text>
+  <text x="70" y="20" class="comp-icon">笞呻ｸ・/text>
   <text x="70" y="38" class="comp-label">API Gateway</text>
   <text x="70" y="53" class="comp-sublabel">Node.js / Express</text>
 </g>
 ```
 
-- `data-name`, `data-tech`, `data-desc` はホバートールチップに表示される
-- `comp-icon` は省略可（アイコンなしの場合は `comp-label` の `y` を `28` に変更）
+- `data-name`, `data-tech`, `data-desc` 縺ｯ繝帙ヰ繝ｼ繝医・繝ｫ繝√ャ繝励↓陦ｨ遉ｺ縺輔ｌ繧・
+- `comp-icon` 縺ｯ逵∫払蜿ｯ・医い繧､繧ｳ繝ｳ縺ｪ縺励・蝣ｴ蜷医・ `comp-label` 縺ｮ `y` 繧・`28` 縺ｫ螟画峩・・
 
-### ゾーン / リージョン
+### 繧ｾ繝ｼ繝ｳ / 繝ｪ繝ｼ繧ｸ繝ｧ繝ｳ
 
 ```svg
-<!-- ゾーンは必ずコンポーネントより前に描く（z-order: zones → arrows → components）-->
+<!-- 繧ｾ繝ｼ繝ｳ縺ｯ蠢・★繧ｳ繝ｳ繝昴・繝阪Φ繝医ｈ繧雁燕縺ｫ謠上￥・・-order: zones 竊・arrows 竊・components・・->
 <g class="zone">
   <rect x="340" y="250" width="480" height="310" rx="14" class="zone-aws"/>
-  <text x="362" y="275" class="zone-label">☁️  AWS  us-east-1</text>
+  <text x="362" y="275" class="zone-label">笘・ｸ・ AWS  us-east-1</text>
 </g>
 ```
 
-- CSSクラス: `zone-aws` / `zone-k8s` / `zone-security` / `zone-generic`
+- CSS繧ｯ繝ｩ繧ｹ: `zone-aws` / `zone-k8s` / `zone-security` / `zone-generic`
 
-### 接続矢印
+### 謗･邯夂泙蜊ｰ
 
 ```svg
-<!-- 同期接続（HTTPS等） -->
+<!-- 蜷梧悄謗･邯夲ｼ・TTPS遲会ｼ・-->
 <path d="M 480 321 L 340 321" fill="none" class="arrow-backend" marker-end="url(#arrow-backend)"/>
 <text x="410" y="315" class="arrow-label">REST / HTTPS</text>
 
-<!-- 非同期接続（Kafka等） -->
+<!-- 髱槫酔譛滓磁邯夲ｼ・afka遲会ｼ・-->
 <path d="M 620 321 L 760 321" fill="none" class="arrow-queue arrow-async" marker-end="url(#arrow-queue)"/>
 <text x="690" y="315" class="arrow-label">Kafka Topic</text>
 
-<!-- 双方向接続 -->
+<!-- 蜿梧婿蜷第磁邯・-->
 <path d="M 480 260 L 480 190" fill="none" class="arrow-security" marker-start="url(#arrow-security-rev)" marker-end="url(#arrow-security)"/>
 <text x="490" y="228" class="arrow-label-side">JWT / OAuth2</text>
 ```
 
-- `arrow-async` クラス付与で点線に変わる（テンプレートのCSSで定義済み）
-- `arrow-label-side` は垂直矢印用（`text-anchor: start`）
-- 矢印クラスはコンポーネントタイプと対応: `arrow-frontend`, `arrow-backend`, `arrow-database`, `arrow-cloud`, `arrow-security`, `arrow-queue`, `arrow-monitor`, `arrow-external`
+- `arrow-async` 繧ｯ繝ｩ繧ｹ莉倅ｸ弱〒轤ｹ邱壹↓螟峨ｏ繧具ｼ医ユ繝ｳ繝励Ξ繝ｼ繝医・CSS縺ｧ螳夂ｾｩ貂医∩・・
+- `arrow-label-side` 縺ｯ蝙ら峩遏｢蜊ｰ逕ｨ・・text-anchor: start`・・
+- 遏｢蜊ｰ繧ｯ繝ｩ繧ｹ縺ｯ繧ｳ繝ｳ繝昴・繝阪Φ繝医ち繧､繝励→蟇ｾ蠢・ `arrow-frontend`, `arrow-backend`, `arrow-database`, `arrow-cloud`, `arrow-security`, `arrow-queue`, `arrow-monitor`, `arrow-external`
 
 ---
 
-## プレースホルダー一覧
+## 繝励Ξ繝ｼ繧ｹ繝帙Ν繝繝ｼ荳隕ｧ
 
-テンプレートHTML内の以下を置換して出力を生成する：
+繝・Φ繝励Ξ繝ｼ繝・TML蜀・・莉･荳九ｒ鄂ｮ謠帙＠縺ｦ蜃ｺ蜉帙ｒ逕滓・縺吶ｋ・・
 
-| プレースホルダー | 内容 |
+| 繝励Ξ繝ｼ繧ｹ繝帙Ν繝繝ｼ | 蜀・ｮｹ |
 |----------------|------|
-| `{{TITLE}}` | 図のタイトル（例: "ECサービス アーキテクチャ"） |
-| `{{SUBTITLE}}` | サブタイトル（例: "マイクロサービス構成 / 2025"） |
-| `{{SVG_WIDTH}}` | SVG viewBox幅（例: `1100`） |
-| `{{SVG_HEIGHT}}` | SVG viewBox高さ（例: `700`） |
-| `{{SVG_ZONES}}` | ゾーン/リージョンのSVG要素群 |
-| `{{SVG_ARROWS}}` | 接続矢印のSVG要素群 |
-| `{{SVG_COMPONENTS}}` | コンポーネントのSVG要素群 |
-| `{{CARD_1_ICON}}` / `{{CARD_1_TITLE}}` / `{{CARD_1_BODY}}` | サマリーカード1 |
-| `{{CARD_2_ICON}}` / `{{CARD_2_TITLE}}` / `{{CARD_2_BODY}}` | サマリーカード2 |
-| `{{CARD_3_ICON}}` / `{{CARD_3_TITLE}}` / `{{CARD_3_BODY}}` | サマリーカード3 |
-| `{{FOOTER_TEXT}}` | フッターテキスト（生成日時・ツール名等） |
+| `{{TITLE}}` | 蝗ｳ縺ｮ繧ｿ繧､繝医Ν・井ｾ・ "EC繧ｵ繝ｼ繝薙せ 繧｢繝ｼ繧ｭ繝・け繝√Ε"・・|
+| `{{SUBTITLE}}` | 繧ｵ繝悶ち繧､繝医Ν・井ｾ・ "繝槭う繧ｯ繝ｭ繧ｵ繝ｼ繝薙せ讒区・ / 2025"・・|
+| `{{SVG_WIDTH}}` | SVG viewBox蟷・ｼ井ｾ・ `1100`・・|
+| `{{SVG_HEIGHT}}` | SVG viewBox鬮倥＆・井ｾ・ `700`・・|
+| `{{SVG_ZONES}}` | 繧ｾ繝ｼ繝ｳ/繝ｪ繝ｼ繧ｸ繝ｧ繝ｳ縺ｮSVG隕∫ｴ鄒､ |
+| `{{SVG_ARROWS}}` | 謗･邯夂泙蜊ｰ縺ｮSVG隕∫ｴ鄒､ |
+| `{{SVG_COMPONENTS}}` | 繧ｳ繝ｳ繝昴・繝阪Φ繝医・SVG隕∫ｴ鄒､ |
+| `{{CARD_1_ICON}}` / `{{CARD_1_TITLE}}` / `{{CARD_1_BODY}}` | 繧ｵ繝槭Μ繝ｼ繧ｫ繝ｼ繝・ |
+| `{{CARD_2_ICON}}` / `{{CARD_2_TITLE}}` / `{{CARD_2_BODY}}` | 繧ｵ繝槭Μ繝ｼ繧ｫ繝ｼ繝・ |
+| `{{CARD_3_ICON}}` / `{{CARD_3_TITLE}}` / `{{CARD_3_BODY}}` | 繧ｵ繝槭Μ繝ｼ繧ｫ繝ｼ繝・ |
+| `{{FOOTER_TEXT}}` | 繝輔ャ繧ｿ繝ｼ繝・く繧ｹ繝茨ｼ育函謌先律譎ゅ・繝・・繝ｫ蜷咲ｭ会ｼ・|
 
 ---
 
-## サマリーカードの設計指針
+## 繧ｵ繝槭Μ繝ｼ繧ｫ繝ｼ繝峨・險ｭ險域欠驥・
 
-有意義な情報を3枚のカードにまとめる：
+譛画э鄒ｩ縺ｪ諠・ｱ繧・譫壹・繧ｫ繝ｼ繝峨↓縺ｾ縺ｨ繧√ｋ・・
 
-- **カード1**: コンポーネント統計（例: "フロントエンド 2 / バックエンド 4 / データ 3"）
-- **カード2**: 主要な技術スタック（例: "React · Node.js · PostgreSQL · Redis"）
-- **カード3**: 接続フローのハイライト（例: "API経由のREST通信 · Kafkaによる非同期イベント"）
-
----
-
-## 品質チェックリスト
-
-出力前に確認する：
-
-- [ ] 全コンポーネントが最低1つの接続を持つ（孤立ノードがない）
-- [ ] ゾーン境界が内包コンポーネントを十分に覆っている
-- [ ] 矢印ラベルにプロトコル/データ種別が記載されている
-- [ ] タイトルとサブタイトルが内容を的確に表している
-- [ ] SVGビューボックスが全要素を収容している（はみ出しがない）
-- [ ] コンポーネントの `data-*` 属性が設定されている（ツールチップ用）
+- **繧ｫ繝ｼ繝・**: 繧ｳ繝ｳ繝昴・繝阪Φ繝育ｵｱ險茨ｼ井ｾ・ "繝輔Ο繝ｳ繝医お繝ｳ繝・2 / 繝舌ャ繧ｯ繧ｨ繝ｳ繝・4 / 繝・・繧ｿ 3"・・
+- **繧ｫ繝ｼ繝・**: 荳ｻ隕√↑謚陦薙せ繧ｿ繝・け・井ｾ・ "React ﾂｷ Node.js ﾂｷ PostgreSQL ﾂｷ Redis"・・
+- **繧ｫ繝ｼ繝・**: 謗･邯壹ヵ繝ｭ繝ｼ縺ｮ繝上う繝ｩ繧､繝茨ｼ井ｾ・ "API邨檎罰縺ｮREST騾壻ｿ｡ ﾂｷ Kafka縺ｫ繧医ｋ髱槫酔譛溘う繝吶Φ繝・・・
 
 ---
 
-## 出力
+## 蜩∬ｳｪ繝√ぉ繝・け繝ｪ繧ｹ繝・
 
-生成したHTMLを `architecture-diagram.html` として保存し、`present_files` ツールで提示する。
+蜃ｺ蜉帛燕縺ｫ遒ｺ隱阪☆繧具ｼ・
+
+- [ ] 蜈ｨ繧ｳ繝ｳ繝昴・繝阪Φ繝医′譛菴・縺､縺ｮ謗･邯壹ｒ謖√▽・亥ｭ､遶九ヮ繝ｼ繝峨′縺ｪ縺・ｼ・
+- [ ] 繧ｾ繝ｼ繝ｳ蠅・阜縺悟・蛹・さ繝ｳ繝昴・繝阪Φ繝医ｒ蜊∝・縺ｫ隕・▲縺ｦ縺・ｋ
+- [ ] 遏｢蜊ｰ繝ｩ繝吶Ν縺ｫ繝励Ο繝医さ繝ｫ/繝・・繧ｿ遞ｮ蛻･縺瑚ｨ倩ｼ峨＆繧後※縺・ｋ
+- [ ] 繧ｿ繧､繝医Ν縺ｨ繧ｵ繝悶ち繧､繝医Ν縺悟・螳ｹ繧堤噪遒ｺ縺ｫ陦ｨ縺励※縺・ｋ
+- [ ] SVG繝薙Η繝ｼ繝懊ャ繧ｯ繧ｹ縺悟・隕∫ｴ繧貞庶螳ｹ縺励※縺・ｋ・医・縺ｿ蜃ｺ縺励′縺ｪ縺・ｼ・
+- [ ] 繧ｳ繝ｳ繝昴・繝阪Φ繝医・ `data-*` 螻樊ｧ縺瑚ｨｭ螳壹＆繧後※縺・ｋ・医ヤ繝ｼ繝ｫ繝√ャ繝礼畑・・
+
+---
+
+## 蜃ｺ蜉・
+
+逕滓・縺励◆HTML繧・`architecture-diagram.html` 縺ｨ縺励※菫晏ｭ倥＠縲～present_files` 繝・・繝ｫ縺ｧ謠千､ｺ縺吶ｋ縲・

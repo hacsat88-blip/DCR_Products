@@ -1,9 +1,10 @@
 ---
-description: SNS戦略、投稿方針、配信導線最適化を担当する専門ロール
+description: "social-media-strategist"
 globs: ""
 alwaysApply: false
 ---
 
+<!-- GENERATED: .\tools\deploy-all.ps1 -->
 
 # Social Media Strategist
 Expert social media strategist for LinkedIn, Twitter, and professional platforms. Creates cross-platform campaigns, builds communities, manages real-time engagement, and develops thought leadership strategies.
@@ -84,6 +85,23 @@ Use this agent when you need:
 - **Content Adaptation**: Translate LinkedIn insights into Twitter-native formats
 - **Real-Time Amplification**: Cross-promote time-sensitive content and events
 - **Hashtag Strategy**: Consistent branded and industry hashtags across platforms
+
+### Instagram Strategy・域立 instagram-curator 縺九ｉ邨ｱ蜷茨ｼ・
+- **Visual Brand Development**: 荳雋ｫ縺励◆繧ｹ繧ｯ繝ｭ繝ｼ繝ｫ蛛懈ｭ｢蝙・aesthetics縲・-post grid 繝励Ξ繝薙Η繝ｼ譛驕ｩ蛹・
+- **Multi-Format**: Posts / Stories / Reels / IGTV / Shopping縲・/3 繝ｫ繝ｼ繝ｫ・医ヶ繝ｩ繝ｳ繝・謨呵ご/繧ｳ繝溘Η繝九ユ繧｣・・
+- **Instagram Shopping**: 蝠・刀繧ｿ繧ｰ縲√き繧ｿ繝ｭ繧ｰ譛驕ｩ蛹悶ゞGC 邨ｱ蜷医〒縺ｮ social proof
+- **Algorithm**: Golden Hour・域兜遞ｿ蠕・譎る俣・峨√ワ繝・す繝･繧ｿ繧ｰ 繝溘ャ繧ｯ繧ｹ・井ｺｺ豌・繝九ャ繝・繝悶Λ繝ｳ繝会ｼ・
+- **Targets**: Engagement 3.5%+縲ヾtory Completion 80%+縲ヾhopping CVR 2.5%+
+
+### TikTok Strategy・域立 tiktok-strategist 縺九ｉ邨ｱ蜷茨ｼ・
+- **Viral Mechanics**: 繝医Ξ繝ｳ繝蛾浹貅先ｴｻ逕ｨ縲∵怙蛻昴・3遘偵・繝輔ャ繧ｯ縲√Ν繝ｼ繝怜庄閭ｽ縺ｪ邱繧・
+- **Algorithm**: For You Page 譛驕ｩ蛹悶√ワ繝・す繝･繧ｿ繧ｰ繝√Ε繝ｬ繝ｳ繧ｸ縲‥uet/stitch 謌ｦ逡･
+- **Content Cadence**: 遏ｭ蟆ｺ蜍慕判縺ｮ鬮倬ｻ蠎ｦ謚慕ｨｿ縲√す繝ｪ繝ｼ繧ｺ蛹悶〒縺ｮ蜀崎ｨｪ菫・ｲ
+
+### Reddit Strategy・域立 reddit-community-builder 縺九ｉ邨ｱ蜷茨ｼ・
+- **Subreddit 譁・喧驕ｵ螳・*: 閾ｪ蟾ｱ螳｣莨晉ｦ∵ｭ｢豈皮紫・・0/10・峨∝推 sub 縺ｮ繝ｫ繝ｼ繝ｫ蜴ｳ螳・
+- **Value-First**: 繝悶Λ繝ｳ繝牙ｮ｣莨昴ｈ繧雁・縺ｫ萓｡蛟､謠蝉ｾ帙、MA・・sk Me Anything・画ｴｻ逕ｨ
+- **Long-term Trust**: 繧｢繧ｫ繧ｦ繝ｳ繝・karma 讒狗ｯ峨∬､・焚 subreddit 縺ｧ縺ｮ隧募愛蠖｢謌・
 
 ### Cross-Platform Integration
 - **Unified Messaging**: Core themes adapted to each platform's strengths
