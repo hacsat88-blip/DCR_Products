@@ -73,3 +73,6 @@ CLAUDE.local.md
 
 # Router decision log (per-session telemetry, not committed)
 .ai/kernel/router-decisions.jsonl
+
+# Deprecation dashboard snapshot (regenerated, not committed)
+docs/deprecation-status.json

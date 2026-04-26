@@ -1,0 +1,166 @@
+[
+  {
+    "input": "LP のCV改善を考えて",
+    "kind": "skill",
+    "expected": "conversion-optimization-hub",
+    "match_keywords": ["CRO", "conversion", "親"]
+  },
+  {
+    "input": "ポップアップを作って離脱を防ぎたい",
+    "kind": "skill",
+    "expected": "popup-cro",
+    "match_keywords": ["popup", "modal", "exit"]
+  },
+  {
+    "input": "サインアップフローを最適化して",
+    "kind": "skill",
+    "expected": "signup-flow-cro",
+    "match_keywords": ["signup", "registration"]
+  },
+  {
+    "input": "このバグを直したい、原因が分からない",
+    "kind": "skill",
+    "expected": "systematic-debugging",
+    "match_keywords": ["bug", "debug"]
+  },
+  {
+    "input": "TDD で機能を実装したい",
+    "kind": "skill",
+    "expected": "tdd-workflow",
+    "match_keywords": ["test", "TDD"]
+  },
+  {
+    "input": "実装計画を作って",
+    "kind": "skill",
+    "expected": "writing-plans",
+    "match_keywords": ["plan", "計画"]
+  },
+  {
+    "input": "アイデアブレストしたい（新機能の設計前）",
+    "kind": "skill",
+    "expected": "brainstorming",
+    "match_keywords": ["creative", "design", "intent"]
+  },
+  {
+    "input": "新機能のメッセージを作りたい",
+    "kind": "skill",
+    "expected": "strategic-messaging",
+    "match_keywords": ["message", "戦略", "心理"]
+  },
+  {
+    "input": "コピーを書いて",
+    "kind": "skill",
+    "expected": "persuasive-content-craft",
+    "match_keywords": ["copy", "content", "コピー", "説得"]
+  },
+  {
+    "input": "コールドメールを書きたい",
+    "kind": "skill",
+    "expected": "email-marketing-flow",
+    "match_keywords": ["email", "cold", "outreach", "メール"]
+  },
+  {
+    "input": "SEO の構造化データを確認したい",
+    "kind": "skill",
+    "expected": "seo-audit",
+    "match_keywords": ["SEO", "schema", "structured"]
+  },
+  {
+    "input": "schema-markup を使って",
+    "kind": "skill",
+    "expected": "seo-audit",
+    "expected_alias_from": "schema-markup",
+    "match_keywords": ["SEO", "schema"]
+  },
+  {
+    "input": "ルーティング判断はpied-piperで",
+    "kind": "agent",
+    "expected": "pied-piper",
+    "match_keywords": ["coordin", "Coordinator", "orchestr"]
+  },
+  {
+    "input": "Instagram投稿コンテンツを作る",
+    "kind": "rule",
+    "expected": "content-creator",
+    "expected_alias_from": "instagram-curator",
+    "match_keywords": ["content", "creator", "social"]
+  },
+  {
+    "input": "TikTokのプラットフォーム別戦略",
+    "kind": "rule",
+    "expected": "social-media-strategist",
+    "expected_alias_from": "tiktok-strategist",
+    "match_keywords": ["social", "戦略", "tiktok"]
+  },
+  {
+    "input": "UI設計とフロー設計を一気にやりたい",
+    "kind": "rule",
+    "expected": "ui-designer",
+    "match_keywords": ["UI", "UX", "design"]
+  },
+  {
+    "input": "テスト結果を分析してQAレポートにまとめて",
+    "kind": "rule",
+    "expected": "qa-reality-checker",
+    "match_keywords": ["QA", "qa", "test", "verification"]
+  },
+  {
+    "input": "スプリント優先順位を整理したい",
+    "kind": "rule",
+    "expected": "senior-project-manager",
+    "expected_alias_from": "sprint-prioritizer",
+    "match_keywords": ["sprint", "project", "priorit"]
+  },
+  {
+    "input": "複数エージェントを協調させたい",
+    "kind": "agent",
+    "expected": "pied-piper",
+    "expected_alias_from": "multi-agent-coordinator",
+    "match_keywords": ["coordin", "Coordinator", "orchestr"]
+  },
+  {
+    "input": "ワークフローを調整して",
+    "kind": "agent",
+    "expected": "pied-piper",
+    "expected_alias_from": "workflow-orchestrator",
+    "match_keywords": ["coordin", "orchestr", "workflow"]
+  },
+  {
+    "input": "市場調査をまとめて",
+    "kind": "agent",
+    "expected": "research-analyst",
+    "expected_alias_from": "market-researcher",
+    "match_keywords": ["research", "market", "synth"]
+  },
+  {
+    "input": "API設計を強化して",
+    "kind": "agent",
+    "expected": "backend-developer",
+    "expected_alias_from": "api-designer",
+    "match_keywords": ["backend", "API", "module"]
+  },
+  {
+    "input": "PowerShell 7のスクリプトを書いて",
+    "kind": "agent",
+    "expected": "powershell-7-expert",
+    "match_keywords": ["powershell", "PowerShell"]
+  },
+  {
+    "input": ".NET Coreで実装",
+    "kind": "agent",
+    "expected": "dotnet-core-expert",
+    "match_keywords": ["dotnet", ".NET"]
+  },
+  {
+    "input": "セキュリティ設定の浅いスキャンをして",
+    "kind": "skill",
+    "expected": "security-scan",
+    "match_keywords": ["security", "secret", "シークレット"]
+  },
+  {
+    "input": "OWASP脅威モデリングを深掘りしたい",
+    "kind": "skill",
+    "expected": "security-deepdive",
+    "match_keywords": ["security", "OWASP", "暗号"]
+  }
+]
