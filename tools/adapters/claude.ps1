@@ -30,6 +30,37 @@ function Get-DeprecationInfo($file) {
     return @{ Deprecated = $false; Successor = $null }
 }
 
+function Get-RoutingCategory($file) {
+    $text = Get-Content $file.FullName -Raw
+    if ($text -match '(?ms)^---(.*?)^---') {
+        $fm = $Matches[1]
+        if ($fm -match '(?m)^\s*routing_category\s*:\s*(\S+)') { return $Matches[1].Trim() }
+    }
+    return $null
+}
+
+# Group rule names by routing_category for 3-group display
+function Group-RulesByCategory($ruleNames, $rulesDir) {
+    $groups = @{
+        'governance' = @()  # Core governance & stewards (highest priority)
+        'role' = @()         # Domain roles (developers, designers, engineers)
+        'specialist' = @()   # Topic specialists (growth, ui-ux, devops, documents)
+    }
+    foreach ($name in $ruleNames) {
+        $f = Get-Item (Join-Path $rulesDir "$name.md") -ErrorAction SilentlyContinue
+        if (-not $f) { continue }
+        $cat = Get-RoutingCategory $f
+        if ($cat -eq 'governance') {
+            $groups['governance'] += $name
+        } elseif ($cat -in @('devops', 'ui-ux')) {
+            $groups['role'] += $name
+        } else {
+            $groups['specialist'] += $name
+        }
+    }
+    return $groups
+}
+
 $rules = @()
 $skills = @()
 $agents = @()
@@ -81,7 +112,30 @@ foreach ($f in Get-ChildItem $agentsDir -Filter "*.md" | Where-Object { $_.Name 
     }
 }
 
-$ruleList = if ($rules) { (($rules | ForEach-Object { "- [$_](.ai/catalog/rules/$_.md)" }) -join "`n") } else { "(none)" }
+if ($rules) {
+    $rg = Group-RulesByCategory $rules $rulesDir
+    $sections = @()
+    if ($rg['governance'].Count -gt 0) {
+        $sections += "### Governance & Core (境界・統制)"
+        $sections += ""
+        foreach ($n in ($rg['governance'] | Sort-Object)) { $sections += "- [$n](.ai/catalog/rules/$n.md)" }
+        $sections += ""
+    }
+    if ($rg['role'].Count -gt 0) {
+        $sections += "### Roles (実装ロール: devops / ui-ux)"
+        $sections += ""
+        foreach ($n in ($rg['role'] | Sort-Object)) { $sections += "- [$n](.ai/catalog/rules/$n.md)" }
+        $sections += ""
+    }
+    if ($rg['specialist'].Count -gt 0) {
+        $sections += "### Specialists (専門領域: growth / documents / その他)"
+        $sections += ""
+        foreach ($n in ($rg['specialist'] | Sort-Object)) { $sections += "- [$n](.ai/catalog/rules/$n.md)" }
+    }
+    $ruleList = ($sections -join "`n").TrimEnd()
+} else {
+    $ruleList = "(none)"
+}
 $skillList = if ($skills) { (($skills | ForEach-Object { "- [$_](.ai/catalog/skills/$_/SKILL.md)" }) -join "`n") } else { "(none)" }
 $agentList = if ($agents) { (($agents | ForEach-Object { "- [$_](.ai/catalog/agents-source/$_.md)" }) -join "`n") } else { "(none)" }
 

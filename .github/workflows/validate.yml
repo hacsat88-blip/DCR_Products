@@ -29,3 +29,10 @@ jobs:
           if (Test-Path docs/deprecation-status.json) {
             Write-Host "Snapshot generated (informational, not gating)"
           }
+
+      - name: Token budget vs baseline (informational)
+        shell: pwsh
+        continue-on-error: true
+        run: |
+          pwsh -ExecutionPolicy Bypass -File ./tools/token-budget.ps1 -CompareWith docs/token-budget-baseline.json
+          Write-Host "Token budget compared against baseline (informational)"

@@ -152,7 +152,6 @@ GitHub Copilot CLI specific behavior lives in [.ai/kernel/environments/copilot-c
 
 - [accessibility-tester](.ai/catalog/agents-source/accessibility-tester.md)
 - [agent-installer](.ai/catalog/agents-source/agent-installer.md)
-- [agent-organizer](.ai/catalog/agents-source/agent-organizer.md)
 - [ai-engineer](.ai/catalog/agents-source/ai-engineer.md)
 - [angular-architect](.ai/catalog/agents-source/angular-architect.md)
 - [architect-reviewer](.ai/catalog/agents-source/architect-reviewer.md)
@@ -281,6 +280,7 @@ These names are kept as aliases that route to their successor:
 - ~~schema-markup~~ 竊・[seo-audit](.ai/catalog/skills/seo-audit/SKILL.md) _(skill)_
 - ~~skill-router~~ 竊・[unified-router](.ai/catalog/skills/unified-router/SKILL.md) _(skill)_
 - ~~ad-security-reviewer~~ 竊・[security-auditor](.ai/catalog/agents-source/security-auditor.md) _(agent)_
+- ~~agent-organizer~~ 竊・[pied-piper](.ai/catalog/agents-source/pied-piper.md) _(agent)_
 - ~~ai-prompt-manager-orchestrator~~ 竊・[pied-piper](.ai/catalog/agents-source/pied-piper.md) _(agent)_
 - ~~api-designer~~ 竊・[backend-developer](.ai/catalog/agents-source/backend-developer.md) _(agent)_
 - ~~api-documenter~~ 竊・[documentation-engineer](.ai/catalog/agents-source/documentation-engineer.md) _(agent)_

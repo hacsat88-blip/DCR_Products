@@ -9,58 +9,66 @@ Unified entry point for Claude Code environment.
 
 ## Included Rules
 
-- [accessibility-auditor](.ai/catalog/rules/accessibility-auditor.md)
+### Governance & Core (蠅・阜繝ｻ邨ｱ蛻ｶ)
+
 - [agentic-identity-trust-architect](.ai/catalog/rules/agentic-identity-trust-architect.md)
 - [agents-orchestrator](.ai/catalog/rules/agents-orchestrator.md)
-- [ai-engineer](.ai/catalog/rules/ai-engineer.md)
 - [ai-prompt-manager-steward](.ai/catalog/rules/ai-prompt-manager-steward.md)
-- [analytics-reporter](.ai/catalog/rules/analytics-reporter.md)
+- [finance-tracker](.ai/catalog/rules/finance-tracker.md)
+- [identity-graph-operator](.ai/catalog/rules/identity-graph-operator.md)
+- [jira-workflow-steward](.ai/catalog/rules/jira-workflow-steward.md)
+- [legal-compliance-checker](.ai/catalog/rules/legal-compliance-checker.md)
+- [model-qa-specialist](.ai/catalog/rules/model-qa-specialist.md)
+- [project-shepherd](.ai/catalog/rules/project-shepherd.md)
+- [repo-boundary-steward](.ai/catalog/rules/repo-boundary-steward.md)
+- [security-engineer](.ai/catalog/rules/security-engineer.md)
+- [senior-project-manager](.ai/catalog/rules/senior-project-manager.md)
+- [token-efficiency-steward](.ai/catalog/rules/token-efficiency-steward.md)
+- [tool-evaluator](.ai/catalog/rules/tool-evaluator.md)
+
+### Roles (螳溯｣・Ο繝ｼ繝ｫ: devops / ui-ux)
+
+- [accessibility-auditor](.ai/catalog/rules/accessibility-auditor.md)
+- [ai-engineer](.ai/catalog/rules/ai-engineer.md)
 - [api-tester](.ai/catalog/rules/api-tester.md)
-- [app-store-optimizer](.ai/catalog/rules/app-store-optimizer.md)
-- [architecture-diagram-steward](.ai/catalog/rules/architecture-diagram-steward.md)
 - [backend-architect](.ai/catalog/rules/backend-architect.md)
-- [brand-guardian](.ai/catalog/rules/brand-guardian.md)
-- [content-creator](.ai/catalog/rules/content-creator.md)
 - [cultural-intelligence-strategist](.ai/catalog/rules/cultural-intelligence-strategist.md)
 - [data-engineer](.ai/catalog/rules/data-engineer.md)
-- [developer-advocate](.ai/catalog/rules/developer-advocate.md)
 - [devops-automator](.ai/catalog/rules/devops-automator.md)
 - [embedded-firmware-engineer](.ai/catalog/rules/embedded-firmware-engineer.md)
+- [frontend-developer](.ai/catalog/rules/frontend-developer.md)
+- [incident-response-commander](.ai/catalog/rules/incident-response-commander.md)
+- [infrastructure-maintainer](.ai/catalog/rules/infrastructure-maintainer.md)
+- [mobile-app-builder](.ai/catalog/rules/mobile-app-builder.md)
+- [performance-benchmarker](.ai/catalog/rules/performance-benchmarker.md)
+- [qa-reality-checker](.ai/catalog/rules/qa-reality-checker.md)
+- [rapid-prototyper](.ai/catalog/rules/rapid-prototyper.md)
+- [senior-developer](.ai/catalog/rules/senior-developer.md)
+- [ui-designer](.ai/catalog/rules/ui-designer.md)
+- [ux-researcher](.ai/catalog/rules/ux-researcher.md)
+- [whimsy-injector](.ai/catalog/rules/whimsy-injector.md)
+- [workflow-optimizer](.ai/catalog/rules/workflow-optimizer.md)
+
+### Specialists (蟆る摩鬆伜沺: growth / documents / 縺昴・莉・
+
+- [analytics-reporter](.ai/catalog/rules/analytics-reporter.md)
+- [app-store-optimizer](.ai/catalog/rules/app-store-optimizer.md)
+- [architecture-diagram-steward](.ai/catalog/rules/architecture-diagram-steward.md)
+- [brand-guardian](.ai/catalog/rules/brand-guardian.md)
+- [content-creator](.ai/catalog/rules/content-creator.md)
+- [developer-advocate](.ai/catalog/rules/developer-advocate.md)
 - [executive-summary-generator](.ai/catalog/rules/executive-summary-generator.md)
 - [experiment-tracker](.ai/catalog/rules/experiment-tracker.md)
 - [feature-proposal](.ai/catalog/rules/feature-proposal.md)
 - [feedback-synthesizer](.ai/catalog/rules/feedback-synthesizer.md)
-- [finance-tracker](.ai/catalog/rules/finance-tracker.md)
-- [frontend-developer](.ai/catalog/rules/frontend-developer.md)
 - [growth-hacker](.ai/catalog/rules/growth-hacker.md)
-- [identity-graph-operator](.ai/catalog/rules/identity-graph-operator.md)
 - [image-prompt-engineer](.ai/catalog/rules/image-prompt-engineer.md)
-- [incident-response-commander](.ai/catalog/rules/incident-response-commander.md)
-- [infrastructure-maintainer](.ai/catalog/rules/infrastructure-maintainer.md)
-- [jira-workflow-steward](.ai/catalog/rules/jira-workflow-steward.md)
-- [legal-compliance-checker](.ai/catalog/rules/legal-compliance-checker.md)
-- [mobile-app-builder](.ai/catalog/rules/mobile-app-builder.md)
-- [model-qa-specialist](.ai/catalog/rules/model-qa-specialist.md)
-- [performance-benchmarker](.ai/catalog/rules/performance-benchmarker.md)
-- [project-shepherd](.ai/catalog/rules/project-shepherd.md)
-- [qa-reality-checker](.ai/catalog/rules/qa-reality-checker.md)
-- [rapid-prototyper](.ai/catalog/rules/rapid-prototyper.md)
-- [repo-boundary-steward](.ai/catalog/rules/repo-boundary-steward.md)
-- [security-engineer](.ai/catalog/rules/security-engineer.md)
-- [senior-developer](.ai/catalog/rules/senior-developer.md)
-- [senior-project-manager](.ai/catalog/rules/senior-project-manager.md)
 - [seo-specialist](.ai/catalog/rules/seo-specialist.md)
 - [social-media-strategist](.ai/catalog/rules/social-media-strategist.md)
 - [support-responder](.ai/catalog/rules/support-responder.md)
 - [technical-writer](.ai/catalog/rules/technical-writer.md)
-- [token-efficiency-steward](.ai/catalog/rules/token-efficiency-steward.md)
-- [tool-evaluator](.ai/catalog/rules/tool-evaluator.md)
 - [trend-researcher](.ai/catalog/rules/trend-researcher.md)
-- [ui-designer](.ai/catalog/rules/ui-designer.md)
-- [ux-researcher](.ai/catalog/rules/ux-researcher.md)
 - [visual-storyteller](.ai/catalog/rules/visual-storyteller.md)
-- [whimsy-injector](.ai/catalog/rules/whimsy-injector.md)
-- [workflow-optimizer](.ai/catalog/rules/workflow-optimizer.md)
 - [zk-steward](.ai/catalog/rules/zk-steward.md)
 
 ## Included Skills
@@ -150,7 +158,6 @@ Unified entry point for Claude Code environment.
 
 - [accessibility-tester](.ai/catalog/agents-source/accessibility-tester.md)
 - [agent-installer](.ai/catalog/agents-source/agent-installer.md)
-- [agent-organizer](.ai/catalog/agents-source/agent-organizer.md)
 - [ai-engineer](.ai/catalog/agents-source/ai-engineer.md)
 - [angular-architect](.ai/catalog/agents-source/angular-architect.md)
 - [architect-reviewer](.ai/catalog/agents-source/architect-reviewer.md)
@@ -279,6 +286,7 @@ These names are kept as aliases that route to their successor (Phase A/B/C conso
 - ~~schema-markup~~ 竊・[seo-audit](.ai/catalog/skills/seo-audit/SKILL.md) _(skill)_
 - ~~skill-router~~ 竊・[unified-router](.ai/catalog/skills/unified-router/SKILL.md) _(skill)_
 - ~~ad-security-reviewer~~ 竊・[security-auditor](.ai/catalog/agents-source/security-auditor.md) _(agent)_
+- ~~agent-organizer~~ 竊・[pied-piper](.ai/catalog/agents-source/pied-piper.md) _(agent)_
 - ~~ai-prompt-manager-orchestrator~~ 竊・[pied-piper](.ai/catalog/agents-source/pied-piper.md) _(agent)_
 - ~~api-designer~~ 竊・[backend-developer](.ai/catalog/agents-source/backend-developer.md) _(agent)_
 - ~~api-documenter~~ 竊・[documentation-engineer](.ai/catalog/agents-source/documentation-engineer.md) _(agent)_

@@ -1,5 +1,8 @@
 name = "agent-organizer"
-description = "Use when you need agent catalog organization, naming cleanup, or grouping and deprecation workflow support."
+description = "[DEPRECATED -> pied-piper]"
+deprecated = true
+successor = "pied-piper"
+deprecation_reason = "A-residual: catalog org workflow merged to pied-piper"
 version = "1.0.0"
 model = "gpt-5.4"
 model_reasoning_effort = "medium"
