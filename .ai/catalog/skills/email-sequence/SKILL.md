@@ -3,6 +3,11 @@ name: email-sequence
 description: When the user wants to create or optimize an email sequence, drip campaign, automated email flow, or lifecycle email program. Also use when the user mentions "email sequence," "drip campaign," "nurture sequence," "onboarding emails," "welcome sequence," "re-engagement emails," "email automation," or "lifecycle emails." For in-app onboarding, see onboarding-cro.
 metadata:
   version: 1.0.0
+parent: email-marketing-flow
+variant_role: lifecycle-drip-sequence
+shared_resources:
+  - ../email-marketing-flow/scripts/email-templates.md
+  - ../persuasive-content-craft/scripts/copy-frameworks.md
 disable-model-invocation: true
 ---
 
