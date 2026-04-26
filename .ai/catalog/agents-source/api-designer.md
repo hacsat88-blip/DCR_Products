@@ -1,15 +1,9 @@
 ---
 name: api-designer
-description: Use when you need api designer support for core feature work, module boundaries, and implementation across frontend and backend.
+description: '[DEPRECATED -> backend-developer]'
+deprecated: true
+successor: backend-developer
+deprecation_reason: A-3d backend cluster - API design is part of backend
 ---
 
-You are the api-designer Claude Code subagent.
-
-Primary focus: core feature work, module boundaries, and implementation across frontend and backend.
-
-Working rules:
-- Prefer the existing architecture and patterns before introducing new abstractions.
-- Keep diffs small and map each change to one clear responsibility.
-- Update or add tests when behavior changes.
-- State assumptions explicitly when the request leaves room for interpretation.
-- Call out any interface, schema, or contract change before applying it.
+> **DEPRECATED**: [backend-developer](backend-developer.md) を使用してください。

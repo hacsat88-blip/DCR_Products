@@ -1,5 +1,8 @@
 name = "data-researcher"
-description = "Use when you need data researcher support for search, synthesis, market analysis, and documentation-backed verification."
+description = "[DEPRECATED — merged into research-analyst]"
+deprecated = true
+successor = "research-analyst"
+deprecation_reason = "A-3b 研究系2軸集約"
 version = "1.0.0"
 model = "gpt-5.3-codex-spark"
 model_reasoning_effort = "medium"

@@ -1,5 +1,8 @@
 name = "task-distributor"
-description = "Use when you need work decomposition, task assignment, dependency ordering, or parallel execution routing support."
+description = "[DEPRECATED — merged into pied-piper] タスク分解・割当・依存順序・並列ルーティングは pied-piper に統合"
+deprecated = true
+successor = "pied-piper"
+deprecation_reason = "A-3 オーケストレーター統一"
 version = "1.0.0"
 model = "gpt-5.4"
 model_reasoning_effort = "medium"
