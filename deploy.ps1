@@ -33,7 +33,8 @@ param(
     [switch]$DryRun,
     [switch]$Check,
     [switch]$Watch,
-    [switch]$Backup
+    [switch]$Backup,
+    [switch]$EnforceGate
 )
 
 $ErrorActionPreference = "Stop"
@@ -41,6 +42,25 @@ $RepoRoot = $PSScriptRoot
 $UserHome = $env:USERPROFILE
 $CatalogPaths = Join-Path $RepoRoot "tools\lib\catalog-paths.ps1"
 . $CatalogPaths
+$GateStateLib = Join-Path $RepoRoot "tools\lib\gate-state.ps1"
+if (Test-Path $GateStateLib) { . $GateStateLib }
+
+# Hard-block deploy if -EnforceGate and qa_passed != true (or critical findings > 0)
+if ($EnforceGate -and -not $DryRun -and -not $Check) {
+    if (Get-Command Assert-GateReady -ErrorAction SilentlyContinue) {
+        Write-Host "[gate] Verifying QA gate state..." -ForegroundColor Cyan
+        try {
+            Assert-GateReady -RepoRoot $RepoRoot -RequireGate 'qa_passed' -AllowMissing:$false
+            Write-Host "  ✓ qa_passed = true, no critical findings" -ForegroundColor Green
+        } catch {
+            Write-Host "🔴 Stop — $($_.Exception.Message)" -ForegroundColor Red
+            Write-Host "   Run the q/ trigger first or remove -EnforceGate to bypass." -ForegroundColor Yellow
+            exit 1
+        }
+    } else {
+        Write-Warning "[gate] gate-state library not loaded; skipping enforcement."
+    }
+}
 
 # ── Unified Adapter Framework (new) ──
 $DeployAll = Join-Path $RepoRoot "tools\deploy-all.ps1"
