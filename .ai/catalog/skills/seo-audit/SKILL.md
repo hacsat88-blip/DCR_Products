@@ -1,8 +1,10 @@
 ---
 name: seo-audit
-description: When the user wants to audit, review, or diagnose SEO issues on their site. Also use when the user mentions "SEO audit," "technical SEO," "why am I not ranking," "SEO issues," "on-page SEO," "meta tags review," or "SEO health check." For building pages at scale to target keywords, see programmatic-seo. For adding structured data, see schema-markup.
+description: When the user wants to audit, review, or diagnose SEO issues on their site — including technical SEO, on-page SEO, meta tags, structured data (schema markup, JSON-LD, rich snippets, FAQ/product/review/breadcrumb schema), and SEO health checks. Also use for "why am I not ranking," "SEO issues." For building pages at scale to target keywords, see programmatic-seo. Schema markup is now part of this audit (formerly schema-markup skill).
 metadata:
   version: 1.0.0
+absorbs:
+  - schema-markup
 disable-model-invocation: true
 ---
 
