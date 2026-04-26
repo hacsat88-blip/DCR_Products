@@ -1,33 +1,32 @@
 ---
-description: "security-scan"
+description: agent 設定、rules/skills、hook 相当設定を対象に、シークレット露出・危険な権限・注入リスクを監査する。設定面の浅い監査（shallow depth）。コードレベルのOWASP/暗号/認証の深掘り審査には security-deepdive を使用。
 globs: ""
 alwaysApply: false
 ---
 
-<!-- GENERATED: .\tools\deploy-all.ps1 -->
 
 # Security Scan
 
-## 縺・▽菴ｿ縺・°
+## いつ使うか
 
-- 繝ｫ繝ｼ繝ｫ/繧ｹ繧ｭ繝ｫ繧定ｿｽ蜉繝ｻ譖ｴ譁ｰ縺励◆蠕・
-- PR 蜑阪・譛邨ら｢ｺ隱・
-- 螳壽悄逧・↑讒区・逶｣譟ｻ
+- ルール/スキルを追加・更新した後
+- PR 前の最終確認
+- 定期的な構成監査
 
-## 驥咲せ繝√ぉ繝・け
+## 重点チェック
 
-- Secrets: API key/token/password 縺ｮ繝上・繝峨さ繝ｼ繝・
-- Permissions: 驕主臆縺ｪ螳溯｡梧ｨｩ髯舌∫┌蛻ｶ髯先桃菴・
-- Injection: 謖・､ｺ譁・・繝・Φ繝励Ξ繝ｼ繝医・譁・ｭ怜・陬憺俣縺ｮ豕ｨ蜈･繝ｪ繧ｹ繧ｯ
-- Supply Chain: 荳崎ｦ√↑閾ｪ蜍輔う繝ｳ繧ｹ繝医・繝ｫ繧・悴蝗ｺ螳壻ｾ晏ｭ・
+- Secrets: API key/token/password のハードコード
+- Permissions: 過剰な実行権限、無制限操作
+- Injection: 指示文・テンプレート・文字列補間の注入リスク
+- Supply Chain: 不要な自動インストールや未固定依存
 
-## 菴ｿ縺・婿
+## 使い方
 
-1. 螟画峩繝輔ぃ繧､繝ｫ繧貞ｯｾ雎｡縺ｫ繧ｹ繧ｭ繝｣繝ｳ
-2. `critical/high/medium/info` 縺ｧ蛻・｡・
-3. critical/high 縺・0 縺ｫ縺ｪ繧九∪縺ｧ菫ｮ豁｣
+1. 変更ファイルを対象にスキャン
+2. `critical/high/medium/info` で分類
+3. critical/high が 0 になるまで修正
 
-## 蜃ｺ蜉帙ユ繝ｳ繝励Ξ繝ｼ繝・
+## 出力テンプレート
 
 ```markdown
 SECURITY SCAN: PASS/FAIL

@@ -1,14 +1,9 @@
 ---
 name: architecture-diagram-orchestrator
-description: Use when you need architecture diagram orchestration support for system visualization, deployment mapping, and design documentation diagrams.
+description: '[DEPRECATED -> pied-piper]'
+deprecated: true
+successor: pied-piper
+deprecation_reason: Phase mid-A: -orchestrator suffix reserved for pied-piper. architecture-diagram-steward rule retains governance
 ---
 
-You are the architecture-diagram-orchestrator Claude Code subagent.
-
-Primary focus: coordinate architecture diagram generation workflows, including component modeling, edge labeling, and export-ready documentation visuals.
-
-Working rules:
-- Clarify audience and diagram purpose before generating output.
-- Keep graph structure explicit: components, zones, links, and direction.
-- Prefer consistent labels over decorative naming.
-- Preserve updateability so future edits can be made safely.
+> **DEPRECATED**: [pied-piper](pied-piper.md) を使用してください。governance 観点は対応する steward rule を参照してください。

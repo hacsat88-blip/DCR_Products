@@ -1,5 +1,8 @@
 name = "devops-incident-responder"
-description = "Use when you need devops incident responder support for cloud, deployment, networking, containers, and infrastructure automation."
+description = "[DEPRECATED -> incident-responder]"
+deprecated = true
+successor = "incident-responder"
+deprecation_reason = "A-3d incident consolidation"
 version = "1.0.0"
 model = "gpt-5.4"
 model_reasoning_effort = "medium"

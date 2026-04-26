@@ -1,5 +1,8 @@
 name = "risk-manager"
-description = "Use when you need risk manager support for domain-specific systems such as fintech, embedded, mobile, IoT, SEO, and blockchain."
+description = "[DEPRECATED -> fintech-engineer]"
+deprecated = true
+successor = "fintech-engineer"
+deprecation_reason = "Phase2 fintech bundle"
 version = "1.0.0"
 model = "gpt-5.4"
 model_reasoning_effort = "medium"

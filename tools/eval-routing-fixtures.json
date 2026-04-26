@@ -162,5 +162,29 @@
     "kind": "skill",
     "expected": "security-deepdive",
     "match_keywords": ["security", "OWASP", "暗号"]
+  },
+  {
+    "input": "skill-router を使ってルーティング判断したい",
+    "kind": "skill",
+    "expected": "unified-router",
+    "expected_alias_from": "skill-router",
+    "match_keywords": ["routing", "router", "dispatc"],
+    "note": "Step-0 alias: skill-router(deprecated) -> unified-router"
+  },
+  {
+    "input": "behavioral-nudge-engine でエンゲージメント設計",
+    "kind": "rule",
+    "expected": "growth-hacker",
+    "expected_alias_from": "behavioral-nudge-engine",
+    "match_keywords": ["growth", "experiment"],
+    "note": "Step-0 alias: behavioral-nudge-engine(deprecated) -> growth-hacker"
+  },
+  {
+    "input": "workflow-orchestrator でパイプラインを管理",
+    "kind": "agent",
+    "expected": "pied-piper",
+    "expected_alias_from": "workflow-orchestrator",
+    "match_keywords": ["orchestrat", "pipeline", "coordinator"],
+    "note": "Step-0 alias: workflow-orchestrator(deprecated) -> pied-piper"
   }
 ]

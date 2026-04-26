@@ -1,5 +1,8 @@
 name = "workflow-orchestrator"
-description = "Use when you need generic cross-cutting workflow orchestration for agent coordination, context management, recovery, and workflow automation."
+description = "[DEPRECATED — merged into pied-piper] 汎用クロスカッティング・ワークフロー調整は pied-piper に統合"
+deprecated = true
+successor = "pied-piper"
+deprecation_reason = "A-3 オーケストレーター統一"
 version = "1.0.0"
 model = "gpt-5.4"
 model_reasoning_effort = "medium"

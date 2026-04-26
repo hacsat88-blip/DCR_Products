@@ -1,5 +1,8 @@
 name = "reviewer"
-description = "Use when you need reviewer support for reviewing correctness, debugging, testing, resilience, and security."
+description = "[DEPRECATED -> code-reviewer]"
+deprecated = true
+successor = "code-reviewer"
+deprecation_reason = "A-3c review consolidation"
 version = "1.0.0"
 model = "gpt-5.4"
 model_reasoning_effort = "medium"

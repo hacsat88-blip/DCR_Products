@@ -1,5 +1,8 @@
 name = "graphql-architect"
-description = "Use when you need graphql architect support for core feature work, module boundaries, and implementation across frontend and backend."
+description = "[DEPRECATED -> backend-developer]"
+deprecated = true
+successor = "backend-developer"
+deprecation_reason = "Phase2 backend cluster (API design)"
 version = "1.0.0"
 model = "gpt-5.3-codex-spark"
 model_reasoning_effort = "medium"

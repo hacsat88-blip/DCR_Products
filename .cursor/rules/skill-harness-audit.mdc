@@ -1,31 +1,30 @@
 ---
-description: "harness-audit"
+description: repo の harness 健全性を監査し、Tool Coverage / Quality Gates / Security / Cost の不足を優先順位付きで可視化する。
 globs: ""
 alwaysApply: false
 ---
 
-<!-- GENERATED: .\tools\deploy-all.ps1 -->
 
 # Harness Audit
 
-## 逶ｮ逧・
+## 目的
 
-險ｭ螳壹・驕狗畑縺ｮ蜩∬ｳｪ繧貞ｮ壽悄轤ｹ讀懊＠縲∵ｬ｡縺ｫ逶ｴ縺吶∋縺阪・繝医Ν繝阪ャ繧ｯ繧呈・遒ｺ蛹悶☆繧九・
+設定・運用の品質を定期点検し、次に直すべきボトルネックを明確化する。
 
-## 逶｣譟ｻ繧ｫ繝・ざ繝ｪ
+## 監査カテゴリ
 
-- Tool Coverage: 蠢・ｦ・skill/command/rule 縺梧純縺｣縺ｦ縺・ｋ縺・
-- Quality Gates: p/q/sh 縺ｨ verify 縺碁°逕ｨ縺輔ｌ縺ｦ縺・ｋ縺・
-- Security Guardrails: 繧ｻ繧ｭ繝･繝ｪ繝・ぅ逶｣譟ｻ蟆守ｷ壹′縺ゅｋ縺・
-- Cost Efficiency: 繝｢繝・Ν菴ｿ縺・・縺第欠驥昴′縺ゅｋ縺・
+- Tool Coverage: 必要 skill/command/rule が揃っているか
+- Quality Gates: p/q/sh と verify が運用されているか
+- Security Guardrails: セキュリティ監査導線があるか
+- Cost Efficiency: モデル使い分け指針があるか
 
-## 螳溯｡梧焔鬆・
+## 実行手順
 
-1. `skills/`, `rules/`, `.ai/kernel/gates/` 繧呈｣壼査縺・
-2. 逶｣譟ｻ邨先棡繧・PASS/FAIL 縺ｧ險倬鹸
-3. Top 3 謾ｹ蝟・い繧ｯ繧ｷ繝ｧ繝ｳ繧呈署遉ｺ
+1. `skills/`, `rules/`, `.ai/kernel/gates/` を棚卸し
+2. 監査結果を PASS/FAIL で記録
+3. Top 3 改善アクションを提示
 
-## 蜃ｺ蜉帙ユ繝ｳ繝励Ξ繝ｼ繝・
+## 出力テンプレート
 
 ```markdown
 Harness Audit: [score]/100

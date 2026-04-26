@@ -145,6 +145,7 @@ Unified entry point for Claude Code environment.
 - [theme-factory](.ai/catalog/skills/theme-factory/SKILL.md)
 - [token-efficiency-advisor](.ai/catalog/skills/token-efficiency-advisor/SKILL.md)
 - [ui-ux-pro-max](.ai/catalog/skills/ui-ux-pro-max/SKILL.md)
+- [unified-router](.ai/catalog/skills/unified-router/SKILL.md)
 - [using-git-worktrees](.ai/catalog/skills/using-git-worktrees/SKILL.md)
 - [vercel-composition-patterns](.ai/catalog/skills/vercel-composition-patterns/SKILL.md)
 - [verification-before-completion](.ai/catalog/skills/verification-before-completion/SKILL.md)

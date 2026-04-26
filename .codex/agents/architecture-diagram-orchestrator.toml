@@ -1,5 +1,8 @@
 name = "architecture-diagram-orchestrator"
-description = "Use when you need architecture diagram orchestration support for system visualization, deployment mapping, and design documentation diagrams."
+description = "[DEPRECATED -> pied-piper]"
+deprecated = true
+successor = "pied-piper"
+deprecation_reason = "Phase mid-A: -orchestrator suffix reserved for pied-piper. architecture-diagram-steward rule retains governance"
 version = "1.0.0"
 model = "gpt-5.4"
 model_reasoning_effort = "medium"

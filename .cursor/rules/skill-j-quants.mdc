@@ -1,17 +1,16 @@
 ---
-description: "j-quants"
+description: J-Quants 関連タスクのルーティング用エントリ。CLI 実行・データ取得・プラン制約確認は `jquants-cli-usage` を利用する。
 globs: ""
 alwaysApply: false
 ---
 
-<!-- GENERATED: .\tools\deploy-all.ps1 -->
 
 # J-Quants Skill Router
 
-J-Quants 髢｢騾｣縺ｮ萓晞ｼ繧貞女縺代◆縺ｨ縺阪↓縲・・荳九・隧ｳ邏ｰ繧ｹ繧ｭ繝ｫ縺ｸ蟋碑ｭｲ縺吶ｋ縺溘ａ縺ｮ繝ｫ繝ｼ繝医せ繧ｭ繝ｫ縲・
+J-Quants 関連の依頼を受けたときに、配下の詳細スキルへ委譲するためのルートスキル。
 
-## 蠖ｹ蜑ｲ
+## 役割
 
-- J-Quants CLI 縺ｮ蜈ｷ菴鍋噪縺ｪ繧ｳ繝槭Φ繝芽ｨｭ險医・螳溯｡後・ `skills/j-quants/jquants-cli-usage/SKILL.md` 繧剃ｽｿ逕ｨ縺吶ｋ
-- 繝励Λ繝ｳ蛻･ API 蜿ｯ蜷ｦ縲∝叙蠕怜庄閭ｽ譛滄俣縲∵峩譁ｰ譎ょ綾縺ｮ遒ｺ隱阪′蠢・ｦ√↑蝣ｴ蜷医・蜷後せ繧ｭ繝ｫ縺ｮ references 繧貞盾辣ｧ縺吶ｋ
-- 縺薙・繝輔ぃ繧､繝ｫ閾ｪ菴薙・繝ｫ繝ｼ繝・ぅ繝ｳ繧ｰ蟆ら畑縺ｧ縺ゅｊ縲∬ｩｳ邏ｰ莉墓ｧ倥・豁｣譛ｬ縺ｯ `jquants-cli-usage` 蛛ｴ縺ｫ鄂ｮ縺・
+- J-Quants CLI の具体的なコマンド設計・実行は `skills/j-quants/jquants-cli-usage/SKILL.md` を使用する
+- プラン別 API 可否、取得可能期間、更新時刻の確認が必要な場合は同スキルの references を参照する
+- このファイル自体はルーティング専用であり、詳細仕様の正本は `jquants-cli-usage` 側に置く

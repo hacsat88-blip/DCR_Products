@@ -139,7 +139,7 @@ function Assert-GateReady {
     #>
     param(
         [Parameter(Mandatory)][string]$RepoRoot,
-        [Parameter(Mandatory)][string]$RequireGate,
+        [Parameter(Mandatory)][ValidateSet('plan_passed','review_passed','qa_passed','ship_ready')][string]$RequireGate,
         [switch]$AllowMissing
     )
     if (-not (Test-GateReady -RepoRoot $RepoRoot -RequireGate $RequireGate -AllowMissing:$AllowMissing)) {

@@ -1,6 +1,9 @@
 ---
 name: build-engineer
 description: Use when you need build engineer support for build systems, CLIs, tooling, refactoring, documentation, and developer productivity.
+absorbs:
+  - tooling-engineer
+
 ---
 
 You are the build-engineer Claude Code subagent.

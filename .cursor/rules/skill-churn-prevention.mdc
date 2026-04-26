@@ -1,10 +1,9 @@
 ---
-description: "churn-prevention"
+description: When the user wants to reduce churn, build cancellation flows, set up save offers, recover failed payments, or implement retention strategies. Also use when the user mentions 'churn,' 'cancel flow,' 'offboarding,' 'save offer,' 'dunning,' 'failed payment recovery,' 'win-back,' 'retention,' 'exit survey,' 'pause subscription,' or 'involuntary churn.' This skill covers voluntary churn (cancel flows, save offers, exit surveys) and involuntary churn (dunning, payment recovery). For post-cancel win-back email sequences, see email-sequence. For in-app upgrade paywalls, see paywall-upgrade-cro.
 globs: ""
 alwaysApply: false
 ---
 
-<!-- GENERATED: .\tools\deploy-all.ps1 -->
 
 # Churn Prevention
 
@@ -55,9 +54,9 @@ Voluntary churn is typically 50-70% of total churn. Involuntary churn is 30-50% 
 
 This skill supports three modes:
 
-1. **Build a cancel flow** 窶・Design from scratch with survey, save offers, and confirmation
-2. **Optimize an existing flow** 窶・Analyze cancel data and improve save rates
-3. **Set up dunning** 窶・Failed payment recovery with retries and email sequences
+1. **Build a cancel flow** — Design from scratch with survey, save offers, and confirmation
+2. **Optimize an existing flow** — Analyze cancel data and improve save rates
+3. **Set up dunning** — Failed payment recovery with retries and email sequences
 
 ---
 
@@ -68,7 +67,7 @@ This skill supports three modes:
 Every cancel flow follows this sequence:
 
 ```
-Trigger 竊・Survey 竊・Dynamic Offer 竊・Confirmation 竊・Post-Cancel
+Trigger → Survey → Dynamic Offer → Confirmation → Post-Cancel
 ```
 
 **Step 1: Trigger**
@@ -122,7 +121,7 @@ The key insight: **match the offer to the reason.** A discount won't save someon
 | Switching to competitor | Competitive comparison + discount | Feedback session |
 | Technical issues | Escalate to support immediately | Credit + priority fix |
 | Temporary / seasonal | Pause subscription | Downgrade temporarily |
-| Business closed | Skip offer (respect the situation) | 窶・|
+| Business closed | Skip offer (respect the situation) | — |
 
 ### Save Offer Types
 
@@ -157,42 +156,42 @@ The key insight: **match the offer to the reason.** A discount won't save someon
 ### Cancel Flow UI Patterns
 
 ```
-笏娯楳笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏・
-笏・ We're sorry to see you go          笏・
-笏・                                    笏・
-笏・ What's the main reason you're      笏・
-笏・ cancelling?                        笏・
-笏・                                    笏・
-笏・ 笳・Too expensive                    笏・
-笏・ 笳・Not using it enough              笏・
-笏・ 笳・Missing a feature I need         笏・
-笏・ 笳・Switching to another tool        笏・
-笏・ 笳・Technical issues                 笏・
-笏・ 笳・Temporary / don't need right now 笏・
-笏・ 笳・Other: [____________]            笏・
-笏・                                    笏・
-笏・ [Continue]                         笏・
-笏・ [Never mind, keep my subscription] 笏・
-笏披楳笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏・
-         竊・(selects "Too expensive")
-笏娯楳笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏・
-笏・ What if we could help?             笏・
-笏・                                    笏・
-笏・ We'd love to keep you. Here's a    笏・
-笏・ special offer:                     笏・
-笏・                                    笏・
-笏・ 笏娯楳笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏・ 笏・
-笏・ 笏・ 25% off for the next 3 months笏・ 笏・
-笏・ 笏・ Save $XX/month               笏・ 笏・
-笏・ 笏・                              笏・ 笏・
-笏・ 笏・ [Accept Offer]               笏・ 笏・
-笏・ 笏披楳笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏・ 笏・
-笏・                                    笏・
-笏・ Or switch to [Basic Plan] at       笏・
-笏・ $X/month 竊・                        笏・
-笏・                                    笏・
-笏・ [No thanks, continue cancelling]   笏・
-笏披楳笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏・
+┌─────────────────────────────────────┐
+│  We're sorry to see you go          │
+│                                     │
+│  What's the main reason you're      │
+│  cancelling?                        │
+│                                     │
+│  ○ Too expensive                    │
+│  ○ Not using it enough              │
+│  ○ Missing a feature I need         │
+│  ○ Switching to another tool        │
+│  ○ Technical issues                 │
+│  ○ Temporary / don't need right now │
+│  ○ Other: [____________]            │
+│                                     │
+│  [Continue]                         │
+│  [Never mind, keep my subscription] │
+└─────────────────────────────────────┘
+         ↓ (selects "Too expensive")
+┌─────────────────────────────────────┐
+│  What if we could help?             │
+│                                     │
+│  We'd love to keep you. Here's a    │
+│  special offer:                     │
+│                                     │
+│  ┌───────────────────────────────┐  │
+│  │  25% off for the next 3 months│  │
+│  │  Save $XX/month               │  │
+│  │                               │  │
+│  │  [Accept Offer]               │  │
+│  └───────────────────────────────┘  │
+│                                     │
+│  Or switch to [Basic Plan] at       │
+│  $X/month →                         │
+│                                     │
+│  [No thanks, continue cancelling]   │
+└─────────────────────────────────────┘
 ```
 
 **UI principles:**
@@ -231,11 +230,11 @@ Build a simple health score (0-100) from weighted signals:
 
 ```
 Health Score = (
-  Login frequency score ﾃ・0.30 +
-  Feature usage score   ﾃ・0.25 +
-  Support sentiment     ﾃ・0.15 +
-  Billing health        ﾃ・0.15 +
-  Engagement score      ﾃ・0.15
+  Login frequency score × 0.30 +
+  Feature usage score   × 0.25 +
+  Support sentiment     × 0.15 +
+  Billing health        × 0.15 +
+  Engagement score      × 0.15
 )
 ```
 
@@ -253,7 +252,7 @@ Health Score = (
 | Trigger | Intervention |
 |---------|-------------|
 | Usage drop >50% for 2 weeks | "We noticed you haven't used [feature]. Need help?" email |
-| Approaching plan limit | Upgrade nudge (not a wall 窶・paywall-upgrade-cro handles this) |
+| Approaching plan limit | Upgrade nudge (not a wall — paywall-upgrade-cro handles this) |
 | No login for 14 days | Re-engagement email with recent product updates |
 | NPS detractor (0-6) | Personal follow-up within 24 hours |
 | Support ticket unresolved >48h | Escalation + proactive status update |
@@ -268,7 +267,7 @@ Failed payments cause 30-50% of all churn but are the most recoverable.
 ### The Dunning Stack
 
 ```
-Pre-dunning 竊・Smart retry 竊・Dunning emails 竊・Grace period 竊・Hard cancel
+Pre-dunning → Smart retry → Dunning emails → Grace period → Hard cancel
 ```
 
 ### Pre-Dunning (Prevent Failures)
@@ -285,7 +284,7 @@ Not all failures are the same. Retry strategy by decline type:
 | Decline Type | Examples | Retry Strategy |
 |-------------|----------|----------------|
 | Soft decline (temporary) | Insufficient funds, processor timeout | Retry 3-5 times over 7-10 days |
-| Hard decline (permanent) | Card stolen, account closed | Don't retry 窶・ask for new card |
+| Hard decline (permanent) | Card stolen, account closed | Don't retry — ask for new card |
 | Authentication required | 3D Secure, SCA | Send customer to update payment |
 
 **Retry timing best practices:**
@@ -302,7 +301,7 @@ Not all failures are the same. Retry strategy by decline type:
 | Email | Timing | Tone | Content |
 |-------|--------|------|---------|
 | 1 | Day 0 (failure) | Friendly alert | "Your payment didn't go through. Update your card." |
-| 2 | Day 3 | Helpful reminder | "Quick reminder 窶・update your payment to keep access." |
+| 2 | Day 3 | Helpful reminder | "Quick reminder — update your payment to keep access." |
 | 3 | Day 7 | Urgency | "Your account will be paused in 3 days. Update now." |
 | 4 | Day 10 | Final warning | "Last chance to keep your account active." |
 
@@ -343,11 +342,11 @@ For the complete dunning playbook with provider-specific setup, see [references/
 ### Cohort Analysis
 
 Segment churn by:
-- **Acquisition channel** 窶・Which channels bring stickier customers?
-- **Plan type** 窶・Which plans churn most?
-- **Tenure** 窶・When do most cancellations happen? (30, 60, 90 days?)
-- **Cancel reason** 窶・Which reasons are growing?
-- **Save offer type** 窶・Which offers work best for which segments?
+- **Acquisition channel** — Which channels bring stickier customers?
+- **Plan type** — Which plans churn most?
+- **Tenure** — When do most cancellations happen? (30, 60, 90 days?)
+- **Cancel reason** — Which reasons are growing?
+- **Save offer type** — Which offers work best for which segments?
 
 ### Cancel Flow A/B Tests
 
@@ -361,22 +360,22 @@ Test one variable at a time:
 | Offer presentation (modal vs full page) | Full page gets more attention | Save rate |
 | Copy tone (empathetic vs direct) | Empathetic reduces friction | Save rate |
 
-**How to run cancel flow experiments:** Use the **ab-test-setup** skill to design statistically rigorous tests. PostHog is a good fit for cancel flow experiments 窶・its feature flags can split users into different flows server-side, and its funnel analytics track each step of the cancel flow (survey 竊・offer 竊・accept/decline 竊・confirm). See the [PostHog integration guide](../../tools/integrations/posthog.md) for setup.
+**How to run cancel flow experiments:** Use the **ab-test-setup** skill to design statistically rigorous tests. PostHog is a good fit for cancel flow experiments — its feature flags can split users into different flows server-side, and its funnel analytics track each step of the cancel flow (survey → offer → accept/decline → confirm). See the [PostHog integration guide](../../tools/integrations/posthog.md) for setup.
 
 ---
 
 ## Common Mistakes
 
-- **No cancel flow at all** 窶・Instant cancel leaves money on the table. Even a simple survey + one offer saves 10-15%
-- **Making cancellation hard to find** 窶・Hidden cancel buttons breed resentment and bad reviews. Many jurisdictions require easy cancellation (FTC Click-to-Cancel rule)
-- **Same offer for every reason** 窶・A blanket discount doesn't address "missing feature" or "not using it"
-- **Discounts too deep** 窶・50%+ discounts train customers to cancel-and-return for deals
-- **Ignoring involuntary churn** 窶・Often 30-50% of total churn and the easiest to fix
-- **No dunning emails** 窶・Letting payment failures silently cancel accounts
-- **Guilt-trip copy** 窶・"Are you sure you want to abandon us?" damages brand trust
-- **Not tracking save offer LTV** 窶・A "saved" customer who churns 30 days later wasn't really saved
-- **Pausing too long** 窶・Pauses beyond 3 months rarely reactivate. Set limits.
-- **No post-cancel path** 窶・Always make reactivation easy and trigger win-back emails
+- **No cancel flow at all** — Instant cancel leaves money on the table. Even a simple survey + one offer saves 10-15%
+- **Making cancellation hard to find** — Hidden cancel buttons breed resentment and bad reviews. Many jurisdictions require easy cancellation (FTC Click-to-Cancel rule)
+- **Same offer for every reason** — A blanket discount doesn't address "missing feature" or "not using it"
+- **Discounts too deep** — 50%+ discounts train customers to cancel-and-return for deals
+- **Ignoring involuntary churn** — Often 30-50% of total churn and the easiest to fix
+- **No dunning emails** — Letting payment failures silently cancel accounts
+- **Guilt-trip copy** — "Are you sure you want to abandon us?" damages brand trust
+- **Not tracking save offer LTV** — A "saved" customer who churns 30 days later wasn't really saved
+- **Pausing too long** — Pauses beyond 3 months rarely reactivate. Set limits.
+- **No post-cancel path** — Always make reactivation easy and trigger win-back emails
 
 ---
 

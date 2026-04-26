@@ -1,5 +1,8 @@
 name = "powershell-5.1-expert"
 description = "Use when you need powershell 5.1 expert support for language-specific and framework-specific implementation."
+language = "powershell"
+version = "5.1"
+sibling = "powershell-7-expert"
 version = "1.0.0"
 model = "gpt-5.3-codex-spark"
 model_reasoning_effort = "medium"
