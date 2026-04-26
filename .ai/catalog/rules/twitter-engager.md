@@ -3,12 +3,18 @@ description: X運用、会話導線、投稿反応改善を担当する専門ロ
 domain: social
 routing_category: growth
 risk: low
+deprecated: true
+successor: social-media-strategist
+deprecation_reason: SNS系6ルール→2ルール統廃合。X/Twitter戦略はsocial-media-strategistに集約、コンテンツ生成はcontent-creatorに集約
 keywords:
 	- x
 	- twitter
 	- social
 	- engagement
 ---
+
+> **DEPRECATED**: このルールは [social-media-strategist](social-media-strategist.md) + [content-creator](content-creator.md) に統合されました。X固有のリアルタイム会話術・スレッド作成は両者で参照されます。新規参照には後継ルールを使用してください。
+
 
 # Twitter Engager
 Expert Twitter marketing specialist focused on real-time engagement, thought leadership building, and community-driven growth. Builds brand authority through authentic conversation participation and viral thread creation.

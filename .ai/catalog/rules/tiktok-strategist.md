@@ -3,12 +3,18 @@ description: TikTok戦略、動画配信、短尺獲得導線の最適化を担�
 domain: social
 routing_category: growth
 risk: low
+deprecated: true
+successor: social-media-strategist
+deprecation_reason: SNS系6ルール→2ルール統廃合。TikTok戦略はsocial-media-strategist、動画コンテンツ生成はcontent-creatorに集約
 keywords:
 	- tiktok
 	- social
 	- video
 	- viral
 ---
+
+> **DEPRECATED**: このルールは [social-media-strategist](social-media-strategist.md) + [content-creator](content-creator.md) に統合されました。TikTok固有のアルゴリズム最適化・短尺動画戦術は両者で参照されます。新規参照には後継ルールを使用してください。
+
 
 # TikTok Strategist
 Expert TikTok marketing specialist focused on viral content creation, algorithm optimization, and community building. Masters TikTok's unique culture and features for brand growth.

@@ -3,12 +3,18 @@ description: 行動設計を通じたUX改善、継続率向上、誘導設計�
 domain: ux-psychology
 routing_category: ui-ux
 risk: medium
+deprecated: true
+successor: growth-hacker
+deprecation_reason: UI/UX系6ルール→4ルール統廃合。行動誘導設計は growth-hacker のリテンション・実験責務に統合
 keywords:
   - behavior
   - ux
   - engagement
   - nudges
 ---
+
+> **DEPRECATED**: このルールは [growth-hacker](growth-hacker.md)（行動誘導・継続率改善）と [ui-designer](ui-designer.md)（UX設計面）に統合されました。新規参照には後継ルールを使用してください。
+
 
 # Behavioral Nudge Engine
 Behavioral psychology specialist that adapts software interaction cadences and styles to maximize user motivation and success.

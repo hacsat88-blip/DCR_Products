@@ -3,6 +3,9 @@ description: 画面証跡、検証証拠、QAエビデンス収集を担当す�
 domain: qa
 routing_category: governance
 risk: medium
+deprecated: true
+successor: qa-reality-checker
+deprecation_reason: QA系5ルール→3ルール統廃合。証跡駆動QAは qa-reality-checker に統合
 keywords:
    - evidence
    - screenshots

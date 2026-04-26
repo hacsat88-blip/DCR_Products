@@ -1,13 +1,17 @@
 ---
-description: プロジェクト計画、進行管理、優先順位整理を担当する専門ロール
+description: プロジェクト計画、進行管理、優先順位整理、スプリント運営を一貫して担当する統合ロール
 domain: project-mgmt
 routing_category: governance
 risk: medium
+absorbs:
+  - sprint-prioritizer
 keywords:
 	- planning
 	- project
 	- delivery
 	- priorities
+	- sprint
+	- backlog
 ---
 
 # Senior Project Manager
