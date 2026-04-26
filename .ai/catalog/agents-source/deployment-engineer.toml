@@ -1,5 +1,8 @@
 name = "deployment-engineer"
-description = "Use when you need deployment engineer support for cloud, deployment, networking, containers, and infrastructure automation."
+description = "[DEPRECATED -> devops-engineer]"
+deprecated = true
+successor = "devops-engineer"
+deprecation_reason = "Phase2 infra cluster"
 version = "1.0.0"
 model = "gpt-5.3-codex-spark"
 model_reasoning_effort = "medium"

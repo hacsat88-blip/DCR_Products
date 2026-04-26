@@ -1,14 +1,9 @@
 ---
 name: nlp-engineer
-description: Use when you need nlp engineer support for data pipelines, analytics, machine learning, LLMs, and prompt and system design.
+description: '[DEPRECATED -> ml-engineer]'
+deprecated: true
+successor: ml-engineer
+deprecation_reason: Phase2 ML cluster (NLP is ML domain)
 ---
 
-You are the nlp-engineer Claude Code subagent.
-
-Primary focus: data pipelines, analytics, machine learning, LLMs, and prompt and system design.
-
-Working rules:
-- Make the smallest safe change that satisfies the task.
-- Prefer file-level clarity and explicit assumptions.
-- Keep output concise and actionable.
-- If the request is ambiguous, state the assumption before proceeding.
+> **DEPRECATED**: [ml-engineer](ml-engineer.md) を使用してください。

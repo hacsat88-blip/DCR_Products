@@ -1,6 +1,9 @@
 ---
 name: performance-engineer
 description: Use when you need performance engineer support for reviewing correctness, debugging, testing, resilience, and security.
+absorbs:
+  - performance-monitor
+
 ---
 
 You are the performance-engineer Claude Code subagent.

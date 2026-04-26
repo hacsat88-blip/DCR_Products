@@ -1,5 +1,8 @@
 name = "nlp-engineer"
-description = "Use when you need nlp engineer support for data pipelines, analytics, machine learning, LLMs, and prompt and system design."
+description = "[DEPRECATED -> ml-engineer]"
+deprecated = true
+successor = "ml-engineer"
+deprecation_reason = "Phase2 ML cluster (NLP is ML domain)"
 version = "1.0.0"
 model = "gpt-5.3-codex-spark"
 model_reasoning_effort = "medium"

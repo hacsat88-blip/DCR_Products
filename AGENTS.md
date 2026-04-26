@@ -156,7 +156,6 @@ GitHub Copilot CLI specific behavior lives in [.ai/kernel/environments/copilot-c
 - [ai-engineer](.ai/catalog/agents-source/ai-engineer.md)
 - [ai-prompt-manager-orchestrator](.ai/catalog/agents-source/ai-prompt-manager-orchestrator.md)
 - [angular-architect](.ai/catalog/agents-source/angular-architect.md)
-- [api-documenter](.ai/catalog/agents-source/api-documenter.md)
 - [architect-reviewer](.ai/catalog/agents-source/architect-reviewer.md)
 - [architecture-diagram-orchestrator](.ai/catalog/agents-source/architecture-diagram-orchestrator.md)
 - [azure-infra-engineer](.ai/catalog/agents-source/azure-infra-engineer.md)
@@ -180,10 +179,8 @@ GitHub Copilot CLI specific behavior lives in [.ai/kernel/environments/copilot-c
 - [data-engineer](.ai/catalog/agents-source/data-engineer.md)
 - [data-scientist](.ai/catalog/agents-source/data-scientist.md)
 - [database-administrator](.ai/catalog/agents-source/database-administrator.md)
-- [database-optimizer](.ai/catalog/agents-source/database-optimizer.md)
 - [debugger](.ai/catalog/agents-source/debugger.md)
 - [dependency-manager](.ai/catalog/agents-source/dependency-manager.md)
-- [deployment-engineer](.ai/catalog/agents-source/deployment-engineer.md)
 - [devops-engineer](.ai/catalog/agents-source/devops-engineer.md)
 - [django-developer](.ai/catalog/agents-source/django-developer.md)
 - [docker-expert](.ai/catalog/agents-source/docker-expert.md)
@@ -204,7 +201,6 @@ GitHub Copilot CLI specific behavior lives in [.ai/kernel/environments/copilot-c
 - [game-developer](.ai/catalog/agents-source/game-developer.md)
 - [git-workflow-manager](.ai/catalog/agents-source/git-workflow-manager.md)
 - [golang-pro](.ai/catalog/agents-source/golang-pro.md)
-- [graphql-architect](.ai/catalog/agents-source/graphql-architect.md)
 - [incident-responder](.ai/catalog/agents-source/incident-responder.md)
 - [iot-engineer](.ai/catalog/agents-source/iot-engineer.md)
 - [it-ops-orchestrator](.ai/catalog/agents-source/it-ops-orchestrator.md)
@@ -216,7 +212,6 @@ GitHub Copilot CLI specific behavior lives in [.ai/kernel/environments/copilot-c
 - [laravel-specialist](.ai/catalog/agents-source/laravel-specialist.md)
 - [legacy-modernizer](.ai/catalog/agents-source/legacy-modernizer.md)
 - [legal-advisor](.ai/catalog/agents-source/legal-advisor.md)
-- [llm-architect](.ai/catalog/agents-source/llm-architect.md)
 - [m365-admin](.ai/catalog/agents-source/m365-admin.md)
 - [market-researcher](.ai/catalog/agents-source/market-researcher.md)
 - [mcp-developer](.ai/catalog/agents-source/mcp-developer.md)
@@ -225,14 +220,10 @@ GitHub Copilot CLI specific behavior lives in [.ai/kernel/environments/copilot-c
 - [mobile-developer](.ai/catalog/agents-source/mobile-developer.md)
 - [network-engineer](.ai/catalog/agents-source/network-engineer.md)
 - [nextjs-developer](.ai/catalog/agents-source/nextjs-developer.md)
-- [nlp-engineer](.ai/catalog/agents-source/nlp-engineer.md)
-- [payment-integration](.ai/catalog/agents-source/payment-integration.md)
 - [penetration-tester](.ai/catalog/agents-source/penetration-tester.md)
 - [performance-engineer](.ai/catalog/agents-source/performance-engineer.md)
-- [performance-monitor](.ai/catalog/agents-source/performance-monitor.md)
 - [php-pro](.ai/catalog/agents-source/php-pro.md)
 - [pied-piper](.ai/catalog/agents-source/pied-piper.md)
-- [platform-engineer](.ai/catalog/agents-source/platform-engineer.md)
 - [postgres-pro](.ai/catalog/agents-source/postgres-pro.md)
 - [powershell-5.1-expert](.ai/catalog/agents-source/powershell-5.1-expert.md)
 - [powershell-7-expert](.ai/catalog/agents-source/powershell-7-expert.md)
@@ -249,7 +240,6 @@ GitHub Copilot CLI specific behavior lives in [.ai/kernel/environments/copilot-c
 - [react-specialist](.ai/catalog/agents-source/react-specialist.md)
 - [refactoring-specialist](.ai/catalog/agents-source/refactoring-specialist.md)
 - [research-analyst](.ai/catalog/agents-source/research-analyst.md)
-- [risk-manager](.ai/catalog/agents-source/risk-manager.md)
 - [rust-engineer](.ai/catalog/agents-source/rust-engineer.md)
 - [sales-engineer](.ai/catalog/agents-source/sales-engineer.md)
 - [scrum-master](.ai/catalog/agents-source/scrum-master.md)
@@ -266,11 +256,9 @@ GitHub Copilot CLI specific behavior lives in [.ai/kernel/environments/copilot-c
 - [terraform-engineer](.ai/catalog/agents-source/terraform-engineer.md)
 - [terragrunt-expert](.ai/catalog/agents-source/terragrunt-expert.md)
 - [test-automator](.ai/catalog/agents-source/test-automator.md)
-- [tooling-engineer](.ai/catalog/agents-source/tooling-engineer.md)
 - [trend-analyst](.ai/catalog/agents-source/trend-analyst.md)
 - [typescript-pro](.ai/catalog/agents-source/typescript-pro.md)
 - [ui-designer](.ai/catalog/agents-source/ui-designer.md)
-- [ui-fixer](.ai/catalog/agents-source/ui-fixer.md)
 - [ux-researcher](.ai/catalog/agents-source/ux-researcher.md)
 - [vue-expert](.ai/catalog/agents-source/vue-expert.md)
 - [websocket-engineer](.ai/catalog/agents-source/websocket-engineer.md)
@@ -296,16 +284,28 @@ These names are kept as aliases that route to their successor:
 - ~~skill-router~~ 竊・[unified-router](.ai/catalog/skills/unified-router/SKILL.md) _(skill)_
 - ~~ad-security-reviewer~~ 竊・[security-auditor](.ai/catalog/agents-source/security-auditor.md) _(agent)_
 - ~~api-designer~~ 竊・[backend-developer](.ai/catalog/agents-source/backend-developer.md) _(agent)_
+- ~~api-documenter~~ 竊・[documentation-engineer](.ai/catalog/agents-source/documentation-engineer.md) _(agent)_
 - ~~browser-debugger~~ 竊・[debugger](.ai/catalog/agents-source/debugger.md) _(agent)_
 - ~~data-researcher~~ 竊・[research-analyst](.ai/catalog/agents-source/research-analyst.md) _(agent)_
+- ~~database-optimizer~~ 竊・[database-administrator](.ai/catalog/agents-source/database-administrator.md) _(agent)_
+- ~~deployment-engineer~~ 竊・[devops-engineer](.ai/catalog/agents-source/devops-engineer.md) _(agent)_
 - ~~devops-incident-responder~~ 竊・[incident-responder](.ai/catalog/agents-source/incident-responder.md) _(agent)_
 - ~~error-detective~~ 竊・[debugger](.ai/catalog/agents-source/debugger.md) _(agent)_
+- ~~graphql-architect~~ 竊・[backend-developer](.ai/catalog/agents-source/backend-developer.md) _(agent)_
+- ~~llm-architect~~ 竊・[ai-engineer](.ai/catalog/agents-source/ai-engineer.md) _(agent)_
 - ~~machine-learning-engineer~~ 竊・[ml-engineer](.ai/catalog/agents-source/ml-engineer.md) _(agent)_
 - ~~microservices-architect~~ 竊・[backend-developer](.ai/catalog/agents-source/backend-developer.md) _(agent)_
 - ~~mobile-app-developer~~ 竊・[mobile-developer](.ai/catalog/agents-source/mobile-developer.md) _(agent)_
 - ~~multi-agent-coordinator~~ 竊・[pied-piper](.ai/catalog/agents-source/pied-piper.md) _(agent)_
+- ~~nlp-engineer~~ 竊・[ml-engineer](.ai/catalog/agents-source/ml-engineer.md) _(agent)_
+- ~~payment-integration~~ 竊・[fintech-engineer](.ai/catalog/agents-source/fintech-engineer.md) _(agent)_
+- ~~performance-monitor~~ 竊・[performance-engineer](.ai/catalog/agents-source/performance-engineer.md) _(agent)_
+- ~~platform-engineer~~ 竊・[devops-engineer](.ai/catalog/agents-source/devops-engineer.md) _(agent)_
 - ~~reviewer~~ 竊・[code-reviewer](.ai/catalog/agents-source/code-reviewer.md) _(agent)_
+- ~~risk-manager~~ 竊・[fintech-engineer](.ai/catalog/agents-source/fintech-engineer.md) _(agent)_
 - ~~task-distributor~~ 竊・[pied-piper](.ai/catalog/agents-source/pied-piper.md) _(agent)_
+- ~~tooling-engineer~~ 竊・[build-engineer](.ai/catalog/agents-source/build-engineer.md) _(agent)_
+- ~~ui-fixer~~ 竊・[frontend-developer](.ai/catalog/agents-source/frontend-developer.md) _(agent)_
 - ~~workflow-orchestrator~~ 竊・[pied-piper](.ai/catalog/agents-source/pied-piper.md) _(agent)_
 
 ---

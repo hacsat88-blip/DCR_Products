@@ -1,6 +1,10 @@
 ---
 name: fintech-engineer
 description: Use when you need fintech engineer support for domain-specific systems such as fintech, embedded, mobile, IoT, SEO, and blockchain.
+absorbs:
+  - payment-integration
+  - risk-manager
+
 ---
 
 You are the fintech-engineer Claude Code subagent.
