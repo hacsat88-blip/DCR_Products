@@ -1,7 +1,7 @@
 ---
 name: unified-router
 description: Unified routing dispatcher for DCR. Classifies intent/domain/risk/phase, selects the best rule/skill/agent (router decision tree Step 0-6), and reports via 3-line template. Replaces skill-router; actual execution handled by pied-piper agent.
-routing_category: meta
+routing_category: governance
 keywords:
   - routing
   - router

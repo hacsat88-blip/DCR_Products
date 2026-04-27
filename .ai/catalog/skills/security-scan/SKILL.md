@@ -1,5 +1,6 @@
 ---
 name: security-scan
+routing_category: devops
 description: "agent 設定、rules/skills、hook 相当設定を対象に、シークレット露出・危険な権限・注入リスクを監査する。設定面の浅い監査（shallow depth）。コードレベルのOWASP/暗号/認証の深掘り審査には security-deepdive を使用。"
 audit_depth: shallow
 audit_scope: config-and-secrets

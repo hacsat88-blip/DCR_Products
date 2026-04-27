@@ -27,15 +27,10 @@
 
 ## Gate state persistence
 
-- q/ 実行時、`/memories/session/gate-state.md` の `plan_approved: true` を確認する
-- `plan_approved` が存在しない場合: `⚠️ p/ で計画を先に策定してください` を提示（ブロックではなく警告）
-- q/ 全通過（🔴 = 0）時、同ファイルに以下を追記する:
-  ```
-  qa_passed: true
-  qa_date: YYYY-MM-DD HH:MM
-  findings_summary: "N items checked, 0 critical, M warnings"
-  ```
-- 🔴 が残存する場合は `qa_passed: false` のまま
+- q/ 実行時、`gate-state.json` の `plan_passed: true` を確認する（`Read-GateState` で取得）
+- `plan_passed` が `false` の場合: `⚠️ p/ で計画を先に策定してください` を提示（ブロックではなく警告）
+- q/ 全通過（🔴 = 0）時、`Update-GateState` で `.ai/kernel/gate-state.json` に記録する（唯一の正本）
+- 🔴 が残存する場合は `qa_passed = $false` で書き込む
 
 ## Evidence format
 

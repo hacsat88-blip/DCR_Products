@@ -1,5 +1,6 @@
 ---
 name: token-efficiency-advisor
+routing_category: governance
 description: Use when tasks risk context bloat, excessive tool output, or broad codebase scanning; proactively suggest RTK, code-review-graph, or MCP retrieval tools before token-heavy operations across Claude Code, Copilot CLI, and Cursor.
 contract:
   preconditions:

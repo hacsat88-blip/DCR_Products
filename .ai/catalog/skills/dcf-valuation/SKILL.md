@@ -1,5 +1,6 @@
 ---
 name: dcf-valuation
+routing_category: growth
 description: Performs discounted cash flow (DCF) valuation analysis to estimate intrinsic value per share for Japanese listed companies. Triggers when user asks for fair value, intrinsic value, DCF, valuation, "what is X worth", price target, undervalued/overvalued analysis, or wants to compare current price to fundamental value.
 contract:
   preconditions:

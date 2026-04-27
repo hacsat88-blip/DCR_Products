@@ -25,13 +25,13 @@
 
 ## Gate state enforcement
 
-- sh/ 起動時、`/memories/session/gate-state.md` の `qa_passed: true` を確認する
-- `qa_passed: true` が存在しない場合: **ブロック**。実装を進めず以下を返す:
+- sh/ 起動時、`Test-GateReady -RequireGate 'qa_passed'` で `.ai/kernel/gate-state.json` を確認する（唯一の正本）
+- `qa_passed = true` でない場合: **ブロック**。実装を進めず以下を返す:
   ```
   🔴 Stop — q/ QA Gate を通過していません。
   💡 q/ でQA検証を実行してください
   ```
-- `qa_passed: true` かつ `findings_summary` 内に critical > 0: **ブロック**
+- `qa_passed = true` かつ `findings.critical > 0`: **ブロック**（`Test-GateReady` が自動判定）
 - 検証証跡が揃っている場合のみリリース判定に進む
 
 ## Ship checklist

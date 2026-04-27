@@ -1,5 +1,6 @@
 ---
 name: email-marketing-flow
+routing_category: growth
 description: メールマーケティング全般の親ハブ。シーケンス・自動化（email-sequence）と B2B コールド・アウトリーチ（cold-email）の2変種を統合。共通の件名最適化、開封率設計、フォロー戦略を提供する。トリガー：「メール書いて」「ドリップ」「シーケンス」「コールド」「アウトリーチ」「件名」など。
 metadata:
   version: 1.0.0

@@ -1,5 +1,6 @@
 ---
 name: marketing-psychology
+routing_category: growth
 description: "When the user wants to apply psychological principles, mental models, or behavioral science to marketing. Also use when the user mentions 'psychology,' 'mental models,' 'cognitive bias,' 'persuasion,' 'behavioral science,' 'why people buy,' 'decision-making,' or 'consumer behavior.' Covers foundational thinking, buyer psychology, persuasion, and pricing psychology."
 metadata:
   version: 1.0.0

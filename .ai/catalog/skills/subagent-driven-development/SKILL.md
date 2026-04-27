@@ -1,5 +1,6 @@
 ---
 name: subagent-driven-development
+routing_category: devops
 description: Use when executing implementation plans with independent tasks in the current session, or dispatching parallel agents for concurrent problem-solving
 ---
 

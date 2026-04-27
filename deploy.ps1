@@ -62,6 +62,21 @@ if ($EnforceGate -and -not $DryRun -and -not $Check) {
     }
 }
 
+# ── Routing Index Pre-generation ──
+if (-not $Check -and -not $DryRun) {
+    $RoutingIndexScript = Join-Path $RepoRoot "tools\generate-routing-index.ps1"
+    if (Test-Path $RoutingIndexScript) {
+        Write-Host "[routing] Regenerating routing indexes..." -ForegroundColor Cyan
+        $skillsIndexPath = Join-Path $RepoRoot ".ai\catalog\skills\_SKILLS_ROUTING_INDEX.md"
+        & powershell -ExecutionPolicy Bypass -File $RoutingIndexScript `
+            -RepoRoot $RepoRoot `
+            -SkillsOutputPath $skillsIndexPath
+        if ($LASTEXITCODE -ne 0) {
+            Write-Warning "[routing] generate-routing-index.ps1 exited $LASTEXITCODE — continuing"
+        }
+    }
+}
+
 # ── Unified Adapter Framework (new) ──
 $DeployAll = Join-Path $RepoRoot "tools\deploy-all.ps1"
 if ((Test-Path $DeployAll) -and -not $Check -and ($Target -in @("all", "vscode", "cursor"))) {
@@ -524,6 +539,8 @@ function Get-DirectoryDrift {
     $sourceFiles = Get-ChildItem $Source -Recurse -File | Where-Object { $_.Name -notin $IgnoreNames }
     foreach ($sf in $sourceFiles) {
         $relativePath = $sf.FullName.Substring($Source.Length + 1)
+        # Skip root-level _* files — Sync-Directory copies only subdirectories (not root files)
+        if ($relativePath -notlike '*\*' -and $relativePath -like '_*') { continue }
         $destFile = Join-Path $Destination $relativePath
         if (-not (Test-Path $destFile)) {
             $diffs += "[MISSING] $relativePath (not deployed to destination)"

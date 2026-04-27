@@ -1,5 +1,6 @@
 ---
 name: continuous-learning-v2
+routing_category: governance
 description: "project/global スコープと confidence を持つ instinct 運用。学びを status/export/import/evolve/promote で管理し、再利用可能な skill/rule 候補へ昇格する。"
 metadata:
   origin: ECC continuous-learning-v2 (lightweight adaptation for DCR)

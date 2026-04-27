@@ -21,13 +21,20 @@ jobs:
         shell: pwsh
         run: pwsh -ExecutionPolicy Bypass -File ./tools/eval-routing-accuracy.ps1
 
-      - name: Deprecation status snapshot (informational)
+      - name: Deprecation status snapshot
         shell: pwsh
         continue-on-error: true
         run: |
-          pwsh -ExecutionPolicy Bypass -File ./tools/deprecation-dashboard.ps1 -OutputJson
+          pwsh -ExecutionPolicy Bypass -File ./tools/deprecation-dashboard.ps1 -OutputJson -Verbose
           if (Test-Path docs/deprecation-status.json) {
-            Write-Host "Snapshot generated (informational, not gating)"
+            $snap = Get-Content docs/deprecation-status.json -Raw | ConvertFrom-Json
+            $n = $snap.eligible_for_removal
+            if ($n -ge 1) {
+              Write-Host "##[warning] $n deprecated asset(s) are ELIGIBLE-FOR-REMOVAL (>=90d, 0 calls, 0 refs)."
+              Write-Host "  Run: pwsh ./tools/deprecation-dashboard.ps1 -Verbose"
+            } else {
+              Write-Host "No deprecated assets eligible for removal."
+            }
           }
 
       - name: Token budget vs baseline (informational)

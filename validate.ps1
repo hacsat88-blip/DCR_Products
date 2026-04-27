@@ -601,6 +601,31 @@ foreach ($file in $ruleFiles) {
 Write-Host "  rule descriptions checked: $descCheckCount" -ForegroundColor DarkGray
 
 # ─────────────────────────────────────────────
+Write-Host "== 16. catalog skills/*/SKILL.md routing_category check ====="
+# ─────────────────────────────────────────────
+$skillRoutingCheckCount = 0
+foreach ($dir in $skillDirs) {
+    $sf = Join-Path $dir.FullName "SKILL.md"
+    if (-not (Test-Path $sf)) { continue }
+    $content = [System.IO.File]::ReadAllText((Resolve-Path $sf).Path)
+    # Skip deprecated skills
+    if ($content -match '(?m)^deprecated:\s*true\s*$') { continue }
+    $skillRoutingCheckCount++
+    if ($content -match '(?m)^routing_category:\s*(.+)$') {
+        $cat = $Matches[1].Trim()
+        if ($cat -in $AllowedRoutingCategories) {
+            if ($Verbose) { Write-Ok "$($dir.Name)/SKILL.md — routing_category '$cat' OK" }
+            else { $script:passed++ }
+        } else {
+            Write-Fail "$($dir.Name)/SKILL.md — routing_category '$cat' not in allowed set: $($AllowedRoutingCategories -join ', ')"
+        }
+    } else {
+        Write-Fail "$($dir.Name)/SKILL.md — routing_category missing"
+    }
+}
+Write-Host "  skill routing_category checked: $skillRoutingCheckCount" -ForegroundColor DarkGray
+
+# ─────────────────────────────────────────────
 # 結果サマリー
 # ─────────────────────────────────────────────
 Write-Host ""

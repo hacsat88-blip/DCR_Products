@@ -1,5 +1,6 @@
 ---
 name: prompt-master
+routing_category: governance
 description: Use this skill whenever the user asks to create, rewrite, optimize, compare, or systematize prompts for chat-style use, GPTs/custom assistants, project instructions, system prompts, agent prompts, or prompt templates. Trigger on phrases like "prompt generator", "prompt-master", "system prompt", "GPTs", "project prompt", "rewrite this prompt", "improve my prompt", or "prompt template".
 metadata:
   origin: prompt-master (adapted for DCR unified operation)
