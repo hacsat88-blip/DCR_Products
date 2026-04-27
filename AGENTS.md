@@ -11,68 +11,66 @@ GitHub Copilot CLI specific behavior lives in [.ai/kernel/environments/copilot-c
 
 ## Included Rules
 
-- [accessibility-auditor](.ai/catalog/rules/accessibility-auditor.md)
+### Governance & Core (蠅・阜繝ｻ邨ｱ蛻ｶ)
+
 - [agentic-identity-trust-architect](.ai/catalog/rules/agentic-identity-trust-architect.md)
 - [agents-orchestrator](.ai/catalog/rules/agents-orchestrator.md)
-- [ai-engineer](.ai/catalog/rules/ai-engineer.md)
 - [ai-prompt-manager-steward](.ai/catalog/rules/ai-prompt-manager-steward.md)
-- [analytics-reporter](.ai/catalog/rules/analytics-reporter.md)
+- [finance-tracker](.ai/catalog/rules/finance-tracker.md)
+- [identity-graph-operator](.ai/catalog/rules/identity-graph-operator.md)
+- [jira-workflow-steward](.ai/catalog/rules/jira-workflow-steward.md)
+- [legal-compliance-checker](.ai/catalog/rules/legal-compliance-checker.md)
+- [model-qa-specialist](.ai/catalog/rules/model-qa-specialist.md)
+- [project-shepherd](.ai/catalog/rules/project-shepherd.md)
+- [repo-boundary-steward](.ai/catalog/rules/repo-boundary-steward.md)
+- [security-engineer](.ai/catalog/rules/security-engineer.md)
+- [senior-project-manager](.ai/catalog/rules/senior-project-manager.md)
+- [token-efficiency-steward](.ai/catalog/rules/token-efficiency-steward.md)
+- [tool-evaluator](.ai/catalog/rules/tool-evaluator.md)
+
+### Roles (螳溯｣・Ο繝ｼ繝ｫ: devops / ui-ux)
+
+- [accessibility-auditor](.ai/catalog/rules/accessibility-auditor.md)
+- [ai-engineer](.ai/catalog/rules/ai-engineer.md)
 - [api-tester](.ai/catalog/rules/api-tester.md)
-- [app-store-optimizer](.ai/catalog/rules/app-store-optimizer.md)
-- [architecture-diagram-steward](.ai/catalog/rules/architecture-diagram-steward.md)
 - [backend-architect](.ai/catalog/rules/backend-architect.md)
-- [behavioral-nudge-engine](.ai/catalog/rules/behavioral-nudge-engine.md)
-- [brand-guardian](.ai/catalog/rules/brand-guardian.md)
-- [content-creator](.ai/catalog/rules/content-creator.md)
 - [cultural-intelligence-strategist](.ai/catalog/rules/cultural-intelligence-strategist.md)
 - [data-engineer](.ai/catalog/rules/data-engineer.md)
-- [developer-advocate](.ai/catalog/rules/developer-advocate.md)
 - [devops-automator](.ai/catalog/rules/devops-automator.md)
 - [embedded-firmware-engineer](.ai/catalog/rules/embedded-firmware-engineer.md)
-- [evidence-collector](.ai/catalog/rules/evidence-collector.md)
+- [frontend-developer](.ai/catalog/rules/frontend-developer.md)
+- [incident-response-commander](.ai/catalog/rules/incident-response-commander.md)
+- [infrastructure-maintainer](.ai/catalog/rules/infrastructure-maintainer.md)
+- [mobile-app-builder](.ai/catalog/rules/mobile-app-builder.md)
+- [performance-benchmarker](.ai/catalog/rules/performance-benchmarker.md)
+- [qa-reality-checker](.ai/catalog/rules/qa-reality-checker.md)
+- [rapid-prototyper](.ai/catalog/rules/rapid-prototyper.md)
+- [senior-developer](.ai/catalog/rules/senior-developer.md)
+- [ui-designer](.ai/catalog/rules/ui-designer.md)
+- [ux-researcher](.ai/catalog/rules/ux-researcher.md)
+- [whimsy-injector](.ai/catalog/rules/whimsy-injector.md)
+- [workflow-optimizer](.ai/catalog/rules/workflow-optimizer.md)
+
+### Specialists (蟆る摩鬆伜沺: growth / documents / 縺昴・莉・
+
+- [analytics-reporter](.ai/catalog/rules/analytics-reporter.md)
+- [app-store-optimizer](.ai/catalog/rules/app-store-optimizer.md)
+- [architecture-diagram-steward](.ai/catalog/rules/architecture-diagram-steward.md)
+- [brand-guardian](.ai/catalog/rules/brand-guardian.md)
+- [content-creator](.ai/catalog/rules/content-creator.md)
+- [developer-advocate](.ai/catalog/rules/developer-advocate.md)
 - [executive-summary-generator](.ai/catalog/rules/executive-summary-generator.md)
 - [experiment-tracker](.ai/catalog/rules/experiment-tracker.md)
 - [feature-proposal](.ai/catalog/rules/feature-proposal.md)
 - [feedback-synthesizer](.ai/catalog/rules/feedback-synthesizer.md)
-- [finance-tracker](.ai/catalog/rules/finance-tracker.md)
-- [frontend-developer](.ai/catalog/rules/frontend-developer.md)
 - [growth-hacker](.ai/catalog/rules/growth-hacker.md)
-- [identity-graph-operator](.ai/catalog/rules/identity-graph-operator.md)
 - [image-prompt-engineer](.ai/catalog/rules/image-prompt-engineer.md)
-- [incident-response-commander](.ai/catalog/rules/incident-response-commander.md)
-- [inclusive-visuals-specialist](.ai/catalog/rules/inclusive-visuals-specialist.md)
-- [infrastructure-maintainer](.ai/catalog/rules/infrastructure-maintainer.md)
-- [instagram-curator](.ai/catalog/rules/instagram-curator.md)
-- [jira-workflow-steward](.ai/catalog/rules/jira-workflow-steward.md)
-- [legal-compliance-checker](.ai/catalog/rules/legal-compliance-checker.md)
-- [mobile-app-builder](.ai/catalog/rules/mobile-app-builder.md)
-- [model-qa-specialist](.ai/catalog/rules/model-qa-specialist.md)
-- [performance-benchmarker](.ai/catalog/rules/performance-benchmarker.md)
-- [project-shepherd](.ai/catalog/rules/project-shepherd.md)
-- [qa-reality-checker](.ai/catalog/rules/qa-reality-checker.md)
-- [rapid-prototyper](.ai/catalog/rules/rapid-prototyper.md)
-- [reddit-community-builder](.ai/catalog/rules/reddit-community-builder.md)
-- [repo-boundary-steward](.ai/catalog/rules/repo-boundary-steward.md)
-- [security-engineer](.ai/catalog/rules/security-engineer.md)
-- [senior-developer](.ai/catalog/rules/senior-developer.md)
-- [senior-project-manager](.ai/catalog/rules/senior-project-manager.md)
 - [seo-specialist](.ai/catalog/rules/seo-specialist.md)
 - [social-media-strategist](.ai/catalog/rules/social-media-strategist.md)
-- [sprint-prioritizer](.ai/catalog/rules/sprint-prioritizer.md)
 - [support-responder](.ai/catalog/rules/support-responder.md)
 - [technical-writer](.ai/catalog/rules/technical-writer.md)
-- [test-results-analyzer](.ai/catalog/rules/test-results-analyzer.md)
-- [tiktok-strategist](.ai/catalog/rules/tiktok-strategist.md)
-- [token-efficiency-steward](.ai/catalog/rules/token-efficiency-steward.md)
-- [tool-evaluator](.ai/catalog/rules/tool-evaluator.md)
 - [trend-researcher](.ai/catalog/rules/trend-researcher.md)
-- [twitter-engager](.ai/catalog/rules/twitter-engager.md)
-- [ui-designer](.ai/catalog/rules/ui-designer.md)
-- [ux-architect](.ai/catalog/rules/ux-architect.md)
-- [ux-researcher](.ai/catalog/rules/ux-researcher.md)
 - [visual-storyteller](.ai/catalog/rules/visual-storyteller.md)
-- [whimsy-injector](.ai/catalog/rules/whimsy-injector.md)
-- [workflow-optimizer](.ai/catalog/rules/workflow-optimizer.md)
 - [zk-steward](.ai/catalog/rules/zk-steward.md)
 
 ## Included Skills
@@ -90,8 +88,8 @@ GitHub Copilot CLI specific behavior lives in [.ai/kernel/environments/copilot-c
 - [cold-email](.ai/catalog/skills/cold-email/SKILL.md)
 - [competitor-alternatives](.ai/catalog/skills/competitor-alternatives/SKILL.md)
 - [content-strategy](.ai/catalog/skills/content-strategy/SKILL.md)
-- [continuous-learning](.ai/catalog/skills/continuous-learning/SKILL.md)
 - [continuous-learning-v2](.ai/catalog/skills/continuous-learning-v2/SKILL.md)
+- [conversion-optimization-hub](.ai/catalog/skills/conversion-optimization-hub/SKILL.md)
 - [copy-editing](.ai/catalog/skills/copy-editing/SKILL.md)
 - [copywriting](.ai/catalog/skills/copywriting/SKILL.md)
 - [database-schema-design](.ai/catalog/skills/database-schema-design/SKILL.md)
@@ -100,6 +98,7 @@ GitHub Copilot CLI specific behavior lives in [.ai/kernel/environments/copilot-c
 - [deployment-patterns](.ai/catalog/skills/deployment-patterns/SKILL.md)
 - [doc-coauthoring](.ai/catalog/skills/doc-coauthoring/SKILL.md)
 - [docx](.ai/catalog/skills/docx/SKILL.md)
+- [email-marketing-flow](.ai/catalog/skills/email-marketing-flow/SKILL.md)
 - [email-sequence](.ai/catalog/skills/email-sequence/SKILL.md)
 - [eval-harness](.ai/catalog/skills/eval-harness/SKILL.md)
 - [find-skills](.ai/catalog/skills/find-skills/SKILL.md)
@@ -121,6 +120,7 @@ GitHub Copilot CLI specific behavior lives in [.ai/kernel/environments/copilot-c
 - [paywall-upgrade-cro](.ai/catalog/skills/paywall-upgrade-cro/SKILL.md)
 - [pdf](.ai/catalog/skills/pdf/SKILL.md)
 - [performance-profiling](.ai/catalog/skills/performance-profiling/SKILL.md)
+- [persuasive-content-craft](.ai/catalog/skills/persuasive-content-craft/SKILL.md)
 - [popup-cro](.ai/catalog/skills/popup-cro/SKILL.md)
 - [pptx](.ai/catalog/skills/pptx/SKILL.md)
 - [prd-to-issues](.ai/catalog/skills/prd-to-issues/SKILL.md)
@@ -132,22 +132,22 @@ GitHub Copilot CLI specific behavior lives in [.ai/kernel/environments/copilot-c
 - [remotion-best-practices](.ai/catalog/skills/remotion-best-practices/SKILL.md)
 - [repo-boundary-hygiene](.ai/catalog/skills/repo-boundary-hygiene/SKILL.md)
 - [rules-distill](.ai/catalog/skills/rules-distill/SKILL.md)
-- [schema-markup](.ai/catalog/skills/schema-markup/SKILL.md)
 - [search-first](.ai/catalog/skills/search-first/SKILL.md)
 - [security-deepdive](.ai/catalog/skills/security-deepdive/SKILL.md)
 - [security-scan](.ai/catalog/skills/security-scan/SKILL.md)
 - [seo-audit](.ai/catalog/skills/seo-audit/SKILL.md)
 - [signup-flow-cro](.ai/catalog/skills/signup-flow-cro/SKILL.md)
 - [skill-creator](.ai/catalog/skills/skill-creator/SKILL.md)
-- [skill-router](.ai/catalog/skills/skill-router/SKILL.md)
 - [social-content](.ai/catalog/skills/social-content/SKILL.md)
 - [strategic-compact](.ai/catalog/skills/strategic-compact/SKILL.md)
+- [strategic-messaging](.ai/catalog/skills/strategic-messaging/SKILL.md)
 - [subagent-driven-development](.ai/catalog/skills/subagent-driven-development/SKILL.md)
 - [systematic-debugging](.ai/catalog/skills/systematic-debugging/SKILL.md)
 - [tdd-workflow](.ai/catalog/skills/tdd-workflow/SKILL.md)
 - [theme-factory](.ai/catalog/skills/theme-factory/SKILL.md)
 - [token-efficiency-advisor](.ai/catalog/skills/token-efficiency-advisor/SKILL.md)
 - [ui-ux-pro-max](.ai/catalog/skills/ui-ux-pro-max/SKILL.md)
+- [unified-router](.ai/catalog/skills/unified-router/SKILL.md)
 - [using-git-worktrees](.ai/catalog/skills/using-git-worktrees/SKILL.md)
 - [vercel-composition-patterns](.ai/catalog/skills/vercel-composition-patterns/SKILL.md)
 - [verification-before-completion](.ai/catalog/skills/verification-before-completion/SKILL.md)
@@ -160,20 +160,13 @@ GitHub Copilot CLI specific behavior lives in [.ai/kernel/environments/copilot-c
 ## Included Agents
 
 - [accessibility-tester](.ai/catalog/agents-source/accessibility-tester.md)
-- [ad-security-reviewer](.ai/catalog/agents-source/ad-security-reviewer.md)
 - [agent-installer](.ai/catalog/agents-source/agent-installer.md)
-- [agent-organizer](.ai/catalog/agents-source/agent-organizer.md)
 - [ai-engineer](.ai/catalog/agents-source/ai-engineer.md)
-- [ai-prompt-manager-orchestrator](.ai/catalog/agents-source/ai-prompt-manager-orchestrator.md)
 - [angular-architect](.ai/catalog/agents-source/angular-architect.md)
-- [api-designer](.ai/catalog/agents-source/api-designer.md)
-- [api-documenter](.ai/catalog/agents-source/api-documenter.md)
 - [architect-reviewer](.ai/catalog/agents-source/architect-reviewer.md)
-- [architecture-diagram-orchestrator](.ai/catalog/agents-source/architecture-diagram-orchestrator.md)
 - [azure-infra-engineer](.ai/catalog/agents-source/azure-infra-engineer.md)
 - [backend-developer](.ai/catalog/agents-source/backend-developer.md)
 - [blockchain-developer](.ai/catalog/agents-source/blockchain-developer.md)
-- [browser-debugger](.ai/catalog/agents-source/browser-debugger.md)
 - [build-engineer](.ai/catalog/agents-source/build-engineer.md)
 - [business-analyst](.ai/catalog/agents-source/business-analyst.md)
 - [chaos-engineer](.ai/catalog/agents-source/chaos-engineer.md)
@@ -190,15 +183,11 @@ GitHub Copilot CLI specific behavior lives in [.ai/kernel/environments/copilot-c
 - [customer-success-manager](.ai/catalog/agents-source/customer-success-manager.md)
 - [data-analyst](.ai/catalog/agents-source/data-analyst.md)
 - [data-engineer](.ai/catalog/agents-source/data-engineer.md)
-- [data-researcher](.ai/catalog/agents-source/data-researcher.md)
 - [data-scientist](.ai/catalog/agents-source/data-scientist.md)
 - [database-administrator](.ai/catalog/agents-source/database-administrator.md)
-- [database-optimizer](.ai/catalog/agents-source/database-optimizer.md)
 - [debugger](.ai/catalog/agents-source/debugger.md)
 - [dependency-manager](.ai/catalog/agents-source/dependency-manager.md)
-- [deployment-engineer](.ai/catalog/agents-source/deployment-engineer.md)
 - [devops-engineer](.ai/catalog/agents-source/devops-engineer.md)
-- [devops-incident-responder](.ai/catalog/agents-source/devops-incident-responder.md)
 - [django-developer](.ai/catalog/agents-source/django-developer.md)
 - [docker-expert](.ai/catalog/agents-source/docker-expert.md)
 - [docs-researcher](.ai/catalog/agents-source/docs-researcher.md)
@@ -210,7 +199,6 @@ GitHub Copilot CLI specific behavior lives in [.ai/kernel/environments/copilot-c
 - [elixir-expert](.ai/catalog/agents-source/elixir-expert.md)
 - [embedded-systems](.ai/catalog/agents-source/embedded-systems.md)
 - [error-coordinator](.ai/catalog/agents-source/error-coordinator.md)
-- [error-detective](.ai/catalog/agents-source/error-detective.md)
 - [feature-proposal](.ai/catalog/agents-source/feature-proposal.md)
 - [fintech-engineer](.ai/catalog/agents-source/fintech-engineer.md)
 - [flutter-expert](.ai/catalog/agents-source/flutter-expert.md)
@@ -219,7 +207,6 @@ GitHub Copilot CLI specific behavior lives in [.ai/kernel/environments/copilot-c
 - [game-developer](.ai/catalog/agents-source/game-developer.md)
 - [git-workflow-manager](.ai/catalog/agents-source/git-workflow-manager.md)
 - [golang-pro](.ai/catalog/agents-source/golang-pro.md)
-- [graphql-architect](.ai/catalog/agents-source/graphql-architect.md)
 - [incident-responder](.ai/catalog/agents-source/incident-responder.md)
 - [iot-engineer](.ai/catalog/agents-source/iot-engineer.md)
 - [it-ops-orchestrator](.ai/catalog/agents-source/it-ops-orchestrator.md)
@@ -231,27 +218,18 @@ GitHub Copilot CLI specific behavior lives in [.ai/kernel/environments/copilot-c
 - [laravel-specialist](.ai/catalog/agents-source/laravel-specialist.md)
 - [legacy-modernizer](.ai/catalog/agents-source/legacy-modernizer.md)
 - [legal-advisor](.ai/catalog/agents-source/legal-advisor.md)
-- [llm-architect](.ai/catalog/agents-source/llm-architect.md)
 - [m365-admin](.ai/catalog/agents-source/m365-admin.md)
-- [machine-learning-engineer](.ai/catalog/agents-source/machine-learning-engineer.md)
 - [market-researcher](.ai/catalog/agents-source/market-researcher.md)
 - [mcp-developer](.ai/catalog/agents-source/mcp-developer.md)
-- [microservices-architect](.ai/catalog/agents-source/microservices-architect.md)
 - [ml-engineer](.ai/catalog/agents-source/ml-engineer.md)
 - [mlops-engineer](.ai/catalog/agents-source/mlops-engineer.md)
-- [mobile-app-developer](.ai/catalog/agents-source/mobile-app-developer.md)
 - [mobile-developer](.ai/catalog/agents-source/mobile-developer.md)
-- [multi-agent-coordinator](.ai/catalog/agents-source/multi-agent-coordinator.md)
 - [network-engineer](.ai/catalog/agents-source/network-engineer.md)
 - [nextjs-developer](.ai/catalog/agents-source/nextjs-developer.md)
-- [nlp-engineer](.ai/catalog/agents-source/nlp-engineer.md)
-- [payment-integration](.ai/catalog/agents-source/payment-integration.md)
 - [penetration-tester](.ai/catalog/agents-source/penetration-tester.md)
 - [performance-engineer](.ai/catalog/agents-source/performance-engineer.md)
-- [performance-monitor](.ai/catalog/agents-source/performance-monitor.md)
 - [php-pro](.ai/catalog/agents-source/php-pro.md)
 - [pied-piper](.ai/catalog/agents-source/pied-piper.md)
-- [platform-engineer](.ai/catalog/agents-source/platform-engineer.md)
 - [postgres-pro](.ai/catalog/agents-source/postgres-pro.md)
 - [powershell-5.1-expert](.ai/catalog/agents-source/powershell-5.1-expert.md)
 - [powershell-7-expert](.ai/catalog/agents-source/powershell-7-expert.md)
@@ -268,8 +246,6 @@ GitHub Copilot CLI specific behavior lives in [.ai/kernel/environments/copilot-c
 - [react-specialist](.ai/catalog/agents-source/react-specialist.md)
 - [refactoring-specialist](.ai/catalog/agents-source/refactoring-specialist.md)
 - [research-analyst](.ai/catalog/agents-source/research-analyst.md)
-- [reviewer](.ai/catalog/agents-source/reviewer.md)
-- [risk-manager](.ai/catalog/agents-source/risk-manager.md)
 - [rust-engineer](.ai/catalog/agents-source/rust-engineer.md)
 - [sales-engineer](.ai/catalog/agents-source/sales-engineer.md)
 - [scrum-master](.ai/catalog/agents-source/scrum-master.md)
@@ -282,23 +258,72 @@ GitHub Copilot CLI specific behavior lives in [.ai/kernel/environments/copilot-c
 - [sql-pro](.ai/catalog/agents-source/sql-pro.md)
 - [sre-engineer](.ai/catalog/agents-source/sre-engineer.md)
 - [swift-expert](.ai/catalog/agents-source/swift-expert.md)
-- [task-distributor](.ai/catalog/agents-source/task-distributor.md)
 - [technical-writer](.ai/catalog/agents-source/technical-writer.md)
 - [terraform-engineer](.ai/catalog/agents-source/terraform-engineer.md)
 - [terragrunt-expert](.ai/catalog/agents-source/terragrunt-expert.md)
 - [test-automator](.ai/catalog/agents-source/test-automator.md)
-- [tooling-engineer](.ai/catalog/agents-source/tooling-engineer.md)
 - [trend-analyst](.ai/catalog/agents-source/trend-analyst.md)
 - [typescript-pro](.ai/catalog/agents-source/typescript-pro.md)
 - [ui-designer](.ai/catalog/agents-source/ui-designer.md)
-- [ui-fixer](.ai/catalog/agents-source/ui-fixer.md)
 - [ux-researcher](.ai/catalog/agents-source/ux-researcher.md)
 - [vue-expert](.ai/catalog/agents-source/vue-expert.md)
 - [websocket-engineer](.ai/catalog/agents-source/websocket-engineer.md)
 - [windows-infra-admin](.ai/catalog/agents-source/windows-infra-admin.md)
 - [wordpress-master](.ai/catalog/agents-source/wordpress-master.md)
-- [workflow-orchestrator](.ai/catalog/agents-source/workflow-orchestrator.md)
+
+## Deprecated Aliases
+
+These names are kept as aliases that route to their successor:
+
+- ~~behavioral-nudge-engine~~ 竊・[growth-hacker](.ai/catalog/rules/growth-hacker.md) _(rule)_
+- ~~evidence-collector~~ 竊・[qa-reality-checker](.ai/catalog/rules/qa-reality-checker.md) _(rule)_
+- ~~inclusive-visuals-specialist~~ 竊・[ui-designer](.ai/catalog/rules/ui-designer.md) _(rule)_
+- ~~instagram-curator~~ 竊・[content-creator](.ai/catalog/rules/content-creator.md) _(rule)_
+- ~~reddit-community-builder~~ 竊・[social-media-strategist](.ai/catalog/rules/social-media-strategist.md) _(rule)_
+- ~~sprint-prioritizer~~ 竊・[senior-project-manager](.ai/catalog/rules/senior-project-manager.md) _(rule)_
+- ~~test-results-analyzer~~ 竊・[qa-reality-checker](.ai/catalog/rules/qa-reality-checker.md) _(rule)_
+- ~~tiktok-strategist~~ 竊・[social-media-strategist](.ai/catalog/rules/social-media-strategist.md) _(rule)_
+- ~~twitter-engager~~ 竊・[social-media-strategist](.ai/catalog/rules/social-media-strategist.md) _(rule)_
+- ~~ux-architect~~ 竊・[ui-designer](.ai/catalog/rules/ui-designer.md) _(rule)_
+- ~~continuous-learning~~ 竊・[continuous-learning-v2](.ai/catalog/skills/continuous-learning-v2/SKILL.md) _(skill)_
+- ~~schema-markup~~ 竊・[seo-audit](.ai/catalog/skills/seo-audit/SKILL.md) _(skill)_
+- ~~skill-router~~ 竊・[unified-router](.ai/catalog/skills/unified-router/SKILL.md) _(skill)_
+- ~~ad-security-reviewer~~ 竊・[security-auditor](.ai/catalog/agents-source/security-auditor.md) _(agent)_
+- ~~agent-organizer~~ 竊・[pied-piper](.ai/catalog/agents-source/pied-piper.md) _(agent)_
+- ~~ai-prompt-manager-orchestrator~~ 竊・[pied-piper](.ai/catalog/agents-source/pied-piper.md) _(agent)_
+- ~~api-designer~~ 竊・[backend-developer](.ai/catalog/agents-source/backend-developer.md) _(agent)_
+- ~~api-documenter~~ 竊・[documentation-engineer](.ai/catalog/agents-source/documentation-engineer.md) _(agent)_
+- ~~architecture-diagram-orchestrator~~ 竊・[pied-piper](.ai/catalog/agents-source/pied-piper.md) _(agent)_
+- ~~browser-debugger~~ 竊・[debugger](.ai/catalog/agents-source/debugger.md) _(agent)_
+- ~~data-researcher~~ 竊・[research-analyst](.ai/catalog/agents-source/research-analyst.md) _(agent)_
+- ~~database-optimizer~~ 竊・[database-administrator](.ai/catalog/agents-source/database-administrator.md) _(agent)_
+- ~~deployment-engineer~~ 竊・[devops-engineer](.ai/catalog/agents-source/devops-engineer.md) _(agent)_
+- ~~devops-incident-responder~~ 竊・[incident-responder](.ai/catalog/agents-source/incident-responder.md) _(agent)_
+- ~~error-detective~~ 竊・[debugger](.ai/catalog/agents-source/debugger.md) _(agent)_
+- ~~graphql-architect~~ 竊・[backend-developer](.ai/catalog/agents-source/backend-developer.md) _(agent)_
+- ~~llm-architect~~ 竊・[ai-engineer](.ai/catalog/agents-source/ai-engineer.md) _(agent)_
+- ~~machine-learning-engineer~~ 竊・[ml-engineer](.ai/catalog/agents-source/ml-engineer.md) _(agent)_
+- ~~microservices-architect~~ 竊・[backend-developer](.ai/catalog/agents-source/backend-developer.md) _(agent)_
+- ~~mobile-app-developer~~ 竊・[mobile-developer](.ai/catalog/agents-source/mobile-developer.md) _(agent)_
+- ~~multi-agent-coordinator~~ 竊・[pied-piper](.ai/catalog/agents-source/pied-piper.md) _(agent)_
+- ~~nlp-engineer~~ 竊・[ml-engineer](.ai/catalog/agents-source/ml-engineer.md) _(agent)_
+- ~~payment-integration~~ 竊・[fintech-engineer](.ai/catalog/agents-source/fintech-engineer.md) _(agent)_
+- ~~performance-monitor~~ 竊・[performance-engineer](.ai/catalog/agents-source/performance-engineer.md) _(agent)_
+- ~~platform-engineer~~ 竊・[devops-engineer](.ai/catalog/agents-source/devops-engineer.md) _(agent)_
+- ~~reviewer~~ 竊・[code-reviewer](.ai/catalog/agents-source/code-reviewer.md) _(agent)_
+- ~~risk-manager~~ 竊・[fintech-engineer](.ai/catalog/agents-source/fintech-engineer.md) _(agent)_
+- ~~task-distributor~~ 竊・[pied-piper](.ai/catalog/agents-source/pied-piper.md) _(agent)_
+- ~~tooling-engineer~~ 竊・[build-engineer](.ai/catalog/agents-source/build-engineer.md) _(agent)_
+- ~~ui-fixer~~ 竊・[frontend-developer](.ai/catalog/agents-source/frontend-developer.md) _(agent)_
+- ~~workflow-orchestrator~~ 竊・[pied-piper](.ai/catalog/agents-source/pied-piper.md) _(agent)_
 
 ---
 
-For architecture details, see [.ai/module/unified-integration.md](.ai/module/unified-integration.md)
+## Unified Coordinator
+
+蜈ｨ繧ｿ繧ｹ繧ｯ縺ｮ蜊倅ｸ蜈･蜿｣縺ｯ **pied-piper** agent縲３ule/Skill/Agent 驕ｸ螳壹・豎ｺ螳壽惠縺ｫ蠕薙＞縲∵治逕ｨ蜑阪↓3陦悟ｱ蜻奇ｼ域治逕ｨ蜷阪・逅・罰繝ｻ譛溷ｾ・柑譫懶ｼ峨ｒ蜃ｺ縺吶・
+
+隧ｳ邏ｰ・・
+- [.ai/module/unified-coordinator.md](.ai/module/unified-coordinator.md)
+- [.ai/module/unified-router.md](.ai/module/unified-router.md)
+- [.ai/module/unified-integration.md](.ai/module/unified-integration.md)

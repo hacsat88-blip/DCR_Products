@@ -1,5 +1,6 @@
 ---
 name: code-review
+routing_category: devops
 description: Use when requesting code reviews, dispatching reviewer subagents, or receiving and responding to code review feedback. Covers both sides of the review process with technical rigor.
 contract:
   preconditions:

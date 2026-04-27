@@ -1,5 +1,6 @@
 ---
 name: canvas-design
+routing_category: documents
 description: "Use when the user asks to create a poster, piece of art, visual design, or other static design piece using design philosophy. Outputs .png and .pdf files only. This skill creates original visual designs via a two-step process: design philosophy document + canvas expression."
 license: Complete terms in LICENSE.txt
 disable-model-invocation: true

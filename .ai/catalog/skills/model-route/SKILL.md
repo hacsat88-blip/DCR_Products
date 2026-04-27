@@ -1,5 +1,6 @@
 ---
 name: model-route
+routing_category: governance
 description: "タスク難易度とコスト制約に応じてモデルをルーティングする。cheap-default / deep-on-demand を徹底する。"
 ---
 

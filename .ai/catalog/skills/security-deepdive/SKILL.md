@@ -1,6 +1,10 @@
 ---
 name: security-deepdive
-description: OWASP Top 10 深掘り、暗号選定、認証認可設計、コンプライアンスチェックの実践ガイド。セキュリティ品質を体系的に確保する。
+routing_category: devops
+description: OWASP Top 10 深掘り、暗号選定、認証認可設計、コンプライアンスチェックの実践ガイド。セキュリティ品質を体系的に確保する。コードレベルの深い監査（deep depth）。設定・シークレットの浅い監査には security-scan を使用。
+audit_depth: deep
+audit_scope: code-and-design
+sibling: security-scan
 contract:
   preconditions:
     - "対象システムの技術スタックが把握されている"

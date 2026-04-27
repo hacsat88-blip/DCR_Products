@@ -1,5 +1,6 @@
 ---
 name: ai-prompt-manager
+routing_category: governance
 description: Chrome拡張 Product/ai-prompt-manager の開発・改修・検証を行う専用スキル。manifest v3、sidepanel、content script、AIチャットDOM差分吸収を含む。
 ---
 

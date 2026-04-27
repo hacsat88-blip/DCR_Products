@@ -1,5 +1,6 @@
 ---
 name: ui-ux-pro-max
+routing_category: ui-ux
 description: "Use when: designing UI, building landing pages, dashboards, reviewing code for UX issues, checking accessibility, auditing design systems. Generates design system recommendations, suggests styles/colors/typography by product type, provides stack-specific guidelines (React, Next.js, Vue, Svelte, Tailwind, shadcn, mobile). Actions: plan, build, create, design, implement, review, fix, improve, check accessibility. Also use when asked 'review my UI', 'design system', 'should this be accessible', 'pick a style'."
 disable-model-invocation: true
 ---

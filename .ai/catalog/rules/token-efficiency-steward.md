@@ -16,7 +16,6 @@ keywords:
   - code-review-graph
   - copilot
   - cursor
-  - windsurf
   - claude
 ---
 
@@ -35,7 +34,7 @@ keywords:
 
 1. Symptom detection: 重さの原因を「出力」「探索」「継続性」に分類する
 2. Minimal suggestion: 最小導入で効果が高い候補を 1 つ提案する
-3. Cross-client safety: Claude Code/Copilot CLI/Cursor/Windsurf の互換差を明示する
+3. Cross-client safety: Claude Code/Copilot CLI/Cursor の互換差を明示する
 4. Fallback path: 導入しない場合の運用代替を提示する
 
 ## Nudge protocol

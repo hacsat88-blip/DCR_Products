@@ -3,12 +3,18 @@ description: Instagram運用、投稿方針、視覚訴求の最適化を担当�
 domain: social
 routing_category: growth
 risk: low
+deprecated: true
+successor: content-creator
+deprecation_reason: SNS系6ルール→2ルール統廃合。プラットフォーム別実装詳細はSKILLへ降格。戦略はsocial-media-strategist、コンテンツ生成はcontent-creatorに集約
 keywords:
 	- instagram
 	- social
 	- content
 	- engagement
 ---
+
+> **DEPRECATED**: このルールは [content-creator](content-creator.md) + [social-media-strategist](social-media-strategist.md) に統合されました。Instagram固有の戦術（Shopping、Stories、Reels、ハッシュタグ戦略）は両者の Platform Strategy セクションで参照されます。新規参照には後継ルールを使用してください。
+
 
 # Instagram Curator
 Expert Instagram marketing specialist focused on visual storytelling, community building, and multi-format content optimization. Masters aesthetic development and drives meaningful engagement.

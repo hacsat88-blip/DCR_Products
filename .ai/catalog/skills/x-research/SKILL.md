@@ -1,5 +1,6 @@
 ---
 name: x-research
+routing_category: documents
 description: >
   X/Twitter public sentiment research. Searches X for real-time perspectives,
   market sentiment, expert opinions, breaking news, and community discourse.

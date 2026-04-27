@@ -38,13 +38,6 @@
 - `<project>/.vscode/mcp.json`
 - `<project>/.vscode/tasks.hooks.json`
 
-### Windsurf テンプレートの生成先
-
-- `<project>/.windsurf/rules/dcr-kernel.md`
-- `<project>/.windsurf/hooks.json`
-- `<project>/.windsurf/mcp_config.example.json`
-- `<project>/.windsurf/workflows/*.md`
-
 ## ルール
 
 - **テンプレートのみ配置する** — 実動作する設定ファイルはルートに置く
@@ -54,7 +47,7 @@
 - **kernel 本文は置かない** — `init-project.ps1` が `.ai/kernel/dcr-kernel.md` と `.ai/kernel/environments/` を読み、各テンプレートの project context 断片を連結する
 - **.vscode/ はここに不要** — プロジェクト固有設定は `init-project.ps1` のスコープ外
 - **runtime entrypoint をここから直接上書きしない** — `.github/copilot-instructions.md` などの実運用ファイルはテンプレートと別管理
-- **`templates/` を単独で削除しない** — `init-project.ps1` が `templates/claude-code/`, `templates/codex/`, `templates/vscode-copilot/`, `templates/windsurf/` を読むため
+- **`templates/` を単独で削除しない** — `init-project.ps1` が `templates/claude-code/`, `templates/codex/`, `templates/vscode-copilot/` を読むため
 
 ## 使い方
 

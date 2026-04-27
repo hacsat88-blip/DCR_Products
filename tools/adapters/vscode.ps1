@@ -8,6 +8,14 @@ $skillsDir = Resolve-DcrSourcePath -RepoRoot $RepoRoot -AssetType "skills"
 
 Write-Host "[vscode] Generating .github/copilot-instructions.md..." -ForegroundColor Cyan
 
+function Test-Deprecated($text) {
+    if ($text -match '(?ms)^---(.*?)^---') {
+        $fm = $Matches[1]
+        if ($fm -match '(?m)^\s*deprecated\s*:\s*true\s*$') { return $true }
+    }
+    return $false
+}
+
 # Collect vscode-targeted rules and skills
 $rules = @()
 $skills = @()
@@ -15,6 +23,7 @@ $skills = @()
 # Check rules
 foreach ($f in Get-ChildItem $rulesDir -Filter "*.md" | Where-Object { -not $_.BaseName.StartsWith("_") }) {
     $text = Get-Content $f.FullName -Raw
+    if (Test-Deprecated $text) { continue }
     if ($text -match '(?s)^---.*?^targets:\s*\n((?:.*?\n)*?)(?:^---|^$)') {
         $targets = [regex]::Matches($Matches[1], '^\s*-\s*(.+)$', 'Multiline') | % { $_.Groups[1].Value }
     } else {
@@ -30,6 +39,7 @@ foreach ($dir in Get-ChildItem $skillsDir -Directory | Where-Object { -not $_.Na
     $sf = Join-Path $dir.FullName "SKILL.md"
     if (Test-Path $sf) {
         $text = Get-Content $sf -Raw
+        if (Test-Deprecated $text) { continue }
         if ($text -match '(?s)^---.*?^targets:\s*\n((?:.*?\n)*?)(?:^---|^$)') {
             $targets = [regex]::Matches($Matches[1], '^\s*-\s*(.+)$', 'Multiline') | % { $_.Groups[1].Value }
         } else {

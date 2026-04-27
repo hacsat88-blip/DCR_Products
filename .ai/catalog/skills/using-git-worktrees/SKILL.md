@@ -1,5 +1,6 @@
 ---
 name: using-git-worktrees
+routing_category: devops
 description: Use when starting feature work that needs isolation from current workspace or before executing implementation plans - creates isolated git worktrees with smart directory selection and safety verification
 disable-model-invocation: true
 ---

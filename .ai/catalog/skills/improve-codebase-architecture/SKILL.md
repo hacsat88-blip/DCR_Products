@@ -1,5 +1,6 @@
 ---
 name: improve-codebase-architecture
+routing_category: devops
 description: コードベースの構造改善ポイントを探索し、浅いモジュールを深くし、テスタビリティと変更容易性を高める改善案を提示する。
 metadata:
   origin: inspired by mattpocock/skills (adapted for DCR)

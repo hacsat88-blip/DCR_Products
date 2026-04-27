@@ -1,5 +1,6 @@
 ---
 name: search-first
+routing_category: governance
 description: Research-before-coding workflow. Search for existing tools, libraries, and patterns before writing custom code.
 metadata:
    origin: ECC (adapted for DCR)

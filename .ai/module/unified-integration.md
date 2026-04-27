@@ -63,6 +63,22 @@ team-plan → team-prd → team-exec → team-verify → team-fix (loop)
 3. rules
 4. 直接処理
 
+## Unified Coordinator（統一調整層）
+
+**全タスクの入口**は [pied-piper](../catalog/agents-source/pied-piper.md) agent で受ける。
+詳細は [unified-coordinator.md](unified-coordinator.md) と [unified-router.md](unified-router.md) を参照。
+
+採用前に以下3行報告を必ず先に出す：
+
+```
+🎯 採用：<rule|skill|agent名>（信頼度 0.XX）
+📌 理由：<routing_category 一致 + match keywords/domain>
+✨ 期待効果：<1行で見込まれる成果物・短縮時間・品質ゲート>
+```
+
+旧オーケストレーター（workflow-orchestrator / multi-agent-coordinator / task-distributor）は
+すべて pied-piper に統合済み。alias 経由で旧名呼び出しも動作する。
+
 ## External Capability Packs
 
 外部 plugin / skill pack は DCR の置換ではなく、ドメイン特化の拡張として扱う。

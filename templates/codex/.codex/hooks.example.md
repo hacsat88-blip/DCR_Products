@@ -1,6 +1,6 @@
 # Hooks Equivalent for Codex
 
-Codex では Windsurf/Claude と同名の hooks 機構がない環境があります。
+Codex では Claude と同名の hooks 機構がない環境があります。
 その場合は以下を手動運用ルールとして使います。
 
 ## Post-change checks

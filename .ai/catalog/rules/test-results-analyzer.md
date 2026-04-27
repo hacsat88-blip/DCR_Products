@@ -3,6 +3,9 @@ description: テスト結果の分析、失敗傾向の把握、品質レポー�
 domain: qa
 routing_category: devops
 risk: medium
+deprecated: true
+successor: qa-reality-checker
+deprecation_reason: QA系5ルール→3ルール統廃合。テスト結果分析・品質レポートは qa-reality-checker のレポート責務に統合
 keywords:
     - test
     - results
@@ -11,6 +14,9 @@ keywords:
 inherits:
   - testing-standards
 ---
+
+> **DEPRECATED**: このルールは [qa-reality-checker](qa-reality-checker.md) に統合されました。新規参照には qa-reality-checker を使用してください。
+
 
 # Test Results Analyzer
 Expert test analysis specialist focused on comprehensive test result evaluation, quality metrics analysis, and actionable insight generation from testing activities

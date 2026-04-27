@@ -1,5 +1,6 @@
 ---
 name: database-schema-design
+routing_category: devops
 description: データベーススキーマ設計、マイグレーション戦略、インデックス最適化の実践ガイド。データモデルの品質と変更容易性を確保する。
 contract:
   preconditions:

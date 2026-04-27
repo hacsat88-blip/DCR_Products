@@ -37,8 +37,7 @@
                                 "cursor",
                                 "claude",
                                 "codex",
-                                "zed",
-                                "windsurf"
+                                "zed"
                             ]
                         },
                         "minItems": 1
@@ -78,8 +77,7 @@
                                 "cursor",
                                 "claude",
                                 "codex",
-                                "zed",
-                                "windsurf"
+                                "zed"
                             ]
                         },
                         "minItems": 1

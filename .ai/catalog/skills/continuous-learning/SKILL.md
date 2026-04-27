@@ -1,9 +1,15 @@
 ---
 name: continuous-learning
-description: "セッション中の学びを構造化して記録し、リポジトリ固有の知見を蓄積する継続学習スキル。エラー解決、ユーザー修正、回避策、プロジェクト固有パターンを /memories/repo/ に instinct として記録する。Use when completing tasks, resolving errors, discovering project-specific patterns, or at session end for retrospective."
+description: '[DEPRECATED — superseded by continuous-learning-v2] 継続学習スキルの v1。すべての機能は v2 に統合済み（project/global スコープ + confidence + status/export/import/evolve/promote）。'
 metadata:
   origin: ECC continuous-learning-v2 (adapted for DCR)
+deprecated: true
+successor: continuous-learning-v2
+deprecation_reason: A-2e。v2が完全上位互換のため、v1は alias として残し新規参照は v2 へ
 ---
+
+> **DEPRECATED**: このスキルは [continuous-learning-v2](../continuous-learning-v2/SKILL.md) に置き換えられました。新規参照には v2 を使用してください。
+
 
 # Continuous Learning — セッションの学びを蓄積する
 

@@ -1,5 +1,6 @@
 ---
 name: tdd-workflow
+routing_category: devops
 description: Test-driven development workflow. Write tests first, then implement, with 80%+ coverage target. Use when implementing any feature or bugfix, before writing implementation code.
 metadata:
   origin: ECC (adapted for DCR)

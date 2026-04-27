@@ -25,13 +25,13 @@
 
 ## Gate state enforcement
 
-- sh/ 起動時、`/memories/session/gate-state.md` の `qa_passed: true` を確認する
-- `qa_passed: true` が存在しない場合: **ブロック**。実装を進めず以下を返す:
+- sh/ 起動時、`Test-GateReady -RequireGate 'qa_passed'` で `.ai/kernel/gate-state.json` を確認する（唯一の正本）
+- `qa_passed = true` でない場合: **ブロック**。実装を進めず以下を返す:
   ```
   🔴 Stop — q/ QA Gate を通過していません。
   💡 q/ でQA検証を実行してください
   ```
-- `qa_passed: true` かつ `findings_summary` 内に critical > 0: **ブロック**
+- `qa_passed = true` かつ `findings.critical > 0`: **ブロック**（`Test-GateReady` が自動判定）
 - 検証証跡が揃っている場合のみリリース判定に進む
 
 ## Ship checklist
@@ -42,3 +42,21 @@ sh/ 通過時、以下を確認して報告する:
 3. git status がクリーン（未コミットの変更なし）
 4. セキュリティ上の懸念がないこと
 5. コミットメッセージが規約に従っていること
+
+## Mandatory: structured gate-state write + hard-block check
+
+sh/ 実行直前に `Test-GateReady` で `qa_passed = true` && `critical = 0`
+を **必ず** 確認する：
+
+```powershell
+. .\tools\lib\gate-state.ps1
+if (-not (Test-GateReady -RepoRoot $RepoRoot -RequireGate 'qa_passed')) {
+    Write-Host "🔴 Stop — q/ QA Gate を通過していません。"
+    return
+}
+Update-GateState -RepoRoot $RepoRoot -Phase 'ship' -GateUpdate @{ ship_ready = $true }
+```
+
+`deploy.ps1 -EnforceGate` 実行時はこのチェックが自動適用される。
+ヒューマン操作で sh/ を回す場合も、Update-GateState の呼び出しを
+怠らないこと（次のセッション以降のゲート連鎖が壊れる）。

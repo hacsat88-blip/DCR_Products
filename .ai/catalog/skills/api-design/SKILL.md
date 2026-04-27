@@ -1,5 +1,6 @@
 ---
 name: api-design
+routing_category: devops
 description: "REST API 設計の実務チェックリスト。命名、HTTP semantics、エラー形式、認可、レート制限、バージョニングを定義する。"
 ---
 

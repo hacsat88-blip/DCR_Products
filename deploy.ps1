@@ -10,7 +10,7 @@
     Agents          : .ai/catalog/agents-source/ -> .codex/agents/ (toml) + .claude/agents/ (md)
 
 .PARAMETER Target
-    同期先を指定: all | vscode | cursor | windsurf | agents | dcr
+    同期先を指定: all | vscode | cursor | agents | dcr
   デフォルト: all
 
 .PARAMETER DryRun
@@ -28,12 +28,13 @@
 #>
 
 param(
-    [ValidateSet("all", "vscode", "cursor", "windsurf", "agents", "dcr")]
+    [ValidateSet("all", "vscode", "cursor", "agents", "dcr")]
     [string]$Target = "all",
     [switch]$DryRun,
     [switch]$Check,
     [switch]$Watch,
-    [switch]$Backup
+    [switch]$Backup,
+    [switch]$EnforceGate
 )
 
 $ErrorActionPreference = "Stop"
@@ -290,6 +291,8 @@ function Get-DirectoryDrift {
     $sourceFiles = Get-ChildItem $Source -Recurse -File | Where-Object { $_.Name -notin $IgnoreNames }
     foreach ($sf in $sourceFiles) {
         $relativePath = $sf.FullName.Substring($Source.Length + 1)
+        # Skip root-level _* files — Sync-Directory copies only subdirectories (not root files)
+        if ($relativePath -notlike '*\*' -and $relativePath -like '_*') { continue }
         $destFile = Join-Path $Destination $relativePath
         if (-not (Test-Path $destFile)) {
             $diffs += "[MISSING] $relativePath (not deployed to destination)"
@@ -482,16 +485,6 @@ if ($Check) {
             }
         }
     }
-    if ($Target -eq "all" -or $Target -eq "windsurf") {
-        $windsurfDiffs = Get-WindsurfDrift -RepoRootPath $RepoRoot -DestinationPath (Join-Path $RepoRoot ".windsurf") -AdapterScriptPath $WindsurfAdapter
-        if ($windsurfDiffs.Count -eq 0) {
-            Write-Host "[OK] Windsurf rules/workflows/config : in sync" -ForegroundColor Green
-        }
-        else {
-            Write-Host "[DRIFT] Windsurf rules/workflows/config : $($windsurfDiffs.Count) differences" -ForegroundColor Red
-            $windsurfDiffs | ForEach-Object { Write-Host "  $_" -ForegroundColor Yellow }
-        }
-    }
     if ($Target -eq "all" -or $Target -eq "agents") {
         $codexDiffs = Get-FlatFileDrift -Source $SourceAgents -Destination $DestCodexAgents -Filter '*.toml'
         if ($codexDiffs.Count -eq 0) {
@@ -603,6 +596,12 @@ if ($DryRun) {
 }
 else {
     Write-Host "Deploy complete." -ForegroundColor Green
+}
+
+# ── Deprecation Aliases Summary (Phase A/B/C consolidation) ──
+$catalogRoot = Join-Path $RepoRoot ".ai\catalog"
+if (Test-Path $catalogRoot) {
+    Write-DeprecationSummary -CatalogRoot $catalogRoot
 }
 
 # ── Watch Mode ──

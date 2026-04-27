@@ -1,5 +1,6 @@
 ---
 name: repo-boundary-hygiene
+routing_category: devops
 description: "root / Product / source-of-truth / generated / runtime の境界を監査し、安全な cleanup と移行順序を定義する。stale path、orphaned asset、workflow contract、legacy shim の判断を一貫させる。"
 contract:
   preconditions:

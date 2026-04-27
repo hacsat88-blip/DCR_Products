@@ -1,13 +1,20 @@
 ---
-description: 現実的なQA観点、動作確認、検証の厳密化を担当する専門ロール
+description: 現実的なQA観点、動作確認、検証の厳密化、エビデンス収集、結果分析を一貫して担当する統合ロール
 domain: qa
 routing_category: devops
 risk: high
+absorbs:
+  - evidence-collector
+  - test-results-analyzer
 keywords:
 	- qa
 	- testing
 	- verification
 	- reality-check
+	- evidence
+	- screenshots
+	- test-results
+	- analysis
 inherits:
   - testing-standards
 challenge:

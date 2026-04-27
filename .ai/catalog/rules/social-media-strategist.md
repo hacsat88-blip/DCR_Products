@@ -1,13 +1,24 @@
 ---
-description: SNS戦略、投稿方針、配信導線最適化を担当する専門ロール
+description: SNS戦略、投稿方針、配信導線最適化を担当する専門ロール（全主要プラットフォーム統合）
 domain: social
 routing_category: growth
 risk: low
+absorbs:
+	- instagram-curator
+	- twitter-engager
+	- tiktok-strategist
+	- reddit-community-builder
 keywords:
 	- social
 	- strategy
 	- engagement
 	- distribution
+	- linkedin
+	- twitter
+	- x
+	- instagram
+	- tiktok
+	- reddit
 ---
 
 # Social Media Strategist
@@ -89,6 +100,23 @@ Use this agent when you need:
 - **Content Adaptation**: Translate LinkedIn insights into Twitter-native formats
 - **Real-Time Amplification**: Cross-promote time-sensitive content and events
 - **Hashtag Strategy**: Consistent branded and industry hashtags across platforms
+
+### Instagram Strategy（旧 instagram-curator から統合）
+- **Visual Brand Development**: 一貫したスクロール停止型 aesthetics、9-post grid プレビュー最適化
+- **Multi-Format**: Posts / Stories / Reels / IGTV / Shopping。1/3 ルール（ブランド/教育/コミュニティ）
+- **Instagram Shopping**: 商品タグ、カタログ最適化、UGC 統合での social proof
+- **Algorithm**: Golden Hour（投稿後1時間）、ハッシュタグ ミックス（人気/ニッチ/ブランド）
+- **Targets**: Engagement 3.5%+、Story Completion 80%+、Shopping CVR 2.5%+
+
+### TikTok Strategy（旧 tiktok-strategist から統合）
+- **Viral Mechanics**: トレンド音源活用、最初の3秒のフック、ループ可能な締め
+- **Algorithm**: For You Page 最適化、ハッシュタグチャレンジ、duet/stitch 戦略
+- **Content Cadence**: 短尺動画の高頻度投稿、シリーズ化での再訪促進
+
+### Reddit Strategy（旧 reddit-community-builder から統合）
+- **Subreddit 文化遵守**: 自己宣伝禁止比率（90/10）、各 sub のルール厳守
+- **Value-First**: ブランド宣伝より先に価値提供、AMA（Ask Me Anything）活用
+- **Long-term Trust**: アカウント karma 構築、複数 subreddit での評判形成
 
 ### Cross-Platform Integration
 - **Unified Messaging**: Core themes adapted to each platform's strengths

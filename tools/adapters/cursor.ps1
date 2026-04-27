@@ -20,4 +20,8 @@ New-DcrCursorRulePackage `
     -OutputDir $outDir `
     -VerboseOutput
 
+if ($skippedDeprecated -gt 0) {
+    Write-Host "  (skipped $skippedDeprecated deprecated assets — use successor names)" -ForegroundColor DarkGray
+}
+
 Write-Host ""

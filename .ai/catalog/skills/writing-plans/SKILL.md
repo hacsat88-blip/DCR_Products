@@ -1,5 +1,6 @@
 ---
 name: writing-plans
+routing_category: documents
 description: Use when you have a spec or requirements for a multi-step task, before touching code, or when executing a written plan in the current session
 contract:
   preconditions:
