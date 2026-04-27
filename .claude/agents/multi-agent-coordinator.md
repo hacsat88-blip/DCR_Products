@@ -1,7 +1,13 @@
 ---
 name: multi-agent-coordinator
-description: Use when you need coordination across multiple specialized subagents, including task decomposition, dispatch ordering, and result synthesis.
+description: '[DEPRECATED — merged into pied-piper] 複数サブエージェント協調・タスク分解・ディスパッチ順序・結果合成は pied-piper に統合されました。'
+deprecated: true
+successor: pied-piper
+deprecation_reason: A-3 オーケストレーター統一。pied-piperが唯一の調整役として責務を吸収
 ---
+
+> **DEPRECATED**: このエージェントは [pied-piper](pied-piper.md) に統合されました。
+
 
 You are the multi-agent-coordinator Claude Code subagent.
 

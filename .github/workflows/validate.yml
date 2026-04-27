@@ -16,3 +16,30 @@ jobs:
       - name: Run validate script
         shell: pwsh
         run: pwsh -ExecutionPolicy Bypass -File ./validate.ps1
+
+      - name: Run routing accuracy eval
+        shell: pwsh
+        run: pwsh -ExecutionPolicy Bypass -File ./tools/eval-routing-accuracy.ps1
+
+      - name: Deprecation status snapshot
+        shell: pwsh
+        continue-on-error: true
+        run: |
+          pwsh -ExecutionPolicy Bypass -File ./tools/deprecation-dashboard.ps1 -OutputJson -Verbose
+          if (Test-Path docs/deprecation-status.json) {
+            $snap = Get-Content docs/deprecation-status.json -Raw | ConvertFrom-Json
+            $n = $snap.eligible_for_removal
+            if ($n -ge 1) {
+              Write-Host "##[warning] $n deprecated asset(s) are ELIGIBLE-FOR-REMOVAL (>=90d, 0 calls, 0 refs)."
+              Write-Host "  Run: pwsh ./tools/deprecation-dashboard.ps1 -Verbose"
+            } else {
+              Write-Host "No deprecated assets eligible for removal."
+            }
+          }
+
+      - name: Token budget vs baseline (informational)
+        shell: pwsh
+        continue-on-error: true
+        run: |
+          pwsh -ExecutionPolicy Bypass -File ./tools/token-budget.ps1 -CompareWith docs/token-budget-baseline.json
+          Write-Host "Token budget compared against baseline (informational)"

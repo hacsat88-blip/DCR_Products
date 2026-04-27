@@ -1,5 +1,6 @@
 ---
 name: j-quants
+routing_category: growth
 description: J-Quants 関連タスクのルーティング用エントリ。CLI 実行・データ取得・プラン制約確認は `jquants-cli-usage` を利用する。
 metadata:
   origin: DCR local

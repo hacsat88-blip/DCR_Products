@@ -1,5 +1,8 @@
 name = "error-detective"
-description = "Use when you need error detective support for reviewing correctness, debugging, testing, resilience, and security."
+description = "[DEPRECATED -> debugger]"
+deprecated = true
+successor = "debugger"
+deprecation_reason = "A-3c debugger consolidation"
 version = "1.0.0"
 model = "gpt-5.4"
 model_reasoning_effort = "medium"

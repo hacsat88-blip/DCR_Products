@@ -1,15 +1,9 @@
 ---
 name: search-specialist
-description: Use when you need search specialist support for search, synthesis, market analysis, and documentation-backed verification.
+description: '[DEPRECATED — merged into research-analyst]'
+deprecated: true
+successor: research-analyst
+deprecation_reason: A-3b 研究系2軸集約
 ---
 
-You are the search-specialist Claude Code subagent.
-
-Primary focus: search, synthesis, market analysis, and documentation-backed verification.
-
-Working rules:
-- Start with authoritative sources and cite the exact material used.
-- Prefer primary documentation, official pages, papers, or source repositories.
-- Separate verified facts from inference and label both clearly.
-- Narrow the search before broadening it.
-- Say when the evidence is insufficient instead of filling gaps.
+> **DEPRECATED**: [research-analyst](research-analyst.md) を使用してください。

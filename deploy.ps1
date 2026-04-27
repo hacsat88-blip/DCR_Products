@@ -10,7 +10,7 @@
     Agents          : .ai/catalog/agents-source/ → .codex/agents/ (toml) + .claude/agents/ (md)
 
 .PARAMETER Target
-    同期先を指定: all | vscode | cursor | windsurf | agents | dcr
+    同期先を指定: all | vscode | cursor | agents | dcr
   デフォルト: all
 
 .PARAMETER DryRun
@@ -28,12 +28,13 @@
 #>
 
 param(
-    [ValidateSet("all", "vscode", "cursor", "windsurf", "agents", "dcr")]
+    [ValidateSet("all", "vscode", "cursor", "agents", "dcr")]
     [string]$Target = "all",
     [switch]$DryRun,
     [switch]$Check,
     [switch]$Watch,
-    [switch]$Backup
+    [switch]$Backup,
+    [switch]$EnforceGate
 )
 
 $ErrorActionPreference = "Stop"
@@ -41,11 +42,44 @@ $RepoRoot = $PSScriptRoot
 $UserHome = $env:USERPROFILE
 $CatalogPaths = Join-Path $RepoRoot "tools\lib\catalog-paths.ps1"
 . $CatalogPaths
+$GateStateLib = Join-Path $RepoRoot "tools\lib\gate-state.ps1"
+if (Test-Path $GateStateLib) { . $GateStateLib }
+
+# Hard-block deploy if -EnforceGate and qa_passed != true (or critical findings > 0)
+if ($EnforceGate -and -not $DryRun -and -not $Check) {
+    if (Get-Command Assert-GateReady -ErrorAction SilentlyContinue) {
+        Write-Host "[gate] Verifying QA gate state..." -ForegroundColor Cyan
+        try {
+            Assert-GateReady -RepoRoot $RepoRoot -RequireGate 'qa_passed' -AllowMissing:$false
+            Write-Host "  ✓ qa_passed = true, no critical findings" -ForegroundColor Green
+        } catch {
+            Write-Host "🔴 Stop — $($_.Exception.Message)" -ForegroundColor Red
+            Write-Host "   Run the q/ trigger first or remove -EnforceGate to bypass." -ForegroundColor Yellow
+            exit 1
+        }
+    } else {
+        Write-Warning "[gate] gate-state library not loaded; skipping enforcement."
+    }
+}
+
+# ── Routing Index Pre-generation ──
+if (-not $Check -and -not $DryRun) {
+    $RoutingIndexScript = Join-Path $RepoRoot "tools\generate-routing-index.ps1"
+    if (Test-Path $RoutingIndexScript) {
+        Write-Host "[routing] Regenerating routing indexes..." -ForegroundColor Cyan
+        $skillsIndexPath = Join-Path $RepoRoot ".ai\catalog\skills\_SKILLS_ROUTING_INDEX.md"
+        & powershell -ExecutionPolicy Bypass -File $RoutingIndexScript `
+            -RepoRoot $RepoRoot `
+            -SkillsOutputPath $skillsIndexPath
+        if ($LASTEXITCODE -ne 0) {
+            Write-Warning "[routing] generate-routing-index.ps1 exited $LASTEXITCODE — continuing"
+        }
+    }
+}
 
 # ── Unified Adapter Framework (new) ──
 $DeployAll = Join-Path $RepoRoot "tools\deploy-all.ps1"
-$WindsurfAdapter = Join-Path $RepoRoot "tools\adapters\windsurf.ps1"
-if ((Test-Path $DeployAll) -and -not $Check -and ($Target -in @("all", "vscode", "cursor", "windsurf"))) {
+if ((Test-Path $DeployAll) -and -not $Check -and ($Target -in @("all", "vscode", "cursor"))) {
     Write-Host ""
     Write-Host "=== Deploy Adapters (Unified Framework) ===" -ForegroundColor Cyan
     $targetArg = if ($Target -eq "all") { "all" } else { $Target }
@@ -75,31 +109,6 @@ function Get-TempDirectory {
     $tempDir = Join-Path ([System.IO.Path]::GetTempPath()) ("dcr-cursor-rules-" + [System.Guid]::NewGuid().ToString("N"))
     New-Item -ItemType Directory -Path $tempDir -Force | Out-Null
     return $tempDir
-}
-
-function Get-WindsurfDrift {
-    param(
-        [string]$RepoRootPath,
-        [string]$DestinationPath,
-        [string]$AdapterScriptPath
-    )
-
-    if (-not (Test-Path $AdapterScriptPath)) {
-        throw "Windsurf adapter not found: $AdapterScriptPath"
-    }
-
-    $tempDir = Get-TempDirectory
-    $tempOutputRoot = Join-Path $tempDir ".windsurf"
-
-    try {
-        & $AdapterScriptPath -RepoRoot $RepoRootPath -OutputRoot $tempOutputRoot -Quiet -InformationAction Ignore
-        return Get-DirectoryDrift -Source $tempOutputRoot -Destination $DestinationPath
-    }
-    finally {
-        if (Test-Path $tempDir) {
-            Remove-Item -Path $tempDir -Recurse -Force
-        }
-    }
 }
 
 function Get-RuleDescription {
@@ -279,6 +288,54 @@ function New-CursorRulePackage {
     }
 
     Copy-Item -Path $KernelSource -Destination (Join-Path $OutputDir "dcr-kernel.md") -Force
+}
+
+function Get-DeprecationReport {
+    param([string]$CatalogRoot)
+
+    $report = @{ rules = @(); skills = @(); agents = @() }
+    $patterns = @(
+        @{ Kind = 'rules'; Path = Join-Path $CatalogRoot 'rules'; Filter = '*.md' }
+        @{ Kind = 'agents'; Path = Join-Path $CatalogRoot 'agents-source'; Filter = '*.md' }
+        @{ Kind = 'skills'; Path = Join-Path $CatalogRoot 'skills'; Filter = 'SKILL.md'; Recurse = $true }
+    )
+    foreach ($p in $patterns) {
+        if (-not (Test-Path $p.Path)) { continue }
+        $params = @{ Path = $p.Path; File = $true; Filter = $p.Filter }
+        if ($p.Recurse) { $params.Recurse = $true }
+        $files = Get-ChildItem @params
+        foreach ($f in $files) {
+            $head = Get-Content -Path $f.FullName -TotalCount 20 -Encoding utf8
+            $isDep = $head | Where-Object { $_ -match '^\s*deprecated\s*:\s*true\s*$' }
+            if ($isDep) {
+                $succ = ($head | Where-Object { $_ -match '^\s*successor\s*:' } | Select-Object -First 1) -replace '^\s*successor\s*:\s*', ''
+                $name = $f.BaseName
+                if ($p.Kind -eq 'skills') { $name = (Split-Path $f.DirectoryName -Leaf) }
+                $report[$p.Kind] += [pscustomobject]@{ Name = $name; Successor = $succ.Trim() }
+            }
+        }
+    }
+    return $report
+}
+
+function Write-DeprecationSummary {
+    param([string]$CatalogRoot)
+
+    $report = Get-DeprecationReport -CatalogRoot $CatalogRoot
+    $total = $report.rules.Count + $report.skills.Count + $report.agents.Count
+    if ($total -eq 0) { return }
+
+    Write-Host ""
+    Write-Host "=== Deprecation Aliases (旧名 → 新後継) ===" -ForegroundColor Cyan
+    foreach ($kind in @('rules', 'skills', 'agents')) {
+        if ($report[$kind].Count -gt 0) {
+            Write-Host "  [$kind] $($report[$kind].Count) deprecated:" -ForegroundColor Yellow
+            foreach ($entry in $report[$kind]) {
+                Write-Host "    $($entry.Name) → $($entry.Successor)" -ForegroundColor DarkGray
+            }
+        }
+    }
+    Write-Host ""
 }
 
 function Sync-Agents {
@@ -482,6 +539,8 @@ function Get-DirectoryDrift {
     $sourceFiles = Get-ChildItem $Source -Recurse -File | Where-Object { $_.Name -notin $IgnoreNames }
     foreach ($sf in $sourceFiles) {
         $relativePath = $sf.FullName.Substring($Source.Length + 1)
+        # Skip root-level _* files — Sync-Directory copies only subdirectories (not root files)
+        if ($relativePath -notlike '*\*' -and $relativePath -like '_*') { continue }
         $destFile = Join-Path $Destination $relativePath
         if (-not (Test-Path $destFile)) {
             $diffs += "[MISSING] $relativePath (not deployed to destination)"
@@ -674,16 +733,6 @@ if ($Check) {
             }
         }
     }
-    if ($Target -eq "all" -or $Target -eq "windsurf") {
-        $windsurfDiffs = Get-WindsurfDrift -RepoRootPath $RepoRoot -DestinationPath (Join-Path $RepoRoot ".windsurf") -AdapterScriptPath $WindsurfAdapter
-        if ($windsurfDiffs.Count -eq 0) {
-            Write-Host "[OK] Windsurf rules/workflows/config : in sync" -ForegroundColor Green
-        }
-        else {
-            Write-Host "[DRIFT] Windsurf rules/workflows/config : $($windsurfDiffs.Count) differences" -ForegroundColor Red
-            $windsurfDiffs | ForEach-Object { Write-Host "  $_" -ForegroundColor Yellow }
-        }
-    }
     if ($Target -eq "all" -or $Target -eq "agents") {
         $codexDiffs = Get-FlatFileDrift -Source $SourceAgents -Destination $DestCodexAgents -Filter '*.toml'
         if ($codexDiffs.Count -eq 0) {
@@ -793,6 +842,12 @@ if ($DryRun) {
 }
 else {
     Write-Host "Deploy complete." -ForegroundColor Green
+}
+
+# ── Deprecation Aliases Summary (Phase A/B/C consolidation) ──
+$catalogRoot = Join-Path $RepoRoot ".ai\catalog"
+if (Test-Path $catalogRoot) {
+    Write-DeprecationSummary -CatalogRoot $catalogRoot
 }
 
 # ── Watch Mode ──

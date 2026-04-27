@@ -1,5 +1,6 @@
 ---
 name: brainstorming
+routing_category: governance
 description: "You MUST use this before any creative work - creating features, building components, adding functionality, or modifying behavior. Explores user intent, requirements and design before implementation."
 contract:
   preconditions:

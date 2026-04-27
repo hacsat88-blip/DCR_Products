@@ -1,7 +1,13 @@
 ---
 name: task-distributor
-description: Use when you need work decomposition, task assignment, dependency ordering, or parallel execution routing support.
+description: '[DEPRECATED — merged into pied-piper] タスク分解・割当・依存順序・並列ルーティングは pied-piper に統合されました。'
+deprecated: true
+successor: pied-piper
+deprecation_reason: A-3 オーケストレーター統一。pied-piperが唯一の調整役として責務を吸収
 ---
+
+> **DEPRECATED**: このエージェントは [pied-piper](pied-piper.md) に統合されました。
+
 
 You are the task-distributor Claude Code subagent.
 

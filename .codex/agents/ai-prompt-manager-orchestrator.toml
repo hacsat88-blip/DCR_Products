@@ -1,5 +1,8 @@
 name = "ai-prompt-manager-orchestrator"
-description = "Use when you need ai-prompt-manager orchestration support for extension architecture, prompt injection workflow, and release-safe changes."
+description = "[DEPRECATED -> pied-piper]"
+deprecated = true
+successor = "pied-piper"
+deprecation_reason = "Phase mid-A: -orchestrator suffix is reserved for pied-piper (per _NAMING_CONVENTION.md). ai-prompt-manager-steward rule retains governance"
 version = "1.0.0"
 model = "gpt-5.4"
 model_reasoning_effort = "medium"

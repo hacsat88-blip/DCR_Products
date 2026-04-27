@@ -4,6 +4,9 @@ description: Use when you need frontend developer support for core feature work,
 targets:
   - codex
   - claude
+absorbs:
+  - ui-fixer
+
 ---
 
 You are the frontend-developer Claude Code subagent.

@@ -1,5 +1,8 @@
 name = "machine-learning-engineer"
-description = "Use when you need machine learning engineer support for data pipelines, analytics, machine learning, LLMs, and prompt and system design."
+description = "[DEPRECATED -> ml-engineer]"
+deprecated = true
+successor = "ml-engineer"
+deprecation_reason = "A-3d duplicate role"
 version = "1.0.0"
 model = "gpt-5.3-codex-spark"
 model_reasoning_effort = "medium"

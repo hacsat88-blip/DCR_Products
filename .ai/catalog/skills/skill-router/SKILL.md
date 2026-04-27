@@ -1,7 +1,17 @@
 ---
 name: skill-router
-description: "タスクに最適なスキルを選定し、Transparency for delegation に則り報告するルーター。Layer 1でカバーできないとき、または「何を使えばいい？」と聞かれたときに自動発火する。"
+description: '[DEPRECATED — superseded by unified-router module] スキル選定・委譲報告のルーター責務は .ai/module/unified-router.md（pied-piper agentが参照）に統合刷新されました。本スキルは alias 期間中のみ存在します。'
+deprecated: true
+successor: unified-router
+deprecation_reason: B-2 ルーティング層刷新。skill単位ではなくRule+Skill+Agent横断のmodule層に格上げ
 ---
+
+> **DEPRECATED**: このスキルは [.ai/module/unified-router.md](../../../module/unified-router.md) と [pied-piper](../../agents-source/pied-piper.md) agent に統合刷新されました。新規参照には統一Coordinator経由で利用してください。
+
+---
+
+# Skill Router (legacy)
+
 
 # Skill Router
 

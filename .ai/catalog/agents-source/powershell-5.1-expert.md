@@ -1,6 +1,10 @@
 ---
 name: powershell-5.1-expert
 description: Use when you need powershell 5.1 expert support for language-specific and framework-specific implementation.
+language: powershell
+version: "5.1"
+sibling: powershell-7-expert
+
 ---
 
 You are the powershell-5.1-expert Claude Code subagent.

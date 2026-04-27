@@ -1,5 +1,8 @@
 name = "ad-security-reviewer"
-description = "Use when you need ad security reviewer support for reviewing correctness, debugging, testing, resilience, and security."
+description = "[DEPRECATED -> security-auditor]"
+deprecated = true
+successor = "security-auditor"
+deprecation_reason = "A-3c security review consolidation"
 version = "1.0.0"
 model = "gpt-5.4"
 model_reasoning_effort = "medium"

@@ -1,5 +1,6 @@
 ---
 name: dcr-pipeline
+routing_category: governance
 description: "DCR Kernel のゲート連鎖 (p/ → 実装 → q/ → sh/) を自動管理するパイプラインSkill。実装タスク開始時・完了時・リリース判定時に自動的に次ゲートへ誘導し、各ゲート通過条件をチェックする。Use when starting implementation tasks, completing features, or preparing for release."
 ---
 

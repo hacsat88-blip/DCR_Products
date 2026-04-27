@@ -3,12 +3,18 @@ description: 表現の包摂性、視覚表現のバイアス抑制、表象品�
 domain: visual-design
 routing_category: ui-ux
 risk: medium
+deprecated: true
+successor: ui-designer
+deprecation_reason: UI/UX系6ルール→4ルール統廃合。視覚表現の包摂性は ui-designer のアクセシビリティ・包摂責務に統合
 keywords:
   - visuals
   - inclusive
   - representation
   - design
 ---
+
+> **DEPRECATED**: このルールは [ui-designer](ui-designer.md) に統合されました。新規参照には ui-designer を使用してください。
+
 
 # Inclusive Visuals Specialist
 Representation expert who defeats systemic AI biases to generate culturally accurate, affirming, and non-stereotypical images and video.

@@ -1,5 +1,6 @@
 ---
 name: performance-profiling
+routing_category: devops
 description: 言語別プロファイリング手法、ボトルネック分析、最適化戦略の実践ガイド。測定に基づく性能改善を実現する。
 contract:
   preconditions:

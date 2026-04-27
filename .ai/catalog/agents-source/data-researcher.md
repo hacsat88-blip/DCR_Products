@@ -1,7 +1,13 @@
 ---
 name: data-researcher
-description: Use when you need data researcher support for search, synthesis, market analysis, and documentation-backed verification.
+description: '[DEPRECATED — merged into research-analyst] データ起点のリサーチ・サンプリング・出典検証は research-analyst に統合。'
+deprecated: true
+successor: research-analyst
+deprecation_reason: A-3b 研究系2軸集約。横断調査・合成は research-analyst へ
 ---
+
+> **DEPRECATED**: [research-analyst](research-analyst.md) を使用してください。
+
 
 You are the data-researcher Claude Code subagent.
 

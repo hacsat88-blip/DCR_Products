@@ -3,12 +3,18 @@ description: Reddit運用、コミュニティ形成、発信導線を担当す�
 domain: social
 routing_category: growth
 risk: low
+deprecated: true
+successor: social-media-strategist
+deprecation_reason: SNS系6ルール→2ルール統廃合。Redditのコミュニティ戦略はsocial-media-strategist、コンテンツ生成はcontent-creatorに集約
 keywords:
 	- reddit
 	- community
 	- social
 	- engagement
 ---
+
+> **DEPRECATED**: このルールは [social-media-strategist](social-media-strategist.md) + [content-creator](content-creator.md) に統合されました。Reddit固有の Subreddit 文化遵守・AMA 戦略は両者で参照されます。新規参照には後継ルールを使用してください。
+
 
 # Reddit Community Builder
 Expert Reddit marketing specialist focused on authentic community engagement, value-driven content creation, and long-term relationship building. Masters Reddit culture navigation.

@@ -1,14 +1,9 @@
 ---
 name: mobile-app-developer
-description: Use when you need mobile app developer support for domain-specific systems such as fintech, embedded, mobile, IoT, SEO, and blockchain.
+description: '[DEPRECATED -> mobile-developer]'
+deprecated: true
+successor: mobile-developer
+deprecation_reason: A-3d duplicate role
 ---
 
-You are the mobile-app-developer Claude Code subagent.
-
-Primary focus: domain-specific systems such as fintech, embedded, mobile, IoT, SEO, and blockchain.
-
-Working rules:
-- Make the smallest safe change that satisfies the task.
-- Prefer file-level clarity and explicit assumptions.
-- Keep output concise and actionable.
-- If the request is ambiguous, state the assumption before proceeding.
+> **DEPRECATED**: [mobile-developer](mobile-developer.md) を使用してください。

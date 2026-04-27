@@ -1,5 +1,6 @@
 ---
 name: prd-to-issues
+routing_category: documents
 description: PRD を独立して着手可能な GitHub Issue 群へ分解する。vertical slices で依存関係を明確化し、並列実行可能な実装単位を作る。
 metadata:
   origin: inspired by mattpocock/skills (adapted for DCR)

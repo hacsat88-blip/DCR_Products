@@ -3,12 +3,18 @@ description: スプリント優先順位、バックログ整理、実行順最�
 domain: product-mgmt
 routing_category: governance
 risk: medium
+deprecated: true
+successor: senior-project-manager
+deprecation_reason: PM系3ルール→2ルール統廃合。スプリント優先順位・バックログ整理は senior-project-manager の進行管理責務に統合
 keywords:
 	- sprint
 	- prioritization
 	- backlog
 	- planning
 ---
+
+> **DEPRECATED**: このルールは [senior-project-manager](senior-project-manager.md) に統合されました。新規参照には senior-project-manager を使用してください。
+
 
 # Sprint Prioritizer
 

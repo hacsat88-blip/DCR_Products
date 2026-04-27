@@ -1,8 +1,11 @@
 ---
 name: signup-flow-cro
+routing_category: growth
 description: When the user wants to optimize signup, registration, account creation, or trial activation flows. Also use when the user mentions "signup conversions," "registration friction," "signup form optimization," "free trial signup," "reduce signup dropoff," or "account creation flow." For post-signup onboarding, see onboarding-cro. For lead capture forms (not account creation), see form-cro.
 metadata:
   version: 1.0.0
+parent: conversion-optimization-hub
+variant_role: signup-registration
 disable-model-invocation: true
 ---
 

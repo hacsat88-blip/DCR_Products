@@ -1,5 +1,6 @@
 ---
 name: systematic-debugging
+routing_category: devops
 description: Use when encountering any bug, test failure, or unexpected behavior, before proposing fixes
 contract:
   preconditions:

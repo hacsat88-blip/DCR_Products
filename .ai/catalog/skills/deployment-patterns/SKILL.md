@@ -1,5 +1,6 @@
 ---
 name: deployment-patterns
+routing_category: devops
 description: "CI/CD、ヘルスチェック、ロールバック、段階リリースの標準パターン。運用前提の安全なデプロイを定義する。"
 disable-model-invocation: true
 ---

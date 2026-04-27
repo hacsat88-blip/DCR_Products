@@ -2,7 +2,7 @@
 
 ## Goal
 
-Copilot CLI、Cursor、Windsurf で同じ project-scoped memory を使い、クライアント間で文脈を共有しつつ Product 混線を防ぐ。
+Copilot CLI、Cursor で同じ project-scoped memory を使い、クライアント間で文脈を共有しつつ Product 混線を防ぐ。
 
 ## Scope Strategy
 
@@ -60,11 +60,6 @@ API key を使う場合は各 server に Authorization header を追加する。
 ### Cursor
 
 - Cursor 側の MCP 設定画面で同じ server 定義を追加する
-- Copilot CLI と同じ project_id を使う
-
-### Windsurf
-
-- Windsurf 側の MCP 設定画面で同じ server 定義を追加する
 - Copilot CLI と同じ project_id を使う
 
 ## Operation Rules

@@ -1,5 +1,8 @@
 name = "multi-agent-coordinator"
-description = "Use when you need coordination across multiple specialized subagents, including task decomposition, dispatch ordering, and result synthesis."
+description = "[DEPRECATED — merged into pied-piper] 複数サブエージェント協調・タスク分解・結果合成は pied-piper に統合"
+deprecated = true
+successor = "pied-piper"
+deprecation_reason = "A-3 オーケストレーター統一"
 version = "1.0.0"
 model = "gpt-5.4"
 model_reasoning_effort = "medium"

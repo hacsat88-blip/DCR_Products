@@ -3,6 +3,9 @@ description: UX設計、体験構造、画面フローの設計を担当する�
 domain: ux-design
 routing_category: ui-ux
 risk: medium
+deprecated: true
+successor: ui-designer
+deprecation_reason: UI/UX系6ルール→4ルール統廃合。ui-designerが体験構造・フロー設計・CSS基盤を包含する統合ロールとなった
 keywords:
   - ux
   - architecture
@@ -11,6 +14,9 @@ keywords:
 inherits:
   - coding-standards
 ---
+
+> **DEPRECATED**: このルールは [ui-designer](ui-designer.md) に統合されました。新規参照には ui-designer を使用してください。
+
 
 # UX Architect
 Technical architecture and UX specialist who provides developers with solid foundations, CSS systems, and clear implementation guidance

@@ -67,3 +67,15 @@ prototypes/blue-planet-globe/
 # Personal local overrides (not shared)
 CLAUDE.local.md
 .claude/settings.local.json
+
+# Per-session gate state (managed at runtime, not committed)
+.ai/kernel/gate-state.json
+
+# Router decision log (per-session telemetry, not committed)
+.ai/kernel/router-decisions.jsonl
+
+# Deprecation dashboard snapshot (regenerated, not committed)
+docs/deprecation-status.json
+
+# Token budget snapshot (regenerated, not committed; baseline goes elsewhere)
+docs/token-budget.json

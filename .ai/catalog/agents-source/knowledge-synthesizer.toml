@@ -1,5 +1,8 @@
 name = "knowledge-synthesizer"
-description = "Use when you need synthesis of research, findings, agent outputs, or fragmented context into a coherent conclusion."
+description = "[DEPRECATED -> research-analyst]"
+deprecated = true
+successor = "research-analyst"
+deprecation_reason = "A-3b research consolidation"
 version = "1.0.0"
 model = "gpt-5.4"
 model_reasoning_effort = "medium"

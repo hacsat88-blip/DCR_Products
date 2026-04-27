@@ -1,5 +1,5 @@
 ---
-description: 現実的なQA観点、動作確認、検証の厳密化を担当する専門ロール
+description: 現実的なQA観点、動作確認、検証の厳密化、エビデンス収集、結果分析を一貫して担当する統合ロール
 globs: ""
 alwaysApply: false
 ---

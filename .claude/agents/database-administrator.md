@@ -1,6 +1,9 @@
 ---
 name: database-administrator
 description: Use when you need database administrator support for cloud, deployment, networking, containers, and infrastructure automation.
+absorbs:
+  - database-optimizer
+
 ---
 
 You are the database-administrator Claude Code subagent.

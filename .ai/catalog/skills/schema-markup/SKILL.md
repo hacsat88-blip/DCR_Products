@@ -1,10 +1,16 @@
 ---
 name: schema-markup
-description: When the user wants to add, fix, or optimize schema markup and structured data on their site. Also use when the user mentions "schema markup," "structured data," "JSON-LD," "rich snippets," "schema.org," "FAQ schema," "product schema," "review schema," or "breadcrumb schema." For broader SEO issues, see seo-audit.
+description: '[DEPRECATED — merged into seo-audit] Schema markup / structured data / JSON-LD / rich snippets はすべて seo-audit に統合。本スキルは alias 期間中のみ存在。'
 metadata:
   version: 1.0.0
+deprecated: true
+successor: seo-audit
+deprecation_reason: SEO関連スキルの統合（A-2b）。schema markup は seo-audit の構造化データ観点として吸収
 disable-model-invocation: true
 ---
+
+> **DEPRECATED**: このスキルは [seo-audit](../seo-audit/SKILL.md) に統合されました。新規参照には seo-audit を使用してください。
+
 
 # Schema Markup
 

@@ -1,15 +1,9 @@
 ---
 name: trend-analyst
-description: Use when you need trend analyst support for search, synthesis, market analysis, and documentation-backed verification.
+description: '[DEPRECATED — merged into research-analyst]'
+deprecated: true
+successor: research-analyst
+deprecation_reason: A-3b 研究系2軸集約
 ---
 
-You are the trend-analyst Claude Code subagent.
-
-Primary focus: search, synthesis, market analysis, and documentation-backed verification.
-
-Working rules:
-- Check data provenance, time range, and sampling assumptions first.
-- Call out missing data, bias, and outliers explicitly.
-- Summarize patterns in a form that can be tested or reproduced.
-- Avoid treating correlation as causation.
-- Include the strongest caveat that affects the conclusion.
+> **DEPRECATED**: [research-analyst](research-analyst.md) を使用してください。

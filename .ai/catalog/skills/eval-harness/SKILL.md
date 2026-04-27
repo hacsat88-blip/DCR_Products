@@ -1,5 +1,6 @@
 ---
 name: eval-harness
+routing_category: governance
 description: "DCR リポジトリの構造品質を validate.ps1 で機械的に検証する Eval Harness スキル。q/ ゲートで validate.ps1 を実行し、rules/skills の frontmatter・H1・body・deploy整合を確認する。Use during q/ QA gate, before ship gate, or to verify structural integrity of rules and skills."
 metadata:
   origin: ECC eval-harness (adapted for DCR)
@@ -78,6 +79,48 @@ CI/CD（GitHub Actions 等）に組み込む場合:
 ```yaml
 - name: Validate DCR structure
   run: pwsh -ExecutionPolicy Bypass -File ./validate.ps1
+
+- name: Validate routing accuracy
+  run: pwsh -ExecutionPolicy Bypass -File ./tools/eval-routing-accuracy.ps1
 ```
 
 exit 1 をそのまま CI 失敗として扱える。
+
+## ルーティング精度測定（routing accuracy eval）
+
+`tools/eval-routing-accuracy.ps1` で **静的に** ルーティングの正しさを検証する。
+LLM 不要、frontmatter とフィクスチャを突き合わせる：
+
+```powershell
+.\tools\eval-routing-accuracy.ps1
+.\tools\eval-routing-accuracy.ps1 -Verbose   # per-case 表示
+.\tools\eval-routing-accuracy.ps1 -FixturePath custom-fixtures.json
+```
+
+**フィクスチャ形式**（`tools/eval-routing-fixtures.json`）：
+
+```json
+{
+  "input": "ユーザー想定発話",
+  "kind": "rule | skill | agent",
+  "expected": "<採用される asset 名>",
+  "expected_alias_from": "<旧名（任意、Step 0 経路をテストする場合）>",
+  "match_keywords": ["frontmatter に存在すべき語"]
+}
+```
+
+**検証項目**：
+1. **存在**: expected の asset ファイルがある
+2. **非 deprecation**: expected 自身は deprecated でない（alias テスト除く）
+3. **alias 整合**: `expected_alias_from` 指定時、その asset が deprecated で
+   かつ successor が expected と一致
+4. **キーワードマッチ**: match_keywords の少なくとも1つが
+   description / keywords / domain / routing_category のいずれかに含まれる
+
+**目標精度**: 80%以上（プラン目標）。現状: 26/26 = 100% で達成済み。
+
+**fixture 追加方針**：
+- 新スキル/エージェント追加時、想定ユーザー発話を1件追加
+- deprecation 実施時、旧名 → 新名の alias 経路を1件追加
+- 曖昧入力（confidence < 0.8 想定）も意図的に含める
+  （その場合は `expected_alias_from` は省略）

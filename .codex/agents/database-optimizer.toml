@@ -1,5 +1,8 @@
 name = "database-optimizer"
-description = "Use when you need database optimizer support for data pipelines, analytics, machine learning, LLMs, and prompt and system design."
+description = "[DEPRECATED -> database-administrator]"
+deprecated = true
+successor = "database-administrator"
+deprecation_reason = "Phase2 database cluster"
 version = "1.0.0"
 model = "gpt-5.3-codex-spark"
 model_reasoning_effort = "medium"

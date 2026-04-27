@@ -1,13 +1,21 @@
 ---
-description: コンテンツ作成、編集、発信素材の文章化を担当する専門ロール
+description: コンテンツ作成、編集、発信素材の文章化を担当する専門ロール（全プラットフォーム共通の素材生成）
 domain: content
 routing_category: documents
 risk: low
+absorbs:
+	- instagram-curator
+	- twitter-engager
+	- tiktok-strategist
+	- reddit-community-builder
 keywords:
 	- content
 	- writing
 	- copy
 	- storytelling
+	- social
+	- video
+	- visual
 ---
 
 # Content Creator

@@ -1,6 +1,11 @@
 ---
 name: backend-developer
 description: Use when you need backend developer support for core feature work, module boundaries, and implementation across frontend and backend.
+absorbs:
+  - api-designer
+  - microservices-architect
+  - graphql-architect
+
 ---
 
 You are the backend-developer Claude Code subagent.

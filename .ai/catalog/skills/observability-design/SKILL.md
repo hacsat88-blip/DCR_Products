@@ -1,5 +1,6 @@
 ---
 name: observability-design
+routing_category: devops
 description: メトリクス設計、アラート戦略、分散トレーシング、ログ構造化の実践ガイド。システムの可観測性を体系的に構築する。
 contract:
   preconditions:

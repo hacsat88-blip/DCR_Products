@@ -1,5 +1,5 @@
 ---
-description: OWASP Top 10 深掘り、暗号選定、認証認可設計、コンプライアンスチェックの実践ガイド。セキュリティ品質を体系的に確保する。
+description: OWASP Top 10 深掘り、暗号選定、認証認可設計、コンプライアンスチェックの実践ガイド。セキュリティ品質を体系的に確保する。コードレベルの深い監査（deep depth）。設定・シークレットの浅い監査には security-scan を使用。
 globs: ""
 alwaysApply: false
 ---

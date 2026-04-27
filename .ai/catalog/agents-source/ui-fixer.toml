@@ -1,5 +1,8 @@
 name = "ui-fixer"
-description = "Use when you need ui fixer support for core feature work, module boundaries, and implementation across frontend and backend."
+description = "[DEPRECATED -> frontend-developer]"
+deprecated = true
+successor = "frontend-developer"
+deprecation_reason = "Phase2 frontend cluster"
 version = "1.0.0"
 model = "gpt-5.3-codex-spark"
 model_reasoning_effort = "medium"

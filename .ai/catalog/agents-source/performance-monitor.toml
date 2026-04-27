@@ -1,5 +1,8 @@
 name = "performance-monitor"
-description = "Use when you need workflow performance monitoring, bottleneck analysis, throughput tracking, or regression alerting support."
+description = "[DEPRECATED -> performance-engineer]"
+deprecated = true
+successor = "performance-engineer"
+deprecation_reason = "Phase2 perf consolidation"
 version = "1.0.0"
 model = "gpt-5.4"
 model_reasoning_effort = "medium"
