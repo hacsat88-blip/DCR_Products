@@ -252,6 +252,68 @@ function Sync-Files {
     Write-Host "[OK] $Label : $count files -> $Destination" -ForegroundColor Green
 }
 
+function Write-DeprecationSummary {
+    param(
+        [string]$CatalogRoot
+    )
+
+    if (-not (Test-Path $CatalogRoot)) {
+        Write-Host "[WARN] Catalog root not found: $CatalogRoot" -ForegroundColor Yellow
+        return
+    }
+
+    $deprecatedEntries = @()
+    $ruleFiles = Get-ChildItem -Path (Join-Path $CatalogRoot "rules") -File -Filter *.md -Recurse -ErrorAction SilentlyContinue
+    $skillFiles = Get-ChildItem -Path (Join-Path $CatalogRoot "skills") -File -Filter SKILL.md -Recurse -ErrorAction SilentlyContinue
+    $agentFiles = Get-ChildItem -Path (Join-Path $CatalogRoot "agents-source") -File -Filter *.md -Recurse -ErrorAction SilentlyContinue
+
+    foreach ($file in $ruleFiles) {
+        $content = Get-Content -Path $file.FullName -Raw -Encoding utf8
+        if ($content -match '(?m)^\s*deprecated\s*:\s*true\s*$') {
+            $name = $file.BaseName
+            $successor = ''
+            if ($content -match '(?m)^\s*successor\s*:\s*(.+)\s*$') { $successor = $matches[1].Trim() }
+            $deprecatedEntries += [pscustomobject]@{ Kind = 'rule'; Name = $name; Successor = $successor }
+        }
+    }
+
+    foreach ($file in $skillFiles) {
+        $content = Get-Content -Path $file.FullName -Raw -Encoding utf8
+        if ($content -match '(?m)^\s*deprecated\s*:\s*true\s*$') {
+            $name = Split-Path $file.DirectoryName -Leaf
+            $successor = ''
+            if ($content -match '(?m)^\s*successor\s*:\s*(.+)\s*$') { $successor = $matches[1].Trim() }
+            $deprecatedEntries += [pscustomobject]@{ Kind = 'skill'; Name = $name; Successor = $successor }
+        }
+    }
+
+    foreach ($file in $agentFiles) {
+        $content = Get-Content -Path $file.FullName -Raw -Encoding utf8
+        if ($content -match '(?m)^\s*deprecated\s*:\s*true\s*$') {
+            $name = $file.BaseName
+            $successor = ''
+            if ($content -match '(?m)^\s*successor\s*:\s*(.+)\s*$') { $successor = $matches[1].Trim() }
+            $deprecatedEntries += [pscustomobject]@{ Kind = 'agent'; Name = $name; Successor = $successor }
+        }
+    }
+
+    if ($deprecatedEntries.Count -eq 0) {
+        Write-Host "No deprecated aliases found." -ForegroundColor DarkGray
+        return
+    }
+
+    Write-Host "Deprecated alias summary:" -ForegroundColor Cyan
+    $deprecatedEntries | Group-Object Kind | ForEach-Object {
+        Write-Host "  $($_.Name): $($_.Count)" -ForegroundColor DarkGray
+    }
+
+    foreach ($entry in $deprecatedEntries | Sort-Object Kind, Name) {
+        $line = "  - $($entry.Kind): $($entry.Name)"
+        if ($entry.Successor) { $line += " -> $($entry.Successor)" }
+        Write-Host $line -ForegroundColor DarkGray
+    }
+}
+
 # ── Diff Check ──
 function Get-DirectoryDrift {
     param(
