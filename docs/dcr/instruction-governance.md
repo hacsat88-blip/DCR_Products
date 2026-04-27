@@ -7,8 +7,8 @@
 - `.ai/catalog/rules/`: invariant、routing metadata、handoff policy を置く
 - `.ai/catalog/skills/`: 再利用可能な workflow、generator、analysis method を置く
 - `.ai/catalog/agents-source/`: runtime persona と execution specialist を置く
-- `Product/**`: product-local overlay か external clone を置く。shared にしたい asset だけ root 正本へ昇格する
-- `Product/_template/`: bootstrap 用の最小構成例を置く。実在 Product discovery の対象にはしない
+- `Product/**`: 再作中・成果物として保持する Product workspace だけを置く。shared にしたい asset だけ root 正本へ昇格する
+- `templates/product/`: bootstrap 用の最小構成例を置く。実在 Product discovery の対象にはしない
 
 ## 正本
 
@@ -23,16 +23,19 @@
 
 `.dcr/` と `docs/dcr/` はどちらも DCR の control surface だが、`.dcr/` は machine-readable config、`docs/dcr/` は human-readable governance として物理的に分離する。
 
-## Repo 内 generated mirror
+## Generated mirror
 
 以下は deploy によって再生成されます。
 
 - `AGENTS.md`
 - `CLAUDE.md`
 - `.github/copilot-instructions.md`
-- `.cursor/rules/*.mdc`
-- `.claude/agents/`
-- `.codex/agents/`
+- `.cursor/rules/` (Git 管理外)
+- `.windsurf/` (Git 管理外)
+- `.claude/agents/` (Git 管理外)
+- `.codex/agents/` (Git 管理外)
+
+大量生成される mirror は `.gitignore` で除外し、`.ai/catalog/` と `.ai/kernel/` を正本として扱います。
 
 ## User-Level Managed Target
 
@@ -61,6 +64,5 @@
 - `.dcr/` を `docs/` 配下へ物理移動しない。統合が必要な場合は `docs/dcr/reference/control-surface.md` のような stable reference で論理統合する
 - 新規 active spec / plan は `docs/dcr/specs/` と `docs/dcr/plans/` の直下へ保存し、完了済み・低頻度参照の文書だけ `docs/dcr/specs/archive/` と `docs/dcr/plans/archive/` へ移す
 - Product-local `.ai/` には overlay 用の source-of-truth だけを置き、generated mirror や editor-specific output は含めない
-- `Product/_template/` は bootstrap 用であり、実在 Product と同じ運用対象にしない
-- standalone product clone を `Product/` 配下へ一時配置する場合も、DCR 正本としては扱わない。shared 化したい rule / skill / agent だけ root へ昇格する
-- `Product/dexter-jp/` は local runtime clone 用の ignore path として扱い、親 repo では track しない
+- `templates/product/` は bootstrap 用であり、実在 Product と同じ運用対象にしない
+- standalone product clone は `Product/` 配下へ同居させない。shared 化したい rule / skill / agent だけ root へ昇格する

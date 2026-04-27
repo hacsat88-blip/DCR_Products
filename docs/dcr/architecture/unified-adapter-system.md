@@ -14,9 +14,10 @@
 - `.github/copilot-instructions.md`
 - `AGENTS.md`
 - `CLAUDE.md`
-- `.cursor/rules/*.mdc`
-- `.claude/agents/`
-- `.codex/agents/`
+- `.cursor/rules/` (local generated mirror, Git 管理外)
+- `.windsurf/` (local generated mirror, Git 管理外)
+- `.claude/agents/` (local generated mirror, Git 管理外)
+- `.codex/agents/` (local generated mirror, Git 管理外)
 
 ## Deployment Path
 
@@ -28,5 +29,6 @@
 ## Design Rules
 
 - 生成物は read-only とみなす
+- 大量生成 mirror は Git で追跡せず、必要時に `deploy.ps1` で再生成する
 - path migration は旧新両対応期間を設ける
 - adapter の変更は generated file ではなく `tools/adapters/` 側で行う

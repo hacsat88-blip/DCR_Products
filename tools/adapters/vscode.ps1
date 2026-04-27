@@ -75,4 +75,4 @@ New-Item -ItemType Directory -Path $outDir -Force | Out-Null
 $utf8 = New-Object System.Text.UTF8Encoding $false
 [System.IO.File]::WriteAllText("$outDir/copilot-instructions.md", ($content.TrimEnd() + [Environment]::NewLine), $utf8)
 
-Write-Host "  ✓ .github/copilot-instructions.md" -ForegroundColor Green
+Write-Host "  [OK] .github/copilot-instructions.md" -ForegroundColor Green

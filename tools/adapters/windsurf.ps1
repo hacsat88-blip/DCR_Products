@@ -9,7 +9,7 @@ $CatalogPaths = Join-Path (Split-Path $PSScriptRoot -Parent) "lib\catalog-paths.
 
 $rulesDir = Resolve-DcrSourcePath -RepoRoot $RepoRoot -AssetType "rules"
 $commandsDir = Join-Path $RepoRoot ".claude\commands"
-$cursorKernel = Join-Path $RepoRoot ".cursor\rules\dcr-kernel.md"
+$runtimeKernel = Join-Path $RepoRoot ".ai\kernel\dcr-kernel.md"
 $templateRoot = Join-Path $RepoRoot "templates\windsurf\.windsurf"
 $templateWorkflowsDir = Join-Path $templateRoot "workflows"
 $templateHooksPath = Join-Path $templateRoot "hooks.json"
@@ -116,9 +116,9 @@ New-Item -ItemType Directory -Path $outWorkflowsDir -Force | Out-Null
 
 $managedFiles = New-Object System.Collections.Generic.List[string]
 
-# 1) Always-on kernel rule from existing cursor kernel
-if (Test-Path $cursorKernel) {
-    $kernelRaw = Get-Content -Path $cursorKernel -Raw -Encoding utf8
+# 1) Always-on kernel rule from shared runtime kernel
+if (Test-Path $runtimeKernel) {
+    $kernelRaw = Get-Content -Path $runtimeKernel -Raw -Encoding utf8
     $kernelBody = Remove-LeadingFrontmatter -Content $kernelRaw
     $kernelOut = @(
         "---"

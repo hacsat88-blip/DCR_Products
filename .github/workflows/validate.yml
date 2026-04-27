@@ -8,7 +8,7 @@ on:
 
 jobs:
   validate:
-    runs-on: ubuntu-latest
+    runs-on: windows-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -16,3 +16,29 @@ jobs:
       - name: Run validate script
         shell: pwsh
         run: pwsh -ExecutionPolicy Bypass -File ./validate.ps1
+
+      - name: Generate deploy mirrors
+        shell: pwsh
+        run: pwsh -ExecutionPolicy Bypass -File ./deploy.ps1
+
+      - name: Check deploy drift
+        shell: pwsh
+        run: pwsh -ExecutionPolicy Bypass -File ./deploy.ps1 -Check
+
+      - name: Ensure generated mirrors stay untracked
+        shell: pwsh
+        run: |
+          $tracked = @(git ls-files .cursor .windsurf .codex/agents .claude/agents)
+          if ($tracked.Count -gt 0) {
+            $tracked | ForEach-Object { Write-Host $_ }
+            throw "Generated mirrors must stay untracked."
+          }
+
+      - name: Check generated entrypoint drift
+        shell: pwsh
+        run: |
+          $diff = @(git status --short AGENTS.md CLAUDE.md .github/copilot-instructions.md .ai/catalog/rules/_ROUTING_INDEX.md)
+          if ($diff.Count -gt 0) {
+            $diff | ForEach-Object { Write-Host $_ }
+            throw "Generated tracked entrypoints are stale."
+          }

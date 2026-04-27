@@ -70,8 +70,8 @@ Run this from the repository root:
 
 The deployment process copies:
 
-- `*.toml` to `.codex/agents/`
-- `*.md` to `.claude/agents/`
+- `*.toml` to `.codex/agents/` (Git 管理外 generated mirror)
+- `*.md` to `.claude/agents/` (Git 管理外 generated mirror)
 
 ## Notes
 

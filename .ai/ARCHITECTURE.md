@@ -39,7 +39,7 @@ DCR (Dynamic Context Router) は、5つの AI 開発環境に統一的なルー�
     └─────────┘  └─────────┘  └────────┘  └─────────────┘
 ```
 
-`(*)` `.ai/catalog/agents-source/` を `.codex/agents/` / `.claude/agents/` へ配布する経路。`sync-agents.ps1` はこの処理を呼び出す legacy shim として残します。
+`(*)` `.ai/catalog/agents-source/` を Git 管理外の `.codex/agents/` / `.claude/agents/` へ配布する経路。`sync-agents.ps1` はこの処理を呼び出す legacy shim として残します。
 
 ## レイヤー構造
 
@@ -75,14 +75,16 @@ DCR (Dynamic Context Router) は、5つの AI 開発環境に統一的なルー�
 | Codex           | `AGENTS.md`                       |
 | Claude Code     | `CLAUDE.md`                       |
 | Cursor          | `.cursor/rules/dcr-kernel.md`     |
+| Windsurf        | `.windsurf/rules/dcr-kernel.md`   |
 
 ### 4. Generated Layer
 
-`deploy.ps1` が自動生成。手編集禁止。`sync-agents.ps1` は `deploy.ps1 -Target agents` を呼ぶ互換 shim。
+`deploy.ps1` が自動生成。手編集禁止。大量生成 mirror は Git 管理外。`sync-agents.ps1` は `deploy.ps1 -Target agents` を呼ぶ互換 shim。
 
-- `.cursor/rules/*.mdc` — Cursor rules (deploy.ps1 生成)
-- `.codex/agents/` — Codex agent files (deploy.ps1 -Target agents 生成)
-- `.claude/agents/` — Claude agent files (deploy.ps1 -Target agents 生成)
+- `.cursor/rules/` — Cursor rules/kernel (deploy.ps1 生成、Git 管理外)
+- `.windsurf/` — Windsurf rules/workflows/config (deploy.ps1 生成、Git 管理外)
+- `.codex/agents/` — Codex agent files (deploy.ps1 -Target agents 生成、Git 管理外)
+- `.claude/agents/` — Claude agent files (deploy.ps1 -Target agents 生成、Git 管理外)
 
 ## ルーティングアーキテクチャ
 

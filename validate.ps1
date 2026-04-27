@@ -41,6 +41,7 @@ $KernelRoot = Join-Path $RepoRoot ".ai\kernel"
 $AgentsSource = Resolve-DcrSourcePath -RepoRoot $RepoRoot -AssetType "agents-source"
 $DeployScript = Join-Path $RepoRoot "deploy.ps1"
 $RoutingIndexScript = Join-Path $RepoRoot "tools\generate-routing-index.ps1"
+$ExternalSuperpowersCheckScript = Join-Path $RepoRoot "tools\check-external-superpowers.ps1"
 $RoutingIndexFile = Join-Path $SourceRules "_ROUTING_INDEX.md"
 $PowerShellExe = (Get-Process -Id $PID).Path
 
@@ -599,6 +600,26 @@ foreach ($file in $ruleFiles) {
     # No frontmatter description is acceptable (auto-route from filename)
 }
 Write-Host "  rule descriptions checked: $descCheckCount" -ForegroundColor DarkGray
+
+# ─────────────────────────────────────────────
+# 16. external Superpowers checkout — drift check
+# ─────────────────────────────────────────────
+Write-Host ""
+Write-Host "== 16. external Superpowers drift check ========"
+if (-not (Test-Path $ExternalSuperpowersCheckScript)) {
+    Write-Fail "tools/check-external-superpowers.ps1 — file not found"
+}
+else {
+    $result = & $PowerShellExe -ExecutionPolicy Bypass -File $ExternalSuperpowersCheckScript 2>&1
+    if ($LASTEXITCODE -eq 0) {
+        if ($Verbose -and $result) { Write-Host "  $result" -ForegroundColor DarkGray }
+        $script:passed++
+    }
+    else {
+        Write-Fail "external Superpowers checkout — drift detected"
+        if ($result) { Write-Host "  $result" -ForegroundColor DarkGray }
+    }
+}
 
 # ─────────────────────────────────────────────
 # 結果サマリー

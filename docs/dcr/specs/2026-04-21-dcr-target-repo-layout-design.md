@@ -15,7 +15,7 @@ core / Product / generated / historical docs の 4 層モデル、移行フェ�
 2026-04-21 時点の前提:
 
 - `.ai/catalog/rules/`, `.ai/catalog/skills/`, `.ai/catalog/agents-source/` の taxonomy は文書化済み
-- repo 内 generated mirror と user-level managed target の境界は定義済み
+- repo-local generated mirror と user-level managed target の境界は定義済み
 - `validate.ps1` と `deploy.ps1 -Check` は clean に通る
 - root `.vscode/` はすでに DCR core-safe な最小構成に寄っている
 
@@ -80,11 +80,13 @@ generated output は概念上 1 層として扱うが、path は現行 consumer 
 - `AGENTS.md`
 - `CLAUDE.md`
 - `.github/copilot-instructions.md`
-- `.cursor/rules/*.mdc`
-- `.claude/agents/`
-- `.codex/agents/`
+- `.cursor/rules/` (Git 管理外)
+- `.windsurf/` (Git 管理外)
+- `.claude/agents/` (Git 管理外)
+- `.codex/agents/` (Git 管理外)
 
 この段階では `.generated/` へ一括移動しない。理由は、各 editor / CLI が現在の path を直接参照しているため。
+大量生成 mirror は Git 管理対象にせず、`deploy.ps1` による再生成契約を正本にする。
 
 ### Layer D: Historical Docs
 
@@ -156,7 +158,7 @@ Product overlay を root へ混ぜないための gate:
 
 ### 2. Product workspace template
 
-`Product/_template/` を追加し、新しい Product を置くときの最小構成を固定する。
+`templates/product/` を追加し、新しい Product を置くときの最小構成を固定する。
 
 最低限欲しいもの:
 
@@ -165,7 +167,7 @@ Product overlay を root へ混ぜないための gate:
 - `.ai/`
 - `docs/`
 
-`Product/_template/` 自体は実在 Product discovery の対象にせず、bootstrap 用の例示ディレクトリとして扱う。
+`templates/product/` 自体は実在 Product discovery の対象にせず、bootstrap 用の例示ディレクトリとして扱う。
 
 ### 3. Repo layout reference
 
@@ -190,7 +192,7 @@ Product overlay を root へ混ぜないための gate:
 
 ### Phase 2: Product Workspace Standard
 
-- `Product/_template/` を作る
+- `templates/product/` を作る
 - product-local `.ai/` と `.vscode/` の最低限を固定する
 
 ### Phase 3: Historical Doc Relocation
@@ -217,6 +219,6 @@ Product overlay を root へ混ぜないための gate:
 
 1. archive directory の追加
 2. repo layout stable reference の追加
-3. `Product/_template/` の追加
+3. `templates/product/` の追加
 4. active / archive の初回棚卸し
 5. 必要なら overlay migration gate を docs から script へ昇格

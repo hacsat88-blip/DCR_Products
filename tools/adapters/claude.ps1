@@ -77,5 +77,5 @@ For architecture details, see [.ai/module/unified-integration.md](.ai/module/uni
 $utf8 = New-Object System.Text.UTF8Encoding $false
 [System.IO.File]::WriteAllText("$RepoRoot/CLAUDE.md", ($content.TrimEnd() + [Environment]::NewLine), $utf8)
 
-Write-Host "  ✓ CLAUDE.md" -ForegroundColor Green
+Write-Host "  [OK] CLAUDE.md" -ForegroundColor Green
 Write-Host ""

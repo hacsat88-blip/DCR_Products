@@ -11,15 +11,17 @@ Utility scripts for build, deployment, and maintenance operations.
 **Delegates to:**
 - `manifest-compiler.ps1` (frontmatter → JSON manifest)
 - `adapters/vscode.ps1` → `.github/copilot-instructions.md`
-- `adapters/cursor.ps1` → `.cursor/rules/*.mdc`
+- `adapters/cursor.ps1` → `.cursor/rules/dcr-kernel.md` + `.cursor/rules/*.mdc` (Git 管理外)
 - `adapters/claude.ps1` → `CLAUDE.md`
 - `adapters/codex.ps1` → `AGENTS.md`
-- `adapters/windsurf.ps1` → `.windsurf/rules/*.md` + `.windsurf/workflows/*.md` + `.windsurf/hooks.json` + `.windsurf/mcp_config.example.json`
+- `adapters/windsurf.ps1` → `.windsurf/rules/*.md` + `.windsurf/workflows/*.md` + `.windsurf/hooks.json` + `.windsurf/mcp_config.example.json` (Git 管理外)
+- `adapters/agents.ps1` → `.codex/agents/*.toml` + `.claude/agents/*.md` (Git 管理外)
 
 **Usage:**
 ```powershell
 .\deploy-all.ps1                    # Deploy to all targets
 .\deploy-all.ps1 -Target vscode     # Deploy to VS Code only
+.\deploy-all.ps1 -Target agents     # Generate Codex/Claude agent mirrors only
 .\deploy-all.ps1 -DryRun            # Preview without executing
 ```
 
@@ -52,7 +54,8 @@ Each adapter reads `manifest.json` and generates tool-specific formats:
 Generates `.github/copilot-instructions.md` for VS Code Copilot
 
 #### `adapters/cursor.ps1`
-Generates `.cursor/rules/*.mdc` files in Cursor MDC format
+Generates `.cursor/rules/dcr-kernel.md` from `.ai/kernel/dcr-kernel.md` and `.cursor/rules/*.mdc` files in Cursor MDC format
+The generated `.cursor/rules/` mirror is ignored by Git; edit `.ai/kernel/`, `.ai/catalog/rules/`, or `.ai/catalog/skills/` instead.
 
 #### `adapters/claude.ps1`
 Generates `CLAUDE.md` for Claude Code environment
@@ -62,10 +65,15 @@ Generates `AGENTS.md` for Codex (GitHub CLI) environment
 
 #### `adapters/windsurf.ps1`
 Generates `.windsurf/rules/*.md`, `.windsurf/workflows/*.md`, `.windsurf/hooks.json`, and `.windsurf/mcp_config.example.json` for Windsurf Cascade.
+The generated `.windsurf/` mirror is ignored by Git; edit `.ai/kernel/`, `.ai/catalog/rules/`, `.claude/commands/`, or `templates/windsurf/` instead.
 
 Workflow sources:
 - `.claude/commands/*.md`
 - `templates/windsurf/.windsurf/workflows/*.md`
+
+#### `adapters/agents.ps1`
+Generates `.codex/agents/*.toml` and `.claude/agents/*.md` from `.ai/catalog/agents-source/`.
+The generated agent mirrors are ignored by Git; edit `.ai/catalog/agents-source/` instead.
 
 ---
 

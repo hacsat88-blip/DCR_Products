@@ -8,10 +8,11 @@
 
 | ディレクトリ                    | 内容                                       | 生成先                                         |
 | ------------------------------- | ------------------------------------------ | ---------------------------------------------- |
-| `claude-code/`                  | Claude Code 用テンプレート                 | `<project>/.claude/CLAUDE.md`                  |
-| `codex/`                        | Codex 用テンプレート                       | `<project>/AGENTS.md`                          |
-| `vscode-copilot/`               | VS Code Copilot 用テンプレート             | `<project>/.github/copilot-instructions.md`    |
-| `windsurf/`                     | Windsurf 用テンプレート                    | `<project>/.windsurf/rules/dcr-kernel.md` ほか |
+| `claude-code/`                  | Claude Code 用 project context 断片と周辺設定 | `<project>/.claude/CLAUDE.md`                  |
+| `codex/`                        | Codex 用 project context 断片と周辺設定    | `<project>/AGENTS.md`                          |
+| `product/`                      | 新規 Product 用の最小構成テンプレート      | `Product/<name>/` へ手動コピー                 |
+| `vscode-copilot/`               | VS Code Copilot 用 project context 断片と周辺設定 | `<project>/.github/copilot-instructions.md`    |
+| `windsurf/`                     | Windsurf 用の project context 断片と周辺設定 | `<project>/.windsurf/rules/dcr-kernel.md` ほか |
 | `project-context.md`            | プレースホルダーのキー一覧サンプル         | プロジェクトごとにコピーして編集               |
 | `supermemory-project-policy.md` | project 単位の memory 運用方針テンプレート | プロジェクトごとにコピーして編集               |
 
@@ -47,8 +48,10 @@
 ## ルール
 
 - **テンプレートのみ配置する** — 実動作する設定ファイルはルートに置く
+- **Product 雛形は `templates/product/` に置く** — `Product/` 配下は実在 Product だけを置く
 - **プレースホルダーは `{key}` 形式** — `project-context.md` のキーと対応
 - **共有リソース（.ai/, .ai/kernel/gates/）はここに置かない** — `init-project.ps1` がルートからコピーする
+- **kernel 本文は置かない** — `init-project.ps1` が `.ai/kernel/dcr-kernel.md` と `.ai/kernel/environments/` を読み、各テンプレートの project context 断片を連結する
 - **.vscode/ はここに不要** — プロジェクト固有設定は `init-project.ps1` のスコープ外
 - **runtime entrypoint をここから直接上書きしない** — `.github/copilot-instructions.md` などの実運用ファイルはテンプレートと別管理
 - **`templates/` を単独で削除しない** — `init-project.ps1` が `templates/claude-code/`, `templates/codex/`, `templates/vscode-copilot/`, `templates/windsurf/` を読むため
