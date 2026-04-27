@@ -9,7 +9,6 @@ Copilot CLI、Cursor で同じ project-scoped memory を使い、クライアン
 - satoshi-dev
 - dcr-core
 - product-cyber-stock-dashboard
-- product-dexter-jp
 
 各クライアントで server 名を統一し、同じ project_id を使う。
 
@@ -36,12 +35,6 @@ Copilot CLI、Cursor で同じ project-scoped memory を使い、クライアン
       "url": "https://mcp.supermemory.ai/mcp",
       "headers": {
         "x-sm-project": "product-cyber-stock-dashboard"
-      }
-    },
-    "supermemory-product-dexter-jp": {
-      "url": "https://mcp.supermemory.ai/mcp",
-      "headers": {
-        "x-sm-project": "product-dexter-jp"
       }
     }
   }

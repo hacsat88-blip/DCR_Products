@@ -25,8 +25,7 @@ npm-debug.log*
 # 秘密情報
 .env
 .env.*
-!Product/autotrader-suite/backend/.env.example
-!Product/autotrader-suite/ui/.env.local.example
+!Product/cyber-stock-dashboard/.env.example
 *.key
 *.pem
 
@@ -35,14 +34,12 @@ npm-debug.log*
 **/.superpowers/
 /autotrader.xlsm
 /~$autotrader.xlsm
-/Product/autotrader-suite/backend/state.json
-/Product/autotrader-suite/backend/settings.json
 
-# External standalone product clones (kept outside DCR source-of-truth)
-/Product/dexter-jp/
-
-# Generated adapter outputs (Cursor rules, etc.)
-.cursor/rules/*.mdc
+# Generated adapter outputs (not source of truth)
+/.cursor/rules/
+/.windsurf/
+/.codex/agents/
+/.claude/agents/
 
 # Ignore all .dcr directories by default (runtime/session files)
 **/.dcr/

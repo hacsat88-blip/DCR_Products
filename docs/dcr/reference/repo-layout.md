@@ -6,9 +6,9 @@
 
 | Layer             | Responsibility                                  | Main Paths                                                                                                         |
 | ----------------- | ----------------------------------------------- | ------------------------------------------------------------------------------------------------------------------ |
-| DCR core          | Product 不在でも成立する shared source-of-truth | `.ai/catalog/`, `.ai/`, `.dcr/`, `templates/`, `docs/dcr/`, root `.vscode/`                                        |
+| DCR core          | Product 不在でも成立する shared source-of-truth | `.ai/kernel/`, `.ai/catalog/`, `.ai/`, `.dcr/`, `templates/`, `docs/dcr/`, root `.vscode/`                          |
 | Product workspace | 個別 Product の source code と local workflow   | `Product/<product>/`                                                                                               |
-| generated output  | deploy により再生成される mirror                | `AGENTS.md`, `CLAUDE.md`, `.github/copilot-instructions.md`, `.cursor/rules/`, `.claude/agents/`, `.codex/agents/` |
+| generated output  | deploy により再生成される mirror                | `AGENTS.md`, `CLAUDE.md`, `.github/copilot-instructions.md`, `.cursor/rules/`, `.windsurf/`, `.claude/agents/`, `.codex/agents/` |
 | historical docs   | active ではない履歴文書                         | `docs/dcr/specs/archive/`, `docs/dcr/plans/archive/`                                                               |
 
 ## DCR Core
@@ -18,6 +18,7 @@ root に残すのは、どの Product を開いていなくても意味がある
 - `.ai/catalog/rules/`: invariant、routing metadata、handoff policy
 - `.ai/catalog/skills/`: reusable workflow、generator、analysis method
 - `.ai/catalog/agents-source/`: runtime persona と execution specialist の source-of-truth
+- `.ai/kernel/`: 全環境共通の kernel、権限、トリガー、runtime entrypoint source
 - `.dcr/`, `templates/`: DCR 自身の設定と template 契約
 - `docs/dcr/`: governance、workflow、reference、design record
 - root `.vscode/`: DCR core 共通の設定だけ
@@ -54,7 +55,7 @@ Product/
 - generated mirror や editor-specific output は Product 側の `.ai/` に置かない
 - shared 化が必要な asset だけ root の `.ai/catalog/rules/`, `.ai/catalog/skills/`, `.ai/catalog/agents-source/` へ昇格する
 
-`Product/_template/` は新しい Product を始めるときの bootstrap 例であり、実在 Product と同じ discovery 対象にはしません。
+`templates/product/` は新しい Product を始めるときの bootstrap 例であり、実在 Product と同じ discovery 対象にはしません。
 
 ## Generated Output
 
@@ -63,14 +64,16 @@ generated output は 1 つの概念層ですが、path は既存 consumer 契約
 - `AGENTS.md`
 - `CLAUDE.md`
 - `.github/copilot-instructions.md`
-- `.cursor/rules/*.mdc`
-- `.claude/agents/`
-- `.codex/agents/`
+- `.cursor/rules/` (Git 管理外)
+- `.windsurf/` (Git 管理外)
+- `.claude/agents/` (Git 管理外)
+- `.codex/agents/` (Git 管理外)
 
 判断原則:
 
 - ここは直接編集しない
 - 変更は source-of-truth 側から行い、`deploy.ps1` で再生成する
+- 大量生成される editor mirror は Git 管理対象にせず、正本の重複を避ける
 - `.generated/` のような新しい集約 path へは現時点で移さない
 
 ## Active Docs And Archive
@@ -104,7 +107,7 @@ archive は subdirectory で追加します。
    - Yes: `docs/dcr/specs/` または `docs/dcr/plans/`
    - No: 対応する `archive/`
 4. 新規 Product の雛形か
-   - Yes: `Product/_template/`
+   - Yes: `templates/product/`
 
 ## AI Editor Discovery Order
 

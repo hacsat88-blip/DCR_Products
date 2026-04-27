@@ -8,7 +8,7 @@ on:
 
 jobs:
   validate:
-    runs-on: ubuntu-latest
+    runs-on: windows-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -17,29 +17,28 @@ jobs:
         shell: pwsh
         run: pwsh -ExecutionPolicy Bypass -File ./validate.ps1
 
-      - name: Run routing accuracy eval
+      - name: Generate deploy mirrors
         shell: pwsh
-        run: pwsh -ExecutionPolicy Bypass -File ./tools/eval-routing-accuracy.ps1
+        run: pwsh -ExecutionPolicy Bypass -File ./deploy.ps1
 
-      - name: Deprecation status snapshot
+      - name: Check deploy drift
         shell: pwsh
-        continue-on-error: true
+        run: pwsh -ExecutionPolicy Bypass -File ./deploy.ps1 -Check
+
+      - name: Ensure generated mirrors stay untracked
+        shell: pwsh
         run: |
-          pwsh -ExecutionPolicy Bypass -File ./tools/deprecation-dashboard.ps1 -OutputJson -Verbose
-          if (Test-Path docs/deprecation-status.json) {
-            $snap = Get-Content docs/deprecation-status.json -Raw | ConvertFrom-Json
-            $n = $snap.eligible_for_removal
-            if ($n -ge 1) {
-              Write-Host "##[warning] $n deprecated asset(s) are ELIGIBLE-FOR-REMOVAL (>=90d, 0 calls, 0 refs)."
-              Write-Host "  Run: pwsh ./tools/deprecation-dashboard.ps1 -Verbose"
-            } else {
-              Write-Host "No deprecated assets eligible for removal."
-            }
+          $tracked = @(git ls-files .cursor .windsurf .codex/agents .claude/agents)
+          if ($tracked.Count -gt 0) {
+            $tracked | ForEach-Object { Write-Host $_ }
+            throw "Generated mirrors must stay untracked."
           }
 
-      - name: Token budget vs baseline (informational)
+      - name: Check generated entrypoint drift
         shell: pwsh
-        continue-on-error: true
         run: |
-          pwsh -ExecutionPolicy Bypass -File ./tools/token-budget.ps1 -CompareWith docs/token-budget-baseline.json
-          Write-Host "Token budget compared against baseline (informational)"
+          $diff = @(git status --short AGENTS.md CLAUDE.md .github/copilot-instructions.md .ai/catalog/rules/_ROUTING_INDEX.md)
+          if ($diff.Count -gt 0) {
+            $diff | ForEach-Object { Write-Host $_ }
+            throw "Generated tracked entrypoints are stale."
+          }

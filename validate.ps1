@@ -41,6 +41,7 @@ $KernelRoot = Join-Path $RepoRoot ".ai\kernel"
 $AgentsSource = Resolve-DcrSourcePath -RepoRoot $RepoRoot -AssetType "agents-source"
 $DeployScript = Join-Path $RepoRoot "deploy.ps1"
 $RoutingIndexScript = Join-Path $RepoRoot "tools\generate-routing-index.ps1"
+$ExternalSuperpowersCheckScript = Join-Path $RepoRoot "tools\check-external-superpowers.ps1"
 $RoutingIndexFile = Join-Path $SourceRules "_ROUTING_INDEX.md"
 $PowerShellExe = (Get-Process -Id $PID).Path
 
@@ -601,29 +602,24 @@ foreach ($file in $ruleFiles) {
 Write-Host "  rule descriptions checked: $descCheckCount" -ForegroundColor DarkGray
 
 # ─────────────────────────────────────────────
-Write-Host "== 16. catalog skills/*/SKILL.md routing_category check ====="
+# 16. external Superpowers checkout — drift check
 # ─────────────────────────────────────────────
-$skillRoutingCheckCount = 0
-foreach ($dir in $skillDirs) {
-    $sf = Join-Path $dir.FullName "SKILL.md"
-    if (-not (Test-Path $sf)) { continue }
-    $content = [System.IO.File]::ReadAllText((Resolve-Path $sf).Path)
-    # Skip deprecated skills
-    if ($content -match '(?m)^deprecated:\s*true\s*$') { continue }
-    $skillRoutingCheckCount++
-    if ($content -match '(?m)^routing_category:\s*(.+)$') {
-        $cat = $Matches[1].Trim()
-        if ($cat -in $AllowedRoutingCategories) {
-            if ($Verbose) { Write-Ok "$($dir.Name)/SKILL.md — routing_category '$cat' OK" }
-            else { $script:passed++ }
-        } else {
-            Write-Fail "$($dir.Name)/SKILL.md — routing_category '$cat' not in allowed set: $($AllowedRoutingCategories -join ', ')"
-        }
-    } else {
-        Write-Fail "$($dir.Name)/SKILL.md — routing_category missing"
+Write-Host ""
+Write-Host "== 16. external Superpowers drift check ========"
+if (-not (Test-Path $ExternalSuperpowersCheckScript)) {
+    Write-Fail "tools/check-external-superpowers.ps1 — file not found"
+}
+else {
+    $result = & $PowerShellExe -ExecutionPolicy Bypass -File $ExternalSuperpowersCheckScript 2>&1
+    if ($LASTEXITCODE -eq 0) {
+        if ($Verbose -and $result) { Write-Host "  $result" -ForegroundColor DarkGray }
+        $script:passed++
+    }
+    else {
+        Write-Fail "external Superpowers checkout — drift detected"
+        if ($result) { Write-Host "  $result" -ForegroundColor DarkGray }
     }
 }
-Write-Host "  skill routing_category checked: $skillRoutingCheckCount" -ForegroundColor DarkGray
 
 # ─────────────────────────────────────────────
 # 結果サマリー

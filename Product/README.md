@@ -1,17 +1,15 @@
 # Product Workspace Index
 
-このフォルダは、個別 Product の workspace をまとめる場所です。
+このフォルダは、再作中・成果物として保持する Product workspace だけを置く場所です。
 shared source-of-truth ではなく、Product ごとの local source と workflow を見分けるための入口として使います。
 
 ## Directory Roles
 
-- `Product/<product>/`
-  - 実在 Product の workspace
-- `Product/_template/`
-  - 新規 Product bootstrap 用の最小雛形
-  - active Product として扱わない
+- `Product/cyber-stock-dashboard/`
+  - 現在この repo で保持する実在 Product workspace
 
-ignore 済みの standalone clone や外部 repo が同居することはありますが、DCR の shared source-of-truth としては扱いません。
+新規 Product の雛形は `templates/product/` に置き、`Product/` 配下には置きません。
+standalone clone や外部 repo は、このフォルダへ同居させない方針です。
 
 ## First Inspection Order For Product Work
 
@@ -39,4 +37,4 @@ Product 専用の generated mirror はここに置きません。
 
 - shared source-of-truth の入口: `.ai/catalog/README.md`
 - repo 全体の配置ルール: `docs/dcr/reference/repo-layout.md`
-- Product 雛形の意図: `Product/_template/`
+- Product 雛形の意図: `templates/product/`

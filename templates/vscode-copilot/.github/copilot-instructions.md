@@ -1,70 +1,34 @@
-# Copilot Project Instructions
+## Project context
 
-Use the project AI system files as primary guidance for chat responses.
+### Project summary
 
-Primary files:
-- .ai/kernel.md
-- .ai/repo-map.md
+- Project name: {project_name}
+- Description: {project_description}
 
-Module files:
-- .ai/module/architecture.md
-- .ai/module/debugging.md
-- .ai/module/review.md
-- .ai/module/prompting.md
-- .ai/module/unified-integration.md
+### Tech stack
 
-Gate files:
-- .ai/kernel/gates/trigger-a-review.md
-- .ai/kernel/gates/trigger-a-debug.md
-- .ai/kernel/gates/trigger-s.md
-- .ai/kernel/gates/trigger-i.md
-- .ai/kernel/gates/trigger-d.md
-- .ai/kernel/gates/trigger-p.md
-- .ai/kernel/gates/trigger-q.md
-- .ai/kernel/gates/trigger-sh.md
+- Language: {language}
+- Framework: {framework}
+- Package manager: {package_manager}
+- Runtime: {runtime}
 
-Response rules:
-- Start with one signal: 🟢 Go, 🟡 Fix, or 🔴 Stop
-- Lead with the conclusion and the next actionable step
-- Avoid greetings, filler, and ceremonial language
-- Prefer concise, operational answers
-- Do not invent APIs, commands, files, configs, or framework behavior
+### Commands
 
----
-
-## プロジェクト固有情報
-
-<!-- init-project.ps1 実行時に project-context.md から自動注入される -->
-
-### プロジェクト概要
-
-- プロジェクト名: {project_name}
-- 説明: {project_description}
-
-### 技術スタック
-
-- 言語: {language}
-- フレームワーク: {framework}
-- パッケージマネージャ: {package_manager}
-- ランタイム: {runtime}
-
-### コマンド
-
-| 操作 | コマンド |
-|------|----------|
-| インストール | `{cmd_install}` |
-| 開発サーバー | `{cmd_dev}` |
-| ビルド | `{cmd_build}` |
-| テスト | `{cmd_test}` |
+| Task | Command |
+| ---- | ------- |
+| Install | `{cmd_install}` |
+| Dev | `{cmd_dev}` |
+| Build | `{cmd_build}` |
+| Test | `{cmd_test}` |
 | Lint | `{cmd_lint}` |
 
-### ディレクトリ構成
+### Directory structure
 
-```
+```text
 {directory_structure}
 ```
 
-### NEVER — 絶対にやってはいけないこと
+### Never
 
 - {never_item_1}
 - {never_item_2}

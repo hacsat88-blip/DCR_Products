@@ -6,8 +6,8 @@
 .DESCRIPTION
   対象エディタと同期先:
     VS Code Copilot : ~/.agents/skills/
-    Cursor          : ~/.cursor/rules/  (.ai/catalog/rules/ と .ai/catalog/skills/ から .mdc を生成して同期)
-    Agents          : .ai/catalog/agents-source/ → .codex/agents/ (toml) + .claude/agents/ (md)
+    Cursor          : ~/.cursor/rules/  (.ai/kernel/dcr-kernel.md と .ai/catalog/rules/skills から生成して同期)
+    Agents          : .ai/catalog/agents-source/ -> .codex/agents/ (toml) + .claude/agents/ (md)
 
 .PARAMETER Target
     同期先を指定: all | vscode | cursor | agents | dcr
@@ -41,45 +41,14 @@ $ErrorActionPreference = "Stop"
 $RepoRoot = $PSScriptRoot
 $UserHome = $env:USERPROFILE
 $CatalogPaths = Join-Path $RepoRoot "tools\lib\catalog-paths.ps1"
+$CursorPackage = Join-Path $RepoRoot "tools\lib\cursor-package.ps1"
 . $CatalogPaths
-$GateStateLib = Join-Path $RepoRoot "tools\lib\gate-state.ps1"
-if (Test-Path $GateStateLib) { . $GateStateLib }
-
-# Hard-block deploy if -EnforceGate and qa_passed != true (or critical findings > 0)
-if ($EnforceGate -and -not $DryRun -and -not $Check) {
-    if (Get-Command Assert-GateReady -ErrorAction SilentlyContinue) {
-        Write-Host "[gate] Verifying QA gate state..." -ForegroundColor Cyan
-        try {
-            Assert-GateReady -RepoRoot $RepoRoot -RequireGate 'qa_passed' -AllowMissing:$false
-            Write-Host "  ✓ qa_passed = true, no critical findings" -ForegroundColor Green
-        } catch {
-            Write-Host "🔴 Stop — $($_.Exception.Message)" -ForegroundColor Red
-            Write-Host "   Run the q/ trigger first or remove -EnforceGate to bypass." -ForegroundColor Yellow
-            exit 1
-        }
-    } else {
-        Write-Warning "[gate] gate-state library not loaded; skipping enforcement."
-    }
-}
-
-# ── Routing Index Pre-generation ──
-if (-not $Check -and -not $DryRun) {
-    $RoutingIndexScript = Join-Path $RepoRoot "tools\generate-routing-index.ps1"
-    if (Test-Path $RoutingIndexScript) {
-        Write-Host "[routing] Regenerating routing indexes..." -ForegroundColor Cyan
-        $skillsIndexPath = Join-Path $RepoRoot ".ai\catalog\skills\_SKILLS_ROUTING_INDEX.md"
-        & powershell -ExecutionPolicy Bypass -File $RoutingIndexScript `
-            -RepoRoot $RepoRoot `
-            -SkillsOutputPath $skillsIndexPath
-        if ($LASTEXITCODE -ne 0) {
-            Write-Warning "[routing] generate-routing-index.ps1 exited $LASTEXITCODE — continuing"
-        }
-    }
-}
+. $CursorPackage
 
 # ── Unified Adapter Framework (new) ──
 $DeployAll = Join-Path $RepoRoot "tools\deploy-all.ps1"
-if ((Test-Path $DeployAll) -and -not $Check -and ($Target -in @("all", "vscode", "cursor"))) {
+$WindsurfAdapter = Join-Path $RepoRoot "tools\adapters\windsurf.ps1"
+if ((Test-Path $DeployAll) -and -not $Check -and ($Target -in @("all", "vscode", "cursor", "windsurf", "agents"))) {
     Write-Host ""
     Write-Host "=== Deploy Adapters (Unified Framework) ===" -ForegroundColor Cyan
     $targetArg = if ($Target -eq "all") { "all" } else { $Target }
@@ -95,7 +64,7 @@ if ((Test-Path $DeployAll) -and -not $Check -and ($Target -in @("all", "vscode",
 # ── Paths ──
 $SourceSkills = Resolve-DcrSourcePath -RepoRoot $RepoRoot -AssetType "skills"
 $SourceRules = Resolve-DcrSourcePath -RepoRoot $RepoRoot -AssetType "rules"
-$SourceCursorKernel = Join-Path $RepoRoot ".cursor\rules\dcr-kernel.md"
+$SourceRuntimeKernel = Join-Path $RepoRoot ".ai\kernel\dcr-kernel.md"
 $SourceAgents = Resolve-DcrSourcePath -RepoRoot $RepoRoot -AssetType "agents-source"
 
 $DestVSCodeSkills = Join-Path $UserHome ".agents\skills"
@@ -111,93 +80,29 @@ function Get-TempDirectory {
     return $tempDir
 }
 
-function Get-RuleDescription {
+function Get-WindsurfDrift {
     param(
-        [string]$Path
+        [string]$RepoRootPath,
+        [string]$DestinationPath,
+        [string]$AdapterScriptPath
     )
 
-    $lines = Get-Content -Path $Path -Encoding utf8
-    $inFrontmatter = $false
-    $frontmatterStarted = $false
-
-    for ($index = 0; $index -lt $lines.Count; $index++) {
-        $line = $lines[$index]
-        $trimmed = $line.Trim()
-        if (-not $frontmatterStarted -and $trimmed -eq '---') {
-            $frontmatterStarted = $true
-            $inFrontmatter = $true
-            continue
-        }
-        if ($inFrontmatter) {
-            if ($trimmed -eq '---') {
-                $inFrontmatter = $false
-                continue
-            }
-
-            if ($trimmed -match '^description:\s*(.*)$') {
-                $description = $Matches[1].Trim()
-                if ($description) {
-                    return $description.Trim([char]34, [char]39)
-                }
-
-                $descriptionLines = @()
-                for ($nextIndex = $index + 1; $nextIndex -lt $lines.Count; $nextIndex++) {
-                    $nextLine = $lines[$nextIndex]
-                    if ($nextLine -notmatch '^\s+') {
-                        break
-                    }
-
-                    $descriptionLines += $nextLine.Trim()
-                    $index = $nextIndex
-                }
-
-                if ($descriptionLines.Count -gt 0) {
-                    return (($descriptionLines -join ' ') -replace '\s+', ' ').Trim([char]34, [char]39)
-                }
-            }
-
-            continue
-        }
-        if (-not $trimmed) {
-            continue
-        }
-        if ($trimmed.StartsWith("#")) {
-            continue
-        }
-        if ($trimmed.StartsWith('```')) {
-            continue
-        }
-        return $trimmed.Replace([char]34, [char]39)
+    if (-not (Test-Path $AdapterScriptPath)) {
+        throw "Windsurf adapter not found: $AdapterScriptPath"
     }
 
-    return [System.IO.Path]::GetFileNameWithoutExtension($Path)
-}
+    $tempDir = Get-TempDirectory
+    $tempOutputRoot = Join-Path $tempDir ".windsurf"
 
-function Write-Utf8NoBom {
-    param(
-        [string]$Path,
-        [string]$Content
-    )
-
-    $utf8NoBom = New-Object System.Text.UTF8Encoding($false)
-    [System.IO.File]::WriteAllText($Path, $Content, $utf8NoBom)
-}
-
-function Remove-LeadingFrontmatter {
-    param(
-        [string]$Content
-    )
-
-    if (-not $Content) {
-        return $Content
+    try {
+        & $AdapterScriptPath -RepoRoot $RepoRootPath -OutputRoot $tempOutputRoot -Quiet -InformationAction Ignore
+        return Get-DirectoryDrift -Source $tempOutputRoot -Destination $DestinationPath
     }
-
-    # Strip only the first YAML frontmatter block at file start.
-    if ($Content -match '(?s)^---\r?\n.*?\r?\n---\r?\n?') {
-        return $Content.Substring($Matches[0].Length)
+    finally {
+        if (Test-Path $tempDir) {
+            Remove-Item -Path $tempDir -Recurse -Force
+        }
     }
-
-    return $Content
 }
 
 function Get-ManagedFileNames {
@@ -219,159 +124,6 @@ function Get-ManagedFileNames {
     }
 }
 
-function New-CursorRulePackage {
-    param(
-        [string]$RulesSource,
-        [string]$SkillsSource,
-        [string]$KernelSource,
-        [string]$OutputDir
-    )
-
-    if (-not (Test-Path $RulesSource)) {
-        throw "Source rules not found: $RulesSource"
-    }
-
-    if (-not (Test-Path $KernelSource)) {
-        throw "Cursor kernel not found: $KernelSource"
-    }
-
-    # Rules → .mdc
-    $ruleFiles = Get-ChildItem -Path $RulesSource -File -Filter *.md |
-    Where-Object { $_.BaseName -notlike "_*" } |
-    Sort-Object Name
-    foreach ($ruleFile in $ruleFiles) {
-        $description = Get-RuleDescription -Path $ruleFile.FullName
-        $body = Get-Content -Path $ruleFile.FullName -Raw -Encoding utf8
-        $body = Remove-LeadingFrontmatter -Content $body
-        $cursorContent = @(
-            "---"
-            "description: $description"
-            'globs: ""'
-            "alwaysApply: false"
-            "---"
-            ""
-            $body.TrimEnd()
-            ""
-        ) -join "`r`n"
-
-        $destination = Join-Path $OutputDir ($ruleFile.BaseName + ".mdc")
-        Write-Utf8NoBom -Path $destination -Content $cursorContent
-    }
-
-    # Skills → .mdc (prefixed with "skill-")
-    if (Test-Path $SkillsSource) {
-        $skillDirs = Get-ChildItem -Path $SkillsSource -Directory |
-        Where-Object { $_.Name -notlike "_*" } |
-        Sort-Object Name
-        foreach ($skillDir in $skillDirs) {
-            $skillFile = Join-Path $skillDir.FullName "SKILL.md"
-            if (Test-Path $skillFile) {
-                $description = Get-RuleDescription -Path $skillFile
-                $body = Get-Content -Path $skillFile -Raw -Encoding utf8
-                $body = Remove-LeadingFrontmatter -Content $body
-                if (-not $body) { continue }
-                $cursorContent = @(
-                    "---"
-                    "description: $description"
-                    'globs: ""'
-                    "alwaysApply: false"
-                    "---"
-                    ""
-                    $body.TrimEnd()
-                    ""
-                ) -join "`r`n"
-
-                $destination = Join-Path $OutputDir ("skill-" + $skillDir.Name + ".mdc")
-                Write-Utf8NoBom -Path $destination -Content $cursorContent
-            }
-        }
-    }
-
-    Copy-Item -Path $KernelSource -Destination (Join-Path $OutputDir "dcr-kernel.md") -Force
-}
-
-function Get-DeprecationReport {
-    param([string]$CatalogRoot)
-
-    $report = @{ rules = @(); skills = @(); agents = @() }
-    $patterns = @(
-        @{ Kind = 'rules'; Path = Join-Path $CatalogRoot 'rules'; Filter = '*.md' }
-        @{ Kind = 'agents'; Path = Join-Path $CatalogRoot 'agents-source'; Filter = '*.md' }
-        @{ Kind = 'skills'; Path = Join-Path $CatalogRoot 'skills'; Filter = 'SKILL.md'; Recurse = $true }
-    )
-    foreach ($p in $patterns) {
-        if (-not (Test-Path $p.Path)) { continue }
-        $params = @{ Path = $p.Path; File = $true; Filter = $p.Filter }
-        if ($p.Recurse) { $params.Recurse = $true }
-        $files = Get-ChildItem @params
-        foreach ($f in $files) {
-            $head = Get-Content -Path $f.FullName -TotalCount 20 -Encoding utf8
-            $isDep = $head | Where-Object { $_ -match '^\s*deprecated\s*:\s*true\s*$' }
-            if ($isDep) {
-                $succ = ($head | Where-Object { $_ -match '^\s*successor\s*:' } | Select-Object -First 1) -replace '^\s*successor\s*:\s*', ''
-                $name = $f.BaseName
-                if ($p.Kind -eq 'skills') { $name = (Split-Path $f.DirectoryName -Leaf) }
-                $report[$p.Kind] += [pscustomobject]@{ Name = $name; Successor = $succ.Trim() }
-            }
-        }
-    }
-    return $report
-}
-
-function Write-DeprecationSummary {
-    param([string]$CatalogRoot)
-
-    $report = Get-DeprecationReport -CatalogRoot $CatalogRoot
-    $total = $report.rules.Count + $report.skills.Count + $report.agents.Count
-    if ($total -eq 0) { return }
-
-    Write-Host ""
-    Write-Host "=== Deprecation Aliases (旧名 → 新後継) ===" -ForegroundColor Cyan
-    foreach ($kind in @('rules', 'skills', 'agents')) {
-        if ($report[$kind].Count -gt 0) {
-            Write-Host "  [$kind] $($report[$kind].Count) deprecated:" -ForegroundColor Yellow
-            foreach ($entry in $report[$kind]) {
-                Write-Host "    $($entry.Name) → $($entry.Successor)" -ForegroundColor DarkGray
-            }
-        }
-    }
-    Write-Host ""
-}
-
-function Sync-Agents {
-    param(
-        [string]$Source,
-        [string]$CodexDest,
-        [string]$ClaudeDest
-    )
-
-    if (-not (Test-Path $Source)) {
-        Write-Warning "Agents source not found: $Source"
-        return
-    }
-
-    $tomlFiles = Get-ChildItem -Path $Source -File -Filter '*.toml'
-    $mdFiles = Get-ChildItem -Path $Source -File -Filter '*.md' | Where-Object { $_.Name -ne 'README.md' }
-
-    if ($DryRun) {
-        Write-Host "[DRY RUN] Codex agents : $($tomlFiles.Count) toml files → $CodexDest" -ForegroundColor Yellow
-        Write-Host "[DRY RUN] Claude agents : $($mdFiles.Count) md files → $ClaudeDest" -ForegroundColor Yellow
-        return
-    }
-
-    New-Item -ItemType Directory -Force -Path $CodexDest, $ClaudeDest | Out-Null
-
-    foreach ($file in $tomlFiles) {
-        Copy-Item -Path $file.FullName -Destination (Join-Path $CodexDest $file.Name) -Force
-    }
-    foreach ($file in $mdFiles) {
-        Copy-Item -Path $file.FullName -Destination (Join-Path $ClaudeDest $file.Name) -Force
-    }
-
-    Write-Host "[OK] Codex agents : $($tomlFiles.Count) files → $CodexDest" -ForegroundColor Green
-    Write-Host "[OK] Claude agents : $($mdFiles.Count) files → $ClaudeDest" -ForegroundColor Green
-}
-
 function Sync-DCRConfig {
     param(
         [string]$Source,
@@ -388,13 +140,13 @@ function Sync-DCRConfig {
     $dcrConfigDest = Join-Path $HOME ".config/dcr"
     try {
         if ($DryRun) {
-            Write-Host "[DRY RUN] .dcr config : $ConfigPath → $dcrConfigDest" -ForegroundColor Yellow
+            Write-Host "[DRY RUN] .dcr config : $ConfigPath -> $dcrConfigDest" -ForegroundColor Yellow
             return
         }
 
         New-Item -ItemType Directory -Force -Path $dcrConfigDest | Out-Null
         Copy-Item -Path $ConfigPath -Destination (Join-Path $dcrConfigDest "config.json") -Force
-        Write-Host "[OK] .dcr config : config.json → $dcrConfigDest" -ForegroundColor Green
+        Write-Host "[OK] .dcr config : config.json -> $dcrConfigDest" -ForegroundColor Green
     }
     catch {
         Write-Warning "Failed to sync .dcr config: $_"
@@ -418,7 +170,7 @@ function Sync-Directory {
     $count = $sourceItems.Count
 
     if ($DryRun) {
-        Write-Host "[DRY RUN] $Label : $count items → $Destination" -ForegroundColor Yellow
+        Write-Host "[DRY RUN] $Label : $count items -> $Destination" -ForegroundColor Yellow
         $sourceItems | ForEach-Object { Write-Host "  $_" }
         return
     }
@@ -430,7 +182,7 @@ function Sync-Directory {
     foreach ($item in $sourceItems) {
         Copy-Item -Path $item.FullName -Destination $Destination -Recurse -Force
     }
-    Write-Host "[OK] $Label : $count items → $Destination" -ForegroundColor Green
+    Write-Host "[OK] $Label : $count items -> $Destination" -ForegroundColor Green
 }
 
 function Sync-Files {
@@ -471,7 +223,7 @@ function Sync-Files {
     }
 
     if ($DryRun) {
-        Write-Host "[DRY RUN] $Label : $count files → $Destination" -ForegroundColor Yellow
+        Write-Host "[DRY RUN] $Label : $count files -> $Destination" -ForegroundColor Yellow
         if ($Prune -and $staleItems.Count -gt 0) {
             Write-Host "  stale files to remove: $($staleItems.Count)" -ForegroundColor Yellow
         }
@@ -497,7 +249,7 @@ function Sync-Files {
         Write-Utf8NoBom -Path $PruneManifestPath -Content (($sourceNames | ConvertTo-Json -Compress) + "`r`n")
     }
 
-    Write-Host "[OK] $Label : $count files → $Destination" -ForegroundColor Green
+    Write-Host "[OK] $Label : $count files -> $Destination" -ForegroundColor Green
 }
 
 # ── Diff Check ──
@@ -705,7 +457,7 @@ function Backup-DeployTarget {
         }
     }
 
-    Write-Host "[BACKUP] $Label : $($items.Count) files → $backupDir" -ForegroundColor DarkCyan
+    Write-Host "[BACKUP] $Label : $($items.Count) files -> $backupDir" -ForegroundColor DarkCyan
 }
 
 # ── Main ──
@@ -723,7 +475,7 @@ if ($Check) {
     if ($Target -eq "all" -or $Target -eq "cursor") {
         $cursorTempDir = Get-TempDirectory
         try {
-            New-CursorRulePackage -RulesSource $SourceRules -SkillsSource $SourceSkills -KernelSource $SourceCursorKernel -OutputDir $cursorTempDir
+            New-CursorRulePackage -RulesSource $SourceRules -SkillsSource $SourceSkills -KernelSource $SourceRuntimeKernel -OutputDir $cursorTempDir
             Compare-Directories -Source $cursorTempDir -Destination $DestCursorRules -Label "Cursor rules (user)" -IgnoreNames @('.dcr-managed-files.json')
             Compare-Directories -Source $cursorTempDir -Destination $DestProjectCursorRules -Label "Cursor rules (project)"
         }
@@ -793,7 +545,7 @@ if ($Target -eq "all" -or $Target -eq "cursor") {
     }
     $cursorTempDir = Get-TempDirectory
     try {
-        New-CursorRulePackage -RulesSource $SourceRules -SkillsSource $SourceSkills -KernelSource $SourceCursorKernel -OutputDir $cursorTempDir
+        New-CursorRulePackage -RulesSource $SourceRules -SkillsSource $SourceSkills -KernelSource $SourceRuntimeKernel -OutputDir $cursorTempDir
         if (-not $DryRun) {
             Write-PrecheckSummary -Label "Cursor rules (user)" -Diffs (Get-DirectoryDrift -Source $cursorTempDir -Destination $DestCursorRules -IgnoreNames @('.dcr-managed-files.json'))
             Write-PrecheckSummary -Label "Cursor rules (project)" -Diffs (Get-DirectoryDrift -Source $cursorTempDir -Destination $DestProjectCursorRules)
@@ -817,7 +569,9 @@ if ($Target -eq "all" -or $Target -eq "agents") {
         Write-PrecheckSummary -Label "Codex agents" -Diffs (Get-FlatFileDrift -Source $SourceAgents -Destination $DestCodexAgents -Filter '*.toml')
         Write-PrecheckSummary -Label "Claude agents" -Diffs (Get-FlatFileDrift -Source $SourceAgents -Destination $DestClaudeAgents -Filter '*.md' -IgnoreNames @('README.md'))
     }
-    Sync-Agents -Source $SourceAgents -CodexDest $DestCodexAgents -ClaudeDest $DestClaudeAgents
+    elseif ($DryRun) {
+        Write-Host "[DRY RUN] Agents mirror generation is delegated to tools/adapters/agents.ps1" -ForegroundColor Yellow
+    }
     if (-not $DryRun) {
         Assert-NoDrift -Label "Codex agents" -Diffs (Get-FlatFileDrift -Source $SourceAgents -Destination $DestCodexAgents -Filter '*.toml')
         Assert-NoDrift -Label "Claude agents" -Diffs (Get-FlatFileDrift -Source $SourceAgents -Destination $DestClaudeAgents -Filter '*.md' -IgnoreNames @('README.md'))
@@ -895,7 +649,7 @@ if ($Watch) {
                 if ($Target -eq "all" -or $Target -eq "cursor") {
                     $cursorWatchDir = Get-TempDirectory
                     try {
-                        New-CursorRulePackage -RulesSource $SourceRules -SkillsSource $SourceSkills -KernelSource $SourceCursorKernel -OutputDir $cursorWatchDir
+                        New-CursorRulePackage -RulesSource $SourceRules -SkillsSource $SourceSkills -KernelSource $SourceRuntimeKernel -OutputDir $cursorWatchDir
                         Sync-Files -Source $cursorWatchDir -Destination $DestCursorRules -Label "Cursor rules (user)" -Prune -PruneManifestPath $DestCursorManifest
                         Sync-Files -Source $cursorWatchDir -Destination $DestProjectCursorRules -Label "Cursor rules (project)" -Prune
                     }
@@ -904,7 +658,7 @@ if ($Watch) {
                     }
                 }
                 if ($Target -eq "all" -or $Target -eq "agents") {
-                    Sync-Agents -Source $SourceAgents -CodexDest $DestCodexAgents -ClaudeDest $DestClaudeAgents
+                    & $DeployAll -Target agents
                 }
 
                 Write-Host "[WATCH] Deploy complete. Watching..." -ForegroundColor Green

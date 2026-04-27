@@ -26,9 +26,10 @@ DCR Products の最小運用フローです。迷ったときはこのファイ�
 - `AGENTS.md`
 - `CLAUDE.md`
 - `.github/copilot-instructions.md`
-- `.cursor/rules/*.mdc`
-- `.claude/agents/`
-- `.codex/agents/`
+- `.cursor/rules/` (Git 管理外)
+- `.windsurf/` (Git 管理外)
+- `.claude/agents/` (Git 管理外)
+- `.codex/agents/` (Git 管理外)
 
 ## 計画と仕様の保存先
 

@@ -15,7 +15,7 @@
 - `.ai/catalog/rules/` にロール別のMarkdownがある
 - `.cursor/rules/` に Cursor 用の `.mdc` が展開済み
 - `.github/copilot-instructions.md` がある
-- `.gemini/settings.json` がある
+- `.windsurf/` に Windsurf 用の rules/workflows/config が展開済み
 - `deploy.ps1` が同期の中心になっている
 
 ## 制約
@@ -23,19 +23,20 @@
 1. Editorごとに instruction の読み込み方法が違う
 2. `Cursor` は `.mdc` 形式が使える
 3. `Claude Code` と `Codex` は Markdown 指示ファイルの再帰参照に寄せやすい
-4. `Antigravity` は現状 `systemInstruction` 中心で、外部ファイルの動的読込前提にしない方が安全
+4. 未対応クライアントは、実体がある adapter を追加するまで現行導線に載せない
 5. 品質重視のため、曖昧なときに無理にロールを自動適用しない
 
 ## 設計方針
 
 ### 1. 単一ソース原則
 
-- 共通カーネルの正本: `.ai/kernel.md`
+- 共通カーネルの正本: `.ai/kernel/`
+- runtime kernel の正本: `.ai/kernel/dcr-kernel.md`
 - ロールの正本: `.ai/catalog/rules/*.md`
 - エディタ固有ファイルは生成物または薄い入口に寄せる
 
 `AGENTS.md`、`CLAUDE.md`、`.github/copilot-instructions.md`、
-`.gemini/settings.json`、`.cursor/rules/*.mdc` は
+`.cursor/rules/`、`.windsurf/` は
 できるだけ正本ではなく配布形にする。
 
 ### 2. 自動参照の安全条件
@@ -113,16 +114,22 @@
 ### Cursor
 
 - 入口: `.cursor/rules/dcr-kernel.md` と `.cursor/rules/*.mdc`
-- 方式: `.ai/catalog/rules/*.md` から `.mdc` を生成する
+- 方式: `.ai/kernel/dcr-kernel.md` と `.ai/catalog/rules/*.md` から生成する
 - ロール適用: `alwaysApply: false` を基本とし、必要なら `description` と `globs` で補助する
 - 方針: `.cursor/rules/*.mdc` を手編集の正本にしない
 
-### Antigravity
+### Windsurf
 
-- 入口: `.gemini/settings.json`
-- 方式: 共通カーネルの要約 + ロール選択方針を `systemInstruction` に持たせる
-- ロール適用: 自動読込ではなく、ルータ要約に基づく選択支援を前提にする
-- 方針: 外部ロール本文の完全自動参照を前提設計にしない
+- 入口: `.windsurf/rules/dcr-kernel.md` と `.windsurf/rules/*.md`
+- 方式: `.ai/kernel/dcr-kernel.md` と `.ai/catalog/rules/*.md` から生成する
+- ロール適用: `model_decision` を基本とし、always-on は kernel に限定する
+- 方針: `.windsurf/` を手編集の正本にしない
+
+### Antigravity / Gemini
+
+- 状態: 現行 adapter なし
+- 方針: 実体がある `.gemini/` adapter を追加するまで、対応エディタ一覧には載せない
+- 再開条件: `deploy.ps1`, `validate.ps1`, `init-project.ps1` が `.gemini/` を生成・検証できること
 
 ## 推奨する運用
 
@@ -151,7 +158,7 @@
 ### Phase 2: ずれ防止
 
 - `deploy.ps1` で `.ai/catalog/rules/*.md -> .cursor/rules/*.mdc` の生成を標準化する
-- 可能なら共通カーネルもテンプレートから出力する
+- 共通 runtime kernel は `.ai/kernel/dcr-kernel.md` から出力する
 
 ### Phase 3: 精度向上
 
@@ -168,7 +175,7 @@
 
 ## 未解決事項
 
-- Antigravity が将来どこまで外部ファイル参照できるか
+- Antigravity / Gemini adapter を追加するかどうか
 - VS Code 側で `.ai/catalog/rules/*.md` の追加参照をどこまで安定運用できるか
 - 各ロールにどの粒度のメタデータを持たせるか
 
@@ -180,4 +187,4 @@
 2. 自動参照は「高一致時のみ」に制限する
 3. `Cursor` は生成アダプタ方式にする
 4. `Claude Code` と `Codex` は `.ai/catalog/rules/*.md` の動的参照を採用する
-5. `Antigravity` は当面、要約ルータ方式に留める
+5. 未対応クライアントは adapter 実装まで対応表に載せない

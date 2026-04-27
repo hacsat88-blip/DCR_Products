@@ -18,6 +18,7 @@
 ├── _permissions.md              ← 権限モデル（P1/P2/P3）
 ├── _safety-boundaries.md        ← セーフティバウンダリ（全モデル共通）
 ├── _module-behaviors.md         ← モジュール動作（a/s/i/d 詳細）
+├── dcr-kernel.md                ← runtime entrypoint 生成用の共有 kernel
 │
 ├── environments/                ← 環境別実装レイヤー
 │   ├── README.md               ← 環境選択ガイド
@@ -52,7 +53,8 @@
 | **VS Code Copilot Chat**     | `.github/copilot-instructions.md` | `.ai/kernel/_base.md` + `environments/vscode-copilot.md` | Chat 統合        |
 | **Claude Code**              | `CLAUDE.md`                       | `.ai/kernel/_base.md` + `environments/claude-code.md`    | Code 通合        |
 | **GitHub Copilot CLI**       | `AGENTS.md`                       | `.ai/kernel/_base.md` + `environments/copilot-cli.md`    | CLI 起動時       |
-| **Cursor（Composer/Agent）** | `.cursor/rules/dcr-kernel.md`     | `.ai/kernel/_base.md` + `environments/cursor.md`         | ルール自動ロード |
+| **Cursor（Composer/Agent）** | `.cursor/rules/dcr-kernel.md`     | `.ai/kernel/dcr-kernel.md` + `environments/cursor.md`    | ルール自動ロード |
+| **Windsurf**                 | `.windsurf/rules/dcr-kernel.md`   | `.ai/kernel/dcr-kernel.md`                               | ルール自動ロード |
 | **Codex**                    | `AGENTS.md`                       | `.ai/kernel/_base.md` + `environments/codex.md`          | リファレンス     |
 
 ---
@@ -87,6 +89,11 @@
 - d/ 動作（Adversarial）
 - r/ 動作（Recommendation）
 - その他トリガーの詳細ハンドラ
+
+#### `dcr-kernel.md`
+- Cursor / Windsurf など inline runtime が必要な環境へ配る共有 kernel
+- `.cursor/` や `.windsurf/` ではなく、このファイルを正本として編集する
+- `deploy.ps1` / `tools/adapters/*.ps1` が各環境の形式へ同期する
 
 ---
 
@@ -306,7 +313,7 @@ gate/*.md（12個）   ～300 行（統一）
 □ copilot-instructions.md → 参照層に縮約
 □ CLAUDE.md → 参照層に縮約
 □ AGENTS.md → 参照層に縮約
-□ .cursor/rules/dcr-kernel.md → 参照層に縮約
+✅ .cursor/rules/dcr-kernel.md → `.ai/kernel/dcr-kernel.md` から同期
 ```
 
 ### Phase 5-7: 検証・デプロイ
@@ -321,7 +328,7 @@ gate/*.md（12個）   ～300 行（統一）
 
 - **統合元仕様**: `.ai/module/unified-integration.md`
 - **検証スクリプト**: `validate.ps1` / `deploy.ps1`
-- **モデルファイル**: `AGENTS.md` / `CLAUDE.md` / `.cursor/rules/dcr-kernel.md` / `.github/copilot-instructions.md`
+- **モデルファイル**: `AGENTS.md` / `CLAUDE.md` / `.cursor/rules/dcr-kernel.md` / `.windsurf/rules/dcr-kernel.md` / `.github/copilot-instructions.md`
 
 ---
 
