@@ -25,7 +25,6 @@
 │   ├── vscode-copilot.md       ← VS Code Copilot Chat 用（差分のみ）
 │   ├── claude-code.md          ← Claude Code 用（差分のみ）
 │   ├── copilot-cli.md          ← GitHub Copilot CLI 用（差分のみ + CLI固有）
-│   ├── cursor.md               ← Cursor 用（差分のみ）
 │   └── codex.md                ← Codex 用（差分のみ）
 │
 └── gates/                       ← トリガーハンドラ統一層
@@ -53,7 +52,6 @@
 | **VS Code Copilot Chat**     | `.github/copilot-instructions.md` | `.ai/kernel/_base.md` + `environments/vscode-copilot.md` | Chat 統合        |
 | **Claude Code**              | `CLAUDE.md`                       | `.ai/kernel/_base.md` + `environments/claude-code.md`    | Code 通合        |
 | **GitHub Copilot CLI**       | `AGENTS.md`                       | `.ai/kernel/_base.md` + `environments/copilot-cli.md`    | CLI 起動時       |
-| **Cursor（Composer/Agent）** | `.cursor/rules/dcr-kernel.md`     | `.ai/kernel/dcr-kernel.md` + `environments/cursor.md`    | ルール自動ロード |
 | **Windsurf**                 | `.windsurf/rules/dcr-kernel.md`   | `.ai/kernel/dcr-kernel.md`                               | ルール自動ロード |
 | **Codex**                    | `AGENTS.md`                       | `.ai/kernel/_base.md` + `environments/codex.md`          | リファレンス     |
 
@@ -91,8 +89,8 @@
 - その他トリガーの詳細ハンドラ
 
 #### `dcr-kernel.md`
-- Cursor / Windsurf など inline runtime が必要な環境へ配る共有 kernel
-- `.cursor/` や `.windsurf/` ではなく、このファイルを正本として編集する
+- Windsurf など inline runtime が必要な環境へ配る共有 kernel
+- `.windsurf/` ではなく、このファイルを正本として編集する
 - `deploy.ps1` / `tools/adapters/*.ps1` が各環境の形式へ同期する
 
 ---
@@ -114,10 +112,6 @@
 - 環境固有：**Tool priority hierarchy**（LSP / grep の優先度）
 - 環境固有：**SQL tracking**（キャッシュ管理）
 - 環境固有：**Troubleshooting**（CLI固有エラー）
-
-#### `cursor.md`
-- 環境固有：Cursor ルールの自動ロード機構
-- 拡張：`.cursor/rules/` 配下の動作
 
 #### `codex.md`
 - 環境固有：Codex の agent orchestration
@@ -174,9 +168,9 @@
     │   ↓
     │   .ai/kernel/ 参照
     │
-    ├─ Cursor
+    ├─ Windsurf
     │   ↓
-    │   .cursor/rules/dcr-kernel.md（自動ロード）
+    │   .windsurf/rules/dcr-kernel.md（自動ロード）
     │   ↓
     │   .ai/kernel/ 参照
     │
@@ -267,7 +261,6 @@ _module-behaviors.md ～150 行
 vscode-copilot.md  ～40 行（差分のみ）
 claude-code.md     ～40 行（差分のみ）
 copilot-cli.md     ～80 行（CLI固有）
-cursor.md          ～30 行（差分のみ）
 codex.md           ～30 行（差分のみ）
 gate/*.md（12個）   ～300 行（統一）
 ────────────────────────────
@@ -299,7 +292,6 @@ gate/*.md（12個）   ～300 行（統一）
 □ environments/vscode-copilot.md を生成
 □ environments/claude-code.md を生成
 □ environments/copilot-cli.md を生成（CLI固有セクション保持）
-□ environments/cursor.md を生成
 □ environments/codex.md を生成
 ```
 
@@ -313,7 +305,7 @@ gate/*.md（12個）   ～300 行（統一）
 □ copilot-instructions.md → 参照層に縮約
 □ CLAUDE.md → 参照層に縮約
 □ AGENTS.md → 参照層に縮約
-✅ .cursor/rules/dcr-kernel.md → `.ai/kernel/dcr-kernel.md` から同期
+✅ .windsurf/rules/dcr-kernel.md → `.ai/kernel/dcr-kernel.md` から同期
 ```
 
 ### Phase 5-7: 検証・デプロイ
@@ -328,7 +320,7 @@ gate/*.md（12個）   ～300 行（統一）
 
 - **統合元仕様**: `.ai/module/unified-integration.md`
 - **検証スクリプト**: `validate.ps1` / `deploy.ps1`
-- **モデルファイル**: `AGENTS.md` / `CLAUDE.md` / `.cursor/rules/dcr-kernel.md` / `.windsurf/rules/dcr-kernel.md` / `.github/copilot-instructions.md`
+- **モデルファイル**: `AGENTS.md` / `CLAUDE.md` / `.windsurf/rules/dcr-kernel.md` / `.github/copilot-instructions.md`
 
 ---
 

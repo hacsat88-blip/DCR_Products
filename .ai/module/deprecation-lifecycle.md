@@ -17,7 +17,7 @@ Stage 4: REMOVED                     # ファイル削除、git 履歴のみ残�
 ## Stage 2 → Stage 3 の判断（既に自動）
 
 `deprecated: true` フロントマターを付けた時点で：
-- ✅ cursor.ps1 が生成からスキップ
+- ✅ deprecated aliases are skipped from generated mirrors
 - ✅ CLAUDE.md / AGENTS.md は `Deprecated Aliases` セクションに表示（active list には出ない）
 - ✅ pied-piper Step 0 が successor へ自動置換
 

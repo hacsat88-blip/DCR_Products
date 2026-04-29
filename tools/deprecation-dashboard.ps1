@@ -100,7 +100,7 @@ function Get-ExternalRefs {
     Push-Location $RepoRoot
     try {
         # Scan for references in markdown / config / scripts (exclude self file, .git, generated, history)
-        $exclude = @('.git', '.cursor', '.claude', 'docs/dcr/plans')
+        $exclude = @('.git', '.claude', 'docs/dcr/plans')
         $refs = git grep -l --no-color -e "\b$Name\b" -- '*.md' '*.ps1' '*.json' '*.toml' 2>&1 |
             Where-Object {
                 $f = $_

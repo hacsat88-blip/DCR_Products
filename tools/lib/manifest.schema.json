@@ -34,7 +34,6 @@
                         "items": {
                             "enum": [
                                 "vscode",
-                                "cursor",
                                 "claude",
                                 "codex",
                                 "zed"
@@ -74,7 +73,6 @@
                         "items": {
                             "enum": [
                                 "vscode",
-                                "cursor",
                                 "claude",
                                 "codex",
                                 "zed"

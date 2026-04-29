@@ -98,8 +98,6 @@ else {
 $requiredFiles = @(
     ".claude-plugin\plugin.json",
     ".codex-plugin\plugin.json",
-    ".cursor-plugin\plugin.json",
-    "hooks\hooks-cursor.json",
     "package.json"
 )
 

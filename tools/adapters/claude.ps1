@@ -71,7 +71,7 @@ $deprecatedAgents = @()
 # Collect claude-targeted items (separate active vs deprecated)
 foreach ($f in Get-ChildItem $rulesDir -Filter "*.md" | Where-Object { -not $_.BaseName.StartsWith("_") }) {
     $targets = Get-Targets $f
-    if (-not $targets) { $targets = @("vscode", "cursor", "claude", "codex") }
+    if (-not $targets) { $targets = @("vscode", "claude", "codex") }
     if ($targets -contains "claude") {
         $dep = Get-DeprecationInfo $f
         if ($dep.Deprecated) {
@@ -87,7 +87,7 @@ foreach ($dir in Get-ChildItem $skillsDir -Directory | Where-Object { -not $_.Na
     if (Test-Path $sf) {
         $sfItem = Get-Item $sf
         $targets = Get-Targets $sfItem
-        if (-not $targets) { $targets = @("vscode", "cursor", "claude", "codex") }
+        if (-not $targets) { $targets = @("vscode", "claude", "codex") }
         if ($targets -contains "claude") {
             $dep = Get-DeprecationInfo $sfItem
             if ($dep.Deprecated) {

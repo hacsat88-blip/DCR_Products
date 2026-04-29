@@ -11,7 +11,7 @@ can improve without changing every consumer independently.
 - Metadata is optional today
 - Existing rule files remain valid without any metadata block
 - Auto-routing must keep working from filename, title, and task context alone
-- `deploy.ps1` skips `_*.md` files and generates Cursor `.mdc` files with safe defaults
+- `deploy.ps1` skips `_*.md` files and keeps generated mirrors outside the source-of-truth layer
 
 ## Asset taxonomy
 

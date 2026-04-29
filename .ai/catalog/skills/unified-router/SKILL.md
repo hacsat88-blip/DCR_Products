@@ -11,7 +11,6 @@ keywords:
   - orchestration
 targets:
   - vscode
-  - cursor
   - claude
   - codex
 ---

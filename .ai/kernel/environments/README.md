@@ -7,7 +7,6 @@
 - `vscode-copilot.md` = VS Code Copilot Chat 用差分
 - `claude-code.md` = Claude Code 用差分
 - `copilot-cli.md` = GitHub Copilot CLI 用差分
-- `cursor.md` = Cursor 用差分
 - `codex.md` = Codex 用差分
 
 ## Rule
