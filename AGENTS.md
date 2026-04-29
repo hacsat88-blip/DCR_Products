@@ -139,6 +139,7 @@ GitHub Copilot CLI specific behavior lives in [.ai/kernel/environments/copilot-c
 - [signup-flow-cro](.ai/catalog/skills/signup-flow-cro/SKILL.md)
 - [skill-creator](.ai/catalog/skills/skill-creator/SKILL.md)
 - [social-content](.ai/catalog/skills/social-content/SKILL.md)
+- [stock-skills-sla](.ai/catalog/skills/stock-skills-sla/SKILL.md)
 - [strategic-compact](.ai/catalog/skills/strategic-compact/SKILL.md)
 - [strategic-messaging](.ai/catalog/skills/strategic-messaging/SKILL.md)
 - [subagent-driven-development](.ai/catalog/skills/subagent-driven-development/SKILL.md)
