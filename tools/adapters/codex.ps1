@@ -62,7 +62,7 @@ $deprecatedAgents = @()
 # Collect codex-targeted items
 foreach ($f in Get-ChildItem $rulesDir -Filter "*.md" | Where-Object { -not $_.BaseName.StartsWith("_") }) {
     $targets = Get-Targets $f
-    if (-not $targets) { $targets = @("vscode", "cursor", "claude", "codex") }
+    if (-not $targets) { $targets = @("vscode", "claude", "codex") }
     if ($targets -contains "codex") {
         $dep = Get-DeprecationInfo $f
         if ($dep.Deprecated) { $deprecatedRules += [pscustomobject]@{ Name = $f.BaseName; Successor = $dep.Successor } } else { $rules += $f.BaseName }
@@ -74,7 +74,7 @@ foreach ($dir in Get-ChildItem $skillsDir -Directory | Where-Object { -not $_.Na
     if (Test-Path $sf) {
         $sfItem = Get-Item $sf
         $targets = Get-Targets $sfItem
-        if (-not $targets) { $targets = @("vscode", "cursor", "claude", "codex") }
+        if (-not $targets) { $targets = @("vscode", "claude", "codex") }
         if ($targets -contains "codex") {
             $dep = Get-DeprecationInfo $sfItem
             if ($dep.Deprecated) { $deprecatedSkills += [pscustomobject]@{ Name = $dir.Name; Successor = $dep.Successor } } else { $skills += $dir.Name }

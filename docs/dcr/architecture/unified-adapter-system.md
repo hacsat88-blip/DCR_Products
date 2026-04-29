@@ -14,7 +14,6 @@
 - `.github/copilot-instructions.md`
 - `AGENTS.md`
 - `CLAUDE.md`
-- `.cursor/rules/` (local generated mirror, Git 管理外)
 - `.windsurf/` (local generated mirror, Git 管理外)
 - `.claude/agents/` (local generated mirror, Git 管理外)
 - `.codex/agents/` (local generated mirror, Git 管理外)

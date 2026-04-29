@@ -43,11 +43,11 @@ Closes #<!-- Issue番号 -->
 
 PR作成前に、以下をすべてチェックしてください:
 
-- [ ] `validate.ps1` が PASSED（226 passed, 0 failed）
+- [ ] `validate.ps1` が PASSED（0 failed）
 - [ ] `npm test` が全 PASSED（存在する場合）
 - [ ] このテンプレートの「背景」「変更内容」「テスト观点」を埋めた
 - [ ] コミットメッセージが明確（Conventional Commits推奨）
-- [ ] `.cursor/rules/` などの生成ミラーは含めない
+- [ ] `.windsurf/`, `.codex/agents/`, `.claude/agents/` などの生成ミラーは含めない
 - [ ] `docs/` ファイルが必要なら追加した
 
 チェック漏れがあると、レビュアーから「修正して」と返されます。

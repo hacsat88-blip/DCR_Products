@@ -44,6 +44,13 @@ function Get-Targets {
     return @()
 }
 
+function Test-Deprecated {
+    param([string]$Path)
+
+    $value = Get-FrontmatterField -Path $Path -Field "deprecated"
+    return ($value -and $value.ToLowerInvariant() -eq "true")
+}
+
 function Get-FrontmatterField {
     param(
         [string]$Path,
@@ -138,13 +145,24 @@ if (Test-Path $runtimeKernel) {
 
 # 2) Catalog rules -> Windsurf rules (model_decision)
 $ruleFiles = Get-ChildItem -Path $rulesDir -File -Filter *.md | Where-Object { -not $_.BaseName.StartsWith("_") } | Sort-Object Name
+$deprecatedRules = New-Object System.Collections.Generic.List[object]
 foreach ($ruleFile in $ruleFiles) {
     $targets = @(Get-Targets -Path $ruleFile.FullName)
     if ($targets.Count -eq 0) {
-        $targets = @("vscode", "cursor", "claude", "codex", "windsurf")
+        $targets = @("vscode", "claude", "codex", "windsurf")
     }
 
     if (-not ($targets -contains "windsurf")) {
+        continue
+    }
+
+    if (Test-Deprecated -Path $ruleFile.FullName) {
+        $successor = Get-FrontmatterField -Path $ruleFile.FullName -Field "successor"
+        $deprecatedRules.Add([pscustomobject]@{
+            Name = $ruleFile.BaseName
+            Successor = $successor
+        })
+        Write-WindsurfStatus -Message "  [SKIP] rules/$($ruleFile.BaseName).md (deprecated -> $successor)" -Color "DarkGray"
         continue
     }
 
@@ -174,6 +192,29 @@ foreach ($ruleFile in $ruleFiles) {
     Write-Utf8NoBom -Path $destPath -Content $content
     Register-ManagedFile -ManagedFiles $managedFiles -RelativePath "rules/$destName"
     Write-WindsurfStatus -Message "  [OK] rules/$destName"
+}
+
+if ($deprecatedRules.Count -gt 0) {
+    $aliasLines = @(
+        "---"
+        "trigger: model_decision"
+        "description: Deprecated DCR rule aliases for Windsurf; route old names to successors"
+        "---"
+        ""
+        "# Deprecated Rule Aliases"
+        ""
+        "When a user or document references a deprecated rule name, silently use the successor rule instead."
+        ""
+    )
+    foreach ($rule in ($deprecatedRules | Sort-Object Name)) {
+        $aliasLines += "- $($rule.Name) -> $($rule.Successor)"
+    }
+    $aliasLines += ""
+
+    $aliasesPath = Join-Path $outRulesDir "deprecated-aliases.md"
+    Write-Utf8NoBom -Path $aliasesPath -Content ($aliasLines -join "`r`n")
+    Register-ManagedFile -ManagedFiles $managedFiles -RelativePath "rules/deprecated-aliases.md"
+    Write-WindsurfStatus -Message "  [OK] rules/deprecated-aliases.md"
 }
 
 # 3) Claude commands -> Windsurf workflows

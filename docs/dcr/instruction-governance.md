@@ -30,7 +30,6 @@
 - `AGENTS.md`
 - `CLAUDE.md`
 - `.github/copilot-instructions.md`
-- `.cursor/rules/` (Git 管理外)
 - `.windsurf/` (Git 管理外)
 - `.claude/agents/` (Git 管理外)
 - `.codex/agents/` (Git 管理外)
@@ -42,7 +41,6 @@
 以下は repo 外ですが、`deploy.ps1` の managed target です。
 
 - `%USERPROFILE%/.agents/skills`
-- `%USERPROFILE%/.cursor/rules`
 - `%HOME%/.config/dcr/config.json`
 
 これらは runtime cache ではなく、repo 正本から同期される deploy 先です。user-level 側の手編集は次回 deploy で上書きされます。

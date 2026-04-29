@@ -2,7 +2,7 @@
 
 ## Goal
 
-Copilot CLI、Cursor で同じ project-scoped memory を使い、クライアント間で文脈を共有しつつ Product 混線を防ぐ。
+Copilot CLI、Codex、Claude Code で同じ project-scoped memory を使い、クライアント間で文脈を共有しつつ Product 混線を防ぐ。
 
 ## Scope Strategy
 
@@ -50,9 +50,9 @@ API key を使う場合は各 server に Authorization header を追加する。
 - ルートの .mcp.json を正本として利用する
 - 作業対象に応じて対応する supermemory server を使う
 
-### Cursor
+### Codex / Claude Code
 
-- Cursor 側の MCP 設定画面で同じ server 定義を追加する
+- クライアント側の MCP 設定で同じ server 定義を追加する
 - Copilot CLI と同じ project_id を使う
 
 ## Operation Rules

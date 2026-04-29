@@ -36,7 +36,7 @@ npm-debug.log*
 /~$autotrader.xlsm
 
 # Generated adapter outputs (not source of truth)
-/.cursor/rules/
+/.cursor/
 /.windsurf/
 /.codex/agents/
 /.claude/agents/

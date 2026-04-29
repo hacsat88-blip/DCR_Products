@@ -27,7 +27,7 @@ foreach ($f in Get-ChildItem $rulesDir -Filter "*.md" | Where-Object { -not $_.B
     if ($text -match '(?s)^---.*?^targets:\s*\n((?:.*?\n)*?)(?:^---|^$)') {
         $targets = [regex]::Matches($Matches[1], '^\s*-\s*(.+)$', 'Multiline') | % { $_.Groups[1].Value }
     } else {
-        $targets = @("vscode", "cursor", "claude", "codex")
+        $targets = @("vscode", "claude", "codex")
     }
     if ($targets -contains "vscode") {
         $rules += $f.BaseName
@@ -43,7 +43,7 @@ foreach ($dir in Get-ChildItem $skillsDir -Directory | Where-Object { -not $_.Na
         if ($text -match '(?s)^---.*?^targets:\s*\n((?:.*?\n)*?)(?:^---|^$)') {
             $targets = [regex]::Matches($Matches[1], '^\s*-\s*(.+)$', 'Multiline') | % { $_.Groups[1].Value }
         } else {
-            $targets = @("vscode", "cursor", "claude", "codex")
+            $targets = @("vscode", "claude", "codex")
         }
         if ($targets -contains "vscode") {
             $skills += $dir.Name

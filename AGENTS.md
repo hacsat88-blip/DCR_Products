@@ -174,7 +174,6 @@ GitHub Copilot CLI specific behavior lives in [.ai/kernel/environments/copilot-c
 - [cloud-architect](.ai/catalog/agents-source/cloud-architect.md)
 - [code-mapper](.ai/catalog/agents-source/code-mapper.md)
 - [code-reviewer](.ai/catalog/agents-source/code-reviewer.md)
-- [competitive-analyst](.ai/catalog/agents-source/competitive-analyst.md)
 - [compliance-auditor](.ai/catalog/agents-source/compliance-auditor.md)
 - [content-marketer](.ai/catalog/agents-source/content-marketer.md)
 - [context-manager](.ai/catalog/agents-source/context-manager.md)
@@ -190,7 +189,6 @@ GitHub Copilot CLI specific behavior lives in [.ai/kernel/environments/copilot-c
 - [devops-engineer](.ai/catalog/agents-source/devops-engineer.md)
 - [django-developer](.ai/catalog/agents-source/django-developer.md)
 - [docker-expert](.ai/catalog/agents-source/docker-expert.md)
-- [docs-researcher](.ai/catalog/agents-source/docs-researcher.md)
 - [documentation-engineer](.ai/catalog/agents-source/documentation-engineer.md)
 - [dotnet-core-expert](.ai/catalog/agents-source/dotnet-core-expert.md)
 - [dotnet-framework-4.8-expert](.ai/catalog/agents-source/dotnet-framework-4.8-expert.md)
@@ -212,14 +210,12 @@ GitHub Copilot CLI specific behavior lives in [.ai/kernel/environments/copilot-c
 - [it-ops-orchestrator](.ai/catalog/agents-source/it-ops-orchestrator.md)
 - [java-architect](.ai/catalog/agents-source/java-architect.md)
 - [javascript-pro](.ai/catalog/agents-source/javascript-pro.md)
-- [knowledge-synthesizer](.ai/catalog/agents-source/knowledge-synthesizer.md)
 - [kotlin-specialist](.ai/catalog/agents-source/kotlin-specialist.md)
 - [kubernetes-specialist](.ai/catalog/agents-source/kubernetes-specialist.md)
 - [laravel-specialist](.ai/catalog/agents-source/laravel-specialist.md)
 - [legacy-modernizer](.ai/catalog/agents-source/legacy-modernizer.md)
 - [legal-advisor](.ai/catalog/agents-source/legal-advisor.md)
 - [m365-admin](.ai/catalog/agents-source/m365-admin.md)
-- [market-researcher](.ai/catalog/agents-source/market-researcher.md)
 - [mcp-developer](.ai/catalog/agents-source/mcp-developer.md)
 - [ml-engineer](.ai/catalog/agents-source/ml-engineer.md)
 - [mlops-engineer](.ai/catalog/agents-source/mlops-engineer.md)
@@ -249,7 +245,6 @@ GitHub Copilot CLI specific behavior lives in [.ai/kernel/environments/copilot-c
 - [rust-engineer](.ai/catalog/agents-source/rust-engineer.md)
 - [sales-engineer](.ai/catalog/agents-source/sales-engineer.md)
 - [scrum-master](.ai/catalog/agents-source/scrum-master.md)
-- [search-specialist](.ai/catalog/agents-source/search-specialist.md)
 - [security-auditor](.ai/catalog/agents-source/security-auditor.md)
 - [security-engineer](.ai/catalog/agents-source/security-engineer.md)
 - [seo-specialist](.ai/catalog/agents-source/seo-specialist.md)
@@ -262,7 +257,6 @@ GitHub Copilot CLI specific behavior lives in [.ai/kernel/environments/copilot-c
 - [terraform-engineer](.ai/catalog/agents-source/terraform-engineer.md)
 - [terragrunt-expert](.ai/catalog/agents-source/terragrunt-expert.md)
 - [test-automator](.ai/catalog/agents-source/test-automator.md)
-- [trend-analyst](.ai/catalog/agents-source/trend-analyst.md)
 - [typescript-pro](.ai/catalog/agents-source/typescript-pro.md)
 - [ui-designer](.ai/catalog/agents-source/ui-designer.md)
 - [ux-researcher](.ai/catalog/agents-source/ux-researcher.md)
@@ -295,14 +289,18 @@ These names are kept as aliases that route to their successor:
 - ~~api-documenter~~ 竊・[documentation-engineer](.ai/catalog/agents-source/documentation-engineer.md) _(agent)_
 - ~~architecture-diagram-orchestrator~~ 竊・[pied-piper](.ai/catalog/agents-source/pied-piper.md) _(agent)_
 - ~~browser-debugger~~ 竊・[debugger](.ai/catalog/agents-source/debugger.md) _(agent)_
+- ~~competitive-analyst~~ 竊・[research-analyst](.ai/catalog/agents-source/research-analyst.md) _(agent)_
 - ~~data-researcher~~ 竊・[research-analyst](.ai/catalog/agents-source/research-analyst.md) _(agent)_
 - ~~database-optimizer~~ 竊・[database-administrator](.ai/catalog/agents-source/database-administrator.md) _(agent)_
 - ~~deployment-engineer~~ 竊・[devops-engineer](.ai/catalog/agents-source/devops-engineer.md) _(agent)_
 - ~~devops-incident-responder~~ 竊・[incident-responder](.ai/catalog/agents-source/incident-responder.md) _(agent)_
+- ~~docs-researcher~~ 竊・[research-analyst](.ai/catalog/agents-source/research-analyst.md) _(agent)_
 - ~~error-detective~~ 竊・[debugger](.ai/catalog/agents-source/debugger.md) _(agent)_
 - ~~graphql-architect~~ 竊・[backend-developer](.ai/catalog/agents-source/backend-developer.md) _(agent)_
+- ~~knowledge-synthesizer~~ 竊・[research-analyst](.ai/catalog/agents-source/research-analyst.md) _(agent)_
 - ~~llm-architect~~ 竊・[ai-engineer](.ai/catalog/agents-source/ai-engineer.md) _(agent)_
 - ~~machine-learning-engineer~~ 竊・[ml-engineer](.ai/catalog/agents-source/ml-engineer.md) _(agent)_
+- ~~market-researcher~~ 竊・[research-analyst](.ai/catalog/agents-source/research-analyst.md) _(agent)_
 - ~~microservices-architect~~ 竊・[backend-developer](.ai/catalog/agents-source/backend-developer.md) _(agent)_
 - ~~mobile-app-developer~~ 竊・[mobile-developer](.ai/catalog/agents-source/mobile-developer.md) _(agent)_
 - ~~multi-agent-coordinator~~ 竊・[pied-piper](.ai/catalog/agents-source/pied-piper.md) _(agent)_
@@ -312,8 +310,10 @@ These names are kept as aliases that route to their successor:
 - ~~platform-engineer~~ 竊・[devops-engineer](.ai/catalog/agents-source/devops-engineer.md) _(agent)_
 - ~~reviewer~~ 竊・[code-reviewer](.ai/catalog/agents-source/code-reviewer.md) _(agent)_
 - ~~risk-manager~~ 竊・[fintech-engineer](.ai/catalog/agents-source/fintech-engineer.md) _(agent)_
+- ~~search-specialist~~ 竊・[research-analyst](.ai/catalog/agents-source/research-analyst.md) _(agent)_
 - ~~task-distributor~~ 竊・[pied-piper](.ai/catalog/agents-source/pied-piper.md) _(agent)_
 - ~~tooling-engineer~~ 竊・[build-engineer](.ai/catalog/agents-source/build-engineer.md) _(agent)_
+- ~~trend-analyst~~ 竊・[research-analyst](.ai/catalog/agents-source/research-analyst.md) _(agent)_
 - ~~ui-fixer~~ 竊・[frontend-developer](.ai/catalog/agents-source/frontend-developer.md) _(agent)_
 - ~~workflow-orchestrator~~ 竊・[pied-piper](.ai/catalog/agents-source/pied-piper.md) _(agent)_
 

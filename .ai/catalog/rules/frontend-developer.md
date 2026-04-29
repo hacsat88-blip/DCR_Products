@@ -23,7 +23,6 @@ inherits:
   - git-conventions
 targets:
   - vscode
-  - cursor
   - claude
   - codex
 ---

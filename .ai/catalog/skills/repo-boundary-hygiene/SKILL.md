@@ -63,7 +63,7 @@ package:
 | Class           | 意味                          | 例                                              |
 | --------------- | ----------------------------- | ----------------------------------------------- |
 | source-of-truth | 正本。変更はここから始める    | `rules/*.md`, `skills/*/SKILL.md`, `templates/` |
-| generated       | 正本から派生する生成物        | `.cursor/rules/*.mdc`, generated docs           |
+| generated       | 正本から派生する生成物        | `.windsurf/`, generated docs                    |
 | runtime/config  | 実行時に効く設定や task       | `.vscode/settings.json`, `.vscode/tasks.json`   |
 | product-local   | 特定 Product にだけ属する資産 | `Product/<product>/**`, product overlay         |
 
