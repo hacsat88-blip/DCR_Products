@@ -33,11 +33,7 @@
 
 ### Step 1: Convergence Gate（α2）— 必須
 
-禁止語リストを確認する（`contracts/failure-matrix.md`）:
-```
-禁止語: 買い, 買うべき, 購入を推奨, 売り, 売るべき, 手放せ,
-        必ず上がる, 確実, テンバガー確定, 10倍確定, 安全な投資
-```
+禁止語は **`contracts/safety-protocol.md` の「禁止語」セクションを単一正本**として確認する（オーケストレーター注入済みの safety-protocol ブロック内）。`contracts/failure-matrix.md` は検出後のアクション定義であり、禁止語リストの正本ではない。
 
 検出時:
 - `🟡[Fix]: Convergence Gate — 禁止語検出` を付与
