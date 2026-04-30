@@ -25,3 +25,4 @@ git 履歴と異なり、本ファイルは **「いつ・なぜ・誰が」削�
 - ライフサイクル仕様: [.ai/module/deprecation-lifecycle.md](../.ai/module/deprecation-lifecycle.md)
 - 監視ダッシュボード: `pwsh tools/deprecation-dashboard.ps1`
 - 候補抽出: `pwsh tools/deprecation-dashboard.ps1 -OutputJson`
+- Stage 4候補Markdown: `pwsh tools/deprecation-dashboard.ps1 -OutputMarkdown`

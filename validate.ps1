@@ -38,10 +38,13 @@ $CatalogPaths = Join-Path $RepoRoot "tools\lib\catalog-paths.ps1"
 $SourceRules = Resolve-DcrSourcePath -RepoRoot $RepoRoot -AssetType "rules"
 $SourceSkills = Resolve-DcrSourcePath -RepoRoot $RepoRoot -AssetType "skills"
 $KernelRoot = Join-Path $RepoRoot ".ai\kernel"
+$EnvironmentRoot = Join-Path $RepoRoot ".ai\environments"
 $AgentsSource = Resolve-DcrSourcePath -RepoRoot $RepoRoot -AssetType "agents-source"
 $DeployScript = Join-Path $RepoRoot "deploy.ps1"
 $RoutingIndexScript = Join-Path $RepoRoot "tools\generate-routing-index.ps1"
 $ExternalSuperpowersCheckScript = Join-Path $RepoRoot "tools\check-external-superpowers.ps1"
+$SharedBookCheckScript = Join-Path $RepoRoot "tools\validate-shared-book.ps1"
+$RoutingAccuracyScript = Join-Path $RepoRoot "tools\eval-routing-accuracy.ps1"
 $RoutingIndexFile = Join-Path $SourceRules "_ROUTING_INDEX.md"
 $PowerShellExe = (Get-Process -Id $PID).Path
 
@@ -124,16 +127,20 @@ foreach ($dir in $skillDirs) {
 Write-Host "  skills processed: $($skillDirs.Count)" -ForegroundColor DarkGray
 
 # ─────────────────────────────────────────────
-# 4. .ai/kernel/**/*.md — H1 検証
+# 4. .ai/kernel/**/*.md + .ai/environments/**/*.md — H1 検証
 # ─────────────────────────────────────────────
 Write-Host ""
-Write-Host "== 3. .ai/kernel/**/*.md H1 check ==============="
+Write-Host "== 3. .ai/kernel + .ai/environments H1 check ==="
 $kernelFiles = @()
 if (Test-Path $KernelRoot) {
     $kernelFiles = Get-ChildItem -Path $KernelRoot -File -Filter *.md -Recurse | Sort-Object FullName
 }
+$environmentFiles = @()
+if (Test-Path $EnvironmentRoot) {
+    $environmentFiles = Get-ChildItem -Path $EnvironmentRoot -File -Filter *.md -Recurse | Sort-Object FullName
+}
 
-foreach ($file in $kernelFiles) {
+foreach ($file in @($kernelFiles + $environmentFiles)) {
     $content = Get-Content -Path $file.FullName -Raw -Encoding utf8
     if ($content -match '(?m)^# .+') {
         if ($Verbose) { Write-Ok "$($file.FullName.Replace($RepoRoot + '\\', '')) — H1 found" }
@@ -144,6 +151,7 @@ foreach ($file in $kernelFiles) {
     }
 }
 Write-Host "  kernel docs processed: $($kernelFiles.Count)" -ForegroundColor DarkGray
+Write-Host "  environment docs processed: $($environmentFiles.Count)" -ForegroundColor DarkGray
 
 # ─────────────────────────────────────────────
 # 4. deploy.ps1 -DryRun 全ターゲット
@@ -151,7 +159,7 @@ Write-Host "  kernel docs processed: $($kernelFiles.Count)" -ForegroundColor Dar
 Write-Host ""
 Write-Host "== 4. deploy.ps1 -DryRun check =================="
 $isWindowsPlatform = ($env:OS -eq "Windows_NT")
-$deployDryRunTargets = @("vscode", "windsurf", "agents", "dcr")
+$deployDryRunTargets = @("vscode", "cursor", "windsurf", "agents", "dcr")
 if (-not $isWindowsPlatform) {
     Write-Host "  [SKIP] deploy DryRun: Windows-only script (non-Windows CI skipped)" -ForegroundColor DarkGray
     $script:passed += $deployDryRunTargets.Count
@@ -617,6 +625,46 @@ else {
     }
     else {
         Write-Fail "external Superpowers checkout — drift detected"
+        if ($result) { Write-Host "  $result" -ForegroundColor DarkGray }
+    }
+}
+
+# ─────────────────────────────────────────────
+# 17. shared book contract + thin environment check
+# ─────────────────────────────────────────────
+Write-Host ""
+Write-Host "== 17. shared book contract check =============="
+if (-not (Test-Path $SharedBookCheckScript)) {
+    Write-Fail "tools/validate-shared-book.ps1 — file not found"
+}
+else {
+    $result = & $PowerShellExe -ExecutionPolicy Bypass -File $SharedBookCheckScript -RepoRoot $RepoRoot 2>&1
+    if ($LASTEXITCODE -eq 0) {
+        if ($Verbose -and $result) { Write-Host "  $result" -ForegroundColor DarkGray }
+        $script:passed++
+    }
+    else {
+        Write-Fail "shared book contract — failed"
+        if ($result) { Write-Host "  $result" -ForegroundColor DarkGray }
+    }
+}
+
+# ─────────────────────────────────────────────
+# 18. routing fixture consistency check
+# ─────────────────────────────────────────────
+Write-Host ""
+Write-Host "== 18. routing fixture consistency check ======="
+if (-not (Test-Path $RoutingAccuracyScript)) {
+    Write-Fail "tools/eval-routing-accuracy.ps1 — file not found"
+}
+else {
+    $result = & $PowerShellExe -ExecutionPolicy Bypass -File $RoutingAccuracyScript 2>&1
+    if ($LASTEXITCODE -eq 0) {
+        if ($Verbose -and $result) { Write-Host "  $result" -ForegroundColor DarkGray }
+        $script:passed++
+    }
+    else {
+        Write-Fail "routing fixture consistency — failed"
         if ($result) { Write-Host "  $result" -ForegroundColor DarkGray }
     }
 }

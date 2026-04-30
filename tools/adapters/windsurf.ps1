@@ -123,7 +123,8 @@ New-Item -ItemType Directory -Path $outWorkflowsDir -Force | Out-Null
 
 $managedFiles = New-Object System.Collections.Generic.List[string]
 
-# 1) Always-on kernel rule from shared runtime kernel
+# 1) Always-on kernel rule from shared runtime kernel.
+# Shared thinking source of truth: .ai/book/
 if (Test-Path $runtimeKernel) {
     $kernelRaw = Get-Content -Path $runtimeKernel -Raw -Encoding utf8
     $kernelBody = Remove-LeadingFrontmatter -Content $kernelRaw

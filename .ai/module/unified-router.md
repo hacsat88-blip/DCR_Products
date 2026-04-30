@@ -118,7 +118,7 @@ research-analyst.absorbs = [docs-researcher, market-researcher, competitive-anal
 
 ```
 優先度（高 → 低）:
-  1. CLAUDE.local.md / AGENTS.local.md / GEMINI.local.md（gitignored ローカル）
+  1. CLAUDE.local.md（薄い入口） / .claude/local/CLAUDE.local.md（実体） / AGENTS.local.md / GEMINI.local.md（gitignored ローカル）
   2. ユーザーの当該ターン明示指定（"/skill X" "use agent Y"）
   3. unified-router 決定木 Step 0（alias 解決）
   4. unified-router 決定木 Step 1-6（routing_category 〜 phase 整合）
@@ -132,7 +132,7 @@ research-analyst.absorbs = [docs-researcher, market-researcher, competitive-anal
 - **矛盾する指示**（CLAUDE.local.md と当該ターン発話） → 当該ターン発話を優先（より新しい意図）
 
 ローカル設定の **検出ポイント**：
-- セッション開始時に CLAUDE.local.md / AGENTS.local.md を読み込み、`Local Preferences` セクションをパース
+- セッション開始時に CLAUDE.local.md / .claude/local/CLAUDE.local.md / AGENTS.local.md を読み込み、`Local Preferences` セクションをパース
 - pied-piper は決定木の Step 0 の **前** に「ローカル明示指定」のチェックを入れる
 - 該当時は `via_local_override: true` を decisions log に記録（観測性のため）
 

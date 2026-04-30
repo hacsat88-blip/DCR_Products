@@ -6,11 +6,12 @@
 .DESCRIPTION
   対象エディタと同期先:
     VS Code Copilot : ~/.agents/skills/
+    Cursor          : .cursor/
     Agents          : .ai/catalog/agents-source/ -> .codex/agents/ (toml) + .claude/agents/ (md)
     Windsurf        : .windsurf/
 
 .PARAMETER Target
-    同期先を指定: all | vscode | windsurf | agents | dcr
+    同期先を指定: all | vscode | cursor | windsurf | agents | dcr
   デフォルト: all
 
 .PARAMETER DryRun
@@ -28,7 +29,7 @@
 #>
 
 param(
-    [ValidateSet("all", "vscode", "windsurf", "agents", "dcr")]
+    [ValidateSet("all", "vscode", "cursor", "windsurf", "agents", "dcr")]
     [string]$Target = "all",
     [switch]$DryRun,
     [switch]$Check,
@@ -46,7 +47,7 @@ $CatalogPaths = Join-Path $RepoRoot "tools\lib\catalog-paths.ps1"
 # ── Unified Adapter Framework (new) ──
 $DeployAll = Join-Path $RepoRoot "tools\deploy-all.ps1"
 $WindsurfAdapter = Join-Path $RepoRoot "tools\adapters\windsurf.ps1"
-if ((Test-Path $DeployAll) -and -not $Check -and ($Target -in @("all", "vscode", "windsurf", "agents"))) {
+if ((Test-Path $DeployAll) -and -not $Check -and ($Target -in @("all", "vscode", "cursor", "windsurf", "agents"))) {
     Write-Host ""
     Write-Host "=== Deploy Adapters (Unified Framework) ===" -ForegroundColor Cyan
     $targetArg = if ($Target -eq "all") { "all" } else { $Target }

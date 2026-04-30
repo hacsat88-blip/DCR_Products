@@ -81,7 +81,7 @@ and routing priority.
 
 AGENTS.md
 Codex / GitHub Copilot CLI entry point. DCR Kernel + module behaviors.
-Copilot CLI specific behavior is documented in `.ai/kernel/environments/copilot-cli.md`.
+Copilot CLI specific behavior is documented in `.ai/environments/copilot-cli/kernel.md`.
 
 CLAUDE.md
 Claude Code entry point. DCR Kernel + safety boundaries + permission model.
