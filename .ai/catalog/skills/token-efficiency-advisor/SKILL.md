@@ -1,7 +1,7 @@
 ---
 name: token-efficiency-advisor
 routing_category: governance
-description: Use when tasks risk context bloat, excessive tool output, or broad codebase scanning; proactively suggest RTK, code-review-graph, or MCP retrieval tools before token-heavy operations across Claude Code, Copilot CLI, Codex, and Windsurf.
+description: Use when tasks risk context bloat, excessive tool output, or broad codebase scanning; proactively suggest RTK, code-review-graph, or MCP retrieval tools before token-heavy operations across Claude Code, Copilot CLI, Codex, Cursor, and Windsurf.
 contract:
   preconditions:
     - "user is doing coding work with terminal output, repository exploration, or repeated multi-step sessions"
@@ -62,7 +62,7 @@ metadata:
 ## クライアント別の現実的ガイド
 
 - Claude Code: hook/MCP 機能を使いやすい。提案優先度は高い
-- Codex / Windsurf: まず RTK などクライアント非依存の施策を優先
+- Codex / Cursor / Windsurf: まず RTK などクライアント非依存の施策を優先し、MCP 連携が使える環境では段階導入する
 - Copilot CLI: 機能差があるため、まず RTK などクライアント非依存の施策を優先
 
 ## 応答フォーマット（提案時）
