@@ -51,6 +51,7 @@ for each tool's reading conventions.
 | VS Code Copilot | .github/copilot-instructions.md     | .ai/, .ai/kernel/gates/, .ai/catalog/rules/, .ai/catalog/skills/ |
 | Copilot CLI     | AGENTS.md                           | .ai/repo-map.md, .ai/catalog/rules/, .ai/catalog/skills/         |
 | Codex           | AGENTS.md                           | .ai/catalog/rules/ (by reference)                                |
+| Warp            | AGENTS.md                           | Warp Project Rules; .ai/environments/warp/kernel.md              |
 | Claude Code     | CLAUDE.md                           | .ai/catalog/rules/ (by reference)                                |
 | Windsurf        | .windsurf/rules/dcr-kernel.md       | Generated from .ai/kernel/ + .ai/catalog/rules/                  |
 
@@ -82,6 +83,7 @@ and routing priority.
 AGENTS.md
 Codex / GitHub Copilot CLI entry point. DCR Kernel + module behaviors.
 Copilot CLI specific behavior is documented in `.ai/environments/copilot-cli/kernel.md`.
+Warp also reads this file as its Project Rules entry point.
 
 CLAUDE.md
 Claude Code entry point. DCR Kernel + safety boundaries + permission model.

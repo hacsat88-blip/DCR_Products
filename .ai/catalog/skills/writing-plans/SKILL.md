@@ -27,6 +27,7 @@ package:
     - workflow
 targets:
   - vscode
+  - cursor
   - claude
   - codex
 ---
