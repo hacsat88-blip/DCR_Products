@@ -1,4 +1,4 @@
-<!-- 笞・・AUTO-GENERATED FILE - DO NOT EDIT DIRECTLY 笞・・
+<!-- ⚠️ AUTO-GENERATED FILE - DO NOT EDIT DIRECTLY ⚠️
 Generated from: .ai/book + .ai/kernel + .ai/catalog/rules/ + .ai/catalog/skills/ + .ai/catalog/agents-source/
 To regenerate: Run .\deploy.ps1 or .\tools\deploy-all.ps1
 Any manual edits will be overwritten on next deploy. -->
@@ -29,9 +29,9 @@ GitHub Copilot CLI specific behavior lives in [.ai/environments/copilot-cli/kern
 
 ## Unified Coordinator
 
-蜈ｨ繧ｿ繧ｹ繧ｯ縺ｮ蜊倅ｸ蜈･蜿｣縺ｯ **pied-piper** agent縲３ule/Skill/Agent 驕ｸ螳壹・豎ｺ螳壽惠縺ｫ蠕薙＞縲∵治逕ｨ蜑阪↓3陦悟ｱ蜻奇ｼ域治逕ｨ蜷阪・逅・罰繝ｻ譛溷ｾ・柑譫懶ｼ峨ｒ蜃ｺ縺吶・
+全タスクの単一入口は **pied-piper** agent。Rule/Skill/Agent 選定は決定木に従い、採用前に3行報告（採用名・理由・期待効果）を出す。
 
-隧ｳ邏ｰ・・
+詳細：
 - [.ai/module/unified-coordinator.md](.ai/module/unified-coordinator.md)
 - [.ai/module/unified-router.md](.ai/module/unified-router.md)
 - [.ai/module/unified-integration.md](.ai/module/unified-integration.md)

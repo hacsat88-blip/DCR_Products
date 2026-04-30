@@ -1,4 +1,4 @@
-<!-- 笞・・AUTO-GENERATED FILE - DO NOT EDIT DIRECTLY 笞・・
+<!-- ⚠️ AUTO-GENERATED FILE - DO NOT EDIT DIRECTLY ⚠️
 Generated from: .ai/book + .ai/kernel + .ai/catalog/rules/ + .ai/catalog/skills/ + .ai/catalog/agents-source/
 To regenerate: Run .\deploy.ps1 or .\tools\deploy-all.ps1
 Any manual edits will be overwritten on next deploy. -->
@@ -26,11 +26,11 @@ Unified entry point for Claude Code environment.
 
 ## Unified Coordinator
 
-蜈ｨ繧ｿ繧ｹ繧ｯ縺ｮ蜊倅ｸ蜈･蜿｣縺ｯ **pied-piper** agent縲・
-Rule/Skill/Agent 縺ｮ驕ｸ螳壹・ [.ai/module/unified-router.md](.ai/module/unified-router.md) 縺ｮ豎ｺ螳壽惠縺ｫ蠕薙＞縲・
-謗｡逕ｨ蜑阪↓蠢・★3陦悟ｱ蜻奇ｼ域治逕ｨ蜷阪・逅・罰繝ｻ譛溷ｾ・柑譫懶ｼ峨ｒ蜃ｺ縺吶・
+全タスクの単一入口は **pied-piper** agent。
+Rule/Skill/Agent の選定は [.ai/module/unified-router.md](.ai/module/unified-router.md) の決定木に従い、
+採用前に必ず3行報告（採用名・理由・期待効果）を出す。
 
-隧ｳ邏ｰ・・
+詳細：
 - [.ai/module/unified-coordinator.md](.ai/module/unified-coordinator.md)
 - [.ai/module/unified-router.md](.ai/module/unified-router.md)
 - [.ai/module/unified-integration.md](.ai/module/unified-integration.md)
