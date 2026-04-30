@@ -57,7 +57,7 @@ $skillList = if ($skills) { (($skills | ForEach-Object { "- [$_](../../.ai/catal
 
 $content = @"
 <!-- ⚠️ AUTO-GENERATED FILE - DO NOT EDIT DIRECTLY ⚠️
-Generated from: .ai/kernel + .ai/catalog/rules/ + .ai/catalog/skills/
+Generated from: .ai/book + .ai/kernel + .ai/catalog/rules/ + .ai/catalog/skills/
 To regenerate: Run .\deploy.ps1 or .\tools\deploy-all.ps1
 Any manual edits will be overwritten on next deploy. -->
 
@@ -75,7 +75,7 @@ $skillList
 
 ---
 
-Load priority: .ai/kernel/ > .ai/catalog/rules/ > .ai/catalog/skills/
+Load priority: .ai/book/ > .ai/kernel/ > .ai/catalog/rules/ > .ai/catalog/skills/
 
 For architecture details, see [docs/dcr/architecture/unified-adapter-system.md](../../docs/dcr/architecture/unified-adapter-system.md)
 "@

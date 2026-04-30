@@ -44,7 +44,7 @@
 - **Product 雛形は `templates/product/` に置く** — `Product/` 配下は実在 Product だけを置く
 - **プレースホルダーは `{key}` 形式** — `project-context.md` のキーと対応
 - **共有リソース（.ai/, .ai/kernel/gates/）はここに置かない** — `init-project.ps1` がルートからコピーする
-- **kernel 本文は置かない** — `init-project.ps1` が `.ai/kernel/dcr-kernel.md` と `.ai/kernel/environments/` を読み、各テンプレートの project context 断片を連結する
+- **kernel 本文は置かない** — `init-project.ps1` が `.ai/kernel/dcr-kernel.md` と `.ai/environments/` を読み、各テンプレートの project context 断片を連結する
 - **.vscode/ はここに不要** — プロジェクト固有設定は `init-project.ps1` のスコープ外
 - **runtime entrypoint をここから直接上書きしない** — `.github/copilot-instructions.md` などの実運用ファイルはテンプレートと別管理
 - **`templates/` を単独で削除しない** — `init-project.ps1` が `templates/claude-code/`, `templates/codex/`, `templates/vscode-copilot/` を読むため

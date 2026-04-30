@@ -39,31 +39,9 @@ function Get-RoutingCategory($file) {
     return $null
 }
 
-# Group rule names by routing_category for 3-group display
-function Group-RulesByCategory($ruleNames, $rulesDir) {
-    $groups = @{
-        'governance' = @()  # Core governance & stewards (highest priority)
-        'role' = @()         # Domain roles (developers, designers, engineers)
-        'specialist' = @()   # Topic specialists (growth, ui-ux, devops, documents)
-    }
-    foreach ($name in $ruleNames) {
-        $f = Get-Item (Join-Path $rulesDir "$name.md") -ErrorAction SilentlyContinue
-        if (-not $f) { continue }
-        $cat = Get-RoutingCategory $f
-        if ($cat -eq 'governance') {
-            $groups['governance'] += $name
-        } elseif ($cat -in @('devops', 'ui-ux')) {
-            $groups['role'] += $name
-        } else {
-            $groups['specialist'] += $name
-        }
-    }
-    return $groups
-}
-
-$rules = @()
-$skills = @()
-$agents = @()
+$activeRules = @()
+$activeSkills = @()
+$activeAgents = @()
 $deprecatedRules = @()
 $deprecatedSkills = @()
 $deprecatedAgents = @()
@@ -77,7 +55,7 @@ foreach ($f in Get-ChildItem $rulesDir -Filter "*.md" | Where-Object { -not $_.B
         if ($dep.Deprecated) {
             $deprecatedRules += [pscustomobject]@{ Name = $f.BaseName; Successor = $dep.Successor }
         } else {
-            $rules += $f.BaseName
+            $activeRules += $f.BaseName
         }
     }
 }
@@ -93,7 +71,7 @@ foreach ($dir in Get-ChildItem $skillsDir -Directory | Where-Object { -not $_.Na
             if ($dep.Deprecated) {
                 $deprecatedSkills += [pscustomobject]@{ Name = $dir.Name; Successor = $dep.Successor }
             } else {
-                $skills += $dir.Name
+                $activeSkills += $dir.Name
             }
         }
     }
@@ -107,51 +85,20 @@ foreach ($f in Get-ChildItem $agentsDir -Filter "*.md" | Where-Object { $_.Name 
         if ($dep.Deprecated) {
             $deprecatedAgents += [pscustomobject]@{ Name = $f.BaseName; Successor = $dep.Successor }
         } else {
-            $agents += $f.BaseName
+            $activeAgents += $f.BaseName
         }
     }
 }
-
-if ($rules) {
-    $rg = Group-RulesByCategory $rules $rulesDir
-    $sections = @()
-    if ($rg['governance'].Count -gt 0) {
-        $sections += "### Governance & Core (境界・統制)"
-        $sections += ""
-        foreach ($n in ($rg['governance'] | Sort-Object)) { $sections += "- [$n](.ai/catalog/rules/$n.md)" }
-        $sections += ""
-    }
-    if ($rg['role'].Count -gt 0) {
-        $sections += "### Roles (実装ロール: devops / ui-ux)"
-        $sections += ""
-        foreach ($n in ($rg['role'] | Sort-Object)) { $sections += "- [$n](.ai/catalog/rules/$n.md)" }
-        $sections += ""
-    }
-    if ($rg['specialist'].Count -gt 0) {
-        $sections += "### Specialists (専門領域: growth / documents / その他)"
-        $sections += ""
-        foreach ($n in ($rg['specialist'] | Sort-Object)) { $sections += "- [$n](.ai/catalog/rules/$n.md)" }
-    }
-    $ruleList = ($sections -join "`n").TrimEnd()
-} else {
-    $ruleList = "(none)"
-}
-$skillList = if ($skills) { (($skills | ForEach-Object { "- [$_](.ai/catalog/skills/$_/SKILL.md)" }) -join "`n") } else { "(none)" }
-$agentList = if ($agents) { (($agents | ForEach-Object { "- [$_](.ai/catalog/agents-source/$_.md)" }) -join "`n") } else { "(none)" }
-
-$deprecatedSection = ""
-$totalDep = $deprecatedRules.Count + $deprecatedSkills.Count + $deprecatedAgents.Count
-if ($totalDep -gt 0) {
-    $lines = @("", "## Deprecated Aliases", "", "These names are kept as aliases that route to their successor (Phase A/B/C consolidation):", "")
-    foreach ($e in $deprecatedRules) { $lines += "- ~~$($e.Name)~~ → [$($e.Successor)](.ai/catalog/rules/$($e.Successor).md) _(rule)_" }
-    foreach ($e in $deprecatedSkills) { $lines += "- ~~$($e.Name)~~ → [$($e.Successor)](.ai/catalog/skills/$($e.Successor)/SKILL.md) _(skill)_" }
-    foreach ($e in $deprecatedAgents) { $lines += "- ~~$($e.Name)~~ → [$($e.Successor)](.ai/catalog/agents-source/$($e.Successor).md) _(agent)_" }
-    $deprecatedSection = ($lines -join "`n") + "`n"
-}
+$activeRuleCount = $activeRules.Count
+$activeSkillCount = $activeSkills.Count
+$activeAgentCount = $activeAgents.Count
+$deprecatedRuleCount = $deprecatedRules.Count
+$deprecatedSkillCount = $deprecatedSkills.Count
+$deprecatedAgentCount = $deprecatedAgents.Count
 
 $content = @"
 <!-- ⚠️ AUTO-GENERATED FILE - DO NOT EDIT DIRECTLY ⚠️
-Generated from: .ai/kernel + .ai/catalog/rules/ + .ai/catalog/skills/ + .ai/catalog/agents-source/
+Generated from: .ai/book + .ai/kernel + .ai/catalog/rules/ + .ai/catalog/skills/ + .ai/catalog/agents-source/
 To regenerate: Run .\deploy.ps1 or .\tools\deploy-all.ps1
 Any manual edits will be overwritten on next deploy. -->
 
@@ -159,18 +106,21 @@ Any manual edits will be overwritten on next deploy. -->
 
 Unified entry point for Claude Code environment.
 
-## Included Rules
+## Scope Summary
 
-$ruleList
+- Active rules: $activeRuleCount
+- Active skills: $activeSkillCount
+- Active agents: $activeAgentCount
+- Deprecated aliases (rules/skills/agents): $deprecatedRuleCount / $deprecatedSkillCount / $deprecatedAgentCount
 
-## Included Skills
+## Source of Truth
 
-$skillList
-
-## Included Agents
-
-$agentList
-$deprecatedSection
+- Rules: [.ai/catalog/rules/](.ai/catalog/rules/)
+- Skills: [.ai/catalog/skills/](.ai/catalog/skills/)
+- Agents: [.ai/catalog/agents-source/](.ai/catalog/agents-source/)
+- Shared Book: [.ai/book/](.ai/book/)
+- Kernel: [.ai/kernel/](.ai/kernel/)
+- Environment diff (Claude Code): [.ai/environments/claude-code/kernel.md](.ai/environments/claude-code/kernel.md)
 ---
 
 ## Unified Coordinator

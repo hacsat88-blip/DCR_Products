@@ -10,16 +10,18 @@ AI エージェント設定・ルール・スキルの一元管理リポジト�
 | ------------ | -------------- | ---------------- |
 | 共通ルール・スキル・エージェントを変える | `.ai/catalog/README.md` | `.ai/catalog/rules/`, `.ai/catalog/skills/`, `.ai/catalog/agents-source/` |
 | 全環境共通の応答・権限・トリガーを変える | `.ai/kernel/README.md` | `.ai/kernel/` |
+| エディタ / CLI 固有の差分を変える | `.ai/environments/README.md` | `.ai/environments/<tool>/kernel.md` |
 | Product 固有の作業をする | `Product/README.md` | `Product/<product>/` |
 | 配置や運用境界を確認する | `docs/dcr/reference/control-surface.md` | `.dcr/`, `docs/dcr/` |
 
-`AGENTS.md`, `CLAUDE.md`, `.github/`, `.claude/agents/`, `.codex/agents/`, `.windsurf/` は入口または生成ミラーです。大本の親ではありません。大量生成される mirror は Git 管理外で、`deploy.ps1` から再生成します。
+`AGENTS.md`, `CLAUDE.md`, `.github/`, `.cursor/`, `.claude/agents/`, `.codex/agents/`, `.windsurf/` は入口または生成ミラーです。大本の親ではありません。大量生成される mirror は Git 管理外で、`deploy.ps1` から再生成します。
 
 ## 対応エディタ / CLI
 
 | ツール             | エントリポイント                  | 大本 |
 | ------------------ | --------------------------------- | ---- |
 | VS Code Copilot    | `.github/copilot-instructions.md` | `.ai/` |
+| Cursor             | `.cursor/rules/dcr-kernel.mdc`    | `.ai/` |
 | GitHub Copilot CLI | `AGENTS.md`                       | `.ai/` |
 | Codex              | `AGENTS.md`                       | `.ai/` |
 | Claude Code        | `CLAUDE.md`                       | `.ai/` |
@@ -78,7 +80,7 @@ powershell -ExecutionPolicy Bypass -File .\validate.ps1
 
 必要時だけ見る補助入口:
 
-- 個人上書き: `CLAUDE.local.md`, `.claude/settings.local.json`（どちらも Git 管理外）
+- 個人上書き: `CLAUDE.local.md`（薄い入口）, `.claude/local/CLAUDE.local.md`（実体）, `.claude/settings.local.json`（いずれも Git 管理外）
 - Claude 補助コマンド: `.claude/commands/review.md`, `.claude/commands/fix.md`
 - 外部連携設定: `.mcp.json`
 
@@ -116,6 +118,7 @@ Step 7（運用観測）の記録テンプレートは `docs/dcr/operation-metri
 Source layer
   .ai/              共通カーネル・モジュール・構造マップ
   .ai/kernel/       全環境共通カーネルの正本
+  .ai/environments/ エディタ / CLI 固有差分の正本
   .ai/catalog/      共有 source-of-truth の親フォルダ
   .ai/kernel/gates/ トリガーゲート (a/ i/ r/ s/ d/ p/ q/ sh/)
   DESIGN.md         UI/UX の見た目とトーンの正本
@@ -160,6 +163,7 @@ Workspace / operations layer
 - `.ai/catalog/skills/` — スキル定義
 - `.ai/catalog/agents-source/` — エージェント定義
 - `.ai/kernel/` — 全環境共通カーネル、権限、トリガー、環境差分
+- `.ai/environments/` — VS Code Copilot / Claude Code / Copilot CLI / Codex の環境固有差分
 - `templates/` — `init-project.ps1` 用の入力テンプレート
 
 役割の境界:
@@ -198,7 +202,8 @@ Workspace / operations layer
 ### 設定層（Configuration）— 個人設定のみ
 
 - `.claude/settings.local.json` — Claude Code の個人設定（Git 管理外）
-- `CLAUDE.local.md` — 個人運用ガイド（Git 管理外、参考例）
+- `.claude/local/CLAUDE.local.md` — 個人運用ガイド実体（Git 管理外）
+- `CLAUDE.local.md` — ルート固定の薄い入口（Git 管理外）
 
 ### その他のルール
 

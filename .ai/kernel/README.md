@@ -1,33 +1,35 @@
 # DCR Kernel — 統一・最適化アーキテクチャ
 
-このディレクトリは、複数の AI モデル・環境間で DCR Kernel（Decision-Making Coherence & Reliability）の仕様を統一・最適化する共有レイヤーです。
+このディレクトリは、複数の AI モデル・環境間で DCR Kernel（Decision-Making Coherence & Reliability）の仕様を統一・最適化する runtime 互換レイヤーです。共通思考の製本は [../book/](../book/) です。
 
 **設計哲学**: 
 - **Core は統一** → Signal protocol / Triggers / Permission model など変わらない要素
 - **差分のみカスタマイズ** → 環境固有機能（CLI Session init など）のみ分離
-- **単一ソース・オブ・トゥルース** → Core を修正すれば全環境に自動反映
+- **単一ソース・オブ・トゥルース** → `.ai/book/` を修正し、必要な runtime mirror を同期すれば全環境に自動反映
 
 ---
 
 ## 📁 ファイル構成
 
 ```
-.ai/kernel/
-├── README.md                    ← このファイル
-├── _base.md                     ← ★ Core 統一定義（全モデル共通）
-├── _permissions.md              ← 権限モデル（P1/P2/P3）
-├── _safety-boundaries.md        ← セーフティバウンダリ（全モデル共通）
-├── _module-behaviors.md         ← モジュール動作（a/s/i/d 詳細）
-├── dcr-kernel.md                ← runtime entrypoint 生成用の共有 kernel
+.ai/
+├── kernel/
+│   ├── README.md                ← このファイル
+│   ├── _base.md                 ← ★ Core 統一定義（全モデル共通）
+│   ├── _permissions.md          ← 権限モデル（P1/P2/P3）
+│   ├── _safety-boundaries.md    ← セーフティバウンダリ（全モデル共通）
+│   ├── _module-behaviors.md     ← モジュール動作（a/s/i/d 詳細）
+│   ├── dcr-kernel.md            ← runtime entrypoint 生成用の共有 kernel
+│   └── gates/                   ← トリガーハンドラ統一層
 │
 ├── environments/                ← 環境別実装レイヤー
-│   ├── README.md               ← 環境選択ガイド
-│   ├── vscode-copilot.md       ← VS Code Copilot Chat 用（差分のみ）
-│   ├── claude-code.md          ← Claude Code 用（差分のみ）
-│   ├── copilot-cli.md          ← GitHub Copilot CLI 用（差分のみ + CLI固有）
-│   └── codex.md                ← Codex 用（差分のみ）
+│   ├── README.md                ← 環境選択ガイド
+│   ├── vscode-copilot/kernel.md ← VS Code Copilot Chat 用（差分のみ）
+│   ├── claude-code/kernel.md    ← Claude Code 用（差分のみ）
+│   ├── copilot-cli/kernel.md    ← GitHub Copilot CLI 用（差分のみ + CLI固有）
+│   └── codex/kernel.md          ← Codex 用（差分のみ）
 │
-└── gates/                       ← トリガーハンドラ統一層
+└── kernel/gates/
     ├── README.md               ← トリガー説明
     ├── trigger-a-review.md     ← a/ Review
     ├── trigger-a-debug.md      ← a/ Debug
@@ -49,11 +51,11 @@
 
 | 環境 / モデル                | メインロード                      | 参照先                                                   | 用途             |
 | ---------------------------- | --------------------------------- | -------------------------------------------------------- | ---------------- |
-| **VS Code Copilot Chat**     | `.github/copilot-instructions.md` | `.ai/kernel/_base.md` + `environments/vscode-copilot.md` | Chat 統合        |
-| **Claude Code**              | `CLAUDE.md`                       | `.ai/kernel/_base.md` + `environments/claude-code.md`    | Code 通合        |
-| **GitHub Copilot CLI**       | `AGENTS.md`                       | `.ai/kernel/_base.md` + `environments/copilot-cli.md`    | CLI 起動時       |
+| **VS Code Copilot Chat**     | `.github/copilot-instructions.md` | `.ai/kernel/_base.md` + `.ai/environments/vscode-copilot/kernel.md` | Chat 統合        |
+| **Claude Code**              | `CLAUDE.md`                       | `.ai/kernel/_base.md` + `.ai/environments/claude-code/kernel.md`    | Code 通合        |
+| **GitHub Copilot CLI**       | `AGENTS.md`                       | `.ai/kernel/_base.md` + `.ai/environments/copilot-cli/kernel.md`    | CLI 起動時       |
 | **Windsurf**                 | `.windsurf/rules/dcr-kernel.md`   | `.ai/kernel/dcr-kernel.md`                               | ルール自動ロード |
-| **Codex**                    | `AGENTS.md`                       | `.ai/kernel/_base.md` + `environments/codex.md`          | リファレンス     |
+| **Codex**                    | `AGENTS.md`                       | `.ai/kernel/_base.md` + `.ai/environments/codex/kernel.md`          | リファレンス     |
 
 ---
 
@@ -95,25 +97,25 @@
 
 ---
 
-### 🌍 環境別層（`environments/`）
+### 🌍 環境別層（`.ai/environments/`）
 
 各ファイルは **差分のみ** 記載：
 
-#### `vscode-copilot.md`
+#### `vscode-copilot/kernel.md`
 - 環境固有：VS Code Chat の UI / コンテキスト制限
 - 拡張：module files reference（`.ai/repo-map.md` 等）
 
-#### `claude-code.md`
+#### `claude-code/kernel.md`
 - 環境固有：Claude Code の Communication（日本語指定）
 - 拡張：External capability packs（Azure Skills）
 
-#### `copilot-cli.md` ⭐ 差分大
+#### `copilot-cli/kernel.md` ⭐ 差分大
 - 環境固有：**Session initialization**（CLI固有）
 - 環境固有：**Tool priority hierarchy**（LSP / grep の優先度）
 - 環境固有：**SQL tracking**（キャッシュ管理）
 - 環境固有：**Troubleshooting**（CLI固有エラー）
 
-#### `codex.md`
+#### `codex/kernel.md`
 - 環境固有：Codex の agent orchestration
 - リファレンス層での役割定義
 
@@ -214,7 +216,7 @@ gate/trigger-a-review.md を実行
     │
     ├─ 環境固有機能の追加
     │   ↓
-    │   → environments/[env].md に差分のみ追加
+    │   → .ai/environments/[env]/kernel.md に差分のみ追加
     │
     ├─ モデル別エントリポイントの更新
     │   ↓
@@ -230,7 +232,7 @@ gate/trigger-a-review.md を実行
 
 1. **コア定義（_base.md）を直接いじるな** → 必ず差分を確認して環境別層で吸収できないか検討
 2. **トリガーハンドラの重複排除** → gates/ 内で統一化し、環境別では override しない
-3. **参照切れ防止** → 環境別ファイル内のリンク参照は相対パス（`../_base.md`）を使用
+3. **参照切れ防止** → 環境別ファイル内のリンク参照は相対パス（例: `../../kernel/_base.md`）を使用
 4. **validate.ps1 で検証** → すべての修正後に `validate.ps1` → `deploy.ps1 -Check` を実行
 
 ---
@@ -258,10 +260,10 @@ _base.md           ～200 行（統一 Core）
 _permissions.md    ～50 行
 _safety-boundaries.md ～40 行
 _module-behaviors.md ～150 行
-vscode-copilot.md  ～40 行（差分のみ）
-claude-code.md     ～40 行（差分のみ）
-copilot-cli.md     ～80 行（CLI固有）
-codex.md           ～30 行（差分のみ）
+.ai/environments/vscode-copilot/kernel.md  ～40 行（差分のみ）
+.ai/environments/claude-code/kernel.md     ～40 行（差分のみ）
+.ai/environments/copilot-cli/kernel.md     ～80 行（CLI固有）
+.ai/environments/codex/kernel.md           ～30 行（差分のみ）
 gate/*.md（12個）   ～300 行（統一）
 ────────────────────────────
 計: ～960 行
@@ -289,10 +291,10 @@ gate/*.md（12個）   ～300 行（統一）
 
 ### Phase 2: 環境別層の分離
 ```
-□ environments/vscode-copilot.md を生成
-□ environments/claude-code.md を生成
-□ environments/copilot-cli.md を生成（CLI固有セクション保持）
-□ environments/codex.md を生成
+□ .ai/environments/vscode-copilot/kernel.md を生成
+□ .ai/environments/claude-code/kernel.md を生成
+□ .ai/environments/copilot-cli/kernel.md を生成（CLI固有セクション保持）
+□ .ai/environments/codex/kernel.md を生成
 ```
 
 ### Phase 3: トリガーハンドラの統一化
