@@ -82,7 +82,14 @@ For architecture details, see [docs/dcr/architecture/unified-adapter-system.md](
 
 $outDir = Join-Path $RepoRoot ".github"
 New-Item -ItemType Directory -Path $outDir -Force | Out-Null
+$outPath = Join-Path $outDir "copilot-instructions.md"
 $utf8 = New-Object System.Text.UTF8Encoding $false
-[System.IO.File]::WriteAllText("$outDir/copilot-instructions.md", ($content.TrimEnd() + [Environment]::NewLine), $utf8)
+$newline = "`n"
+if (Test-Path $outPath) {
+    $existingContent = [System.IO.File]::ReadAllText($outPath, [System.Text.Encoding]::UTF8)
+    if ($existingContent -match "`r`n") { $newline = "`r`n" }
+}
+$normalizedContent = (($content -replace "`r`n?", "`n").TrimEnd() -replace "`n", $newline) + $newline
+[System.IO.File]::WriteAllText($outPath, $normalizedContent, $utf8)
 
 Write-Host "  [OK] .github/copilot-instructions.md" -ForegroundColor Green
