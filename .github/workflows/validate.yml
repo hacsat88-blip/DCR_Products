@@ -28,7 +28,7 @@ jobs:
       - name: Ensure generated mirrors stay untracked
         shell: pwsh
         run: |
-          $tracked = @(git ls-files .cursor .windsurf .codex/agents .claude/agents)
+          $tracked = @(git ls-files .windsurf .codex/agents .claude/agents)
           if ($tracked.Count -gt 0) {
             $tracked | ForEach-Object { Write-Host $_ }
             throw "Generated mirrors must stay untracked."

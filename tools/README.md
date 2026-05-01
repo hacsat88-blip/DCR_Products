@@ -11,7 +11,6 @@ Utility scripts for build, deployment, and maintenance operations.
 **Delegates to:**
 - `manifest-compiler.ps1` (frontmatter → JSON manifest)
 - `adapters/vscode.ps1` → `.github/copilot-instructions.md`
-- `adapters/cursor.ps1` → `.cursor/rules/dcr-kernel.md` + `.cursor/rules/*.mdc` (Git 管理外)
 - `adapters/claude.ps1` → `CLAUDE.md`
 - `adapters/codex.ps1` → `AGENTS.md`
 - `adapters/windsurf.ps1` → `.windsurf/rules/*.md` + `.windsurf/workflows/*.md` + `.windsurf/hooks.json` + `.windsurf/mcp_config.example.json` (Git 管理外)
@@ -33,7 +32,7 @@ Utility scripts for build, deployment, and maintenance operations.
 
 **Purpose:** Compile frontmatter from `.ai/catalog/rules/*.md`, `.ai/catalog/skills/*/SKILL.md`, and `.ai/catalog/agents-source/` into a unified JSON manifest
 
-**Input:** YAML frontmatter with `targets: [vscode, cursor, claude, codex]` field
+**Input:** YAML frontmatter with `targets: [vscode, claude, codex, windsurf]` field
 
 **Output:** `manifest.json` (generated artifact, not versioned)
 
@@ -52,10 +51,6 @@ Each adapter reads `manifest.json` and generates tool-specific formats:
 
 #### `adapters/vscode.ps1`
 Generates `.github/copilot-instructions.md` for VS Code Copilot
-
-#### `adapters/cursor.ps1`
-Generates `.cursor/rules/dcr-kernel.md` from `.ai/kernel/dcr-kernel.md` and `.cursor/rules/*.mdc` files in Cursor MDC format
-The generated `.cursor/rules/` mirror is ignored by Git; edit `.ai/kernel/`, `.ai/catalog/rules/`, or `.ai/catalog/skills/` instead.
 
 #### `adapters/claude.ps1`
 Generates `CLAUDE.md` for Claude Code environment

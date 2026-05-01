@@ -8,7 +8,7 @@
 | ----------------- | ----------------------------------------------- | ------------------------------------------------------------------------------------------------------------------ |
 | DCR core          | Product 不在でも成立する shared source-of-truth | `.ai/kernel/`, `.ai/catalog/`, `.ai/`, `.dcr/`, `templates/`, `docs/dcr/`, root `.vscode/`                          |
 | Product workspace | 個別 Product の source code と local workflow   | `Product/<product>/`                                                                                               |
-| generated output  | deploy により再生成される mirror                | `AGENTS.md`, `CLAUDE.md`, `.github/copilot-instructions.md`, `.cursor/rules/`, `.windsurf/`, `.claude/agents/`, `.codex/agents/` |
+| generated output  | deploy により再生成される mirror                | `AGENTS.md`, `CLAUDE.md`, `.github/copilot-instructions.md`, `.windsurf/`, `.claude/agents/`, `.codex/agents/` |
 | historical docs   | active ではない履歴文書                         | `docs/dcr/specs/archive/`, `docs/dcr/plans/archive/`                                                               |
 
 ## DCR Core
@@ -64,7 +64,6 @@ generated output は 1 つの概念層ですが、path は既存 consumer 契約
 - `AGENTS.md`
 - `CLAUDE.md`
 - `.github/copilot-instructions.md`
-- `.cursor/rules/` (Git 管理外)
 - `.windsurf/` (Git 管理外)
 - `.claude/agents/` (Git 管理外)
 - `.codex/agents/` (Git 管理外)

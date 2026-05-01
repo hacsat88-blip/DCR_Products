@@ -27,7 +27,7 @@ foreach ($f in Get-ChildItem $rulesDir -Filter "*.md" | Where-Object { -not $_.B
     if ($text -match '(?s)^---.*?^targets:\s*\n((?:.*?\n)*?)(?:^---|^$)') {
         $targets = [regex]::Matches($Matches[1], '^\s*-\s*(.+)$', 'Multiline') | % { $_.Groups[1].Value }
     } else {
-        $targets = @("vscode", "cursor", "claude", "codex")
+        $targets = @("vscode", "claude", "codex")
     }
     if ($targets -contains "vscode") {
         $rules += $f.BaseName
@@ -43,7 +43,7 @@ foreach ($dir in Get-ChildItem $skillsDir -Directory | Where-Object { -not $_.Na
         if ($text -match '(?s)^---.*?^targets:\s*\n((?:.*?\n)*?)(?:^---|^$)') {
             $targets = [regex]::Matches($Matches[1], '^\s*-\s*(.+)$', 'Multiline') | % { $_.Groups[1].Value }
         } else {
-            $targets = @("vscode", "cursor", "claude", "codex")
+            $targets = @("vscode", "claude", "codex")
         }
         if ($targets -contains "vscode") {
             $skills += $dir.Name
@@ -57,7 +57,7 @@ $skillList = if ($skills) { (($skills | ForEach-Object { "- [$_](../../.ai/catal
 
 $content = @"
 <!-- ⚠️ AUTO-GENERATED FILE - DO NOT EDIT DIRECTLY ⚠️
-Generated from: .ai/kernel + .ai/catalog/rules/ + .ai/catalog/skills/
+Generated from: .ai/book + .ai/kernel + .ai/catalog/rules/ + .ai/catalog/skills/
 To regenerate: Run .\deploy.ps1 or .\tools\deploy-all.ps1
 Any manual edits will be overwritten on next deploy. -->
 
@@ -75,7 +75,7 @@ $skillList
 
 ---
 
-Load priority: .ai/kernel/ > .ai/catalog/rules/ > .ai/catalog/skills/
+Load priority: .ai/book/ > .ai/kernel/ > .ai/catalog/rules/ > .ai/catalog/skills/
 
 For architecture details, see [docs/dcr/architecture/unified-adapter-system.md](../../docs/dcr/architecture/unified-adapter-system.md)
 "@

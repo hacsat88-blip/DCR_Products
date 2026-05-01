@@ -6,11 +6,12 @@
 .DESCRIPTION
   対象エディタと同期先:
     VS Code Copilot : ~/.agents/skills/
-    Cursor          : ~/.cursor/rules/  (.ai/kernel/dcr-kernel.md と .ai/catalog/rules/skills から生成して同期)
+    Cursor          : .cursor/
     Agents          : .ai/catalog/agents-source/ -> .codex/agents/ (toml) + .claude/agents/ (md)
+    Windsurf        : .windsurf/
 
 .PARAMETER Target
-    同期先を指定: all | vscode | cursor | agents | dcr
+    同期先を指定: all | vscode | cursor | windsurf | agents | dcr
   デフォルト: all
 
 .PARAMETER DryRun
@@ -22,13 +23,13 @@
 .EXAMPLE
   .\deploy.ps1
   .\deploy.ps1 -Target vscode
-  .\deploy.ps1 -Target cursor -DryRun
+  .\deploy.ps1 -Target windsurf
   .\deploy.ps1 -Target agents
   .\deploy.ps1 -Check
 #>
 
 param(
-    [ValidateSet("all", "vscode", "cursor", "agents", "dcr")]
+    [ValidateSet("all", "vscode", "cursor", "windsurf", "agents", "dcr")]
     [string]$Target = "all",
     [switch]$DryRun,
     [switch]$Check,
@@ -41,9 +42,7 @@ $ErrorActionPreference = "Stop"
 $RepoRoot = $PSScriptRoot
 $UserHome = $env:USERPROFILE
 $CatalogPaths = Join-Path $RepoRoot "tools\lib\catalog-paths.ps1"
-$CursorPackage = Join-Path $RepoRoot "tools\lib\cursor-package.ps1"
 . $CatalogPaths
-. $CursorPackage
 
 # ── Unified Adapter Framework (new) ──
 $DeployAll = Join-Path $RepoRoot "tools\deploy-all.ps1"
@@ -68,14 +67,12 @@ $SourceRuntimeKernel = Join-Path $RepoRoot ".ai\kernel\dcr-kernel.md"
 $SourceAgents = Resolve-DcrSourcePath -RepoRoot $RepoRoot -AssetType "agents-source"
 
 $DestVSCodeSkills = Join-Path $UserHome ".agents\skills"
-$DestCursorRules = Join-Path $UserHome ".cursor\rules"
-$DestCursorManifest = Join-Path $DestCursorRules ".dcr-managed-files.json"
-$DestProjectCursorRules = Join-Path $RepoRoot ".cursor\rules"
+$DestWindsurf = Join-Path $RepoRoot ".windsurf"
 $DestCodexAgents = Join-Path $RepoRoot ".codex\agents"
 $DestClaudeAgents = Join-Path $RepoRoot ".claude\agents"
 
 function Get-TempDirectory {
-    $tempDir = Join-Path ([System.IO.Path]::GetTempPath()) ("dcr-cursor-rules-" + [System.Guid]::NewGuid().ToString("N"))
+    $tempDir = Join-Path ([System.IO.Path]::GetTempPath()) ("dcr-deploy-" + [System.Guid]::NewGuid().ToString("N"))
     New-Item -ItemType Directory -Path $tempDir -Force | Out-Null
     return $tempDir
 }
@@ -102,25 +99,6 @@ function Get-WindsurfDrift {
         if (Test-Path $tempDir) {
             Remove-Item -Path $tempDir -Recurse -Force
         }
-    }
-}
-
-function Get-ManagedFileNames {
-    param(
-        [string]$ManifestPath
-    )
-
-    if (-not $ManifestPath -or -not (Test-Path $ManifestPath)) {
-        return @()
-    }
-
-    try {
-        $manifestContent = Get-Content -Path $ManifestPath -Raw -Encoding utf8 | ConvertFrom-Json
-        return @($manifestContent) | ForEach-Object { "$($_)" } | Sort-Object -Unique
-    }
-    catch {
-        Write-Warning "Managed file manifest is invalid and will be rebuilt: $ManifestPath"
-        return @()
     }
 }
 
@@ -183,73 +161,6 @@ function Sync-Directory {
         Copy-Item -Path $item.FullName -Destination $Destination -Recurse -Force
     }
     Write-Host "[OK] $Label : $count items -> $Destination" -ForegroundColor Green
-}
-
-function Sync-Files {
-    param(
-        [string]$Source,
-        [string]$Destination,
-        [string]$Label,
-        [switch]$Prune,
-        [string]$PruneManifestPath
-    )
-
-    if (-not (Test-Path $Source)) {
-        Write-Warning "Source not found: $Source"
-        return
-    }
-
-    $sourceItems = Get-ChildItem $Source -File
-    $count = $sourceItems.Count
-    $sourceNames = $sourceItems | Select-Object -ExpandProperty Name | Sort-Object -Unique
-    $managedNames = Get-ManagedFileNames -ManifestPath $PruneManifestPath
-
-    $staleItems = @()
-    if (Test-Path $Destination) {
-        $destItems = Get-ChildItem $Destination -File | Where-Object {
-            -not $PruneManifestPath -or $_.FullName -ne $PruneManifestPath
-        }
-        if ($PruneManifestPath -and -not (Test-Path $PruneManifestPath) -and $destItems.Count -gt 0) {
-            Write-Warning "Managed file manifest not found. Pre-manifest stale files in $Destination will not be pruned until the next deploy writes $PruneManifestPath."
-        }
-        if ($PruneManifestPath) {
-            $staleItems = $destItems | Where-Object {
-                $_.Name -in $managedNames -and $_.Name -notin $sourceNames
-            }
-        }
-        else {
-            $staleItems = $destItems | Where-Object { $_.Name -notin $sourceNames }
-        }
-    }
-
-    if ($DryRun) {
-        Write-Host "[DRY RUN] $Label : $count files -> $Destination" -ForegroundColor Yellow
-        if ($Prune -and $staleItems.Count -gt 0) {
-            Write-Host "  stale files to remove: $($staleItems.Count)" -ForegroundColor Yellow
-        }
-        $sourceItems | ForEach-Object { Write-Host "  $_" }
-        return
-    }
-
-    if (-not (Test-Path $Destination)) {
-        New-Item -ItemType Directory -Path $Destination -Force | Out-Null
-    }
-
-    if ($Prune) {
-        foreach ($stale in $staleItems) {
-            Remove-Item -Path $stale.FullName -Force
-        }
-    }
-
-    foreach ($item in $sourceItems) {
-        Copy-Item -Path $item.FullName -Destination $Destination -Force
-    }
-
-    if ($PruneManifestPath) {
-        Write-Utf8NoBom -Path $PruneManifestPath -Content (($sourceNames | ConvertTo-Json -Compress) + "`r`n")
-    }
-
-    Write-Host "[OK] $Label : $count files -> $Destination" -ForegroundColor Green
 }
 
 function Write-DeprecationSummary {
@@ -534,17 +445,14 @@ if ($Check) {
     if ($Target -eq "all" -or $Target -eq "vscode") {
         Compare-Directories -Source $SourceSkills -Destination $DestVSCodeSkills -Label "VS Code Copilot skills"
     }
-    if ($Target -eq "all" -or $Target -eq "cursor") {
-        $cursorTempDir = Get-TempDirectory
-        try {
-            New-CursorRulePackage -RulesSource $SourceRules -SkillsSource $SourceSkills -KernelSource $SourceRuntimeKernel -OutputDir $cursorTempDir
-            Compare-Directories -Source $cursorTempDir -Destination $DestCursorRules -Label "Cursor rules (user)" -IgnoreNames @('.dcr-managed-files.json')
-            Compare-Directories -Source $cursorTempDir -Destination $DestProjectCursorRules -Label "Cursor rules (project)"
+    if ($Target -eq "all" -or $Target -eq "windsurf") {
+        $windsurfDiffs = Get-WindsurfDrift -RepoRootPath $RepoRoot -DestinationPath $DestWindsurf -AdapterScriptPath $WindsurfAdapter
+        if ($windsurfDiffs.Count -eq 0) {
+            Write-Host "[OK] Windsurf mirror : in sync" -ForegroundColor Green
         }
-        finally {
-            if (Test-Path $cursorTempDir) {
-                Remove-Item -Path $cursorTempDir -Recurse -Force
-            }
+        else {
+            Write-Host "[DRIFT] Windsurf mirror : $($windsurfDiffs.Count) differences" -ForegroundColor Red
+            $windsurfDiffs | ForEach-Object { Write-Host "  $_" -ForegroundColor Yellow }
         }
     }
     if ($Target -eq "all" -or $Target -eq "agents") {
@@ -597,32 +505,6 @@ if ($Target -eq "all" -or $Target -eq "vscode") {
     Sync-Directory -Source $SourceSkills -Destination $DestVSCodeSkills -Label "VS Code Copilot skills"
     if (-not $DryRun) {
         Assert-NoDrift -Label "VS Code Copilot skills" -Diffs (Get-DirectoryDrift -Source $SourceSkills -Destination $DestVSCodeSkills)
-    }
-}
-
-if ($Target -eq "all" -or $Target -eq "cursor") {
-    if ($Backup) { Backup-DeployTarget -TargetPath $DestCursorRules -Label "Cursor rules (user)" }
-    if (-not $DryRun) {
-        Write-ManagedTargetNotice -Label "Cursor rules (user)" -Destination $DestCursorRules
-    }
-    $cursorTempDir = Get-TempDirectory
-    try {
-        New-CursorRulePackage -RulesSource $SourceRules -SkillsSource $SourceSkills -KernelSource $SourceRuntimeKernel -OutputDir $cursorTempDir
-        if (-not $DryRun) {
-            Write-PrecheckSummary -Label "Cursor rules (user)" -Diffs (Get-DirectoryDrift -Source $cursorTempDir -Destination $DestCursorRules -IgnoreNames @('.dcr-managed-files.json'))
-            Write-PrecheckSummary -Label "Cursor rules (project)" -Diffs (Get-DirectoryDrift -Source $cursorTempDir -Destination $DestProjectCursorRules)
-        }
-        Sync-Files -Source $cursorTempDir -Destination $DestCursorRules -Label "Cursor rules (user)" -Prune -PruneManifestPath $DestCursorManifest
-        Sync-Files -Source $cursorTempDir -Destination $DestProjectCursorRules -Label "Cursor rules (project)" -Prune
-        if (-not $DryRun) {
-            Assert-NoDrift -Label "Cursor rules (user)" -Diffs (Get-DirectoryDrift -Source $cursorTempDir -Destination $DestCursorRules -IgnoreNames @('.dcr-managed-files.json'))
-            Assert-NoDrift -Label "Cursor rules (project)" -Diffs (Get-DirectoryDrift -Source $cursorTempDir -Destination $DestProjectCursorRules)
-        }
-    }
-    finally {
-        if (Test-Path $cursorTempDir) {
-            Remove-Item -Path $cursorTempDir -Recurse -Force
-        }
     }
 }
 
@@ -707,17 +589,6 @@ if ($Watch) {
                 # Re-run deploy logic
                 if ($Target -eq "all" -or $Target -eq "vscode") {
                     Sync-Directory -Source $SourceSkills -Destination $DestVSCodeSkills -Label "VS Code Copilot skills"
-                }
-                if ($Target -eq "all" -or $Target -eq "cursor") {
-                    $cursorWatchDir = Get-TempDirectory
-                    try {
-                        New-CursorRulePackage -RulesSource $SourceRules -SkillsSource $SourceSkills -KernelSource $SourceRuntimeKernel -OutputDir $cursorWatchDir
-                        Sync-Files -Source $cursorWatchDir -Destination $DestCursorRules -Label "Cursor rules (user)" -Prune -PruneManifestPath $DestCursorManifest
-                        Sync-Files -Source $cursorWatchDir -Destination $DestProjectCursorRules -Label "Cursor rules (project)" -Prune
-                    }
-                    finally {
-                        if (Test-Path $cursorWatchDir) { Remove-Item -Path $cursorWatchDir -Recurse -Force }
-                    }
                 }
                 if ($Target -eq "all" -or $Target -eq "agents") {
                     & $DeployAll -Target agents
