@@ -1,4 +1,4 @@
-param([string]$RepoRoot = ".")
+﻿param([string]$RepoRoot = ".")
 
 $CatalogPaths = Join-Path (Split-Path $PSScriptRoot -Parent) "lib\catalog-paths.ps1"
 . $CatalogPaths
