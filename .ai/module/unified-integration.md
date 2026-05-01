@@ -1,13 +1,25 @@
 # Unified Integration Module
 
-このモジュールは、VS Code の GitHub Copilot、GitHub Copilot CLI、Codex、Cursor、Claude Code の
-5環境で同じ運用を再現するための共通仕様です。
+このモジュールは、VS Code の GitHub Copilot、GitHub Copilot CLI、Codex、Cursor、Windsurf、Claude Code の
+6環境で同じ運用を再現するための共通仕様です。
 
 ## 目的
 
 - 環境差分で運用品質がぶれないようにする
 - gstack 的な「計画 → 実装 → レビュー → QA → 出荷」の流れを共通化する
 - 既存の `.ai/catalog/rules/` と `.ai/catalog/skills/` を活かし、全面置換ではなく統合で進める
+- 全モデルで同じ思考と実行判断を再現し、個性・口調・利用可能ツールだけを環境差分として残す
+
+## Shared Book Rule
+
+`.ai/kernel/_base.md` を共通正本とし、環境別 kernel は次だけを書く。
+
+- entrypoint と自動ロード仕様
+- 使えるツール・使えないツール
+- セッション状態や計画の保存先
+- 口調、表示密度、UI 制約
+
+判断基準、trigger 解釈、権限、gate、外部確認条件、検証姿勢は環境別に再定義しない。差分が必要な場合も、共通正本への追加可否を先に検討する。
 
 ## Common Flow
 
@@ -111,9 +123,10 @@ team-plan → team-prd → team-exec → team-verify → team-fix (loop)
 
 ## Notes
 
-- Copilot CLI は `AGENTS.md` を入口とし、CLI 固有差分は `.ai/kernel/environments/copilot-cli.md` を参照する
+- Copilot CLI は `AGENTS.md` を入口とし、CLI 固有差分は `.ai/environments/copilot-cli/kernel.md` を参照する
 - VS Code Copilot は `.github/copilot-instructions.md` を優先
 - Codex は `AGENTS.md` を優先
 - Cursor は `.cursor/rules/`（`deploy.ps1` 生成）を優先
+- Windsurf は `.windsurf/rules/`（`deploy.ps1` 生成）を優先
 - Claude Code は `CLAUDE.md` を優先
 - ただし、上記5つはこのモジュールを共通参照し、差分を最小化する

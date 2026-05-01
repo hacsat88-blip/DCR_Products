@@ -36,7 +36,7 @@ npm-debug.log*
 /~$autotrader.xlsm
 
 # Generated adapter outputs (not source of truth)
-/.cursor/rules/
+/.cursor/
 /.windsurf/
 /.codex/agents/
 /.claude/agents/
@@ -63,6 +63,7 @@ prototypes/blue-planet-globe/
 
 # Personal local overrides (not shared)
 CLAUDE.local.md
+.claude/local/
 .claude/settings.local.json
 
 # Per-session gate state (managed at runtime, not committed)

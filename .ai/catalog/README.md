@@ -26,7 +26,7 @@
 - Product 固有の実装や local workflow を調べるとき
   - その場合は `Product/README.md` を先に見る
 - generated output の実体を確認したいだけのとき
-  - `AGENTS.md`, `CLAUDE.md`, `.github/copilot-instructions.md`, `.cursor/rules/`, `.claude/agents/`, `.codex/agents/`, `.windsurf/` は deploy により再生成される mirror
+  - `AGENTS.md`, `CLAUDE.md`, `.github/copilot-instructions.md`, `.claude/agents/`, `.codex/agents/`, `.windsurf/` は deploy により再生成される mirror
 
 ## Promotion Rule
 

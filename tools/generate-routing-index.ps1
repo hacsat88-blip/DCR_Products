@@ -31,15 +31,49 @@ function Get-FrontmatterMap {
         return $null
     }
 
+    $lines = $m.Groups[1].Value -split "`r?`n"
     $map = @{}
-    foreach ($line in ($m.Groups[1].Value -split "`r?`n")) {
-        if ($line -match '^\s*([a-zA-Z_][a-zA-Z0-9_-]*)\s*:\s*(.*)$') {
-            $key = $Matches[1]
-            $value = $Matches[2].Trim().Trim('"').Trim("'")
-            if (-not [string]::IsNullOrWhiteSpace($value)) {
-                $map[$key] = $value
-            }
+    $i = 0
+    while ($i -lt $lines.Count) {
+        $line = $lines[$i]
+        # Top-level YAML keys only (no leading whitespace)
+        if ($line -notmatch '^([a-zA-Z_][a-zA-Z0-9_-]*)\s*:\s*(.*)$') {
+            $i++
+            continue
         }
+
+        $key = $Matches[1]
+        $rest = $Matches[2].TrimEnd()
+
+        # YAML literal block scalar: key: | / |- / |+
+        if ($rest -match '^\|([-+]?)?$') {
+            $i++
+            $blockParts = [System.Collections.Generic.List[string]]::new()
+            while ($i -lt $lines.Count) {
+                $next = $lines[$i]
+                if ($next -match '^[a-zA-Z_][a-zA-Z0-9_-]*\s*:') {
+                    break
+                }
+                if (-not [string]::IsNullOrWhiteSpace($next)) {
+                    $stripped = ($next -replace '^\s+', '').TrimEnd()
+                    if (-not [string]::IsNullOrWhiteSpace($stripped)) {
+                        $blockParts.Add($stripped)
+                    }
+                }
+                $i++
+            }
+            $joined = ($blockParts -join " ").Trim()
+            if (-not [string]::IsNullOrWhiteSpace($joined)) {
+                $map[$key] = $joined
+            }
+            continue
+        }
+
+        $value = $rest.Trim().Trim('"').Trim("'")
+        if (-not [string]::IsNullOrWhiteSpace($value)) {
+            $map[$key] = $value
+        }
+        $i++
     }
 
     return $map

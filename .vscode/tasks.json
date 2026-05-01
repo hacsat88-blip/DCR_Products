@@ -4,7 +4,7 @@
     {
       "label": "DCR Deploy",
       "type": "shell",
-      "command": "powershell",
+      "command": "pwsh",
       "args": [
         "-ExecutionPolicy",
         "Bypass",
@@ -24,7 +24,7 @@
     {
       "label": "DCR Deploy Check",
       "type": "shell",
-      "command": "powershell",
+      "command": "pwsh",
       "args": [
         "-ExecutionPolicy",
         "Bypass",

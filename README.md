@@ -10,6 +10,7 @@ AI エージェント設定・ルール・スキルの一元管理リポジト�
 | ------------ | -------------- | ---------------- |
 | 共通ルール・スキル・エージェントを変える | `.ai/catalog/README.md` | `.ai/catalog/rules/`, `.ai/catalog/skills/`, `.ai/catalog/agents-source/` |
 | 全環境共通の応答・権限・トリガーを変える | `.ai/kernel/README.md` | `.ai/kernel/` |
+| エディタ / CLI 固有の差分を変える | `.ai/environments/README.md` | `.ai/environments/<tool>/kernel.md` |
 | Product 固有の作業をする | `Product/README.md` | `Product/<product>/` |
 | 配置や運用境界を確認する | `docs/dcr/reference/control-surface.md` | `.dcr/`, `docs/dcr/` |
 
@@ -20,11 +21,19 @@ AI エージェント設定・ルール・スキルの一元管理リポジト�
 | ツール             | エントリポイント                  | 大本 |
 | ------------------ | --------------------------------- | ---- |
 | VS Code Copilot    | `.github/copilot-instructions.md` | `.ai/` |
+| Cursor             | `.cursor/rules/dcr-kernel.mdc`    | `.ai/` |
 | GitHub Copilot CLI | `AGENTS.md`                       | `.ai/` |
 | Codex              | `AGENTS.md`                       | `.ai/` |
 | Claude Code        | `CLAUDE.md`                       | `.ai/` |
-| Cursor             | `.cursor/rules/`                  | `.ai/` |
 | Windsurf           | `.windsurf/`                      | `.ai/`, `templates/windsurf/` |
+
+## モデル差分の置き場所
+
+ルール本文はモデル別に分けません。共通ルール・スキル・エージェントの正本は `.ai/catalog/` に置き、モデル差分は実行メタデータだけに閉じ込めます。
+
+- Codex agent のモデル指定: `.ai/catalog/agents-source/*.toml` と生成先 `.codex/agents/*.toml`
+- 例: `model`, `model_reasoning_effort`, `sandbox_mode`
+- Claude / Copilot / Windsurf はエディタ側で選択中のモデルが入口ファイルを読むため、ルール本文をモデル別に複製しない
 
 ## 運用クイックガイド
 
@@ -48,7 +57,7 @@ powershell -ExecutionPolicy Bypass -File .\deploy.ps1 -Check
 powershell -ExecutionPolicy Bypass -File .\validate.ps1
 ```
 
-`.cursor/rules/`, `.windsurf/`, `.codex/agents/`, `.claude/agents/` が無い場合も異常ではありません。`deploy.ps1` が `.ai/kernel/` と `.ai/catalog/` から再生成します。
+`.windsurf/`, `.codex/agents/`, `.claude/agents/` が無い場合も異常ではありません。`deploy.ps1` が `.ai/kernel/` と `.ai/catalog/` から再生成します。
 
 ## 開発ワークフロー標準
 
@@ -71,7 +80,7 @@ powershell -ExecutionPolicy Bypass -File .\validate.ps1
 
 必要時だけ見る補助入口:
 
-- 個人上書き: `CLAUDE.local.md`, `.claude/settings.local.json`（どちらも Git 管理外）
+- 個人上書き: `CLAUDE.local.md`（薄い入口）, `.claude/local/CLAUDE.local.md`（実体）, `.claude/settings.local.json`（いずれも Git 管理外）
 - Claude 補助コマンド: `.claude/commands/review.md`, `.claude/commands/fix.md`
 - 外部連携設定: `.mcp.json`
 
@@ -100,7 +109,7 @@ Step 7（運用観測）の記録テンプレートは `docs/dcr/operation-metri
 - shared rule / skill / agent source を触るなら `.ai/catalog/` から始める
 - Product 固有の変更なら `Product/README.md` から `Product/<product>/` へ入る
 - `.dcr/` と `docs/dcr/` は 1 つの control surface として読むが、machine-readable config と human-readable docs なので物理的には分ける
-- `AGENTS.md`, `CLAUDE.md`, `.github/copilot-instructions.md`, `.cursor/rules/`, `.claude/agents/`, `.codex/agents/`, `.windsurf/` は generated mirror なので最初の編集対象にしない
+- `AGENTS.md`, `CLAUDE.md`, `.github/copilot-instructions.md`, `.claude/agents/`, `.codex/agents/`, `.windsurf/` は generated mirror なので最初の編集対象にしない
 - workspace 既定設定では generated mirror、archive、外部 clone を探索ノイズとして抑える
 
 ## 構造
@@ -109,6 +118,7 @@ Step 7（運用観測）の記録テンプレートは `docs/dcr/operation-metri
 Source layer
   .ai/              共通カーネル・モジュール・構造マップ
   .ai/kernel/       全環境共通カーネルの正本
+  .ai/environments/ エディタ / CLI 固有差分の正本
   .ai/catalog/      共有 source-of-truth の親フォルダ
   .ai/kernel/gates/ トリガーゲート (a/ i/ r/ s/ d/ p/ q/ sh/)
   DESIGN.md         UI/UX の見た目とトーンの正本
@@ -119,7 +129,6 @@ Source layer
 
 Runtime / generated layer
   .github/          VS Code Copilot 実行エントリポイント
-  .cursor/rules/    Cursor 用ローカル生成ミラー (Git 管理外)
   .claude/agents/   Claude 用ローカル生成ミラー (Git 管理外)
   .codex/agents/    Codex 用ローカル生成ミラー (Git 管理外)
   .windsurf/        Windsurf 用ローカル生成ミラー (Git 管理外)
@@ -139,9 +148,9 @@ Workspace / operations layer
 ## デプロイ
 
 ```powershell
-.\deploy.ps1                    # 全エディタへ同期
+.\deploy.ps1                    # 既定エディタへ同期
 .\deploy.ps1 -Target vscode     # VS Code のみ
-.\deploy.ps1 -Target cursor     # Cursor のみ
+.\deploy.ps1 -Target windsurf   # Windsurf のみ
 .\deploy.ps1 -DryRun            # 確認のみ
 .\deploy.ps1 -Check             # ドリフト検出
 ```
@@ -154,6 +163,7 @@ Workspace / operations layer
 - `.ai/catalog/skills/` — スキル定義
 - `.ai/catalog/agents-source/` — エージェント定義
 - `.ai/kernel/` — 全環境共通カーネル、権限、トリガー、環境差分
+- `.ai/environments/` — VS Code Copilot / Claude Code / Copilot CLI / Codex の環境固有差分
 - `templates/` — `init-project.ps1` 用の入力テンプレート
 
 役割の境界:
@@ -167,7 +177,6 @@ Workspace / operations layer
 - **`AGENTS.md`** ← `deploy.ps1` で自動生成（Copilot CLI / Codex 用）
 - **`CLAUDE.md`** ← `deploy.ps1` で自動生成（Claude Code 用）
 - `.github/copilot-instructions.md` ← `deploy.ps1` で自動生成（VS Code Copilot 用）
-- `.cursor/rules/` ← `deploy.ps1` で自動生成（Cursor 用、Git 管理外）
 - `.windsurf/` ← `deploy.ps1` で自動生成（Windsurf 用、Git 管理外）
 - `.claude/agents/` ← `deploy.ps1` で自動生成（Git 管理外）
 - `.codex/agents/` ← `deploy.ps1` で自動生成（Git 管理外）
@@ -177,7 +186,6 @@ Workspace / operations layer
 ### ユーザーレベル managed target — `deploy.ps1` が上書きする
 
 - `%USERPROFILE%/.agents/skills`
-- `%USERPROFILE%/.cursor/rules`
 - `%HOME%/.config/dcr/config.json`
 
 これらは runtime cache ではなく deploy target です。正本はこの repo にあり、user-level 側の手編集は次回 deploy で上書きされます。
@@ -189,13 +197,13 @@ Workspace / operations layer
 - 更新は upstream への fast-forward のみを許可し、DCR の `.ai/catalog/` へコピーして正本化しない
 - ローカル改変検知: `powershell -ExecutionPolicy Bypass -File .\tools\check-external-superpowers.ps1`
 - `validate.ps1` は Superpowers checkout が存在する環境では同じ drift check を実行し、存在しない環境ではスキップする
-- Cursor は公式 plugin として分離導入する。Cursor Agent chat では `/add-plugin superpowers` を使う
 - Windsurf は Superpowers の公式導入先として扱わず、この repo の `.windsurf/` 生成ミラーで運用する
 
 ### 設定層（Configuration）— 個人設定のみ
 
 - `.claude/settings.local.json` — Claude Code の個人設定（Git 管理外）
-- `CLAUDE.local.md` — 個人運用ガイド（Git 管理外、参考例）
+- `.claude/local/CLAUDE.local.md` — 個人運用ガイド実体（Git 管理外）
+- `CLAUDE.local.md` — ルート固定の薄い入口（Git 管理外）
 
 ### その他のルール
 
@@ -207,8 +215,8 @@ Workspace / operations layer
 
 unsafe migration と見なすもの:
 
-- `.ai/catalog/rules/` を `.cursor/` 配下へ移す
-- `.ai/catalog/skills/` を `.cursor/` 配下へ移す
+- `.ai/catalog/rules/` を runtime/generated 配下へ移す
+- `.ai/catalog/skills/` を runtime/generated 配下へ移す
 - `templates/` を削除する
 - `templates/vscode-copilot/.github/copilot-instructions.md` で `.github/copilot-instructions.md` を上書きする
 
