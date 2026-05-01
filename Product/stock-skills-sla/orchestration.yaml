@@ -58,19 +58,10 @@ retry_on_fail:
 # ─── Convergence Gate（α2）──────────────────────────────────────────
 convergence_gate:
   apply_to: [screener, analyst, strategist, reviewer]
-  banned_words:
-    - 買い
-    - 買うべき
-    - 今すぐ買え
-    - 購入を推奨
-    - 売り
-    - 売るべき
-    - 手放せ
-    - 必ず上がる
-    - 確実
-    - テンバガー確定
-    - 10倍確定
-    - 安全な投資
+  # 禁止語リストの正本は contracts/safety-protocol.md の「禁止語」セクション。
+  # ここでは二重管理を避けるため参照のみ。オーケストレーターが起動時に
+  # Read("contracts/safety-protocol.md") して注入済みのリストを使用すること。
+  banned_words_source: "contracts/safety-protocol.md#禁止語"
   on_detection:
     label: "🟡[Fix]: Convergence Gate — 禁止語検出"
     action: "禁止語を含む文を「判断材料の整理」に書き換えて再出力"

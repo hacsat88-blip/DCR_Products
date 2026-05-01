@@ -1,6 +1,5 @@
 ---
 name: stock-skills-sla
-routing_category: growth
 description: |
   投資アシスタント (SLA = Scenario Lens × Agentic)。
   自然言語で話しかけるだけで、銘柄探索・分析・シナリオ生成・PF管理・リスク評価を自律実行する。
