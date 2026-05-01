@@ -77,8 +77,10 @@ AMZN,Amazon.com,5,3000,USD
 
 ### 3. （任意）lesson / thesis ファイルを作成
 
-- `data/notes/lesson_example.json` を参考に過去の投資教訓を記録
-- `data/notes/thesis_example.json` を参考に保有理由を記録
+- `data/notes/lesson_example.json` を参考に過去の投資教訓を記録し、`lesson_<任意ID>.json` で保存
+- `data/notes/thesis_example.json` を参考に保有理由を記録し、**ファイル名は必ず `thesis_<symbol>.json`** の形式で保存すること
+  - 例: トヨタ(7203.T) → `thesis_7203.T.json`、Amazon(AMZN) → `thesis_AMZN.json`
+  - ⚠️ `thesis_example.json` のままだと、オーケストレーターがシンボルで解決できず α8・Conviction ロックが動作しません
 - 登録するほど戦略エージェントの判断精度が上がります
 
 ---
