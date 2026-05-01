@@ -1,0 +1,27 @@
+[mcp_servers.github]
+args = [
+    "-y",
+    "@modelcontextprotocol/server-github",
+]
+command = "npx"
+
+[mcp_servers.github.env]
+GITHUB_PERSONAL_ACCESS_TOKEN = "SET_IN_LOCAL_ENV"
+
+[mcp_servers.supermemory-dcr-core]
+url = "https://mcp.supermemory.ai/mcp"
+
+[mcp_servers.supermemory-dcr-core.http_headers]
+x-sm-project = "dcr-core"
+
+[mcp_servers.supermemory-product-cyber-stock-dashboard]
+url = "https://mcp.supermemory.ai/mcp"
+
+[mcp_servers.supermemory-product-cyber-stock-dashboard.http_headers]
+x-sm-project = "product-cyber-stock-dashboard"
+
+[mcp_servers.supermemory-satoshi-dev]
+url = "https://mcp.supermemory.ai/mcp"
+
+[mcp_servers.supermemory-satoshi-dev.http_headers]
+x-sm-project = "satoshi-dev"
