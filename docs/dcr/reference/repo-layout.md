@@ -105,7 +105,9 @@ archive は subdirectory で追加します。
 3. 現役の design / implementation record か
    - Yes: `docs/dcr/specs/` または `docs/dcr/plans/`
    - No: 対応する `archive/`
-4. 新規 Product の雛形か
+4. 個人向けの任意スナップショット・メモか（チーム正本ではない）
+   - Yes: `docs/snapshots/`（[README](../../snapshots/README.md) 参照）
+5. 新規 Product の雛形か
    - Yes: `templates/product/`
 
 ## AI Editor Discovery Order

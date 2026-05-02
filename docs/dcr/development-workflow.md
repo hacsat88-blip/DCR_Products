@@ -5,9 +5,9 @@ DCR Products の最小運用フローです。迷ったときはこのファイ�
 ## 日常フロー
 
 1. 正本層だけを編集する
-2. `powershell -ExecutionPolicy Bypass -File .\validate.ps1` を実行する
-3. 生成物に影響する変更なら `powershell -ExecutionPolicy Bypass -File .\deploy.ps1` を実行する
-4. `powershell -ExecutionPolicy Bypass -File .\deploy.ps1 -Check` でドリフトを確認する
+2. `pwsh -ExecutionPolicy Bypass -File .\validate.ps1` を実行する（未インストールなら `powershell -ExecutionPolicy Bypass -File .\validate.ps1`）
+3. 生成物に影響する変更なら `pwsh -ExecutionPolicy Bypass -File .\deploy.ps1` を実行する
+4. `pwsh -ExecutionPolicy Bypass -File .\deploy.ps1 -Check` でドリフトを確認する
 5. 問題がなければコミットする
 
 ## 正本層

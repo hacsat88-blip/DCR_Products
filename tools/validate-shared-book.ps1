@@ -1,4 +1,4 @@
-#Requires -Version 5.1
+﻿#Requires -Version 5.1
 <#
 .SYNOPSIS
   Validate the DCR shared book and thin environment capability declarations.
@@ -106,7 +106,8 @@ if (Test-Path $EnvironmentRoot) {
         '(?im)^##\s+Pipeline gate chain\b',
         '(?im)^##\s+Permission model\b',
         '(?im)^##\s+Safety boundaries\b',
-        '(?m)^判断の優先順位'
+        # ASCII-only pattern for PS 5.1 without BOM (matches 判断の優先順位)
+        '(?m)^\u5224\u65AD\u306E\u512A\u5148\u9806\u4F4D'
     )
 
     foreach ($file in $envKernelFiles) {

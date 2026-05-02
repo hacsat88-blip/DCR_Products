@@ -5,8 +5,10 @@ shared source-of-truth ではなく、Product ごとの local source と workflo
 
 ## Directory Roles
 
-- `Product/cyber-stock-dashboard/`
-  - 現在この repo で保持する実在 Product workspace
+- `Product/stock-skills-sla/`
+  - 投資 SLA（シナリオ・レンズ等）の契約・エージェント定義・データ例を置くパッケージ
+
+実装済み Web アプリ workspace は現時点ではこの repo に含めていません（別バックアップ／別リポジトリで管理する想定）。
 
 新規 Product の雛形は `templates/product/` に置き、`Product/` 配下には置きません。
 standalone clone や外部 repo は、このフォルダへ同居させない方針です。

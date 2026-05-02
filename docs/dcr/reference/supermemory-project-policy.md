@@ -9,7 +9,7 @@
 
 - satoshi-dev: サトシ開発全体の横断文脈、共通判断、全体方針
 - dcr-core: DCR 共通資産、root docs、運用ポリシー
-- product-cyber-stock-dashboard: Product/cyber-stock-dashboard 配下の会話と判断
+- product-stock-skills-sla: `Product/stock-skills-sla/` 配下の会話と判断（SLA 契約・エージェント）
 
 上記以外の Product を追加する場合は、`product-<folder-name>` 形式で project_id を追加する。
 

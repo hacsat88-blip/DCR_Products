@@ -22,6 +22,26 @@
       "problemMatcher": []
     },
     {
+      "label": "DCR Validate",
+      "type": "shell",
+      "command": "pwsh",
+      "args": [
+        "-ExecutionPolicy",
+        "Bypass",
+        "-File",
+        "${workspaceFolder}/validate.ps1"
+      ],
+      "group": {
+        "kind": "test",
+        "isDefault": true
+      },
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared"
+      },
+      "problemMatcher": []
+    },
+    {
       "label": "DCR Deploy Check",
       "type": "shell",
       "command": "pwsh",

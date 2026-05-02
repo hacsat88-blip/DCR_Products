@@ -39,7 +39,7 @@ if (-not $OutputPath) {
 
 if (-not (Test-Path $LogPath)) {
     Write-Host "No intent log found at: $LogPath" -ForegroundColor Yellow
-    Write-Host "Intent logging has not started yet. The skill-router will create entries as routing decisions are made." -ForegroundColor DarkGray
+    Write-Host "Intent logging has not started yet. Router-driven workflows (unified-router / pied-piper) will create entries as routing decisions are made." -ForegroundColor DarkGray
     exit 0
 }
 

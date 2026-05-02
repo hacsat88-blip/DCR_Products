@@ -52,10 +52,12 @@ AI エージェント設定・ルール・スキルの一元管理リポジト�
 clone 直後は大量生成 mirror が Git 管理外なので、最初に生成と検証を行います。
 
 ```powershell
-powershell -ExecutionPolicy Bypass -File .\deploy.ps1
-powershell -ExecutionPolicy Bypass -File .\deploy.ps1 -Check
-powershell -ExecutionPolicy Bypass -File .\validate.ps1
+pwsh -ExecutionPolicy Bypass -File .\deploy.ps1
+pwsh -ExecutionPolicy Bypass -File .\deploy.ps1 -Check
+pwsh -ExecutionPolicy Bypass -File .\validate.ps1
 ```
+
+Windows PowerShell 5.1 のみの環境では `pwsh` を `powershell` に読み替えてください。
 
 `.windsurf/`, `.codex/agents/`, `.claude/agents/` が無い場合も異常ではありません。`deploy.ps1` が `.ai/kernel/` と `.ai/catalog/` から再生成します。
 
@@ -80,14 +82,15 @@ powershell -ExecutionPolicy Bypass -File .\validate.ps1
 
 必要時だけ見る補助入口:
 
+- 個人的な記録・スナップショット（任意）: `docs/snapshots/` — repo の正本層とは別目的のファイル用
 - 個人上書き: `CLAUDE.local.md`（薄い入口）, `.claude/local/CLAUDE.local.md`（実体）, `.claude/settings.local.json`（いずれも Git 管理外）
 - Claude 補助コマンド: `.claude/commands/review.md`, `.claude/commands/fix.md`
 - 外部連携設定: `.mcp.json`
 
 最短運用手順（毎日これだけ）:
 
-1. `powershell -ExecutionPolicy Bypass -File .\deploy.ps1 -Check`
-2. `powershell -ExecutionPolicy Bypass -File .\validate.ps1`
+1. `pwsh -ExecutionPolicy Bypass -File .\deploy.ps1 -Check`（5.1 のみなら `powershell`）
+2. `pwsh -ExecutionPolicy Bypass -File .\validate.ps1`
 3. 変更がある場合のみ `deploy.ps1` 実行 → 再検証
 
 `git fetch` で警告が再発した場合の手順は `docs/dcr/instruction-governance.md` を参照。
@@ -138,6 +141,7 @@ Runtime / generated layer
 Workspace / operations layer
   .vscode/          ワークスペース設定
   docs/             設計・仕様・計画書
+  docs/snapshots/   任意の個人メモ・時点スナップショット（正本層外）
   deploy.ps1        エディタへの一方向同期
   validate.ps1      source assets の構造検証
   init-project.ps1  新規プロジェクト初期化

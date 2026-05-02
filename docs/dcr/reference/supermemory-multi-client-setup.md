@@ -8,7 +8,7 @@ Copilot CLI、Codex、Claude Code で同じ project-scoped memory を使い、�
 
 - satoshi-dev
 - dcr-core
-- product-cyber-stock-dashboard
+- product-stock-skills-sla（`Product/stock-skills-sla/`）
 
 各クライアントで server 名を統一し、同じ project_id を使う。
 
@@ -31,10 +31,10 @@ Copilot CLI、Codex、Claude Code で同じ project-scoped memory を使い、�
         "x-sm-project": "dcr-core"
       }
     },
-    "supermemory-product-cyber-stock-dashboard": {
+    "supermemory-product-stock-skills-sla": {
       "url": "https://mcp.supermemory.ai/mcp",
       "headers": {
-        "x-sm-project": "product-cyber-stock-dashboard"
+        "x-sm-project": "product-stock-skills-sla"
       }
     }
   }
