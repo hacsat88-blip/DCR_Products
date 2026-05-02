@@ -32,7 +32,7 @@ generated mirror や archive は既定の探索起点にしません。
 1. `.ai/catalog/rules/<name>.md` を作成する
 2. YAML frontmatter を記述する（必須: `description`, `domain`, `routing_category`, `risk`, `keywords`）
 3. `inherits:` で継承する trait を指定する（コード生成ルールは `coding-standards` を推奨）
-4. `validate.ps1 -Verbose` を実行して構造チェックを通過させる
+4. `validate.ps1 -Verbose` を実行して構造チェックを通過させる（検証項目はスクリプト改修により増減し得ます）
 5. `deploy.ps1` を実行して各エディタへ配布する
 
 ### frontmatter テンプレート
@@ -62,7 +62,7 @@ inherits:
 
 1. `.ai/catalog/skills/<name>/SKILL.md` を作成する
 2. YAML frontmatter に `name`, `description` を記述する（任意: `contract`, `composable`, `package`）
-3. skill-router の該当カテゴリにエントリを追加する
+3. ルーティングや依存関係を変える場合は [.ai/module/unified-router.md](.ai/module/unified-router.md) の決定木に沿い、pied-piper 経由の 3 行報告（採用名・理由・期待効果）を前提にする（旧 skill-router は deprecated）
 4. `validate.ps1 -Verbose` で検証する
 
 ## エージェントの追加
@@ -73,8 +73,14 @@ inherits:
 
 ## 検証とデプロイ
 
+**Windows ローカル**: 文字列に非 ASCII を含む検証スクリプトを安全に通すには **PowerShell 7（`pwsh`）** を推奨します。Windows PowerShell 5.1 でも `tools\validate-shared-book.ps1` は UTF-8 BOM により動作する想定です。
+
 ```powershell
-# 構造検証 (13 checks)
+# 構造検証（推奨: pwsh）
+pwsh -ExecutionPolicy Bypass -File .\validate.ps1 -Verbose
+# 5.1 のみの場合
+powershell -ExecutionPolicy Bypass -File .\validate.ps1 -Verbose
+# または短い表記（pwsh 推奨）
 .\validate.ps1 -Verbose
 
 # デプロイ（すべてのターゲット: VS Code + Cursor + Agents）

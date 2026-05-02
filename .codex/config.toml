@@ -14,11 +14,11 @@ url = "https://mcp.supermemory.ai/mcp"
 [mcp_servers.supermemory-dcr-core.http_headers]
 x-sm-project = "dcr-core"
 
-[mcp_servers.supermemory-product-cyber-stock-dashboard]
+[mcp_servers.supermemory-product-stock-skills-sla]
 url = "https://mcp.supermemory.ai/mcp"
 
-[mcp_servers.supermemory-product-cyber-stock-dashboard.http_headers]
-x-sm-project = "product-cyber-stock-dashboard"
+[mcp_servers.supermemory-product-stock-skills-sla.http_headers]
+x-sm-project = "product-stock-skills-sla"
 
 [mcp_servers.supermemory-satoshi-dev]
 url = "https://mcp.supermemory.ai/mcp"

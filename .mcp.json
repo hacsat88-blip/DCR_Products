@@ -22,10 +22,10 @@
         "x-sm-project": "dcr-core"
       }
     },
-    "supermemory-product-cyber-stock-dashboard": {
+    "supermemory-product-stock-skills-sla": {
       "url": "https://mcp.supermemory.ai/mcp",
       "headers": {
-        "x-sm-project": "product-cyber-stock-dashboard"
+        "x-sm-project": "product-stock-skills-sla"
       }
     }
   }

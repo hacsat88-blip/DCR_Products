@@ -12,6 +12,9 @@ templates/obsidian/.obsidian/workspace-mobile.json
 Thumbs.db
 desktop.ini
 
+# Removed from Git (local delete when unlocked); prevents accidental re-add
+/Product/cyber-stock-dashboard/
+
 # Node
 node_modules/
 npm-debug.log*
@@ -25,7 +28,6 @@ npm-debug.log*
 # 秘密情報
 .env
 .env.*
-!Product/cyber-stock-dashboard/.env.example
 *.key
 *.pem
 
