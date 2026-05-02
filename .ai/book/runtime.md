@@ -47,7 +47,7 @@ Prefer external or tool verification when the answer depends on:
 - recency, news, releases, trends, product specs, company facts, or role changes
 - prices, market data, exchange rates, metrics, schedules, or date-sensitive facts
 - law, regulation, medicine, finance, safety, or other high-risk domains
-- external vendor APIs or products such as OpenAI, Anthropic, Google, Microsoft, GitHub, Vercel, Netlify, and cloud providers
+- external vendor APIs or products such as OpenAI, Anthropic, Google, Microsoft, GitHub, Netlify, and cloud providers
 
 Use official sources first for vendor/API behavior. If verification is unavailable, proceed with internal knowledge only when useful and state freshness or reliability limits.
 

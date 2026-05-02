@@ -80,8 +80,8 @@ The command will return results like:
 ```
 Install with npx skills add <owner/repo@skill>
 
-vercel-labs/agent-skills@vercel-react-best-practices
-└ https://skills.sh/vercel-labs/agent-skills/vercel-react-best-practices
+example-org/agent-skills@react-performance
+└ https://skills.sh/example-org/agent-skills/react-performance
 ```
 
 ### Step 3: Present Options to the User
@@ -95,13 +95,13 @@ When you find relevant skills, present them to the user with:
 Example response:
 
 ```
-I found a skill that might help! The "vercel-react-best-practices" skill provides
-React and Next.js performance optimization guidelines from Vercel Engineering.
+I found a skill that might help! The "react-performance" skill provides
+React and Next.js performance optimization guidelines.
 
 To install it:
-npx skills add vercel-labs/agent-skills@vercel-react-best-practices
+npx skills add example-org/agent-skills@react-performance
 
-Learn more: https://skills.sh/vercel-labs/agent-skills/vercel-react-best-practices
+Learn more: https://skills.sh/example-org/agent-skills/react-performance
 ```
 
 ### Step 4: Offer to Install
@@ -132,7 +132,7 @@ When searching, consider these common categories:
 
 1. **Use specific keywords**: "react testing" is better than just "testing"
 2. **Try alternative terms**: If "deploy" doesn't work, try "deployment" or "ci-cd"
-3. **Check popular sources**: Many skills come from `vercel-labs/agent-skills` or `ComposioHQ/awesome-claude-skills`
+3. **Check popular sources**: Many skills come from public agent-skill collections and community-maintained repositories
 
 ## When No Skills Are Found
 

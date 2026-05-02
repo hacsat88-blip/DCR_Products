@@ -277,7 +277,6 @@ deprecation_reason: B-2 ルーティング層刷新。skill単位ではなくRul
 | finishing-a-development-branch | 実装完了後のマージ・PR・クリーンアップ判断 |
 | using-git-worktrees | feature用のgit worktree分離 |
 | webapp-testing | Playwrightでのローカルウェブアプリテスト |
-| vercel-composition-patterns | Reactコンポーネント設計パターン |
 | prd-to-issues | PRD を独立 Issue へ分解 |
 | improve-codebase-architecture | テスタビリティ重視の構造改善提案 |
 | observability-design | メトリクス・ログ・トレースの可観測性設計 |
