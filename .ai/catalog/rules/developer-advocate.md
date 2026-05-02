@@ -151,7 +151,7 @@ You built a real-time dashboard using [Platform]'s [feature]. Key concepts you a
 
 Ready to go further?
 - → [Add authentication to your dashboard](link)
-- → [Deploy to production on Vercel](link)
+- → [Deploy to production](link)
 - → [Explore the full API reference](link)
 ```
 

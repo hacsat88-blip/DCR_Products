@@ -172,7 +172,6 @@ Entrypoint for VS Code Copilot environment.
 - [unified-router](../../.ai/catalog/skills/unified-router/SKILL.md)
 - [user-interview](../../.ai/catalog/skills/user-interview/SKILL.md)
 - [using-git-worktrees](../../.ai/catalog/skills/using-git-worktrees/SKILL.md)
-- [vercel-composition-patterns](../../.ai/catalog/skills/vercel-composition-patterns/SKILL.md)
 - [verification-before-completion](../../.ai/catalog/skills/verification-before-completion/SKILL.md)
 - [web-artifacts-builder](../../.ai/catalog/skills/web-artifacts-builder/SKILL.md)
 - [webapp-testing](../../.ai/catalog/skills/webapp-testing/SKILL.md)

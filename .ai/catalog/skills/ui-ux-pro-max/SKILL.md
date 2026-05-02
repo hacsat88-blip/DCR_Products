@@ -418,17 +418,7 @@ Match implementation complexity to the aesthetic vision. Maximalist designs need
 
 ## Web Interface Guidelines Review
 
-For UI compliance audits, fetch the latest Vercel Web Interface Guidelines:
-
-```
-https://raw.githubusercontent.com/vercel-labs/web-interface-guidelines/main/command.md
-```
-
-### Review Process
-1. Fetch fresh guidelines from the URL above
-2. Read the specified files (or ask user which files to review)
-3. Check against all rules in the fetched guidelines
-4. Output findings in terse `file:line` format
+For UI compliance audits, use the local checklist above first, then read the specified files and report concrete `file:line` findings.
 
 ---
 

@@ -346,7 +346,7 @@ export function LandingPageHero() {
 - Set up Next.js project with essential dependencies
 - Configure authentication with Clerk or similar
 - Set up database with Prisma and Supabase
-- Deploy to Vercel for instant hosting and preview URLs
+- Deploy to preview hosting for instant review URLs
 
 ### Step 3: Core Feature Implementation (Day 2-3)
 - Build primary user flows with shadcn/ui components
@@ -384,7 +384,7 @@ export function LandingPageHero() {
 **Backend**: [Supabase/Firebase for instant backend services]
 **Database**: [PostgreSQL with Prisma ORM]
 **Authentication**: [Clerk/Auth0 for instant user management]
-**Deployment**: [Vercel for zero-config deployment]
+**Deployment**: [Preview hosting for zero-config deployment]
 
 ### Feature Implementation
 **User Authentication**: [Quick setup with social login options]
