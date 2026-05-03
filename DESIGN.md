@@ -83,6 +83,39 @@
 - Collapse side panels below 1024px
 - Convert dense tables to card rows below 768px
 - Preserve keyboard access across all breakpoints
+- Mobile-first approach for new components
+
+## Accessibility
+
+- WCAG 2.1 AA compliance minimum
+- Keyboard navigation support for all interactive elements
+- Screen reader labels for icon-only buttons
+- Focus visible indicator: 2px Accent Secondary outline
+- Color contrast ratios: 4.5:1 for text, 3:1 for UI components
+- ARIA labels for dynamic content updates
+
+## Component Library
+
+- Primary: shadcn/ui (Radix UI primitives + Tailwind styling)
+- Charts: Recharts, Lightweight Charts
+- Animation: Framer Motion
+- Forms: React Hook Form + Zod validation
+- State: Zustand for global state, React Query for server state
+
+## Theme Strategy
+
+- Default: Dark theme (as specified in Color System)
+- Light theme: Invert colors while maintaining contrast ratios
+- Theme persistence: localStorage with system preference fallback
+- CSS variables for all theme tokens to enable runtime switching
+
+## Performance Guidelines
+
+- Component lazy loading for routes
+- Image optimization with next/image
+- Code splitting at route level
+- Bundle size monitoring: <200KB initial JS
+- Lighthouse score targets: Performance 90+, Accessibility 100
 
 ## Agent Prompt Notes
 
