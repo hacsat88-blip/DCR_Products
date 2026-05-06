@@ -49,6 +49,32 @@ Add an opt-out hint if alternatives exist.
 - **multi-agent-coordinator**: task decomposition, dispatch ordering, result synthesis
 - **task-distributor**: work splitting, dependency ordering, parallel-safe routing
 
+## Orchestration Inserts
+
+`pied-piper` can place a read-only specialist before or after the primary work when it reduces ambiguity or improves verification.
+
+| Insert | Phase | Use when | Handoff output |
+|---|---|---|---|
+| `codebase-onboarding-engineer` | before implementation/review | unfamiliar repo area, source-of-truth confusion, generated/runtime/Product boundary risk | inspected files, safe edit targets, generated mirrors, validation commands, unknowns |
+| `qa-evidence-collector` | after implementation/investigation | completion claims need commands, logs, screenshots, diffs, or reproduction evidence | evidence inventory, pass/fail checklist, residual risks |
+| `accessibility-auditor` | QA | UI changed or keyboard/focus/semantic/WCAG risk exists | accessibility findings by impact, retest notes |
+| `api-tester` | QA | API, CLI, MCP, webhook, auth, contract, or third-party boundary changed | contract/error-path/security test results |
+| `performance-benchmarker` | QA | speed, throughput, memory, startup, bundle size, or resource cost may change | baseline, measurements, regression assessment |
+
+Default flow for multi-agent work:
+
+```text
+pied-piper
+  -> codebase-onboarding-engineer
+  -> primary implementation / investigation / review agent
+  -> qa-evidence-collector
+  -> optional specialist QA agent
+  -> code-reviewer when code risk remains
+  -> pied-piper synthesis
+```
+
+Keep one phase to at most two active selections. Treat onboarding and evidence as phase gates when needed, not as extra peers competing with the primary specialist.
+
 ## Working Rules
 - Smallest safe change that satisfies the task
 - File-level clarity and explicit assumptions

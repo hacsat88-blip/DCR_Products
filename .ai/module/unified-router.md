@@ -87,6 +87,20 @@ research-analyst.absorbs = [docs-researcher, market-researcher, competitive-anal
 
 3件以上必要と判断された場合は、ユーザーに「並列でX件動かしますか？」と確認する。
 
+## 前後工程 agent の挿入
+
+次の agent は primary agent の置換候補ではなく、phase gate として前後に挿入できる。
+
+| agent | phase | trigger |
+|---|---|---|
+| `codebase-onboarding-engineer` | plan / pre-impl / pre-review | 初見領域、正本/生成物境界、実行経路、所有境界が不明 |
+| `qa-evidence-collector` | post-impl / qa / ship | 完了主張に証跡が必要、UI/CLI/API の観測結果を固定したい |
+| `accessibility-auditor` | qa | UI、keyboard、focus、semantic HTML、WCAG |
+| `api-tester` | qa | API、CLI、MCP、webhook、auth、contract、third-party |
+| `performance-benchmarker` | qa | latency、throughput、memory、startup、bundle size、resource cost |
+
+これらは「同一 phase 最大2件」制限の外で、前後の phase gate として扱える。ただし同時に3件以上を並列実行する場合は通常の確認ルールに従う。
+
 ## ルーティング結果のスキーマ
 
 ```json
