@@ -1,0 +1,40 @@
+{
+  "profileName": "dcr-devin-thin-layer",
+  "status": "example-not-active",
+  "note": "This is a policy example, not a guaranteed Devin runtime schema. Confirm the current Devin config format before enabling.",
+  "entrypoint": ".devin/DEVIN.md",
+  "language": "ja",
+  "sourceOfTruth": [
+    ".ai/book/",
+    ".ai/kernel/",
+    ".ai/module/",
+    ".ai/catalog/rules/",
+    ".ai/catalog/skills/",
+    ".ai/catalog/agents-source/"
+  ],
+  "generatedDoNotEdit": [
+    "AGENTS.md",
+    "CLAUDE.md",
+    ".windsurf/rules/",
+    ".cursor/rules/",
+    ".codex/agents/",
+    ".claude/agents/"
+  ],
+  "verification": {
+    "dcrRuntimeOrConfigChanges": [
+      "powershell -ExecutionPolicy Bypass -File ./validate.ps1",
+      "powershell -ExecutionPolicy Bypass -File ./deploy.ps1 -Check"
+    ],
+    "evidenceRequiredBeforeCompletion": true
+  },
+  "delegation": {
+    "preferReadOnlySubagentsForExploration": true,
+    "useQaEvidenceAfterImplementation": true,
+    "cloudHandoffRequiresExplicitUserRequest": true
+  },
+  "safety": {
+    "blockSecrets": true,
+    "blockDestructiveCommandsWithoutApproval": true,
+    "blockGeneratedMirrorEdits": true
+  }
+}

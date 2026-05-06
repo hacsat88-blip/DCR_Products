@@ -68,6 +68,27 @@ team-plan → team-prd → team-exec → team-verify → team-fix (loop)
 | team-verify | 全チェックリスト検証   | q/ QA Gate                             |
 | team-fix    | 不合格項目修正ループ   | systematic-debugging skill → re-verify |
 
+### Agent Inserts
+
+`pied-piper` は primary agent を置き換えず、前後に補助 agent を挟んで品質を上げる。
+
+```text
+pied-piper
+  -> codebase-onboarding-engineer
+  -> primary agent
+  -> qa-evidence-collector
+  -> optional specialist QA
+  -> pied-piper synthesis
+```
+
+| 補助 agent | 挿入位置 | 条件 |
+|---|---|---|
+| `codebase-onboarding-engineer` | 実装/レビュー前 | 初見領域、正本/生成物境界、Product overlay、実行経路が曖昧 |
+| `qa-evidence-collector` | 実装/調査後 | 完了主張にコマンド、ログ、スクショ、差分、再現証跡が必要 |
+| `accessibility-auditor` | QA | UI、キーボード、focus、semantic HTML、WCAG リスク |
+| `api-tester` | QA | API / CLI / MCP / webhook / auth / contract / third-party integration |
+| `performance-benchmarker` | QA | latency、throughput、memory、startup、bundle size、resource cost の変化 |
+
 ## Canonical Priority
 
 1. ユーザーの明示要求

@@ -25,6 +25,15 @@ uses_skills = []                    # e.g. ["code-review", "systematic-debugging
 # Optional: agent composition
 inherits = ""                       # e.g. "multi-agent-coordinator"
 
+[provenance]                        # Optional: required for imported/adapted agents
+origin = "agency-agents"
+upstream_url = "https://example.com/repo"
+upstream_path = "path/to/source.md"
+license = "upstream repository license"
+imported_at = "YYYY-MM-DD"
+adapted_from = "Short note about local DCR adaptation"
+local_owner = "DCR agents-source"
+
 [instructions]
 text = """..."""                    # Agent system prompt
 ```
@@ -45,6 +54,10 @@ text = """..."""                    # Agent system prompt
 ---
 name: agent-id          # Must match .toml basename
 description: "..."      # Must match .toml description
+provenance:             # Optional: mirror imported/adapted source metadata
+  origin: agency-agents
+  upstream_url: https://example.com/repo
+  upstream_path: path/to/source.md
 ---
 
 You are the [agent-name] Claude Code subagent.

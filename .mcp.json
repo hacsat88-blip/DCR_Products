@@ -11,22 +11,31 @@
       }
     },
     "supermemory-satoshi-dev": {
+      "type": "http",
       "url": "https://mcp.supermemory.ai/mcp",
       "headers": {
         "x-sm-project": "satoshi-dev"
       }
     },
     "supermemory-dcr-core": {
+      "type": "http",
       "url": "https://mcp.supermemory.ai/mcp",
       "headers": {
         "x-sm-project": "dcr-core"
       }
     },
     "supermemory-product-stock-skills-sla": {
+      "type": "http",
       "url": "https://mcp.supermemory.ai/mcp",
       "headers": {
         "x-sm-project": "product-stock-skills-sla"
       }
+    },
+    "opencode-bridge": {
+      "command": "python",
+      "args": [
+        "tools/mcp-servers/opencode-bridge/server.py"
+      ]
     }
   }
 }

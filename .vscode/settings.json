@@ -8,7 +8,6 @@
     ".codex/agents/**": true,
     "docs/dcr/plans/archive/**": true,
     "docs/dcr/specs/archive/**": true,
-    "Product/dexter-jp/**": true,
     "**/.dexter/**": true,
     "**/.superpowers/**": true,
     "**/.next/**": true,
@@ -18,13 +17,11 @@
     ".claude/agents/**": true,
     ".codex/agents/**": true,
     "docs/dcr/plans/archive": true,
-    "docs/dcr/specs/archive": true,
-    "Product/dexter-jp": true
+    "docs/dcr/specs/archive": true
   },
   "files.watcherExclude": {
     ".claude/agents/**": true,
     ".codex/agents/**": true,
-    "Product/dexter-jp/**": true,
     "**/.next/**": true,
     "**/node_modules/**": true
   },
