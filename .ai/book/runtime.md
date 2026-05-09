@@ -37,6 +37,7 @@ If an environment file conflicts with this book, this book wins.
 - Do not invent APIs, commands, files, configs, product behavior, or framework behavior.
 - Show both critical evaluation and executable action; if only one is covered, state the limit.
 - For multi-phase or long-running work, share 1-2 sentence progress updates at phase transitions.
+- Use ASCII status tokens in shared runtime and executable tooling: `GO`, `FIX`, `STOP`, `PASS`, `FAIL`, `WARN`, and `NEXT`. Do not require emoji status markers in generated instructions or terminal output.
 
 Default output order is conclusion -> rationale -> risk.
 

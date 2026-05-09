@@ -10,7 +10,7 @@ Do not edit files here directly. Edit .ai/ and regenerate.
 - Rules: ../.ai/catalog/rules/
 - Skills: ../.ai/catalog/skills/
 - Agents: ../.ai/catalog/agents-source/
-- Cursor environment diff: ../.ai/environments/codex/kernel.md
+- Cursor environment diff: ../.ai/environments/cursor/kernel.md
 
 ## Regenerate
 

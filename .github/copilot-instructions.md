@@ -1,4 +1,4 @@
-<!-- ⚠️ AUTO-GENERATED FILE - DO NOT EDIT DIRECTLY ⚠️
+<!-- AUTO-GENERATED FILE - DO NOT EDIT DIRECTLY
 Generated from: .ai/book + .ai/kernel + .ai/catalog/rules/ + .ai/catalog/skills/
 To regenerate: Run .\deploy.ps1 or .\tools\deploy-all.ps1
 Any manual edits will be overwritten on next deploy. -->
@@ -103,6 +103,7 @@ Entrypoint for VS Code Copilot environment.
 - [deployment-patterns](../../.ai/catalog/skills/deployment-patterns/SKILL.md)
 - [disaster-recovery](../../.ai/catalog/skills/disaster-recovery/SKILL.md)
 - [doc-coauthoring](../../.ai/catalog/skills/doc-coauthoring/SKILL.md)
+- [docs-update](../../.ai/catalog/skills/docs-update/SKILL.md)
 - [docx](../../.ai/catalog/skills/docx/SKILL.md)
 - [email-marketing-flow](../../.ai/catalog/skills/email-marketing-flow/SKILL.md)
 - [email-sequence](../../.ai/catalog/skills/email-sequence/SKILL.md)
@@ -113,6 +114,7 @@ Entrypoint for VS Code Copilot environment.
 - [finops](../../.ai/catalog/skills/finops/SKILL.md)
 - [form-cro](../../.ai/catalog/skills/form-cro/SKILL.md)
 - [free-tool-strategy](../../.ai/catalog/skills/free-tool-strategy/SKILL.md)
+- [github-bug-report-triage](../../.ai/catalog/skills/github-bug-report-triage/SKILL.md)
 - [harness-audit](../../.ai/catalog/skills/harness-audit/SKILL.md)
 - [human-in-the-loop](../../.ai/catalog/skills/human-in-the-loop/SKILL.md)
 - [improve-codebase-architecture](../../.ai/catalog/skills/improve-codebase-architecture/SKILL.md)

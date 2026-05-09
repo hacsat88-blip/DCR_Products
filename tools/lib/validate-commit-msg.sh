@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Conventional Commits validation hook — runs via Claude Code PreToolUse on git commit
+# Conventional Commits validation hook - runs via Claude Code PreToolUse on git commit
 set -euo pipefail
 
 input="${CLAUDE_TOOL_INPUT:-}"
@@ -25,7 +25,7 @@ print(m.group(1) if m else '')
 
 pattern='^(feat|fix|docs|refactor|test|chore|ci|perf|build|revert)(\(.+\))?: .{1,72}$'
 if ! echo "$msg" | grep -qP "$pattern"; then
-  echo "🔴 コミットメッセージが Conventional Commits 規約に違反しています" >&2
+  echo "STOP コミットメッセージが Conventional Commits 規約に違反しています" >&2
   echo "   形式: <type>(<scope>): <summary>  (最大 72 文字)" >&2
   echo "   type: feat|fix|docs|refactor|test|chore|ci|perf|build|revert" >&2
   echo "   入力値: $msg" >&2

@@ -43,6 +43,7 @@ DCR では `.ai/catalog/`、`.ai/book/`、`.ai/kernel/`、deploy/adapters を優
 | compress | 継続に必要な履歴だけ残す | `context-compression` へ渡す |
 | cache | 再読が高い情報を短いメモにする | 決定表、触ったファイル一覧 |
 | isolate | タスクが混ざる前に分ける | agent 評価と静的解析を別 pass にする |
+| offload | raw tool outputを会話に入れない | context-mode / Serena を外部候補として検討 |
 
 ## 手順
 
@@ -53,10 +54,20 @@ DCR では `.ai/catalog/`、`.ai/book/`、`.ai/kernel/`、deploy/adapters を優
 5. 長い出力は失敗箇所、差分、要約だけを残す
 6. 読み込んだ根拠と未読の範囲を明示する
 
+## External Candidates
+
+星印記事の候補は自己申告値を含むため、導入前に各READMEで再検証する。
+
+| Candidate | Use when | DCR stance |
+|---|---|---|
+| context-mode | MCP/Web/Playwright/GitHub API出力が重い | 外部MCP PoC候補。正本には混ぜない |
+| ccusage / @ccusage/codex | 使用量やコストを可視化したい | 外部可視化ツール。削減ではなく判断材料 |
+| Serena | 大規模コードのsymbol探索が必要 | 外部MCP PoC候補。編集権限は慎重に扱う |
+| post_compact_reminder pattern | compaction後に判断品質が落ちる | ルール/skill文面へパターンだけ採用 |
+
 ## 避けること
 
 - repo 全体を無差別に読み込む
 - 生成ミラーの差分だけで正本を直す
 - 長いログを全文保持して、現在の目的を埋もれさせる
 - 既に十分な local pattern があるのに外部カタログを丸ごと移植する
-

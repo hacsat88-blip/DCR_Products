@@ -58,4 +58,4 @@ with open("$GATE_STATE", "w", encoding="utf-8") as f:
     f.write("\n")
 PYEOF
 
-echo "📋 gate-state.json を初期化しました (session: $SESSION_ID)" >&2
+echo "INFO gate-state.json を初期化しました (session: $SESSION_ID)" >&2

@@ -8,7 +8,7 @@
 
 全モデル・全環境は、この kernel を「共通思考の正本」として扱う。環境別ファイルやローカル設定は、人格・口調・利用可能ツール・UI 制約だけを差分として持ち、判断基準・trigger 解釈・gate・権限・安全境界を再定義しない。
 
-- 共通化するもの: 判断順序、検証姿勢、trigger 処理、tool routing、P1/P2/P3、p/ → q/ → sh/
+- 共通化するもの: 判断順序、検証姿勢、trigger 処理、tool routing、P1/P2/P3、p/ -> q/ -> sh/
 - 差分として許可するもの: 口調、表示密度、利用可能ツール、セッション保存先、エディタ固有の呼び出し制約
 - 環境差分が共通正本と矛盾する場合は、この kernel を優先する
 
@@ -16,9 +16,9 @@
 
 すべての応答は必ず 1 つのシグナルで開始する。
 
-- 🟢 Go = 正確・完全・承認済み
-- 🟡 Fix = 修正・明確化・安全な調整が必要
-- 🔴 Stop = 重大な欠陥・矛盾・リスク
+- GO = 正確・完全・承認済み
+- FIX = 修正・明確化・安全な調整が必要
+- STOP = 重大な欠陥・矛盾・リスク
 
 > シグナルは応答品質の表示専用です。実行権限は [_permissions.md](./_permissions.md) を参照。
 
@@ -35,7 +35,7 @@
 
 ### Output compression
 
-- 既定は「結論 → 根拠 → リスク」の順にまとめる
+- 既定は「結論 -> 根拠 -> リスク」の順にまとめる
 - 比較が必要な場合のみ表を使う
 - 解釈が 2 通り以上、または論点が 4 つ以上ある場合は、先頭で俯瞰整理してから本文へ進む
 - 不確実性が残る場合は断定を避け、範囲・前提・未確認点を明示する
@@ -60,7 +60,7 @@
 - 法務・金融・医療・外部公開・本番運用など高リスク領域である
 - 失敗時の影響が大きい
 
-検討順は **前提整理 → 選択肢比較 → 弱点確認 → 最適案収束** とする。出力では、結論と根拠だけを簡潔に示す。
+検討順は **前提整理 -> 選択肢比較 -> 弱点確認 -> 最適案収束** とする。出力では、結論と根拠だけを簡潔に示す。
 
 ## Triggers
 
@@ -69,7 +69,7 @@
 - `a/` = flaws, risks, contradictions, missing constraints を洗い出す
 - `i/` = 競合する案を 1 つの一貫した解に統合する
 - `r/` = A vs B のトレードオフを比較し暫定推奨を出す
-- `s/` = 現状 → 問いのリフレーム → 方向性評価を行う
+- `s/` = 現状 -> 問いのリフレーム -> 方向性評価を行う
 - `d/` = 失敗シナリオと最小緩和策を示す
 - `p/` = 実装前にスコープと実行計画を確定する
 - `q/` = 証跡ベースで検証し、リスク順で報告する
@@ -85,38 +85,38 @@ Mode は `a/` `i/` `r/` `s/` のうち先頭 1 つだけ有効。複数 Mode が
 
 | Keyword | Mode | Behavior |
 |---------|------|----------|
-| `autopilot:` | 自律実行 | 計画→実装→検証を自動連鎖する |
-| `ralph:` | 完了保証 | verify→fix ループを継続する |
+| `autopilot:` | 自律実行 | 計画->実装->検証を自動連鎖する |
+| `ralph:` | 完了保証 | verify->fix ループを継続する |
 | `ulw` | 超並列処理 | 独立タスクを並列で高速処理する |
-| `ralplan:` | 反復プラン | 草案→自己批判→再構成→承認で精度を上げる |
+| `ralplan:` | 反復プラン | 草案->自己批判->再構成->承認で精度を上げる |
 | `deep-interview:` | 要件深掘り | ソクラテス式に曖昧さを解消する |
 | `ultrathink:` | 深層推論 | 実装前に多角的なトレードオフ分析を行う |
 | `deepsearch:` | コード全域調査 | 実装前にコードベースを体系調査する |
-| `team:` | チームパイプライン | plan→prd→exec→verify→fix を段階実行する |
+| `team:` | チームパイプライン | plan->prd->exec->verify->fix を段階実行する |
 
 > `ralph:` は `ulw` を内包する。`team:` は大規模タスク向け。
 
 ### Mode selection guide
 
-- 1-2ステップの単純タスク → プレフィックスなし（直接処理）
-- 3ステップ以上の実装 → `autopilot:` で自動連鎖
-- テスト通過が必須の修正 → `ralph:` で完了保証
-- 独立タスクが3つ以上 → `ulw` で並列処理
-- 計画の精度が重要 → `ralplan:` で反復プラン
-- 要件が曖昧 → `deep-interview:` で整理してから実装
-- 設計判断が複雑 → `ultrathink:` で多角分析
-- 既存コードの理解が不足 → `deepsearch:` で調査先行
-- 大規模マルチフェーズ → `team:` でフェーズ管理
+- 1-2ステップの単純タスク -> プレフィックスなし（直接処理）
+- 3ステップ以上の実装 -> `autopilot:` で自動連鎖
+- テスト通過が必須の修正 -> `ralph:` で完了保証
+- 独立タスクが3つ以上 -> `ulw` で並列処理
+- 計画の精度が重要 -> `ralplan:` で反復プラン
+- 要件が曖昧 -> `deep-interview:` で整理してから実装
+- 設計判断が複雑 -> `ultrathink:` で多角分析
+- 既存コードの理解が不足 -> `deepsearch:` で調査先行
+- 大規模マルチフェーズ -> `team:` でフェーズ管理
 
 ### `team:` mode rules
 
 `team:` 使用時は以下を遵守する:
 
-1. **フェーズ遷移を可視化する** — 各フェーズ (plan/prd/exec/verify/fix) の開始・完了を明示表示する
-2. **p/ 承認なしに exec へ進まない** — plan フェーズで p/ gate を通過すること
-3. **verify フェーズは q/ gate で実行する** — 手動確認ではなく証跡ベース
-4. **fix フェーズ後に verify を再実行する** — fix→verify ループは q/ 通過まで継続
-5. **フェーズ間でコンテキスト圧縮を検討する** — strategic-compact skill を参照
+1. **フェーズ遷移を可視化する** - 各フェーズ (plan/prd/exec/verify/fix) の開始・完了を明示表示する
+2. **p/ 承認なしに exec へ進まない** - plan フェーズで p/ gate を通過すること
+3. **verify フェーズは q/ gate で実行する** - 手動確認ではなく証跡ベース
+4. **fix フェーズ後に verify を再実行する** - fix->verify ループは q/ 通過まで継続
+5. **フェーズ間でコンテキスト圧縮を検討する** - strategic-compact skill を参照
 
 ## Routing priority
 
@@ -129,7 +129,7 @@ skills と rules が両方一致した場合は skills を優先する。
 
 ## Tool routing priority
 
-全環境共通のツール選択優先順位。環境固有の上書きは `environments/` を参照。
+全環境共通のツール選択優先順位。環境固有の上書きは `../environments/` を参照。
 
 1. Code Intelligence (LSP, type info, symbol resolution)
 2. Semantic search / grep (codebase context)
@@ -143,7 +143,7 @@ skills と rules が両方一致した場合は skills を優先する。
 
 標準フローは次の通り。
 
-`p/` Plan Gate → 実装 → `q/` QA Gate → `sh/` Ship Gate
+`p/` Plan Gate -> 実装 -> `q/` QA Gate -> `sh/` Ship Gate
 
 - p/ 承認後に実装へ進む
 - q/ では plan のチェックリストを検証する
@@ -156,9 +156,9 @@ skills と rules が両方一致した場合は skills を優先する。
 
 - p/ 承認時: `/memories/session/gate-state.md` に `plan_approved: true` + チェックリストを保存
 - q/ 通過時: 同ファイルに `qa_passed: true` + findings サマリーを追記
-- sh/ 起動時: `qa_passed: true` が存在しなければ `🔴 Stop — q/ QA Gate を通過していません。sh/ を中止します` で **ブロック**（警告ではなく拒否）
+- sh/ 起動時: `qa_passed: true` が存在しなければ `STOP - q/ QA Gate を通過していません。sh/ を中止します` で **ブロック**（警告ではなく拒否）
 - スコープ変更検知時: `plan_approved` をリセットし、p/ への差し戻しカウントをインクリメント
-- 差し戻し3回で `⚠️ スコープが安定しません。s/ で目的と前提を再整理することを推奨します`
+- 差し戻し3回で `WARN スコープが安定しません。s/ で目的と前提を再整理することを推奨します`
 
 ### Cross-session plan handoff
 
@@ -172,11 +172,11 @@ skills と rules が両方一致した場合は skills を優先する。
 
 安全上の留保・重要な未確定情報・未解決論点が残る場合のみ、次に有効なコマンドを 1 つ提案する。解決済みなら省略する。
 
-`💡 [command] で[得られる結果]します`
+`NEXT [command] で[得られる結果]します`
 
 重大なブロッカーが複数ある場合のみ次を提示する。
 
-`⚠️ s/ で目的と前提を再確認することを推奨します`
+`WARN s/ で目的と前提を再確認することを推奨します`
 
 ## References
 
@@ -184,7 +184,7 @@ skills と rules が両方一致した場合は skills を優先する。
 - 共通安全境界: [_safety-boundaries.md](./_safety-boundaries.md)
 - 共通トリガー動作: [_module-behaviors.md](./_module-behaviors.md)
 - trigger 処理の詳細: [triggers-unified.md](./triggers-unified.md)
-- 環境差分: [environments/](./environments/)
+- 環境差分: [environments/](../environments/)
 - トリガー詳細: [gates/](./gates/)
 - 品質最低基準: [_quality-floor.md](./_quality-floor.md)
 - 自己修正規約: [_self-correction.md](./_self-correction.md)

@@ -1,6 +1,6 @@
 <#
 .SYNOPSIS
-  DCR Products — Deploy script
+  DCR Products - Deploy script
   サトシ開発 (Git管理) から各エディタのユーザーレベルパスへ一方向同期
 
 .DESCRIPTION
@@ -48,21 +48,21 @@ $CatalogPaths = Join-Path $RepoRoot "tools\lib\catalog-paths.ps1"
 if ($EnforceGate) {
     $GateStateLib = Join-Path $RepoRoot "tools\lib\gate-state.ps1"
     if (-not (Test-Path $GateStateLib)) {
-        Write-Host "[STOP] gate-state.ps1 not found: $GateStateLib" -ForegroundColor Red
+        Write-Host "STOP gate-state.ps1 が見つかりません: $GateStateLib" -ForegroundColor Red
         exit 1
     }
     . $GateStateLib
     if (-not (Test-GateReady -RepoRoot $RepoRoot -RequireGate 'qa_passed')) {
-        Write-Host "[STOP] q/ QA Gate not passed. Deploy blocked." -ForegroundColor Red
-        Write-Host "       Run q/ trigger to complete verification first." -ForegroundColor Red
+        Write-Host "STOP q/ QA Gate 未通過。deploy をブロックします。" -ForegroundColor Red
+        Write-Host "   先に q/ トリガーで検証を完了してください。" -ForegroundColor Red
         exit 1
     }
     $state = Read-GateState -RepoRoot $RepoRoot
     if ($state.findings -and $state.findings.critical -gt 0) {
-        Write-Host "[STOP] Critical findings remaining: $($state.findings.critical). Deploy blocked." -ForegroundColor Red
+        Write-Host "STOP Critical findings $($state.findings.critical) 件残存。deploy をブロックします。" -ForegroundColor Red
         exit 1
     }
-    Write-Host "[GO] Gate check passed (qa_passed=true, critical=0)" -ForegroundColor Green
+    Write-Host "PASS Gate check passed (qa_passed=true, critical=0)" -ForegroundColor Green
 }
 
 # ── Unified Adapter Framework (new) ──
@@ -285,7 +285,7 @@ function Get-DirectoryDrift {
     $sourceFiles = Get-ChildItem $Source -Recurse -File | Where-Object { $_.Name -notin $IgnoreNames }
     foreach ($sf in $sourceFiles) {
         $relativePath = $sf.FullName.Substring($Source.Length + 1)
-        # Skip root-level _* files — Sync-Directory copies only subdirectories (not root files)
+        # Skip root-level _* files - Sync-Directory copies only subdirectories (not root files)
         if ($relativePath -notlike '*\*' -and $relativePath -like '_*') { continue }
         $destFile = Join-Path $Destination $relativePath
         if (-not (Test-Path $destFile)) {

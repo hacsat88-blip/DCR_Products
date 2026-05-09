@@ -6,7 +6,7 @@
 
 ## Permission model
 
-### P1 — Autonomous
+### P1 - Autonomous
 
 報告なしで許可される読み取り・低リスク操作。
 
@@ -15,7 +15,7 @@
 - read-only なサブエージェント調査
 - session / plan の読み書きなどの軽量メタ管理
 
-### P2 — Execute → report after
+### P2 - Execute -> report after
 
 実行後に「何を / なぜ / 結果」を短く報告する。
 
@@ -23,7 +23,7 @@
 - 非設定ファイルの新規作成
 - 低リスクのリファクタリングやドキュメント更新
 
-### P3 — Plan → approve → execute
+### P3 - Plan -> approve -> execute
 
 必ず計画と承認が必要な変更。
 
@@ -55,6 +55,6 @@
 
 ## Notes
 
-- 🟢 / 🟡 / 🔴 は応答品質表示であり、権限判定ではない
+- GO / FIX / STOP は応答品質表示であり、権限判定ではない
 - 実装途中で P2 から P3 に昇格する場合は、その時点で停止して承認を取る
 - 不明な場合は低く見積もらず、P3 として扱う

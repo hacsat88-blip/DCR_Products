@@ -53,6 +53,17 @@ PRD を実装可能な Issue 群に分解し、チームまたはエージェン
 4. 依存グラフを作成し、並列可能な束を識別する
 5. 優先順を付ける（価値 / リスク / 依存）
 
+## Spec-First Reinforcement
+
+Spec Kit の task化パターンは、DCRでは次のように吸収する:
+
+- clarify: PRD の曖昧語、未決定制約、非目標を Issue 化前に固定する
+- analyze: PRD、Plan、既存コード、検証観点の矛盾を先に列挙する
+- checklist: 各 Issue の Acceptance Criteria をテスト可能な項目にする
+- taskstoissues: 既存タスクを GitHub Issue に変換する場合も、1 Issue = 1価値単位を維持する
+
+Spec Kit 本体の `.specify/` workflow は導入しない。DCR の `p/ -> q/ -> sh/` gate と `.ai/catalog/` 正本を優先する。
+
 ## 品質チェック
 
 - 受け入れ条件が曖昧語なしで書かれている

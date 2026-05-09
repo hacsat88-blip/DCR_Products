@@ -22,15 +22,15 @@
 ## Gate chain
 
 - p/ checklist があれば 1 項目ずつ検証する
-- 🔴 があれば fix 後に q/ を再実行する
-- 全通過時は `💡 sh/ でリリース判定に進めます` を提示する
+- STOP があれば fix 後に q/ を再実行する
+- 全通過時は `NEXT sh/ でリリース判定に進めます` を提示する
 
 ## Gate state persistence
 
 - q/ 実行時、`gate-state.json` の `plan_passed: true` を確認する（`Read-GateState` で取得）
-- `plan_passed` が `false` の場合: `⚠️ p/ で計画を先に策定してください` を提示（ブロックではなく警告）
-- q/ 全通過（🔴 = 0）時、`Update-GateState` で `.ai/kernel/gate-state.json` に記録する（唯一の正本）
-- 🔴 が残存する場合は `qa_passed = $false` で書き込む
+- `plan_passed` が `false` の場合: `WARN p/ で計画を先に策定してください` を提示（ブロックではなく警告）
+- q/ 全通過（STOP = 0）時、`Update-GateState` で `.ai/kernel/gate-state.json` に記録する（唯一の正本）
+- STOP が残存する場合は `qa_passed = $false` で書き込む
 
 ## Evidence format
 
@@ -51,6 +51,6 @@ Update-GateState -RepoRoot $RepoRoot -Phase 'qa' `
   -FindingsUpdate @{ critical = 0; high = 1; medium = 3; low = 5 }
 ```
 
-🔴 critical > 0 が残存する場合は `qa_passed = $false` で書き込む。
+STOP critical > 0 が残存する場合は `qa_passed = $false` で書き込む。
 deploy.ps1 -EnforceGate はこの JSON を読み、qa_passed != true または
 findings.critical > 0 の場合に sh/ deploy を hard-block する。

@@ -1,45 +1,45 @@
-# DCR Kernel — 統一・最適化アーキテクチャ
+# DCR Kernel - 統一・最適化アーキテクチャ
 
 このディレクトリは、複数の AI モデル・環境間で DCR Kernel（Decision-Making Coherence & Reliability）の仕様を統一・最適化する runtime 互換レイヤーです。共通思考の製本は [../book/](../book/) です。
 
 **設計哲学**: 
-- **Core は統一** → Signal protocol / Triggers / Permission model など変わらない要素
-- **差分のみカスタマイズ** → 環境固有機能（CLI Session init など）のみ分離
-- **単一ソース・オブ・トゥルース** → `.ai/book/` を修正し、必要な runtime mirror を同期すれば全環境に自動反映
+- **Core は統一** -> Signal protocol / Triggers / Permission model など変わらない要素
+- **差分のみカスタマイズ** -> 環境固有機能（CLI Session init など）のみ分離
+- **単一ソース・オブ・トゥルース** -> `.ai/book/` を修正し、必要な runtime mirror を同期すれば全環境に自動反映
 
 ---
 
-## 📁 ファイル構成
+## ファイル構成
 
 ```
 .ai/
 ├── kernel/
-│   ├── README.md                ← このファイル
-│   ├── _base.md                 ← ★ Core 統一定義（全モデル共通）
-│   ├── _permissions.md          ← 権限モデル（P1/P2/P3）
-│   ├── _safety-boundaries.md    ← セーフティバウンダリ（全モデル共通）
-│   ├── _module-behaviors.md     ← モジュール動作（a/s/i/d 詳細）
-│   ├── dcr-kernel.md            ← runtime entrypoint 生成用の共有 kernel
-│   └── gates/                   ← トリガーハンドラ統一層
+│   ├── README.md                <- このファイル
+│   ├── _base.md                 <- Core 統一定義（全モデル共通）
+│   ├── _permissions.md          <- 権限モデル（P1/P2/P3）
+│   ├── _safety-boundaries.md    <- セーフティバウンダリ（全モデル共通）
+│   ├── _module-behaviors.md     <- モジュール動作（a/s/i/d 詳細）
+│   ├── dcr-kernel.md            <- runtime entrypoint 生成用の共有 kernel
+│   └── gates/                   <- トリガーハンドラ統一層
 │
-├── environments/                ← 環境別実装レイヤー
-│   ├── README.md                ← 環境選択ガイド
-│   ├── vscode-copilot/kernel.md ← VS Code Copilot Chat 用（差分のみ）
-│   ├── claude-code/kernel.md    ← Claude Code 用（差分のみ）
-│   ├── copilot-cli/kernel.md    ← GitHub Copilot CLI 用（差分のみ + CLI固有）
-│   └── codex/kernel.md          ← Codex 用（差分のみ）
+├── environments/                <- 環境別実装レイヤー
+│   ├── README.md                <- 環境選択ガイド
+│   ├── vscode-copilot/kernel.md <- VS Code Copilot Chat 用（差分のみ）
+│   ├── claude-code/kernel.md    <- Claude Code 用（差分のみ）
+│   ├── copilot-cli/kernel.md    <- GitHub Copilot CLI 用（差分のみ + CLI固有）
+│   └── codex/kernel.md          <- Codex 用（差分のみ）
 │
 └── kernel/gates/
-    ├── README.md               ← トリガー説明
-    ├── trigger-a-review.md     ← a/ Review
-    ├── trigger-a-debug.md      ← a/ Debug
-    ├── trigger-s.md            ← s/ Strategy
-    ├── trigger-i.md            ← i/ Integrate
-    ├── trigger-r.md            ← r/ Recommendation
-    ├── trigger-d.md            ← d/ Adversarial
-    ├── trigger-p.md            ← p/ Plan Gate
-    ├── trigger-q.md            ← q/ QA Gate
-    ├── trigger-sh.md           ← sh/ Ship Gate
+    ├── README.md               <- トリガー説明
+    ├── trigger-a-review.md     <- a/ Review
+    ├── trigger-a-debug.md      <- a/ Debug
+    ├── trigger-s.md            <- s/ Strategy
+    ├── trigger-i.md            <- i/ Integrate
+    ├── trigger-r.md            <- r/ Recommendation
+    ├── trigger-d.md            <- d/ Adversarial
+    ├── trigger-p.md            <- p/ Plan Gate
+    ├── trigger-q.md            <- q/ QA Gate
+    ├── trigger-sh.md           <- sh/ Ship Gate
     ├── trigger-harness-audit.md
     ├── trigger-security-scan.md
     └── trigger-rules-distill.md
@@ -47,7 +47,7 @@
 
 ---
 
-## 🎯 ファイル対応表：モデル・環境別
+## Goal: ファイル対応表：モデル・環境別
 
 | 環境 / モデル                | メインロード                      | 参照先                                                   | 用途             |
 | ---------------------------- | --------------------------------- | -------------------------------------------------------- | ---------------- |
@@ -59,19 +59,19 @@
 
 ---
 
-## 📖 各ファイルの役割
+## 各ファイルの役割
 
-### 🔧 Core 統一層（`_*.md`）
+### Core 統一層（`_*.md`）
 
-#### `_base.md` ⭐ 最重要
-**共通定義** — 全モデルで変わらない要素：
-- Signal protocol（🟢 / 🟡 / 🔴）
+#### `_base.md` 最重要
+**共通定義** - 全モデルで変わらない要素：
+- Signal protocol（GO / FIX / STOP）
 - Response behavior（明示的・簡潔・実装志向）
 - Triggers 定義（a/ s/ i/ r/ d/ p/ q/ sh/）
 - Execution Modes（autopilot / ralph / ulw / ralplan など）
-- Pipeline gate chain（p/ → 実装 → q/ → sh/）
+- Pipeline gate chain（p/ -> 実装 -> q/ -> sh/）
 
-**新規追加時**: Core の仕様変更が発生したら `_base.md` 更新 → **全環境に自動反映**
+**新規追加時**: Core の仕様変更が発生したら `_base.md` 更新 -> **全環境に自動反映**
 
 #### `_permissions.md`
 - P1 / P2 / P3 権限モデル
@@ -97,7 +97,7 @@
 
 ---
 
-### 🌍 環境別層（`.ai/environments/`）
+### 環境別層（`.ai/environments/`）
 
 各ファイルは **差分のみ** 記載：
 
@@ -109,7 +109,7 @@
 - 環境固有：Claude Code の Communication（日本語指定）
 - 拡張：External capability packs（Azure Skills）
 
-#### `copilot-cli/kernel.md` ⭐ 差分大
+#### `copilot-cli/kernel.md` 差分大
 - 環境固有：**Session initialization**（CLI固有）
 - 環境固有：**Tool priority hierarchy**（LSP / grep の優先度）
 - 環境固有：**SQL tracking**（キャッシュ管理）
@@ -121,15 +121,15 @@
 
 ---
 
-### 🎛️ トリガーハンドラ層（`gates/`）
+### トリガーハンドラ層（`gates/`）
 
-**統一トリガーハンドラ** → 全モデルで共有：
+**統一トリガーハンドラ** -> 全モデルで共有：
 
 | トリガー   | ファイル              | 動作                           |
 | ---------- | --------------------- | ------------------------------ |
 | `a/`       | `trigger-a-review.md` | コード・デザイン審査           |
-| `a/ debug` | `trigger-a-debug.md`  | デバッグ（症状 → 根本原因）    |
-| `s/`       | `trigger-s.md`        | 戦略概観（現状→問い→方向）     |
+| `a/ debug` | `trigger-a-debug.md`  | デバッグ（症状 -> 根本原因）    |
+| `s/`       | `trigger-s.md`        | 戦略概観（現状->問い->方向）     |
 | `i/`       | `trigger-i.md`        | 競合解決（複数アイデアの統合） |
 | `r/`       | `trigger-r.md`        | トレードオフ分析               |
 | `d/`       | `trigger-d.md`        | 悪手分析（失敗シナリオ）       |
@@ -144,9 +144,9 @@
 
 ---
 
-## 🔄 使用フロー
+## 使用フロー
 
-### 📌 **モデルを選択して作業開始**
+### **モデルを選択して作業開始**
 
 ```
 ユーザー / IDE
@@ -183,7 +183,7 @@
         .ai/kernel/ 参照
 ```
 
-### 📌 **トリガーを実行**
+### **トリガーを実行**
 
 ```
 ユーザー入力: "a/ ......"
@@ -197,9 +197,9 @@ gate/trigger-a-review.md を実行
 
 ---
 
-## 🔧 管理ガイドライン
+## 管理ガイドライン
 
-### ✅ 追加・修正の判断フロー
+### 追加・修正の判断フロー
 
 ```
 修正対象 = ?
@@ -211,33 +211,33 @@ gate/trigger-a-review.md を実行
     │
     ├─ Signal / Permission / Safety の変更
     │   ↓
-    │   → _base.md / _permissions.md / _safety-boundaries.md 修正
-    │   → 全環境に自動適用
+    │   -> _base.md / _permissions.md / _safety-boundaries.md 修正
+    │   -> 全環境に自動適用
     │
     ├─ 環境固有機能の追加
     │   ↓
-    │   → .ai/environments/[env]/kernel.md に差分のみ追加
+    │   -> .ai/environments/[env]/kernel.md に差分のみ追加
     │
     ├─ モデル別エントリポイントの更新
     │   ↓
-    │   → copilot-instructions.md / CLAUDE.md / AGENTS.md 等を更新
-    │   → 参照先は .ai/kernel/ を指すキープ
+    │   -> copilot-instructions.md / CLAUDE.md / AGENTS.md 等を更新
+    │   -> 参照先は .ai/kernel/ を指すキープ
     │
     └─ 説明文の改善
         ↓
-        → 該当する _*.md またはトリガー ファイルを修正
+        -> 該当する _*.md またはトリガー ファイルを修正
 ```
 
-### 🚨 "修正ミス"を避けるために
+### "修正ミス"を避けるために
 
-1. **コア定義（_base.md）を直接いじるな** → 必ず差分を確認して環境別層で吸収できないか検討
-2. **トリガーハンドラの重複排除** → gates/ 内で統一化し、環境別では override しない
-3. **参照切れ防止** → 環境別ファイル内のリンク参照は相対パス（例: `../../kernel/_base.md`）を使用
-4. **validate.ps1 で検証** → すべての修正後に `validate.ps1` → `deploy.ps1 -Check` を実行
+1. **コア定義（_base.md）を直接いじるな** -> 必ず差分を確認して環境別層で吸収できないか検討
+2. **トリガーハンドラの重複排除** -> gates/ 内で統一化し、環境別では override しない
+3. **参照切れ防止** -> 環境別ファイル内のリンク参照は相対パス（例: `../../kernel/_base.md`）を使用
+4. **validate.ps1 で検証** -> すべての修正後に `validate.ps1` -> `deploy.ps1 -Check` を実行
 
 ---
 
-## 📊 ファイル統合前後の比較
+## Summary: ファイル統合前後の比較
 
 ### Before（現状：重複が高い）
 
@@ -249,7 +249,7 @@ dcr-kernel.md      ～150 行
 copilot-instructions.md  ～160 行
 ────────────────────────────
 計: ～1030 行
-重複度: Signal protocol / Triggers ⭐⭐⭐⭐⭐
+重複度: Signal protocol / Triggers *****
 ```
 
 ### After（最適化後：統一 + 差分のみ）
@@ -267,58 +267,58 @@ _module-behaviors.md ～150 行
 gate/*.md（12個）   ～300 行（統一）
 ────────────────────────────
 計: ～960 行
-重複度: Signal protocol / Triggers ⭐（Core に統一）
+重複度: Signal protocol / Triggers *（Core に統一）
 保守性: ↑↑↑（Core 修正 = 全環境反映）
 ```
 
 **メリット**:
-- ✅ 重複削減（70 行削減）
-- ✅ 参照の一元化（理解しやすい）
-- ✅ 拡張性向上（新環境・トリガー追加が容易）
-- ✅ 同期ズレ防止（Core 1ファイル → 全反映）
+- PASS 重複削減（70 行削減）
+- PASS 参照の一元化（理解しやすい）
+- PASS 拡張性向上（新環境・トリガー追加が容易）
+- PASS 同期ズレ防止（Core 1ファイル -> 全反映）
 
 ---
 
-## 🚀 次のステップ
+## Next: 次のステップ
 
 ### Phase 1: Core 統一層の生成
 ```
-□ _base.md を生成（Signal/Mode/Trigger/Gate chain を統合）
-□ _permissions.md を生成
-□ _safety-boundaries.md を生成
-□ _module-behaviors.md を生成
+[ ] _base.md を生成（Signal/Mode/Trigger/Gate chain を統合）
+[ ] _permissions.md を生成
+[ ] _safety-boundaries.md を生成
+[ ] _module-behaviors.md を生成
 ```
 
 ### Phase 2: 環境別層の分離
 ```
-□ .ai/environments/vscode-copilot/kernel.md を生成
-□ .ai/environments/claude-code/kernel.md を生成
-□ .ai/environments/copilot-cli/kernel.md を生成（CLI固有セクション保持）
-□ .ai/environments/codex/kernel.md を生成
+[ ] .ai/environments/vscode-copilot/kernel.md を生成
+[ ] .ai/environments/claude-code/kernel.md を生成
+[ ] .ai/environments/copilot-cli/kernel.md を生成（CLI固有セクション保持）
+[ ] .ai/environments/codex/kernel.md を生成
 ```
 
 ### Phase 3: トリガーハンドラの統一化
 ```
-✅ gates/trigger-*.md を生成（.commands/ から移行完了、.commands/ 削除済み）
+PASS gates/trigger-*.md を生成（.commands/ から移行完了、.commands/ 削除済み）
 ```
 
 ### Phase 4: エントリポイント参照化
 ```
-□ copilot-instructions.md → 参照層に縮約
-□ CLAUDE.md → 参照層に縮約
-□ AGENTS.md → 参照層に縮約
-✅ .windsurf/rules/dcr-kernel.md → `.ai/kernel/dcr-kernel.md` から同期
+[ ] copilot-instructions.md -> 参照層に縮約
+[ ] CLAUDE.md -> 参照層に縮約
+[ ] AGENTS.md -> 参照層に縮約
+PASS .windsurf/rules/dcr-kernel.md -> `.ai/kernel/dcr-kernel.md` から同期
 ```
 
 ### Phase 5-7: 検証・デプロイ
 ```
-□ validate.ps1 / deploy.ps1 -Check で整合性確認
-□ Git コミット
+[ ] validate.ps1 / deploy.ps1 -Check で整合性確認
+[ ] Git コミット
 ```
 
 ---
 
-## 📝 参考資料
+## Note: 参考資料
 
 - **統合元仕様**: `.ai/module/unified-integration.md`
 - **検証スクリプト**: `validate.ps1` / `deploy.ps1`

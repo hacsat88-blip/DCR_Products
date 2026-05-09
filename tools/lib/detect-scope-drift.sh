@@ -50,10 +50,10 @@ with open(path, "w", encoding="utf-8") as f:
 PYEOF
 
 if [[ "$drift_count" -ge 3 ]]; then
-  echo "🔴 スコープドリフト: 計画外ファイルへの編集が ${drift_count} 回に達しました。" >&2
+  echo "STOP スコープドリフト: 計画外ファイルへの編集が ${drift_count} 回に達しました。" >&2
   echo "   対象: $file_path" >&2
   echo "   p/ でスコープを再確認するか、計画に追加してください。" >&2
 else
-  echo "⚠️  スコープ外編集 (${drift_count}/3): $file_path" >&2
+  echo "WARN  スコープ外編集 (${drift_count}/3): $file_path" >&2
   echo "   このファイルは承認済みスコープに含まれていません。" >&2
 fi

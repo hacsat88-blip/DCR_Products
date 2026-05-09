@@ -38,7 +38,7 @@ AI エージェント設定・ルール・スキルの一元管理リポジト�
 ## 運用クイックガイド
 
 - Execution Modes を全環境で共通運用: タスク先頭に `autopilot:`, `ralph:`, `ulw`, `ralplan:`, `deep-interview:`, `ultrathink:`, `deepsearch:`, `team:` を付けて実行戦略を宣言する
-- **日次更新**: 毎朝 `deploy.ps1 -Check` でドリフト確認 → 変更があれば `deploy.ps1` で同期 → `validate.ps1` で全通過を確認してからコミットする
+- **日次更新**: 毎朝 `deploy.ps1 -Check` でドリフト確認 -> 変更があれば `deploy.ps1` で同期 -> `validate.ps1` で全通過を確認してからコミットする
 - **検証ゲート**: 実装後は `validate.ps1` の `RESULT: ... passed, 0 failed` と `deploy.ps1 -Check` の `in sync` を確認してからコミット・PR を作成する
 - Azure Skills は DCR の置換ではなく、Azure 専用タスクのための external capability pack として扱う
 - Azure architecture / deploy / diagnostics / compliance / cost / RBAC / Kusto / Foundry は、まず Azure Skills plugin の利用可否を確認する
@@ -64,7 +64,7 @@ Windows PowerShell 5.1 のみの環境では `pwsh` を `powershell` に読み�
 ## 開発ワークフロー標準
 
 - **統合運用ドキュメント**: [docs/dcr/development-workflow.md](docs/dcr/development-workflow.md)
-  - 3段階運用モデル（ローカル開発 → 小PR化 → リリース前自動検証）
+  - 3段階運用モデル（ローカル開発 -> 小PR化 -> リリース前自動検証）
   - 必須チェックリスト
   - Branch Protection推奨設定
   - Copilot Agent 自動化オプション
@@ -82,7 +82,7 @@ Windows PowerShell 5.1 のみの環境では `pwsh` を `powershell` に読み�
 
 必要時だけ見る補助入口:
 
-- 個人的な記録・スナップショット（任意）: `docs/snapshots/` — repo の正本層とは別目的のファイル用
+- 個人的な記録・スナップショット（任意）: `docs/snapshots/` - repo の正本層とは別目的のファイル用
 - 個人上書き: `CLAUDE.local.md`（薄い入口）, `.claude/local/CLAUDE.local.md`（実体）, `.claude/settings.local.json`（いずれも Git 管理外）
 - Claude 補助コマンド: `.claude/commands/review.md`, `.claude/commands/fix.md`
 - 外部連携設定: `.mcp.json`
@@ -91,7 +91,7 @@ Windows PowerShell 5.1 のみの環境では `pwsh` を `powershell` に読み�
 
 1. `pwsh -ExecutionPolicy Bypass -File .\deploy.ps1 -Check`（5.1 のみなら `powershell`）
 2. `pwsh -ExecutionPolicy Bypass -File .\validate.ps1`
-3. 変更がある場合のみ `deploy.ps1` 実行 → 再検証
+3. 変更がある場合のみ `deploy.ps1` 実行 -> 再検証
 
 `git fetch` で警告が再発した場合の手順は `docs/dcr/instruction-governance.md` を参照。
 
@@ -161,14 +161,14 @@ Workspace / operations layer
 
 ## 迷わない運用境界 (推奨)
 
-### 正本層（Source of Truth）— これを編集する
+### 正本層（Source of Truth）- これを編集する
 
-- `.ai/catalog/rules/` — エージェントルール定義
-- `.ai/catalog/skills/` — スキル定義
-- `.ai/catalog/agents-source/` — エージェント定義
-- `.ai/kernel/` — 全環境共通カーネル、権限、トリガー、環境差分
-- `.ai/environments/` — VS Code Copilot / Claude Code / Copilot CLI / Codex の環境固有差分
-- `templates/` — `init-project.ps1` 用の入力テンプレート
+- `.ai/catalog/rules/` - エージェントルール定義
+- `.ai/catalog/skills/` - スキル定義
+- `.ai/catalog/agents-source/` - エージェント定義
+- `.ai/kernel/` - 全環境共通カーネル、権限、トリガー、環境差分
+- `.ai/environments/` - VS Code Copilot / Claude Code / Copilot CLI / Codex の環境固有差分
+- `templates/` - `init-project.ps1` 用の入力テンプレート
 
 役割の境界:
 
@@ -176,7 +176,7 @@ Workspace / operations layer
 - `.ai/catalog/skills/` は再利用可能な workflow、generator、analysis method を置く
 - `.ai/catalog/agents-source/` は runtime persona と execution specialist の定義を置く
 
-### 生成物層（Generated）— 直接編集しない ⚠️
+### 生成物層（Generated）- 直接編集しない WARN
 
 - **`AGENTS.md`** ← `deploy.ps1` で自動生成（Copilot CLI / Codex 用）
 - **`CLAUDE.md`** ← `deploy.ps1` で自動生成（Claude Code 用）
@@ -187,14 +187,14 @@ Workspace / operations layer
 
 **生成物層の特性**: `deploy.ps1` 実行時に完全上書きされます。手編集は次回デプロイで失われます。大量生成 mirror は `.gitignore` で除外し、正本の重複を避けます。
 
-### ユーザーレベル managed target — `deploy.ps1` が上書きする
+### ユーザーレベル managed target - `deploy.ps1` が上書きする
 
 - `%USERPROFILE%/.agents/skills`
 - `%HOME%/.config/dcr/config.json`
 
 これらは runtime cache ではなく deploy target です。正本はこの repo にあり、user-level 側の手編集は次回 deploy で上書きされます。
 
-### 外部 capability pack — DCR に取り込まない
+### 外部 capability pack - DCR に取り込まない
 
 - `Superpowers` は外部公式パッケージとして扱う
 - 既定の upstream mirror: `%USERPROFILE%/.codex/superpowers`
@@ -203,11 +203,11 @@ Workspace / operations layer
 - `validate.ps1` は Superpowers checkout が存在する環境では同じ drift check を実行し、存在しない環境ではスキップする
 - Windsurf は Superpowers の公式導入先として扱わず、この repo の `.windsurf/` 生成ミラーで運用する
 
-### 設定層（Configuration）— 個人設定のみ
+### 設定層（Configuration）- 個人設定のみ
 
-- `.claude/settings.local.json` — Claude Code の個人設定（Git 管理外）
-- `.claude/local/CLAUDE.local.md` — 個人運用ガイド実体（Git 管理外）
-- `CLAUDE.local.md` — ルート固定の薄い入口（Git 管理外）
+- `.claude/settings.local.json` - Claude Code の個人設定（Git 管理外）
+- `.claude/local/CLAUDE.local.md` - 個人運用ガイド実体（Git 管理外）
+- `CLAUDE.local.md` - ルート固定の薄い入口（Git 管理外）
 
 ### その他のルール
 
