@@ -62,8 +62,12 @@ If verification fails for pre-existing unrelated changes, report that distinctio
 このプロジェクトは SQLite FTS5 ベースのメモリ検索システムを使用している。
 
 **制約**: `mem_cli.py` と `mem.db` はユーザーのローカルマシン
-(`C:/Users/hacsa/.claude/projects/.../memory/`) に存在するため、
+(`%USERPROFILE%\.claude\projects\<slug>\memory\` など) に存在するため、
 クラウドサンドボックスで動作する Devin からは**直接アクセスできない**。
+
+ローカル Hooks は `tools/lib/resolve-claude-memory.ps1` で `mem_cli.py` を解決する。
+複数の Claude プロジェクトフォルダがある場合は、環境変数 **`DCR_MEMORY_ROOT`** に
+`memory` ディレクトリの絶対パスを設定して一意に固定する。
 
 代替手段:
 - ユーザーがセッション開始時に関連メモリを手動で共有する

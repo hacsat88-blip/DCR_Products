@@ -1,31 +1,24 @@
-﻿# Cursor hooks bundle (DCR / サトシ開発 向け)
+﻿# Cursor hooks bundle（DCR / サトシ開発）
 
-## 導入（コピーのみ）
+## 導入
 
-リポジトリルートで PowerShell:
+リポジトリルートで:
 
 ```powershell
 Copy-Item -Recurse -Force templates\cursor-hooks-bundle\.cursor .\
 ```
 
-既に `.cursor\hooks.json` がある場合は内容をマージしてください。
+既に `.cursor\hooks.json` がある場合は **マージ**してください。
 
-## 含まれるフック（現在）
+## 構成（本番と同一）
 
-- `hooks/risky-shell.ps1` のみ — 明らかに危険なシェル（dd / mkfs / force push 等）で **確認(ask)**。
-- `hooks.json` の `beforeShellExecution` は **`powershell -EncodedCommand …`** で起動します（シェルによるクォート崩れを避けるため）。デコード後のロジックは `.cursor/hooks/risky-shell-launcher.ps1` と同一で、親ディレクトリを最大 32 階まで辿って `risky-shell.ps1` を解決してから実行します。見つからない場合のみ許可（allow）にフォールバックします。
-- **Git 前の validate/deploy ゲートは既定では含めません**（commit が軽くなるため）。必要なら Git 用ブロックを `hooks.json` に戻してください。
-
-## EncodedCommand の保守
-
-ランチャー本文を編集したら、バンドル直下で次を実行して `hooks.json` の Base64 を更新してください。
-
-```powershell
-Set-Location templates\cursor-hooks-bundle
-.\tools\encode-risky-shell-launcher.ps1
-```
+| ファイル | 役割 |
+|-----------|------|
+| `.cursor/hooks.json` | `beforeShellExecution` で `risky-shell.ps1` を実行（**`-File`、EncodedCommand 不使用**） |
+| `.cursor/hooks/risky-shell.ps1` | `dd` / `mkfs` / force push / `reset --hard` 等のみ **ask**（ルーティン削除は検知しない） |
+| `.cursor/hooks/dcr-git-gate.ps1` | **未接続**。`git commit` / `push` 前に validate + deploy -Check を掛けたいとき、`hooks.json` にブロックを追加して利用 |
 
 ## 注意
 
-- `.gitignore` に `/.cursor/` があるため、チーム共有時は `git add -f` 等で追跡するか ignore を調整してください。
-
+- ルート `.gitignore` の `/.cursor/` により既定ではコミットされません。共有時は `git add -f` か ignore 調整。
+- ワークスペース設定の **`chat.tools.terminal.autoApprove`** はリポジトリの `.vscode/settings.json` で **`git add` のみ**に寄せています（commit/push は IDE で確認）。

@@ -1,4 +1,4 @@
-﻿# Cursor hook: validate.ps1 + deploy.ps1 -Check before git commit --trailer "Co-authored-by: Cursor <cursoragent@cursor.com>"/push.
+﻿# Cursor hook: validate.ps1 + deploy.ps1 -Check before git commit --trailer "Co-authored-by: Cursor <cursoragent@cursor.com>"/push (optional; wire in hooks.json to enable).
 
 [CmdletBinding()]
 param()

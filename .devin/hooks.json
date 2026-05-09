@@ -1,0 +1,62 @@
+{
+  "hooks": {
+    "UserPromptSubmit": [
+      {
+        "name": "prompt-routing-hint",
+        "command": "powershell -ExecutionPolicy Bypass -File ./.devin/hooks/prompt-routing-hint.ps1"
+      },
+      {
+        "name": "context-collector",
+        "command": "powershell -ExecutionPolicy Bypass -File ./.devin/hooks/context-collector.ps1"
+      },
+      {
+        "name": "task-estimator",
+        "command": "powershell -ExecutionPolicy Bypass -File ./.devin/hooks/task-estimator.ps1"
+      }
+    ],
+    "PreToolUse": [
+      {
+        "name": "secret-path-guard",
+        "command": "powershell -ExecutionPolicy Bypass -File ./.devin/hooks/guard-secrets.ps1"
+      },
+      {
+        "name": "destructive-command-guard",
+        "command": "powershell -ExecutionPolicy Bypass -File ./.devin/hooks/guard-destructive.ps1"
+      },
+      {
+        "name": "generated-file-guard",
+        "command": "powershell -ExecutionPolicy Bypass -File ./.devin/hooks/guard-generated-files.ps1"
+      },
+      {
+        "name": "resource-monitor",
+        "command": "powershell -ExecutionPolicy Bypass -File ./.devin/hooks/resource-monitor.ps1"
+      }
+    ],
+    "PostToolUse": [
+      {
+        "name": "verification-reminder",
+        "command": "powershell -ExecutionPolicy Bypass -File ./.devin/hooks/remind-verification.ps1"
+      },
+      {
+        "name": "auto-format",
+        "command": "powershell -ExecutionPolicy Bypass -File ./.devin/hooks/auto-format.ps1"
+      },
+      {
+        "name": "memory-index",
+        "command": "powershell -ExecutionPolicy Bypass -File ./.devin/hooks/memory-index.ps1"
+      },
+      {
+        "name": "progress-logger",
+        "command": "powershell -ExecutionPolicy Bypass -File ./.devin/hooks/log-progress.ps1"
+      },
+      {
+        "name": "auto-test",
+        "command": "powershell -ExecutionPolicy Bypass -File ./.devin/hooks/auto-test.ps1"
+      },
+      {
+        "name": "session-health-check",
+        "command": "powershell -ExecutionPolicy Bypass -File ./.devin/hooks/health-check.ps1"
+      }
+    ]
+  }
+}
