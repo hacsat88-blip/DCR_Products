@@ -44,6 +44,27 @@ $UserHome = $env:USERPROFILE
 $CatalogPaths = Join-Path $RepoRoot "tools\lib\catalog-paths.ps1"
 . $CatalogPaths
 
+# ── Gate enforcement ──
+if ($EnforceGate) {
+    $GateStateLib = Join-Path $RepoRoot "tools\lib\gate-state.ps1"
+    if (-not (Test-Path $GateStateLib)) {
+        Write-Host "🔴 gate-state.ps1 が見つかりません: $GateStateLib" -ForegroundColor Red
+        exit 1
+    }
+    . $GateStateLib
+    if (-not (Test-GateReady -RepoRoot $RepoRoot -RequireGate 'qa_passed')) {
+        Write-Host "🔴 q/ QA Gate 未通過。deploy をブロックします。" -ForegroundColor Red
+        Write-Host "   先に q/ トリガーで検証を完了してください。" -ForegroundColor Red
+        exit 1
+    }
+    $state = Read-GateState -RepoRoot $RepoRoot
+    if ($state.findings -and $state.findings.critical -gt 0) {
+        Write-Host "🔴 Critical findings $($state.findings.critical) 件残存。deploy をブロックします。" -ForegroundColor Red
+        exit 1
+    }
+    Write-Host "✅ Gate check passed (qa_passed=true, critical=0)" -ForegroundColor Green
+}
+
 # ── Unified Adapter Framework (new) ──
 $DeployAll = Join-Path $RepoRoot "tools\deploy-all.ps1"
 $WindsurfAdapter = Join-Path $RepoRoot "tools\adapters\windsurf.ps1"

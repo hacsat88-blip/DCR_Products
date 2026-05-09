@@ -11,5 +11,27 @@
       "Read(./**/*.pem)",
       "Read(./**/*.key)"
     ]
+  },
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash tools/lib/validate-commit-msg.sh"
+          }
+        ]
+      },
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash tools/lib/enforce-gate-chain.sh"
+          }
+        ]
+      }
+    ]
   }
 }
