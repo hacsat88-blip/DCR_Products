@@ -57,6 +57,20 @@ powershell -ExecutionPolicy Bypass -File ./deploy.ps1 -Check
 
 If verification fails for pre-existing unrelated changes, report that distinction clearly and provide the exact failing evidence.
 
+## Memory Search
+
+このプロジェクトは SQLite FTS5 ベースのメモリ検索システムを使用している。
+
+**制約**: `mem_cli.py` と `mem.db` はユーザーのローカルマシン
+(`C:/Users/hacsa/.claude/projects/.../memory/`) に存在するため、
+クラウドサンドボックスで動作する Devin からは**直接アクセスできない**。
+
+代替手段:
+- ユーザーがセッション開始時に関連メモリを手動で共有する
+- リポジトリ内の `docs/` や既存のコンテキストファイルを参照する
+- メモリに保存すべき知見が生まれた場合は、ユーザーに
+  「これを mem_cli.py に保存してください」と伝える
+
 ## Completion Report
 
 Report:
