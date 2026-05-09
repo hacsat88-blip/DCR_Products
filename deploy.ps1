@@ -166,11 +166,16 @@ function Sync-Directory {
 
     $sourceItems = Get-ChildItem $Source -Directory |
     Where-Object { $_.Name -notlike "_*" }
+    $sourceNames = @($sourceItems | Select-Object -ExpandProperty Name)
     $count = $sourceItems.Count
 
     if ($DryRun) {
         Write-Host "[DRY RUN] $Label : $count items -> $Destination" -ForegroundColor Yellow
         $sourceItems | ForEach-Object { Write-Host "  $_" }
+        if (Test-Path $Destination) {
+            $extraItems = Get-ChildItem $Destination -Directory | Where-Object { $_.Name -notin $sourceNames }
+            $extraItems | ForEach-Object { Write-Host "  [REMOVE] $($_.FullName)" -ForegroundColor DarkYellow }
+        }
         return
     }
 
@@ -181,6 +186,17 @@ function Sync-Directory {
     foreach ($item in $sourceItems) {
         Copy-Item -Path $item.FullName -Destination $Destination -Recurse -Force
     }
+
+    $destinationRoot = (Resolve-Path -LiteralPath $Destination).Path
+    $extraItems = Get-ChildItem $destinationRoot -Directory | Where-Object { $_.Name -notin $sourceNames }
+    foreach ($extra in $extraItems) {
+        $resolvedExtra = (Resolve-Path -LiteralPath $extra.FullName).Path
+        if (-not $resolvedExtra.StartsWith($destinationRoot + [System.IO.Path]::DirectorySeparatorChar, [System.StringComparison]::OrdinalIgnoreCase)) {
+            throw "Refusing to remove path outside deploy target: $resolvedExtra"
+        }
+        Remove-Item -LiteralPath $resolvedExtra -Recurse -Force
+    }
+
     Write-Host "[OK] $Label : $count items -> $Destination" -ForegroundColor Green
 }
 
