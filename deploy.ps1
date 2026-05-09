@@ -89,6 +89,7 @@ $SourceAgents = Resolve-DcrSourcePath -RepoRoot $RepoRoot -AssetType "agents-sou
 
 $DestVSCodeSkills = Join-Path $UserHome ".agents\skills"
 $DestWindsurf = Join-Path $RepoRoot ".windsurf"
+$DestWindsurfMcpConfig = Join-Path $UserHome ".codeium\windsurf\mcp_config.json"
 $DestCodexAgents = Join-Path $RepoRoot ".codex\agents"
 $DestClaudeAgents = Join-Path $RepoRoot ".claude\agents"
 
@@ -150,6 +151,92 @@ function Sync-DCRConfig {
     catch {
         Write-Warning "Failed to sync .dcr config: $_"
     }
+}
+
+function Sync-WindsurfMcpConfig {
+    param(
+        [string]$RepoRootPath,
+        [string]$DestinationPath
+    )
+
+    $serverPath = Join-Path $RepoRootPath "tools\mcp-servers\opencode-bridge\server.py"
+    if (-not (Test-Path $serverPath)) {
+        Write-Warning "Windsurf MCP server not found: $serverPath"
+        return
+    }
+
+    if ($DryRun) {
+        Write-Host "[DRY RUN] Windsurf MCP config : opencode-bridge -> $DestinationPath" -ForegroundColor Yellow
+        return
+    }
+
+    $destinationDir = Split-Path $DestinationPath -Parent
+    New-Item -ItemType Directory -Path $destinationDir -Force | Out-Null
+
+    if (Test-Path $DestinationPath) {
+        $config = Get-Content -Path $DestinationPath -Raw -Encoding utf8 | ConvertFrom-Json
+    }
+    else {
+        $config = [pscustomobject]@{}
+    }
+
+    if (-not $config.PSObject.Properties["mcpServers"]) {
+        Add-Member -InputObject $config -MemberType NoteProperty -Name "mcpServers" -Value ([pscustomobject]@{})
+    }
+
+    if ($config.mcpServers.PSObject.Properties["opencode-bridge"]) {
+        $config.mcpServers.PSObject.Properties.Remove("opencode-bridge")
+    }
+
+    $opencodeBridgeConfig = [ordered]@{
+        command = "python"
+        args = @($serverPath)
+    }
+    Add-Member -InputObject $config.mcpServers -MemberType NoteProperty -Name "opencode-bridge" -Value $opencodeBridgeConfig
+
+    $json = $config | ConvertTo-Json -Depth 10
+    $utf8NoBom = New-Object System.Text.UTF8Encoding($false)
+    [System.IO.File]::WriteAllText($DestinationPath, ($json.TrimEnd() + "`r`n"), $utf8NoBom)
+
+    Write-Host "[OK] Windsurf MCP config : opencode-bridge -> $DestinationPath" -ForegroundColor Green
+}
+
+function Get-WindsurfMcpConfigDrift {
+    param(
+        [string]$RepoRootPath,
+        [string]$DestinationPath
+    )
+
+    $diffs = @()
+    $serverPath = Join-Path $RepoRootPath "tools\mcp-servers\opencode-bridge\server.py"
+
+    if (-not (Test-Path $DestinationPath)) {
+        return @("[MISSING] Windsurf user MCP config")
+    }
+
+    try {
+        $config = Get-Content -Path $DestinationPath -Raw -Encoding utf8 | ConvertFrom-Json
+    }
+    catch {
+        return @("[INVALID_JSON] Windsurf user MCP config")
+    }
+
+    $entry = $config.mcpServers."opencode-bridge"
+    if (-not $entry) {
+        $diffs += "[MISSING] opencode-bridge in Windsurf user MCP config"
+        return $diffs
+    }
+
+    if ($entry.command -ne "python") {
+        $diffs += "[MODIFIED] opencode-bridge command"
+    }
+
+    $args = @($entry.args)
+    if ($args.Count -ne 1 -or $args[0] -ne $serverPath) {
+        $diffs += "[MODIFIED] opencode-bridge args"
+    }
+
+    return $diffs
 }
 
 function Sync-Directory {
@@ -519,6 +606,15 @@ if ($Check) {
             Write-Host "[DRIFT] Windsurf mirror : $($windsurfDiffs.Count) differences" -ForegroundColor Red
             $windsurfDiffs | ForEach-Object { Write-Host "  $_" -ForegroundColor Yellow }
         }
+
+        $windsurfMcpDiffs = Get-WindsurfMcpConfigDrift -RepoRootPath $RepoRoot -DestinationPath $DestWindsurfMcpConfig
+        if ($windsurfMcpDiffs.Count -eq 0) {
+            Write-Host "[OK] Windsurf MCP config : in sync" -ForegroundColor Green
+        }
+        else {
+            Write-Host "[DRIFT] Windsurf MCP config : $($windsurfMcpDiffs.Count) differences" -ForegroundColor Red
+            $windsurfMcpDiffs | ForEach-Object { Write-Host "  $_" -ForegroundColor Yellow }
+        }
     }
     if ($Target -eq "all" -or $Target -eq "agents") {
         $codexDiffs = Get-FlatFileDrift -Source $SourceAgents -Destination $DestCodexAgents -Filter '*.toml'
@@ -596,6 +692,17 @@ if ($Target -eq "all" -or $Target -eq "dcr") {
     Sync-DCRConfig -Source $SourceRules -ConfigPath $dcrConfigPath
     if ((-not $DryRun) -and (Test-Path $dcrConfigPath)) {
         Assert-NoDrift -Label ".dcr config" -Diffs (Get-FileDrift -SourcePath $dcrConfigPath -DestinationPath (Join-Path $HOME ".config\dcr\config.json") -Label "config.json")
+    }
+}
+
+if ($Target -eq "all" -or $Target -eq "windsurf") {
+    if (-not $DryRun) {
+        Write-ManagedTargetNotice -Label "Windsurf MCP config" -Destination $DestWindsurfMcpConfig
+        Write-PrecheckSummary -Label "Windsurf MCP config" -Diffs (Get-WindsurfMcpConfigDrift -RepoRootPath $RepoRoot -DestinationPath $DestWindsurfMcpConfig)
+    }
+    Sync-WindsurfMcpConfig -RepoRootPath $RepoRoot -DestinationPath $DestWindsurfMcpConfig
+    if (-not $DryRun) {
+        Assert-NoDrift -Label "Windsurf MCP config" -Diffs (Get-WindsurfMcpConfigDrift -RepoRootPath $RepoRoot -DestinationPath $DestWindsurfMcpConfig)
     }
 }
 

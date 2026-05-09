@@ -3,7 +3,7 @@
     "opencode-bridge": {
       "command": "python",
       "args": [
-        "C:\\Users\\hacsa\\Desktop\\サトシ開発\\tools\\mcp-servers\\opencode-bridge\\server.py"
+        "<REPO_ROOT>/tools/mcp-servers/opencode-bridge/server.py"
       ]
     }
   }

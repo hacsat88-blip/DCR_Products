@@ -1,5 +1,6 @@
 [
   "mcp_config.example.json",
+  "mcp_config.json",
   "rules/accessibility-auditor.md",
   "rules/agentic-identity-trust-architect.md",
   "rules/agents-orchestrator.md",

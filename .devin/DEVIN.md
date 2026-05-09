@@ -27,6 +27,7 @@ Use Devin as a high-signal implementation and verification operator for this rep
 - Use implementation subagents only for isolated tasks with clear file ownership.
 - Use QA/evidence collection after implementation when completion claims need commands, logs, screenshots, diffs, or reproduction notes.
 - Use specialist QA for UI accessibility, API/CLI contracts, performance, or security when those risks are in scope.
+- When the user enables the project MCP in Devin, prefer the `opencode-bridge` tools for OSS model delegation: `oss_explore`, `oss_document`, and `oss_implement`.
 - Only hand off to a cloud or remote Devin agent when the user explicitly asks for handoff.
 
 ## Hooks and Feedback

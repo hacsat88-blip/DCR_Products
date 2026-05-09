@@ -263,11 +263,17 @@ if (Test-Path $templateHooksPath) {
 }
 
 if (Test-Path $templateMcpPath) {
-    $mcpOutPath = Join-Path $outRoot "mcp_config.example.json"
     $mcpRaw = Get-Content -Path $templateMcpPath -Raw -Encoding utf8
+
+    $mcpOutPath = Join-Path $outRoot "mcp_config.example.json"
     Write-Utf8NoBom -Path $mcpOutPath -Content ($mcpRaw.TrimEnd() + "`r`n")
     Register-ManagedFile -ManagedFiles $managedFiles -RelativePath "mcp_config.example.json"
     Write-WindsurfStatus -Message "  [OK] mcp_config.example.json"
+
+    $mcpConcreteOutPath = Join-Path $outRoot "mcp_config.json"
+    Write-Utf8NoBom -Path $mcpConcreteOutPath -Content ($mcpRaw.TrimEnd() + "`r`n")
+    Register-ManagedFile -ManagedFiles $managedFiles -RelativePath "mcp_config.json"
+    Write-WindsurfStatus -Message "  [OK] mcp_config.json"
 }
 
 # 6) Cleanup stale generated files

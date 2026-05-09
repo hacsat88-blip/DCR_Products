@@ -134,7 +134,9 @@ Runtime / generated layer
   .github/          VS Code Copilot 実行エントリポイント
   .claude/agents/   Claude 用ローカル生成ミラー (Git 管理外)
   .codex/agents/    Codex 用ローカル生成ミラー (Git 管理外)
-  .windsurf/        Windsurf 用ローカル生成ミラー (Git 管理外)
+  .windsurf/        Windsurf 用ローカル生成ミラー (Git 管理外、MCP はテンプレート)
+  ~/.codeium/windsurf/mcp_config.json
+                    Windsurf Cascade が読む MCP 実設定 (deploy で opencode-bridge を追記)
   AGENTS.md         Codex / GitHub Copilot CLI 実行エントリポイント
   CLAUDE.md         Claude Code 実行エントリポイント
 
@@ -154,7 +156,7 @@ Workspace / operations layer
 ```powershell
 .\deploy.ps1                    # 既定エディタへ同期
 .\deploy.ps1 -Target vscode     # VS Code のみ
-.\deploy.ps1 -Target windsurf   # Windsurf のみ
+.\deploy.ps1 -Target windsurf   # Windsurf のみ（.windsurf/ と Windsurf MCP 実設定）
 .\deploy.ps1 -DryRun            # 確認のみ
 .\deploy.ps1 -Check             # ドリフト検出
 ```
