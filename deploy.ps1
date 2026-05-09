@@ -48,21 +48,21 @@ $CatalogPaths = Join-Path $RepoRoot "tools\lib\catalog-paths.ps1"
 if ($EnforceGate) {
     $GateStateLib = Join-Path $RepoRoot "tools\lib\gate-state.ps1"
     if (-not (Test-Path $GateStateLib)) {
-        Write-Host "🔴 gate-state.ps1 が見つかりません: $GateStateLib" -ForegroundColor Red
+        Write-Host "[STOP] gate-state.ps1 not found: $GateStateLib" -ForegroundColor Red
         exit 1
     }
     . $GateStateLib
     if (-not (Test-GateReady -RepoRoot $RepoRoot -RequireGate 'qa_passed')) {
-        Write-Host "🔴 q/ QA Gate 未通過。deploy をブロックします。" -ForegroundColor Red
-        Write-Host "   先に q/ トリガーで検証を完了してください。" -ForegroundColor Red
+        Write-Host "[STOP] q/ QA Gate not passed. Deploy blocked." -ForegroundColor Red
+        Write-Host "       Run q/ trigger to complete verification first." -ForegroundColor Red
         exit 1
     }
     $state = Read-GateState -RepoRoot $RepoRoot
     if ($state.findings -and $state.findings.critical -gt 0) {
-        Write-Host "🔴 Critical findings $($state.findings.critical) 件残存。deploy をブロックします。" -ForegroundColor Red
+        Write-Host "[STOP] Critical findings remaining: $($state.findings.critical). Deploy blocked." -ForegroundColor Red
         exit 1
     }
-    Write-Host "✅ Gate check passed (qa_passed=true, critical=0)" -ForegroundColor Green
+    Write-Host "[GO] Gate check passed (qa_passed=true, critical=0)" -ForegroundColor Green
 }
 
 # ── Unified Adapter Framework (new) ──
@@ -459,6 +459,34 @@ Write-Host ""
 Write-Host "DCR Products Deploy" -ForegroundColor Cyan
 Write-Host "Source: $RepoRoot" -ForegroundColor DarkGray
 Write-Host ""
+
+# -- Gate Enforcement --
+if ($EnforceGate) {
+    $GateStateLib = Join-Path $RepoRoot "tools\lib\gate-state.ps1"
+    if (-not (Test-Path $GateStateLib)) {
+        Write-Host "[EnforceGate] STOP: gate-state.ps1 not found: $GateStateLib" -ForegroundColor Red
+        exit 1
+    }
+    . $GateStateLib
+
+    Write-Host "[EnforceGate] Checking gate chain..." -ForegroundColor Cyan
+
+    if (-not (Test-GateReady -RepoRoot $RepoRoot -RequireGate 'qa_passed')) {
+        Write-Host "[EnforceGate] STOP: q/ QA Gate not passed. Deploy blocked." -ForegroundColor Red
+        Write-Host "  Run q/ QA Gate first, then retry deploy." -ForegroundColor Yellow
+        exit 1
+    }
+
+    $state = Read-GateState -RepoRoot $RepoRoot
+    if ($state.findings.critical -gt 0) {
+        Write-Host "[EnforceGate] STOP: $($state.findings.critical) critical finding(s) remain." -ForegroundColor Red
+        Write-Host "  Resolve all critical findings before deploying." -ForegroundColor Yellow
+        exit 1
+    }
+
+    Write-Host "[EnforceGate] GO: All gates passed. Proceeding with deploy." -ForegroundColor Green
+    Write-Host ""
+}
 
 if ($Check) {
     Write-Host "Running drift check..." -ForegroundColor Cyan

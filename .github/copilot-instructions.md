@@ -125,6 +125,7 @@ Entrypoint for VS Code Copilot environment.
 - [marketing-ideas](../../.ai/catalog/skills/marketing-ideas/SKILL.md)
 - [marketing-psychology](../../.ai/catalog/skills/marketing-psychology/SKILL.md)
 - [mcp-builder](../../.ai/catalog/skills/mcp-builder/SKILL.md)
+- [mem-search](../../.ai/catalog/skills/mem-search/SKILL.md)
 - [mobile-cicd](../../.ai/catalog/skills/mobile-cicd/SKILL.md)
 - [mobile-performance](../../.ai/catalog/skills/mobile-performance/SKILL.md)
 - [model-route](../../.ai/catalog/skills/model-route/SKILL.md)

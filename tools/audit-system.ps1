@@ -87,12 +87,14 @@ Write-Host "=== 2. フックカバレッジ ===" -ForegroundColor Cyan
 
 $settingsPath = Join-Path $RepoRoot ".claude\settings.json"
 $hookScripts  = @(
-    "tools/lib/validate-commit-msg.sh",
-    "tools/lib/enforce-gate-chain.sh",
-    "tools/lib/enforce-p3.sh",
-    "tools/lib/gate-auto-init.sh",
-    "tools/lib/gate-advance-post-commit.sh",
-    "tools/lib/detect-scope-drift.sh"
+    "tools/lib/validate-commit-msg.ps1",
+    "tools/lib/enforce-gate-chain.ps1",
+    "tools/lib/enforce-p3.ps1",
+    "tools/lib/gate-auto-init.ps1",
+    "tools/lib/gate-advance-post-commit.ps1",
+    "tools/lib/detect-scope-drift.ps1",
+    "tools/lib/session-capture.ps1",
+    "tools/lib/generate-changelog.ps1"
 )
 
 foreach ($rel in $hookScripts) {
