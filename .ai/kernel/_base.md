@@ -186,3 +186,8 @@ skills と rules が両方一致した場合は skills を優先する。
 - trigger 処理の詳細: [triggers-unified.md](./triggers-unified.md)
 - 環境差分: [environments/](./environments/)
 - トリガー詳細: [gates/](./gates/)
+- 品質最低基準: [_quality-floor.md](./_quality-floor.md)
+- 自己修正規約: [_self-correction.md](./_self-correction.md)
+- 自動P3昇格: [_auto-escalation.md](./_auto-escalation.md)
+- 並列実行基準: [_parallel-execution.md](./_parallel-execution.md)
+- コンテキスト効率: [_context-efficiency.md](./_context-efficiency.md)
