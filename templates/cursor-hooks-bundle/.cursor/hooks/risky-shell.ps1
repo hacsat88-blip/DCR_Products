@@ -34,7 +34,8 @@ $checks = @(
     @{ Pattern = "(?i)\bmkfs\b"; Reason = "mkfs" }
     @{ Pattern = "(?i)Format-Volume\b"; Reason = "Format-Volume" }
     @{ Pattern = "(?i)\bClear-Disk\b"; Reason = "Clear-Disk" }
-    @{ Pattern = "(?i)\bRemove-Item\b.*\s-Recurse"; Reason = "recursive delete" }
+    @{ Pattern = "(?i)\bRemove-Item\b[\s\S]*?\s-(?:r|recurse)\b"; Reason = "Remove-Item recursive delete" }
+    @{ Pattern = "(?i)(?:^|[;&|`]\s*)(?:rmdir|rd|ri|rmi|erase|del|rm)\b[\s\S]*?\s-(?:r|recurse)\b"; Reason = "recursive delete (PowerShell alias)" }
     @{ Pattern = "(?i)\bgit\s+push\b[^\r\n]*(\s-f\b|\s--force\b)"; Reason = "git force push" }
     @{ Pattern = "(?i)\bgit\s+reset\b[^\r\n]*--hard\b"; Reason = "git reset --hard" }
 )
