@@ -1,0 +1,10 @@
+{
+  "mcpServers": {
+    "opencode-bridge": {
+      "command": "python",
+      "args": [
+        "C:\\Users\\hacsa\\Desktop\\サトシ開発\\tools\\mcp-servers\\opencode-bridge\\server.py"
+      ]
+    }
+  }
+}
