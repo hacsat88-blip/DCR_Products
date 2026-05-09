@@ -85,6 +85,9 @@ docs/deprecation-status.json
 # Token budget snapshot (regenerated, not committed; baseline goes elsewhere)
 docs/token-budget.json
 
+# Git worktrees (local workspaces, not committed)
+.worktrees/
+
 # Temporary output files
 output/
 portfolio_snapshot_*.md
