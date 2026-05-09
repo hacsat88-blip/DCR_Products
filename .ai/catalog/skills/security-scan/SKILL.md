@@ -22,12 +22,25 @@ disable-model-invocation: true
 - Permissions: 過剰な実行権限、無制限操作
 - Injection: 指示文・テンプレート・文字列補間の注入リスク
 - Supply Chain: 不要な自動インストールや未固定依存
+- External Packs: 外部CLI/MCP/skill catalogのproject pollution、telemetry、uninstall手順
 
 ## 使い方
 
 1. 変更ファイルを対象にスキャン
 2. `critical/high/medium/info` で分類
 3. critical/high が 0 になるまで修正
+
+## External Pack Checklist
+
+外部素材をDCRに取り込む前に確認する:
+
+- README と license が確認できる
+- Windows native / WSL / PowerShell の制約が明記されている
+- インストールが repo-tracked file を勝手に書かない、または書く範囲が明確
+- telemetry が opt-in か、無効化手順が明確
+- uninstall / rollback 手順がある
+- hook や MCP が危険なコマンドを自動実行しない
+- DCR正本 (`.ai/catalog`, `.ai/kernel`, `.ai/book`) を置き換えない
 
 ## 出力テンプレート
 

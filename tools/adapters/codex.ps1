@@ -1,4 +1,4 @@
-﻿param([string]$RepoRoot = ".")
+param([string]$RepoRoot = ".")
 
 $CatalogPaths = Join-Path (Split-Path $PSScriptRoot -Parent) "lib\catalog-paths.ps1"
 . $CatalogPaths
@@ -76,7 +76,7 @@ $deprecatedSkillCount = $deprecatedSkills.Count
 $deprecatedAgentCount = $deprecatedAgents.Count
 
 $content = @"
-<!-- ⚠️ AUTO-GENERATED FILE - DO NOT EDIT DIRECTLY ⚠️
+<!-- AUTO-GENERATED FILE - DO NOT EDIT DIRECTLY
 Generated from: .ai/book + .ai/kernel + .ai/catalog/rules/ + .ai/catalog/skills/ + .ai/catalog/agents-source/
 To regenerate: Run .\deploy.ps1 or .\tools\deploy-all.ps1
 Any manual edits will be overwritten on next deploy. -->

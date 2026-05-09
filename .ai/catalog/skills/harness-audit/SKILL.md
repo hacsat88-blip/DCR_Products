@@ -17,12 +17,27 @@ disable-model-invocation: true
 - Quality Gates: p/q/sh と verify が運用されているか
 - Security Guardrails: セキュリティ監査導線があるか
 - Cost Efficiency: モデル使い分け指針があるか
+- External Capability Packs: 外部CLI/MCP/skill catalogを正本に混ぜていないか
 
 ## 実行手順
 
 1. `skills/`, `rules/`, `.ai/kernel/gates/` を棚卸し
 2. 監査結果を PASS/FAIL で記録
 3. Top 3 改善アクションを提示
+4. 外部候補は `adopt / external-check / skip` に分類する
+
+## External Capability Audit
+
+| Candidate | Default decision | Check |
+|---|---|---|
+| github/spec-kit | adopt patterns only | clarify/analyze/checklist/doctor を DCR gate に対応付ける |
+| anthropics/skills | selective reference | 重複skillは輸入せず、claude-api/template の設計差分だけ確認 |
+| warpdotdev/oz-skills | selective skill import | Warp/Oz runtime は入れず、Agent Skills互換素材だけ採用 |
+| oh-my-codex | pattern library | doctor / false-green / hook merge の考え方だけ採用 |
+| context-mode | external-check | MCP出力オフロードとしてPoC候補、repo正本には混ぜない |
+| ccusage / @ccusage/codex | external-check | 使用量可視化候補、導入前にローカルJSONL範囲を確認 |
+| oraios/serena | external-check | シンボル探索MCP候補、編集権限と対応言語を確認 |
+| post_compact_reminder pattern | adopt pattern only | compaction後の品質維持ルールとして文書化 |
 
 ## 出力テンプレート
 
@@ -32,6 +47,7 @@ Harness Audit: [score]/100
 - Quality Gates: PASS/FAIL
 - Security Guardrails: PASS/FAIL
 - Cost Efficiency: PASS/FAIL
+- External Capability Packs: PASS/FAIL
 
 Top 3 Actions:
 1) ...

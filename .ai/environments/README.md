@@ -18,6 +18,14 @@ The shared thinking source of truth is [../book/runtime.md](../book/runtime.md).
 
 `AGENTS.md`, `CLAUDE.md`, `.github/copilot-instructions.md`, `.cursor/`, and `.windsurf/` remain in their runtime-specific locations because tools auto-load those paths. Warp uses the root `AGENTS.md` as its Project Rules entrypoint.
 
+## Runtime Loading Model
+
+- Claude Code: `CLAUDE.md` plus `.claude/settings.json` hooks. Hook enforcement is Claude-specific; shared policy still belongs in `.ai/book/` and `.ai/kernel/`.
+- Codex and GitHub Copilot CLI: `AGENTS.md` carries the thin shared entrypoint and links back to the shared book/kernel.
+- Cursor: `.cursor/rules/dcr-kernel.mdc` is generated from the shared kernel and `.cursorignore` keeps generated mirrors and deprecated aliases out of discovery.
+- Windsurf: `.windsurf/rules/dcr-kernel.md` is the always-on baseline; generated catalog rules use Windsurf rule activation modes.
+- VS Code Copilot: `.github/copilot-instructions.md` stays concise and points to the shared book, kernel, rules, and skills.
+
 ## Rule
 
 - Put shared behavior in `.ai/book/`.

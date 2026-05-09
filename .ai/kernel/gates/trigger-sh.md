@@ -21,15 +21,15 @@
 ## Gate chain
 
 - q/ 通過済みが前提
-- q/ 未実行なら `⚠️ q/ を先に実行してからリリース判定を行います` を提示する
+- q/ 未実行なら `WARN q/ を先に実行してからリリース判定を行います` を提示する
 
 ## Gate state enforcement
 
 - sh/ 起動時、`Test-GateReady -RequireGate 'qa_passed'` で `.ai/kernel/gate-state.json` を確認する（唯一の正本）
 - `qa_passed = true` でない場合: **ブロック**。実装を進めず以下を返す:
   ```
-  🔴 Stop — q/ QA Gate を通過していません。
-  💡 q/ でQA検証を実行してください
+  STOP - q/ QA Gate を通過していません。
+  NEXT q/ でQA検証を実行してください
   ```
 - `qa_passed = true` かつ `findings.critical > 0`: **ブロック**（`Test-GateReady` が自動判定）
 - 検証証跡が揃っている場合のみリリース判定に進む
@@ -51,7 +51,7 @@ sh/ 実行直前に `Test-GateReady` で `qa_passed = true` && `critical = 0`
 ```powershell
 . .\tools\lib\gate-state.ps1
 if (-not (Test-GateReady -RepoRoot $RepoRoot -RequireGate 'qa_passed')) {
-    Write-Host "🔴 Stop — q/ QA Gate を通過していません。"
+    Write-Host "STOP - q/ QA Gate を通過していません。"
     return
 }
 Update-GateState -RepoRoot $RepoRoot -Phase 'ship' -GateUpdate @{ ship_ready = $true }

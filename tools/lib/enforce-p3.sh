@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# P3 pattern enforcement — blocks Write/Edit on config/infra files without plan_passed
+# P3 pattern enforcement - blocks Write/Edit on config/infra files without plan_passed
 # Runs via Claude Code PreToolUse hook on Write and Edit tools.
 set -euo pipefail
 
@@ -45,7 +45,7 @@ GATE_STATE=".ai/kernel/gate-state.json"
 plan_passed=$(jq -r '.gates.plan_passed // false' "$GATE_STATE")
 
 if [[ "$plan_passed" != "true" ]]; then
-  echo "🔴 P3 操作がブロックされました: $file_path" >&2
+  echo "STOP P3 操作がブロックされました: $file_path" >&2
   echo "   設定・インフラファイルの変更には p/ Plan Gate の承認が必要です。" >&2
   echo "   先に p/ トリガーでスコープと変更計画を確定してください。" >&2
   exit 1

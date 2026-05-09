@@ -138,13 +138,14 @@ if (-not (Test-Path $baseFile)) {
     Write-Fail "_base.md が存在しません"
 } else {
     $content = Get-Content -Path $baseFile -Raw
-    $linkPattern = '\[.*?\]\(\./(.+?)\)'
+    $linkPattern = '\[[^\]]+\]\((\.{1,2}/[^)]+)\)'
     $matches = [regex]::Matches($content, $linkPattern)
     foreach ($m in $matches) {
-        $relPath = $m.Groups[1].Value -replace "/", "\"
-        $target  = Join-Path (Split-Path $baseFile) $relPath
-        if (Test-Path $target) { Write-Ok   "_base.md 参照先存在: $($m.Groups[1].Value)" }
-        else                   { Write-Fail "_base.md 参照先欠落: $($m.Groups[1].Value)" }
+        $href = ($m.Groups[1].Value -split '#')[0]
+        $relPath = $href -replace "/", "\"
+        $target = [System.IO.Path]::GetFullPath((Join-Path (Split-Path $baseFile) $relPath))
+        if (Test-Path $target) { Write-Ok   "_base.md 参照先存在: $href" }
+        else                   { Write-Fail "_base.md 参照先欠落: $href" }
     }
 }
 

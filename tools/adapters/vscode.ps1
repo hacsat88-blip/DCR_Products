@@ -1,4 +1,4 @@
-﻿param([string]$RepoRoot = ".")
+param([string]$RepoRoot = ".")
 
 $CatalogPaths = Join-Path (Split-Path $PSScriptRoot -Parent) "lib\catalog-paths.ps1"
 . $CatalogPaths
@@ -56,7 +56,7 @@ $ruleList = if ($rules) { (($rules | ForEach-Object { "- [$_](../../.ai/catalog/
 $skillList = if ($skills) { (($skills | ForEach-Object { "- [$_](../../.ai/catalog/skills/$_/SKILL.md)" }) -join "`n") } else { "(none)" }
 
 $content = @"
-<!-- ⚠️ AUTO-GENERATED FILE - DO NOT EDIT DIRECTLY ⚠️
+<!-- AUTO-GENERATED FILE - DO NOT EDIT DIRECTLY
 Generated from: .ai/book + .ai/kernel + .ai/catalog/rules/ + .ai/catalog/skills/
 To regenerate: Run .\deploy.ps1 or .\tools\deploy-all.ps1
 Any manual edits will be overwritten on next deploy. -->

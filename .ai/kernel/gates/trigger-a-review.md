@@ -7,7 +7,7 @@
 ## Output behavior
 
 - flaws, risks, contradictions, missing constraints を積極的に洗い出す
-- reassurance より 🔴 Stop / 🟡 Fix を優先する
+- reassurance より STOP / FIX を優先する
 - minor style より decisive issue を優先する
 
 ## Review checklist

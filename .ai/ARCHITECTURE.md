@@ -60,9 +60,9 @@ DCR (Dynamic Context Router) は、4つの AI 開発環境に統一的なルー�
 
 編集対象のカノニカルアセット。
 
-- **.ai/catalog/rules/** — 専門ロール定義 (YAML frontmatter + Markdown body)
-- **.ai/catalog/skills/** — 実行可能なワークフロー定義 (SKILL.md)
-- **.ai/catalog/agents-source/** — エージェント定義 (TOML + MD)
+- **.ai/catalog/rules/** - 専門ロール定義 (YAML frontmatter + Markdown body)
+- **.ai/catalog/skills/** - 実行可能なワークフロー定義 (SKILL.md)
+- **.ai/catalog/agents-source/** - エージェント定義 (TOML + MD)
 
 ### 3. Runtime Layer
 
@@ -80,9 +80,9 @@ DCR (Dynamic Context Router) は、4つの AI 開発環境に統一的なルー�
 
 `deploy.ps1` が自動生成。手編集禁止。大量生成 mirror は Git 管理外。`sync-agents.ps1` は `deploy.ps1 -Target agents` を呼ぶ互換 shim。
 
-- `.windsurf/` — Windsurf rules/workflows/config (deploy.ps1 生成、Git 管理外)
-- `.codex/agents/` — Codex agent files (deploy.ps1 -Target agents 生成、Git 管理外)
-- `.claude/agents/` — Claude agent files (deploy.ps1 -Target agents 生成、Git 管理外)
+- `.windsurf/` - Windsurf rules/workflows/config (deploy.ps1 生成、Git 管理外)
+- `.codex/agents/` - Codex agent files (deploy.ps1 -Target agents 生成、Git 管理外)
+- `.claude/agents/` - Claude agent files (deploy.ps1 -Target agents 生成、Git 管理外)
 
 ## ルーティングアーキテクチャ
 
@@ -91,16 +91,16 @@ DCR (Dynamic Context Router) は、4つの AI 開発環境に統一的なルー�
 ```text
 ユーザーリクエスト
     │
-    ├─ 明示指定 (/skill-name) → 即時実行
+    ├─ 明示指定 (/skill-name) -> 即時実行
     │
-    ├─ Layer 1 (18 skills) → モデルが自動選択可能
+    ├─ Layer 1 (18 skills) -> モデルが自動選択可能
     │   brainstorming, code-review, writing-plans, etc.
     │
-    └─ Layer 3 (58+ skills) → skill-router 経由 or 明示呼び出し
+    └─ Layer 3 (58+ skills) -> skill-router 経由 or 明示呼び出し
         │
-        ├─ routing_category マッチ → 親カテゴリ決定
-        ├─ keywords マッチ → スコアリング
-        └─ 最大3候補を提案 → ユーザー選択
+        ├─ routing_category マッチ -> 親カテゴリ決定
+        ├─ keywords マッチ -> スコアリング
+        └─ 最大3候補を提案 -> ユーザー選択
 ```
 
 ### Rule Routing
@@ -115,17 +115,17 @@ DCR (Dynamic Context Router) は、4つの AI 開発環境に統一的なルー�
 ## Gate Chain
 
 ```text
-p/ (Plan) ──→ 実装 ──→ q/ (QA) ──→ sh/ (Ship)
+p/ (Plan) ──-> 実装 ──-> q/ (QA) ──-> sh/ (Ship)
     │                      │              │
     │ plan_approved: true   │ qa_passed    │ hard block
-    │ → gate-state.md       │ → gate-state │ if !qa_passed
+    │ -> gate-state.md       │ -> gate-state │ if !qa_passed
     │                      │              │
-    │ scope change →       │ 🔴=0 required│ ship checklist
+    │ scope change ->       │ STOP=0 required│ ship checklist
     │ reset + replan       │              │ verified
 ```
 
 - **p/ gate**: スコープと計画を確定。3ステップ以上は `docs/dcr/plans/` に保存
-- **q/ gate**: 証跡ベースの検証。🔴 = 0 で通過
+- **q/ gate**: 証跡ベースの検証。STOP = 0 で通過
 - **sh/ gate**: q/ 通過が必須 (hard block)。ship checklist で最終確認
 
 ## Adversarial Review

@@ -1,7 +1,7 @@
 ---
 name: token-efficiency-advisor
 routing_category: governance
-description: Use when tasks risk context bloat, excessive tool output, or broad codebase scanning; proactively suggest RTK, code-review-graph, or MCP retrieval tools before token-heavy operations across Claude Code, Copilot CLI, Codex, Cursor, and Windsurf.
+description: Use when tasks risk context bloat, excessive tool output, or broad codebase scanning; proactively suggest code-review-graph, context-mode, Serena, or usage monitoring before token-heavy operations across Claude Code, Copilot CLI, Codex, Cursor, and Windsurf.
 contract:
   preconditions:
     - "user is doing coding work with terminal output, repository exploration, or repeated multi-step sessions"
@@ -43,9 +43,9 @@ metadata:
 
 ### 1) CLI 出力が重い
 
-- 第一候補: RTK
-- 目的: git/test/lint/build 出力を圧縮して文脈流入を減らす
-- 提案テンプレ: "出力ノイズが増えているので、RTK を使ってシェル出力を圧縮しますか？"
+- 第一候補: 失敗箇所だけを抽出する既存シェル/PowerShellフィルタ
+- 目的: git/test/lint/build 出力を要約して文脈流入を減らす
+- 提案テンプレ: "出力ノイズが増えているので、失敗行と要約だけを抽出して進めますか？"
 
 ### 2) 読む範囲が広すぎる
 
@@ -55,15 +55,28 @@ metadata:
 
 ### 3) さらに高度な検索/長期メモリが必要
 
-- 候補: token-savior / claude-context / token-optimizer-mcp
+- 候補: context-mode / Serena / token-savior / claude-context / token-optimizer-mcp
 - 目的: セッション継続性、ハイブリッド検索、再利用性の向上
 - 注意: 環境依存・初期設定コストがあるため PoC 前提で提案
+
+### 4) 使用量を可視化したい
+
+- 候補: ccusage / @ccusage/codex
+- 目的: 削減施策の前後で、usage/cost/session長を測る
+- 注意: 直接削減ツールではない。ローカルJSONLの対象範囲とプライバシーを確認する
 
 ## クライアント別の現実的ガイド
 
 - Claude Code: hook/MCP 機能を使いやすい。提案優先度は高い
-- Codex / Cursor / Windsurf: まず RTK などクライアント非依存の施策を優先し、MCP 連携が使える環境では段階導入する
-- Copilot CLI: 機能差があるため、まず RTK などクライアント非依存の施策を優先
+- Codex / Cursor / Windsurf: まず既存シェル要約と source-of-truth 選択を優先し、MCP 連携が使える環境では段階導入する
+- Copilot CLI: 機能差があるため、まず既存シェル要約と正本優先探索を使う
+
+## Adoption Boundaries
+
+- `oh-my-codex` は直接依存にしない。doctor、false-green検知、hook mergeの発想だけを参照する
+- `anthropics/skills` は重複skillを再輸入しない。`claude-api` のcompaction/prompt cachingとtemplate様式だけを参照する
+- `warpdotdev/oz-skills` はWarp/Oz導入ではなく、Agent Skills互換素材として評価する
+- 星印記事の削減率は自己申告値として扱い、導入前に一次READMEで確認する
 
 ## 応答フォーマット（提案時）
 
@@ -75,7 +88,7 @@ metadata:
 
 例:
 
-"テスト出力が長く、会話コンテキストを圧迫しています。RTK で出力圧縮して進めますか？導入しない場合は、失敗ケースのみ抽出して要約運用に切り替えます。"
+"テスト出力が長く、会話コンテキストを圧迫しています。失敗ケースのみ抽出して要約運用に切り替えます。"
 
 ## 非目標
 

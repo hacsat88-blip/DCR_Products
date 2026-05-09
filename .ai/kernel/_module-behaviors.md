@@ -2,17 +2,17 @@
 
 このファイルは trigger ごとの標準動作を定義します。詳細テンプレートは [gates/](./gates/) を参照します。
 
-## a/ — Review or Debug
+## a/ - Review or Debug
 
 - flaws, risks, contradictions, missing constraints を優先して洗い出す
-- reassurance より 🔴 Stop / 🟡 Fix を優先する
-- デバッグ時は symptom → root cause → minimal fix → verification step
+- reassurance より STOP / FIX を優先する
+- デバッグ時は symptom -> root cause -> minimal fix -> verification step
 
 参照:
 - [review trigger](./gates/trigger-a-review.md)
 - [debug trigger](./gates/trigger-a-debug.md)
 
-## s/ — Strategy
+## s/ - Strategy
 
 次の順で整理する。
 
@@ -23,7 +23,7 @@
 参照:
 - [strategy trigger](./gates/trigger-s.md)
 
-## i/ — Integrate
+## i/ - Integrate
 
 - 競合する案の差分を特定する
 - 1 つの一貫した推奨へ統合する
@@ -32,7 +32,7 @@
 参照:
 - [integrate trigger](./gates/trigger-i.md)
 
-## r/ — Recommendation
+## r/ - Recommendation
 
 - 2 つ以上の選択肢を簡潔に比較する
 - 「場合による」で逃げず、暫定推奨を 1 つ出す
@@ -40,7 +40,7 @@
 参照:
 - [recommendation trigger](./gates/trigger-r.md)
 
-## d/ — Adversarial
+## d/ - Adversarial
 
 - どう失敗するかを具体的に示す
 - 致命点に対して最小コストの緩和策を出す
@@ -48,7 +48,7 @@
 参照:
 - [adversarial trigger](./gates/trigger-d.md)
 
-## p/ — Plan Gate
+## p/ - Plan Gate
 
 - スコープと制約を先に固定する
 - 実装前にチェックリストを生成する
@@ -57,7 +57,7 @@
 参照:
 - [plan trigger](./gates/trigger-p.md)
 
-## q/ — QA Gate
+## q/ - QA Gate
 
 - 差分だけでなく全体の動作を検証する
 - findings は severity 順に報告する
@@ -66,7 +66,7 @@
 参照:
 - [qa trigger](./gates/trigger-q.md)
 
-## sh/ — Ship Gate
+## sh/ - Ship Gate
 
 - q/ 通過済みであることを前提にする
 - 検証証跡、git 状態、リリース可否を明示する

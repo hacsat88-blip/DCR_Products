@@ -9,9 +9,9 @@
 
   生成される CHANGELOG エントリの形式:
     ## [バージョン] - YYYY-MM-DD
-    ### ✨ Features
+    ### Features
     - feat: ... (#PR)
-    ### 🐛 Bug Fixes
+    ### Bug Fixes
     - fix: ...
     ...
 
@@ -62,16 +62,16 @@ $logOutput = git -C $RepoRoot log $gitRange `
     --no-merges 2>&1
 
 $typeMap = @{
-    "feat"     = "✨ Features"
-    "fix"      = "🐛 Bug Fixes"
-    "docs"     = "📝 Documentation"
-    "refactor" = "♻️ Refactoring"
-    "perf"     = "⚡ Performance"
-    "test"     = "✅ Tests"
-    "chore"    = "🔧 Chores"
-    "ci"       = "🏗️ CI/CD"
-    "build"    = "📦 Build"
-    "revert"   = "⏪ Reverts"
+    "feat"     = "Features"
+    "fix"      = "Bug Fixes"
+    "docs"     = "Documentation"
+    "refactor" = "Refactoring"
+    "perf"     = "Performance"
+    "test"     = "Tests"
+    "chore"    = "Chores"
+    "ci"       = "CI/CD"
+    "build"    = "Build"
+    "revert"   = "Reverts"
 }
 
 $sections = @{}
@@ -98,7 +98,7 @@ foreach ($line in ($logOutput -split "`n")) {
     $desc     = $m.Groups['desc'].Value.Trim()
 
     $entry = if ($scope) { "**${scope}**: $desc ($sha)" } else { "$desc ($sha)" }
-    if ($breaking) { $entry = "💥 **BREAKING** $entry" }
+    if ($breaking) { $entry = "BREAKING: $entry" }
 
     if ($sections.ContainsKey($type)) {
         $sections[$type] += "- $entry"
@@ -154,5 +154,5 @@ if (Test-Path $OutputPath) {
     [System.IO.File]::WriteAllText($OutputPath, $content, $utf8NoBom)
 }
 
-Write-Host "✅ CHANGELOG を更新しました: $OutputPath" -ForegroundColor Green
-Write-Host "   範囲: $gitRange → [$Version]" -ForegroundColor Cyan
+Write-Host "PASS CHANGELOG を更新しました: $OutputPath" -ForegroundColor Green
+Write-Host "   範囲: $gitRange -> [$Version]" -ForegroundColor Cyan
