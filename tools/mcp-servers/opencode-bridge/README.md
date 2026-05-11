@@ -11,6 +11,7 @@ The `task` and `context` arguments are sent to the external OpenCode Go API. Do 
 | `oss_explore` | `kimi-k2.6` | Read-only code exploration, summaries, call-site checks |
 | `oss_document` | `deepseek-v4-flash` | Documentation, changelog drafts, translation, comments |
 | `oss_implement` | `deepseek-v4-pro` | Test scaffolds, small refactor suggestions, boilerplate generation |
+| `oss_agentic` | `glm-5.1` | Multi-step engineering plans, verification strategy, risk decomposition |
 
 Use this server for bounded assistance. Keep security-sensitive work, cross-module edits, schema migrations, and CI/CD changes in the primary agent. The server does not return provider `reasoning_content`; only final model content and usage metadata are exposed.
 
