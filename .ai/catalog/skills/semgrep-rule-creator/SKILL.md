@@ -23,6 +23,10 @@ metadata:
   upstream_url: "https://github.com/sickn33/antigravity-awesome-skills"
   upstream_path: "skills/semgrep-rule-creator/SKILL.md"
   license: "CC-BY-4.0 content / MIT repository code; adapted summary"
+  upstream_source: "antigravity-awesome-skills skill catalog"
+  upstream_version: "not captured"
+  upstream_last_updated: "not captured"
+  source_notice: "Adapted as a DCR-local summary; inspect upstream_path before expanding or copying source text."
   imported_at: "2026-05-06"
   adapted_from: "Condensed into a DCR reinforcement skill; not a wholesale import."
 ---
@@ -66,4 +70,3 @@ rules:
 - 最初は狭く当て、実例で広げる
 - secret、shell、filesystem、template injection は `security-scan` と合わせて扱う
 - CI に入れる前に false positive の扱いを決める
-

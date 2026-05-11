@@ -58,7 +58,7 @@ $skillList = if ($skills) { (($skills | ForEach-Object { "- [$_](../../.ai/catal
 $content = @"
 <!-- AUTO-GENERATED FILE - DO NOT EDIT DIRECTLY
 Generated from: .ai/book + .ai/kernel + .ai/catalog/rules/ + .ai/catalog/skills/
-To regenerate: Run .\deploy.ps1 or .\tools\deploy-all.ps1
+To regenerate: Run pwsh -ExecutionPolicy Bypass -File .\deploy.ps1 or .\tools\deploy-all.ps1
 Any manual edits will be overwritten on next deploy. -->
 
 # GitHub Copilot Instructions

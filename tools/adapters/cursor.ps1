@@ -50,7 +50,7 @@ Do not edit files here directly. Edit `.ai/` and regenerate.
 
 ## Regenerate
 
-Run: `powershell -ExecutionPolicy Bypass -File .\deploy.ps1 -Target cursor`
+Run: pwsh -ExecutionPolicy Bypass -File .\deploy.ps1 -Target cursor
 "@
 
 Write-Utf8NoBom -Path (Join-Path $outRoot "README.md") -Content ($readme.TrimEnd() + "`r`n")

@@ -45,7 +45,7 @@ $task_plan_content = @"
 ## Success Criteria
 - [ ] All phases complete with quality
 - [ ] findings.md populated (decisions logged)
-- [ ] progress.md all checklist items ✅
+- [ ] progress.md all checklist items [OK]
 - [ ] No recurring failures
 
 ## Known Blockers / Constraints
@@ -93,7 +93,7 @@ $progress_content = @"
 ## Session Timeline
 | Timestamp | Action | Result |
 |-----------|--------|--------|
-| $(Get-Date -Format 'o') | Initialized Manus session | ✅ |
+| $(Get-Date -Format 'o') | Initialized Manus session | [OK] |
 
 ## Verification Checklist
 - [ ] All phases complete
@@ -114,7 +114,7 @@ $task_plan_content | Out-File -Path $task_plan_file -Encoding UTF8 -Force
 $findings_content | Out-File -Path $findings_file -Encoding UTF8 -Force
 $progress_content | Out-File -Path $progress_file -Encoding UTF8 -Force
 
-Write-Host "✅ Manus session initialized:"
+Write-Host "[OK] Manus session initialized:"
 Write-Host "   - $task_plan_file"
 Write-Host "   - $findings_file"
 Write-Host "   - $progress_file"

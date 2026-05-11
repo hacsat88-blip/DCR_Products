@@ -84,5 +84,5 @@ npx tsc --noEmit && npx vitest run && npx eslint src/
 python -m pytest && python -m mypy . && python -m flake8
 
 # PowerShell
-powershell -File validate.ps1 && powershell -File deploy.ps1 -Check
+pwsh -File validate.ps1 && pwsh -File deploy.ps1 -Check
 ```

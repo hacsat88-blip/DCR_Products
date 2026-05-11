@@ -33,7 +33,7 @@ $RepoRoot = (Resolve-Path (Join-Path $PSScriptRoot "..\..")).Path
 $GateStateLib = Join-Path $RepoRoot "tools\lib\gate-state.ps1"
 
 if (-not (Test-Path $GateStateLib)) {
-    Write-Host "⚠️ gate-state.ps1 が見つかりません: $GateStateLib" -ForegroundColor Yellow
+    Write-Host "[WARN] gate-state.ps1 が見つかりません: $GateStateLib" -ForegroundColor Yellow
     exit 0
 }
 
@@ -45,10 +45,10 @@ function Block-Or-Warn {
     param([string]$Message)
     Write-Host ""
     if ($SoftWarn) {
-        Write-Host "⚠️  $Message" -ForegroundColor Yellow
+        Write-Host "[WARN] $Message" -ForegroundColor Yellow
         exit 0
     } else {
-        Write-Host "🔴 $Message" -ForegroundColor Red
+        Write-Host "[STOP] $Message" -ForegroundColor Red
         exit 1
     }
 }
@@ -59,7 +59,7 @@ if (-not (Test-Path $gateFile)) {
         # 初回 p/ — 自動初期化
         $newState = New-DefaultGateState
         Write-GateState -RepoRoot $RepoRoot -State $newState
-        Write-Host "🟢 gate-state.json を初期化しました (session: $($newState.session_id))" -ForegroundColor Green
+        Write-Host "[OK] gate-state.json を初期化しました (session: $($newState.session_id))" -ForegroundColor Green
         exit 0
     } else {
         Block-Or-Warn "gate-state.json が存在しません。p/ で計画を開始してください。"

@@ -24,6 +24,10 @@ metadata:
   upstream_url: "https://github.com/sickn33/antigravity-awesome-skills"
   upstream_path: "skills/agent-overload-recovery/SKILL.md"
   license: "CC-BY-4.0 content / MIT repository code; adapted summary"
+  upstream_source: "antigravity-awesome-skills skill catalog"
+  upstream_version: "not captured"
+  upstream_last_updated: "not captured"
+  source_notice: "Adapted as a DCR-local summary; inspect upstream_path before expanding or copying source text."
   imported_at: "2026-05-06"
   adapted_from: "Condensed into a DCR reinforcement skill; not a wholesale import."
 ---
@@ -45,7 +49,7 @@ metadata:
 ## Recovery
 
 1. 現在の主目的を 1 行に戻す
-2. primary agent は最大 1 つ、補助 insert は最大 2 つに絞る
+2. primary / secondary selection は既存の同一 phase 最大 2 件ルールに従い、補助 insert は前後工程へ分離する
 3. 各候補を `before / during / after / discard` に分類する
 4. coordinator になろうとする候補は discard または helper 化する
 5. 実行順を決めてから作業に戻る
@@ -58,4 +62,3 @@ metadata:
 | during | 実装中の専門判断に必要 |
 | after | QA、評価、証跡、性能確認に効く |
 | discard | 既存 skill/agent と責務が重複する |
-

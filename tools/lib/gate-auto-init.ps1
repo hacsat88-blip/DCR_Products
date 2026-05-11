@@ -58,7 +58,7 @@ if ($trimmedPrompt -match '^q/') {
     if (Test-Path $gateFile) {
         $state = Read-GateState -RepoRoot $RepoRoot
         if (-not $state.gates.plan_passed) {
-            Write-Host "⚠️  [GATE] p/ Plan Gate が未通過です。q/ の結果は非公式な検証となります。" -ForegroundColor Yellow
+            Write-Host "[WARN] [GATE] p/ Plan Gate が未通過です。q/ の結果は非公式な検証となります。" -ForegroundColor Yellow
         }
     }
     exit 0
@@ -67,13 +67,13 @@ if ($trimmedPrompt -match '^q/') {
 # sh/ トリガー: qa_passed チェック (ハードブロック)
 if ($trimmedPrompt -match '^sh/') {
     if (-not (Test-Path $gateFile)) {
-        Write-Host "🔴 [GATE BLOCK] gate-state.json が存在しません。sh/ を実行できません。" -ForegroundColor Red
+        Write-Host "[STOP] [GATE BLOCK] gate-state.json が存在しません。sh/ を実行できません。" -ForegroundColor Red
         Write-Host "   p/ → q/ → sh/ の順序でゲートを通過してください。" -ForegroundColor Yellow
         exit 1
     }
     $state = Read-GateState -RepoRoot $RepoRoot
     if (-not $state.gates.qa_passed) {
-        Write-Host "🔴 [GATE BLOCK] q/ QA Gate が未通過です。sh/ を実行できません。" -ForegroundColor Red
+        Write-Host "[STOP] [GATE BLOCK] q/ QA Gate が未通過です。sh/ を実行できません。" -ForegroundColor Red
         exit 1
     }
     Write-Host "[GATE] sh/ ゲート前提: 通過済み" -ForegroundColor Green

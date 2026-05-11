@@ -49,13 +49,13 @@ if ($Force) {
         tool_input = $env:CLAUDE_TOOL_INPUT
     } | ConvertTo-Json -Compress
     Add-Content -Path $logPath -Value $logEntry -Encoding UTF8
-    Write-Host "⚠️  P3強制実行: $Label (force フラグ使用、ログ記録済み)" -ForegroundColor Yellow
+    Write-Host "[WARN] P3強制実行: $Label (force フラグ使用、ログ記録済み)" -ForegroundColor Yellow
     exit 0
 }
 
 # gate-state.ps1 が存在しない場合は警告のみ
 if (-not (Test-Path $GateStateLib)) {
-    Write-Host "⚠️  [P3] gate-state.ps1 未検出。P3チェックをスキップします。" -ForegroundColor Yellow
+    Write-Host "[WARN] [P3] gate-state.ps1 未検出。P3チェックをスキップします。" -ForegroundColor Yellow
     exit 0
 }
 
@@ -65,7 +65,7 @@ $gateFile = Get-GateStatePath -RepoRoot $RepoRoot
 
 if (-not (Test-Path $gateFile)) {
     Write-Host ""
-    Write-Host "🔴 P3操作検出: $Label" -ForegroundColor Red
+    Write-Host "[STOP] P3操作検出: $Label" -ForegroundColor Red
     Write-Host "   gate-state.json が存在しません。" -ForegroundColor Yellow
     Write-Host "   p/ で計画を策定・承認してから実行してください。" -ForegroundColor Yellow
     Write-Host "   緊急時: -Force フラグで回避可能（要ログ記録）" -ForegroundColor DarkGray
@@ -77,7 +77,7 @@ $state = Read-GateState -RepoRoot $RepoRoot
 
 if (-not $state.gates.plan_passed) {
     Write-Host ""
-    Write-Host "🔴 P3操作ブロック: $Label" -ForegroundColor Red
+    Write-Host "[STOP] P3操作ブロック: $Label" -ForegroundColor Red
     Write-Host "   p/ Plan Gate が未通過です (plan_passed = false)" -ForegroundColor Yellow
     Write-Host "   p/ で計画を策定・承認してから実行してください。" -ForegroundColor Yellow
     Write-Host "   緊急時: -Force フラグで回避可能（要ログ記録）" -ForegroundColor DarkGray

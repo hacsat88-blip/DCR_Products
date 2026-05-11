@@ -1,6 +1,6 @@
 <!-- AUTO-GENERATED FILE - DO NOT EDIT DIRECTLY
 Generated from: .ai/book + .ai/kernel + .ai/catalog/rules/ + .ai/catalog/skills/
-To regenerate: Run .\deploy.ps1 or .\tools\deploy-all.ps1
+To regenerate: Run pwsh -ExecutionPolicy Bypass -File .\deploy.ps1 or .\tools\deploy-all.ps1
 Any manual edits will be overwritten on next deploy. -->
 
 # GitHub Copilot Instructions
@@ -100,6 +100,7 @@ Entrypoint for VS Code Copilot environment.
 - [database-schema-design](../../.ai/catalog/skills/database-schema-design/SKILL.md)
 - [dcf-valuation](../../.ai/catalog/skills/dcf-valuation/SKILL.md)
 - [dcr-pipeline](../../.ai/catalog/skills/dcr-pipeline/SKILL.md)
+- [decision-complete-planning](../../.ai/catalog/skills/decision-complete-planning/SKILL.md)
 - [deployment-patterns](../../.ai/catalog/skills/deployment-patterns/SKILL.md)
 - [disaster-recovery](../../.ai/catalog/skills/disaster-recovery/SKILL.md)
 - [doc-coauthoring](../../.ai/catalog/skills/doc-coauthoring/SKILL.md)
@@ -133,6 +134,7 @@ Entrypoint for VS Code Copilot environment.
 - [model-route](../../.ai/catalog/skills/model-route/SKILL.md)
 - [multi-repo-sync](../../.ai/catalog/skills/multi-repo-sync/SKILL.md)
 - [multimodal-pipeline](../../.ai/catalog/skills/multimodal-pipeline/SKILL.md)
+- [namespace-skill-routing](../../.ai/catalog/skills/namespace-skill-routing/SKILL.md)
 - [observability-design](../../.ai/catalog/skills/observability-design/SKILL.md)
 - [okr-framework](../../.ai/catalog/skills/okr-framework/SKILL.md)
 - [onboarding-cro](../../.ai/catalog/skills/onboarding-cro/SKILL.md)
@@ -140,10 +142,12 @@ Entrypoint for VS Code Copilot environment.
 - [page-cro](../../.ai/catalog/skills/page-cro/SKILL.md)
 - [paid-ads](../../.ai/catalog/skills/paid-ads/SKILL.md)
 - [parallel-agent-patterns](../../.ai/catalog/skills/parallel-agent-patterns/SKILL.md)
+- [parallel-wave-execution](../../.ai/catalog/skills/parallel-wave-execution/SKILL.md)
 - [paywall-upgrade-cro](../../.ai/catalog/skills/paywall-upgrade-cro/SKILL.md)
 - [pdf](../../.ai/catalog/skills/pdf/SKILL.md)
 - [performance-profiling](../../.ai/catalog/skills/performance-profiling/SKILL.md)
 - [persuasive-content-craft](../../.ai/catalog/skills/persuasive-content-craft/SKILL.md)
+- [phase-state-artifacts](../../.ai/catalog/skills/phase-state-artifacts/SKILL.md)
 - [platform-engineering](../../.ai/catalog/skills/platform-engineering/SKILL.md)
 - [popup-cro](../../.ai/catalog/skills/popup-cro/SKILL.md)
 - [pptx](../../.ai/catalog/skills/pptx/SKILL.md)
@@ -180,6 +184,7 @@ Entrypoint for VS Code Copilot environment.
 - [theme-factory](../../.ai/catalog/skills/theme-factory/SKILL.md)
 - [threat-modeling](../../.ai/catalog/skills/threat-modeling/SKILL.md)
 - [token-efficiency-advisor](../../.ai/catalog/skills/token-efficiency-advisor/SKILL.md)
+- [uat-verification-gate](../../.ai/catalog/skills/uat-verification-gate/SKILL.md)
 - [ui-ux-pro-max](../../.ai/catalog/skills/ui-ux-pro-max/SKILL.md)
 - [unified-router](../../.ai/catalog/skills/unified-router/SKILL.md)
 - [user-interview](../../.ai/catalog/skills/user-interview/SKILL.md)

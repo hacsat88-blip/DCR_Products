@@ -1,6 +1,6 @@
 <!-- AUTO-GENERATED FILE - DO NOT EDIT DIRECTLY
 Generated from: .ai/book + .ai/kernel + .ai/catalog/rules/ + .ai/catalog/skills/ + .ai/catalog/agents-source/
-To regenerate: Run .\deploy.ps1 or .\tools\deploy-all.ps1
+To regenerate: Run pwsh -ExecutionPolicy Bypass -File .\deploy.ps1 or .\tools\deploy-all.ps1
 Any manual edits will be overwritten on next deploy. -->
 
 # Codex / GitHub Copilot CLI / Warp Entrypoint
@@ -13,7 +13,7 @@ Warp-specific behavior lives in [.ai/environments/warp/kernel.md](.ai/environmen
 ## Scope Summary
 
 - Active rules: 53
-- Active skills: 126
+- Active skills: 131
 - Active agents: 114
 - Deprecated aliases (rules/skills/agents): 10 / 3 / 34
 

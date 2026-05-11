@@ -1,6 +1,6 @@
 <!-- AUTO-GENERATED FILE - DO NOT EDIT DIRECTLY
 Generated from: .ai/book + .ai/kernel + .ai/catalog/rules/ + .ai/catalog/skills/ + .ai/catalog/agents-source/
-To regenerate: Run .\deploy.ps1 or .\tools\deploy-all.ps1
+To regenerate: Run pwsh -ExecutionPolicy Bypass -File .\deploy.ps1 or .\tools\deploy-all.ps1
 Any manual edits will be overwritten on next deploy. -->
 
 # Claude Code Entrypoint
@@ -10,7 +10,7 @@ Unified entry point for Claude Code environment.
 ## Scope Summary
 
 - Active rules: 53
-- Active skills: 126
+- Active skills: 131
 - Active agents: 114
 - Deprecated aliases (rules/skills/agents): 10 / 3 / 34
 

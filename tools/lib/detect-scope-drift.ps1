@@ -76,12 +76,12 @@ Set-Content -Path $driftLogPath -Value $driftData -Encoding UTF8
 
 if ($driftCount -ge 3) {
     Write-Host ""
-    Write-Host "🔴 スコープドリフト警告 ($driftCount 件目): $relativePath" -ForegroundColor Red
+    Write-Host "[STOP] スコープドリフト警告 ($driftCount 件目): $relativePath" -ForegroundColor Red
     Write-Host "   このファイルはアクティブなプランに含まれていません。" -ForegroundColor Yellow
-    Write-Host "   ⚠️  p/ でスコープを再確認・更新することを推奨します。" -ForegroundColor Yellow
+    Write-Host "   [WARN] p/ でスコープを再確認・更新することを推奨します。" -ForegroundColor Yellow
     Write-Host ""
 } else {
-    Write-Host "⚠️  スコープ外変更 ($driftCount 件目): $relativePath" -ForegroundColor Yellow
+    Write-Host "[WARN] スコープ外変更 ($driftCount 件目): $relativePath" -ForegroundColor Yellow
     Write-Host "   プラン ($($planFiles.Name)) に含まれていません。" -ForegroundColor DarkGray
 }
 

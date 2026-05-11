@@ -32,8 +32,8 @@ generated mirror や archive は既定の探索起点にしません。
 1. `.ai/catalog/rules/<name>.md` を作成する
 2. YAML frontmatter を記述する（必須: `description`, `domain`, `routing_category`, `risk`, `keywords`）
 3. `inherits:` で継承する trait を指定する（コード生成ルールは `coding-standards` を推奨）
-4. `validate.ps1 -Verbose` を実行して構造チェックを通過させる（検証項目はスクリプト改修により増減し得ます）
-5. `deploy.ps1` を実行して各エディタへ配布する
+4. `pwsh -ExecutionPolicy Bypass -File .\validate.ps1 -Verbose` を実行して構造チェックを通過させる（検証項目はスクリプト改修により増減し得ます）
+5. `pwsh -ExecutionPolicy Bypass -File .\deploy.ps1` を実行して各エディタへ配布する
 
 ### frontmatter テンプレート
 
@@ -63,44 +63,40 @@ inherits:
 1. `.ai/catalog/skills/<name>/SKILL.md` を作成する
 2. YAML frontmatter に `name`, `description` を記述する（任意: `contract`, `composable`, `package`）
 3. ルーティングや依存関係を変える場合は [.ai/module/unified-router.md](.ai/module/unified-router.md) の決定木に沿い、pied-piper 経由の 3 行報告（採用名・理由・期待効果）を前提にする（旧 skill-router は deprecated）
-4. `validate.ps1 -Verbose` で検証する
+4. `pwsh -ExecutionPolicy Bypass -File .\validate.ps1 -Verbose` で検証する
 
 ## エージェントの追加
 
 1. `.ai/catalog/agents-source/<name>.toml` と `.ai/catalog/agents-source/<name>.md` を作成する
 2. `.toml` には必須フィールド: `name`, `description`, `version`
-3. `validate.ps1` で検証する
+3. `pwsh -ExecutionPolicy Bypass -File .\validate.ps1` で検証する
 
 ## 検証とデプロイ
 
-**Windows ローカル**: 文字列に非 ASCII を含む検証スクリプトを安全に通すには **PowerShell 7（`pwsh`）** を推奨します。Windows PowerShell 5.1 でも `tools\validate-shared-book.ps1` は UTF-8 BOM により動作する想定です。
+**Windows ローカル**: PowerShell 実行系は **PowerShell 7（`pwsh`）** を標準とします。Windows PowerShell 5.1（`powershell.exe`）は UTF-8 日本語を含む `.ps1` を誤解釈する可能性があるため非推奨です。PowerShell 実行ファイルのステータス表示は `[OK]`, `[WARN]`, `[STOP]` などの ASCII マーカーに統一し、絵文字・装飾記号は入れません。
 
 ```powershell
-# 構造検証（推奨: pwsh）
+# 構造検証
 pwsh -ExecutionPolicy Bypass -File .\validate.ps1 -Verbose
-# 5.1 のみの場合
-powershell -ExecutionPolicy Bypass -File .\validate.ps1 -Verbose
-# または短い表記（pwsh 推奨）
-.\validate.ps1 -Verbose
 
 # デプロイ（すべてのターゲット: VS Code + Cursor + Agents）
-.\deploy.ps1
+pwsh -ExecutionPolicy Bypass -File .\deploy.ps1
 
 # エージェントのみデプロイ
-.\deploy.ps1 -Target agents
+pwsh -ExecutionPolicy Bypass -File .\deploy.ps1 -Target agents
 
 # デプロイ前にバックアップ
-.\deploy.ps1 -Backup
+pwsh -ExecutionPolicy Bypass -File .\deploy.ps1 -Backup
 
 # ファイル変更を監視して自動デプロイ
-.\deploy.ps1 -Watch
+pwsh -ExecutionPolicy Bypass -File .\deploy.ps1 -Watch
 ```
 
 ## コミット規約
 
 - Conventional Commits に従う: `feat:`, `fix:`, `docs:`, `chore:`
 - 1タスク1コミットを原則とする
-- コミット前に `validate.ps1` を実行する
+- コミット前に `pwsh -ExecutionPolicy Bypass -File .\validate.ps1` を実行する
 
 ## Gate Chain
 

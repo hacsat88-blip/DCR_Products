@@ -38,8 +38,8 @@ AI エージェント設定・ルール・スキルの一元管理リポジト�
 ## 運用クイックガイド
 
 - Execution Modes を全環境で共通運用: タスク先頭に `autopilot:`, `ralph:`, `ulw`, `ralplan:`, `deep-interview:`, `ultrathink:`, `deepsearch:`, `team:` を付けて実行戦略を宣言する
-- **日次更新**: 毎朝 `deploy.ps1 -Check` でドリフト確認 -> 変更があれば `deploy.ps1` で同期 -> `validate.ps1` で全通過を確認してからコミットする
-- **検証ゲート**: 実装後は `validate.ps1` の `RESULT: ... passed, 0 failed` と `deploy.ps1 -Check` の `in sync` を確認してからコミット・PR を作成する
+- **日次更新**: 毎朝 `pwsh -ExecutionPolicy Bypass -File .\deploy.ps1 -Check` でドリフト確認 -> 変更があれば `pwsh -ExecutionPolicy Bypass -File .\deploy.ps1` で同期 -> `pwsh -ExecutionPolicy Bypass -File .\validate.ps1` で全通過を確認してからコミットする
+- **検証ゲート**: 実装後は `pwsh -ExecutionPolicy Bypass -File .\validate.ps1` の `RESULT: ... passed, 0 failed` と `pwsh -ExecutionPolicy Bypass -File .\deploy.ps1 -Check` の `in sync` を確認してからコミット・PR を作成する
 - Azure Skills は DCR の置換ではなく、Azure 専用タスクのための external capability pack として扱う
 - Azure architecture / deploy / diagnostics / compliance / cost / RBAC / Kusto / Foundry は、まず Azure Skills plugin の利用可否を確認する
 - Azure Skills を使えない場合は、DCR の `azure-infra-engineer`, `mcp-builder`, `security-engineer`, `devops-automator` などへフォールバックする
@@ -57,7 +57,7 @@ pwsh -ExecutionPolicy Bypass -File .\deploy.ps1 -Check
 pwsh -ExecutionPolicy Bypass -File .\validate.ps1
 ```
 
-Windows PowerShell 5.1 のみの環境では `pwsh` を `powershell` に読み替えてください。
+PowerShell 実行系は PowerShell 7 (`pwsh`) を標準とする。Windows PowerShell 5.1 (`powershell.exe`) は非推奨で、UTF-8 日本語を含むスクリプトを誤解釈する可能性がある。`.ps1` / `.psm1` / `.psd1` の実行ログには `[OK]`, `[WARN]`, `[STOP]` などの ASCII マーカーを使い、絵文字・装飾記号は入れない。
 
 `.windsurf/`, `.codex/agents/`, `.claude/agents/` が無い場合も異常ではありません。`deploy.ps1` が `.ai/kernel/` と `.ai/catalog/` から再生成します。
 
@@ -89,9 +89,9 @@ Windows PowerShell 5.1 のみの環境では `pwsh` を `powershell` に読み�
 
 最短運用手順（毎日これだけ）:
 
-1. `pwsh -ExecutionPolicy Bypass -File .\deploy.ps1 -Check`（5.1 のみなら `powershell`）
+1. `pwsh -ExecutionPolicy Bypass -File .\deploy.ps1 -Check`
 2. `pwsh -ExecutionPolicy Bypass -File .\validate.ps1`
-3. 変更がある場合のみ `deploy.ps1` 実行 -> 再検証
+3. 変更がある場合のみ `pwsh -ExecutionPolicy Bypass -File .\deploy.ps1` 実行 -> 再検証
 
 `git fetch` で警告が再発した場合の手順は `docs/dcr/instruction-governance.md` を参照。
 
@@ -154,11 +154,11 @@ Workspace / operations layer
 ## デプロイ
 
 ```powershell
-.\deploy.ps1                    # 既定エディタへ同期
-.\deploy.ps1 -Target vscode     # VS Code のみ
-.\deploy.ps1 -Target windsurf   # Windsurf のみ（.windsurf/ と Windsurf MCP 実設定）
-.\deploy.ps1 -DryRun            # 確認のみ
-.\deploy.ps1 -Check             # ドリフト検出
+pwsh -ExecutionPolicy Bypass -File .\deploy.ps1                    # 既定エディタへ同期
+pwsh -ExecutionPolicy Bypass -File .\deploy.ps1 -Target vscode     # VS Code のみ
+pwsh -ExecutionPolicy Bypass -File .\deploy.ps1 -Target windsurf   # Windsurf のみ（.windsurf/ と Windsurf MCP 実設定）
+pwsh -ExecutionPolicy Bypass -File .\deploy.ps1 -DryRun            # 確認のみ
+pwsh -ExecutionPolicy Bypass -File .\deploy.ps1 -Check             # ドリフト検出
 ```
 
 ## 迷わない運用境界 (推奨)
@@ -201,7 +201,7 @@ Workspace / operations layer
 - `Superpowers` は外部公式パッケージとして扱う
 - 既定の upstream mirror: `%USERPROFILE%/.codex/superpowers`
 - 更新は upstream への fast-forward のみを許可し、DCR の `.ai/catalog/` へコピーして正本化しない
-- ローカル改変検知: `powershell -ExecutionPolicy Bypass -File .\tools\check-external-superpowers.ps1`
+- ローカル改変検知: `pwsh -ExecutionPolicy Bypass -File .\tools\check-external-superpowers.ps1`
 - `validate.ps1` は Superpowers checkout が存在する環境では同じ drift check を実行し、存在しない環境ではスキップする
 - Windsurf は Superpowers の公式導入先として扱わず、この repo の `.windsurf/` 生成ミラーで運用する
 
