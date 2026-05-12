@@ -1,8 +1,9 @@
 import json
+import os
 import re
 from dataclasses import dataclass
 
-import anthropic
+from openai import OpenAI
 
 
 SYSTEM_PROMPT = """あなたは東証プライムの短期デイトレーダーです。
@@ -26,9 +27,21 @@ class TradeSignal:
     confidence: float
 
 
+OPENCODE_BASE_URL = "https://opencode.ai/zen/go/v1"
+OPENCODE_MODEL = "deepseek-v4-pro"  # 変更する場合: kimi-k2.6 / deepseek-v4-flash / glm-5.1
+
+
 class AITrader:
     def __init__(self) -> None:
-        self._client = anthropic.Anthropic()
+        self._client: OpenAI | None = None
+
+    def _get_client(self) -> OpenAI:
+        if self._client is None:
+            self._client = OpenAI(
+                api_key=os.environ["OPENCODE_GO_API_KEY"],
+                base_url=OPENCODE_BASE_URL,
+            )
+        return self._client
 
     def judge(
         self,
@@ -48,14 +61,16 @@ class AITrader:
         if position_pnl is not None:
             user_msg += f"含み損益: {position_pnl:+.0f}円\n"
 
-        response = self._client.messages.create(
-            model="claude-sonnet-4-6",
+        response = self._get_client().chat.completions.create(
+            model=OPENCODE_MODEL,
             max_tokens=128,
-            system=SYSTEM_PROMPT,
-            messages=[{"role": "user", "content": user_msg}],
+            messages=[
+                {"role": "system", "content": SYSTEM_PROMPT},
+                {"role": "user", "content": user_msg},
+            ],
         )
 
-        return self._parse(response.content[0].text)
+        return self._parse(response.choices[0].message.content or "")
 
     def _parse(self, text: str) -> TradeSignal:
         match = re.search(r"\{.*\}", text, re.DOTALL)

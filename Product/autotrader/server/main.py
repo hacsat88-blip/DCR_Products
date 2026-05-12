@@ -8,6 +8,7 @@ from pydantic import BaseModel
 
 from .ai_trader import AITrader
 from .capital_router import CapitalRouter
+from .price_history import HistoryStore
 from .risk_guard import RiskGuard
 from .technical_filter import PriceData, TechnicalFilter
 
@@ -17,6 +18,7 @@ capital_router = CapitalRouter()
 technical_filter = TechnicalFilter()
 risk_guard = RiskGuard()
 ai_trader = AITrader()
+history_store = HistoryStore()
 
 _ws_clients: list[WebSocket] = []
 _simulation_mode: bool = True  # 最初の2週間はTrue（発注を止めて判断精度を確認）
@@ -26,8 +28,12 @@ class PriceRequest(BaseModel):
     symbol: str
     price: float
     volume: int
-    avg_volume_5d: int
-    rsi14: float
+    prev_close: float
+    available_cash: float
+    timestamp: str
+    # RSI・5日平均出来高は Python 側で計算するため省略可能
+    avg_volume_5d: int = 0
+    rsi14: float = 50.0
     prev_close: float
     available_cash: float
     timestamp: str
@@ -47,12 +53,17 @@ async def handle_price(req: PriceRequest) -> dict[str, Any]:
     config = capital_router.get_config(req.available_cash)
     tier = capital_router.get_tier(req.available_cash)
 
+    # 価格履歴を更新してRSI・5日平均出来高を自動計算
+    history = history_store.update(req.symbol, req.price, req.volume)
+    rsi14 = history.rsi14()
+    avg_volume_5d = history.avg_volume_5d()
+
     price_data = PriceData(
         symbol=req.symbol,
         price=req.price,
         volume=req.volume,
-        avg_volume_5d=req.avg_volume_5d,
-        rsi14=req.rsi14,
+        avg_volume_5d=avg_volume_5d,
+        rsi14=rsi14,
         prev_close=req.prev_close,
         current_time=now.time(),
     )

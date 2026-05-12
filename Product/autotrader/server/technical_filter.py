@@ -33,7 +33,7 @@ class TechnicalFilter:
             return FilterResult(False, "取引時間外")
 
         if data.avg_volume_5d == 0:
-            return FilterResult(False, "出来高データなし")
+            return FilterResult(True, "出来高履歴不足のためスキップ")
 
         volume_ratio = data.volume / data.avg_volume_5d
         if volume_ratio < config.volume_ratio_threshold:

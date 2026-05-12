@@ -23,20 +23,17 @@ Public Sub OnPriceUpdate()
 
         Dim price As Double
         Dim volume As Long
-        Dim avgVol5d As Long
-        Dim rsi14 As Double
         Dim prevClose As Double
         Dim availCash As Double
 
         price     = ws.Cells(i, 2).Value  ' 現在値
         volume    = ws.Cells(i, 3).Value  ' 出来高
-        avgVol5d  = ws.Cells(i, 4).Value  ' 5日平均出来高
-        rsi14     = ws.Cells(i, 5).Value  ' RSI(14)
-        prevClose = ws.Cells(i, 6).Value  ' 前日終値
+        prevClose = ws.Cells(i, 4).Value  ' 前日終値（D列）
         availCash = ThisWorkbook.Sheets("Config").Range("B1").Value  ' 投資余力
+        ' RSI・5日平均出来高は Python 側で自動計算するため送信不要
 
         Dim result As String
-        result = PostPrice(symbol, price, volume, avgVol5d, rsi14, prevClose, availCash)
+        result = PostPrice(symbol, price, volume, prevClose, availCash)
 
         Dim action As String
         Dim lot As Long
@@ -62,8 +59,7 @@ End Sub
 
 Private Function PostPrice( _
     symbol As String, price As Double, volume As Long, _
-    avgVol5d As Long, rsi14 As Double, prevClose As Double, _
-    availCash As Double) As String
+    prevClose As Double, availCash As Double) As String
 
     Dim http As Object
     Set http = CreateObject("MSXML2.XMLHTTP")
@@ -72,8 +68,6 @@ Private Function PostPrice( _
     body = "{""symbol"":""" & symbol & """" & _
            ",""price"":" & price & _
            ",""volume"":" & volume & _
-           ",""avg_volume_5d"":" & avgVol5d & _
-           ",""rsi14"":" & rsi14 & _
            ",""prev_close"":" & prevClose & _
            ",""available_cash"":" & availCash & _
            ",""timestamp"":""" & Format(Now(), "yyyy-mm-ddThh:nn:ss") & """}"
