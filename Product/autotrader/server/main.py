@@ -61,11 +61,15 @@ async def handle_price(req: PriceRequest) -> dict[str, Any]:
     if not filter_result.passed:
         return {"action": "hold", "reason": filter_result.reason, "simulation": _simulation_mode}
 
+    lot = capital_router.calc_lot(req.available_cash, req.price)
+    if lot == 0:
+        return {"action": "hold", "reason": "株価がティア上限超過（取引不可）", "simulation": _simulation_mode}
+
     in_position = req.symbol in risk_guard.session.position_entry_prices
     position_pnl = None
     if in_position:
         entry = risk_guard.session.position_entry_prices[req.symbol]
-        position_pnl = (req.price - entry) * capital_router.calc_lot(req.available_cash, entry)
+        position_pnl = (req.price - entry) * lot
 
         exit_check = risk_guard.check_exit(req.symbol, req.price, now)
         if exit_check.allowed:
@@ -83,8 +87,10 @@ async def handle_price(req: PriceRequest) -> dict[str, Any]:
             signal_reason = signal.reason
             signal_confidence = signal.confidence
     else:
-        target_price = req.price * 1.015
-        entry_check = risk_guard.check_entry(req.symbol, req.price, target_price, now)
+        # RR 1.5 を満たす最小目標価格: -2000円損切りに対して+3000円以上の利益が必要
+        min_gain_per_share = 2_000 * 1.5 / lot
+        target_price = req.price + min_gain_per_share
+        entry_check = risk_guard.check_entry(req.symbol, req.price, target_price, now, lot)
         if not entry_check.allowed:
             return {"action": "hold", "reason": entry_check.reason, "simulation": _simulation_mode}
 
@@ -98,7 +104,6 @@ async def handle_price(req: PriceRequest) -> dict[str, Any]:
         signal_reason = signal.reason
         signal_confidence = signal.confidence
 
-    lot = capital_router.calc_lot(req.available_cash, req.price)
     response = {
         "action": signal_action,
         "reason": signal_reason,

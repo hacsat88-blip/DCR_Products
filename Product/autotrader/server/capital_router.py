@@ -69,7 +69,9 @@ class CapitalRouter:
         return self.get_config(available_cash).max_order_amount
 
     def calc_lot(self, available_cash: float, price: float) -> int:
-        """購入可能株数（100株単位）を返す"""
+        """購入可能株数（100株単位）を返す。上限内に収まらない場合は0（取引不可）。"""
         max_amount = self.get_max_order_amount(available_cash)
         raw_lot = int(max_amount / price / 100) * 100
-        return max(100, raw_lot)
+        if raw_lot < 100:
+            return 0  # 100株単位でも上限超過 → 取引不可
+        return raw_lot

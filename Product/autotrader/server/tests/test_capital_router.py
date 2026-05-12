@@ -40,7 +40,8 @@ def test_max_order_large(router):
 
 
 def test_calc_lot_rounds_to_100(router):
-    lot = router.calc_lot(400_000, 1_200)
+    # SMALL上限10万: 800円×100株=8万 → 通過
+    lot = router.calc_lot(400_000, 800)
     assert lot % 100 == 0
     assert lot >= 100
 
@@ -48,4 +49,14 @@ def test_calc_lot_rounds_to_100(router):
 def test_calc_lot_does_not_exceed_max_order(router):
     price = 500
     lot = router.calc_lot(400_000, price)
-    assert lot * price <= 100_000 + price  # 100株単位の丸めで多少超えることを許容
+    assert lot * price <= 100_000  # 上限内に厳密に収まること
+
+
+def test_calc_lot_returns_zero_when_price_too_high(router):
+    # SMALL上限10万: 1,100円株100株=11万 → 取引不可
+    assert router.calc_lot(400_000, 1_100) == 0
+
+
+def test_calc_lot_returns_100_when_exactly_fits(router):
+    # SMALL上限10万: 1,000円株100株=10万 → ちょうど収まる
+    assert router.calc_lot(400_000, 1_000) == 100

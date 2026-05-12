@@ -35,7 +35,9 @@ class RiskGuard:
     def __init__(self) -> None:
         self.session = TradeSession()
 
-    def check_entry(self, symbol: str, price: float, target_price: float, now: datetime) -> GuardResult:
+    def check_entry(
+        self, symbol: str, price: float, target_price: float, now: datetime, lot: int = 100
+    ) -> GuardResult:
         if self.session.trading_stopped:
             return GuardResult(False, f"取引停止中: {self.session.stop_reason}")
 
@@ -53,9 +55,9 @@ class RiskGuard:
             self._stop_trading("本日利益目標達成")
             return GuardResult(False, "本日利益目標(+5000円)達成済み")
 
-        reward = target_price - price
-        risk = price - (price + RULES["max_loss_per_trade"] / 100)
-        if risk > 0 and (reward / risk) < RULES["min_rr_ratio"]:
+        reward = (target_price - price) * lot
+        risk = abs(RULES["max_loss_per_trade"])
+        if reward / risk < RULES["min_rr_ratio"]:
             return GuardResult(False, f"RR比不足 {reward/risk:.2f} < {RULES['min_rr_ratio']}")
 
         return GuardResult(True, "エントリー許可")
