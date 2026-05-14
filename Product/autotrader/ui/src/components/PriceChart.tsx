@@ -29,7 +29,7 @@ export default function PriceChart({ symbol, signals = [] }: Props) {
     if (!containerRef.current) return;
 
     const chart = createChart(containerRef.current, {
-      layout: { background: { color: "#111827" }, textColor: "#d1d5db" },
+      layout: { background: { color: "#0B0F17" }, textColor: "#9ca3af" },
       grid: {
         vertLines: { color: "#1f2937" },
         horzLines: { color: "#1f2937" },
