@@ -43,6 +43,11 @@ _DEFAULT_SYSTEM_PROMPTS: dict[str, str] = {
         "following the existing patterns. Explain your approach briefly before "
         "presenting the implementation."
     ),
+    "glm-5.1": (
+        "You are an agentic software engineering model. Break complex engineering "
+        "tasks into verifiable steps, reason about tool use carefully, and produce "
+        "concise implementation guidance with explicit assumptions and risks."
+    ),
 }
 
 

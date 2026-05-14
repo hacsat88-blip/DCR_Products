@@ -116,6 +116,23 @@ pied-piper
 
 外部 plugin / skill pack は DCR の置換ではなく、ドメイン特化の拡張として扱う。
 
+### Runtime memory backend
+
+- 位置づけ: agentmemory などの MCP/REST memory backend は任意の外部補助層
+- 役割: 過去判断、関連ファイル履歴、採用/非採用ポリシー、検証済みコマンドを着手前に recall する
+- DCR との関係: `.ai/catalog`、`.ai/book`、docs、git 状態を正本とし、memory recall は補助情報として扱う
+- 保存方針: 作業完了後に保存する場合は、決定・理由・検証結果・次回 recall trigger だけに絞る
+- 禁止: secret、PII、ログ全文、中間推論、正本化すべき内容を runtime memory に保存しない
+
+自然言語 trigger は `unified-router.md` の Runtime Memory Preflight に集約する。
+
+### GSD pattern imports
+
+- 位置づけ: GSD は spec-driven / context engineering / phase-state pattern の参照元
+- 採用形態: runtime command、`.planning/`、installer は導入せず、DCR skill として薄く移植する
+- DCR との関係: `pied-piper`、`unified-router`、`.ai/book` を置換しない
+- 既存導入: `decision-complete-planning`、`phase-state-artifacts`、`parallel-wave-execution`、`uat-verification-gate`、`namespace-skill-routing`
+
 ### Azure Skills plugin
 
 - 位置づけ: Azure 専用 capability pack

@@ -13,10 +13,11 @@ The shared thinking source of truth is [../book/runtime.md](../book/runtime.md).
 - `warp/kernel.md`: Warp Project Rules capability declaration
 - `cursor/kernel.md`: Cursor capability declaration
 - `windsurf/kernel.md`: Windsurf capability declaration
+- `opencode/kernel.md`: OpenCode capability declaration
 
 ## Runtime Entrypoints
 
-`AGENTS.md`, `CLAUDE.md`, `.github/copilot-instructions.md`, `.cursor/`, and `.windsurf/` remain in their runtime-specific locations because tools auto-load those paths. Warp uses the root `AGENTS.md` as its Project Rules entrypoint.
+`AGENTS.md`, `CLAUDE.md`, `.github/copilot-instructions.md`, `.cursor/`, `.windsurf/`, root `opencode.json`, and `.opencode/` remain in their runtime-specific locations because tools auto-load those paths. Warp uses the root `AGENTS.md` as its Project Rules entrypoint.
 
 ## Runtime Loading Model
 
@@ -25,6 +26,7 @@ The shared thinking source of truth is [../book/runtime.md](../book/runtime.md).
 - Cursor: `.cursor/rules/dcr-kernel.mdc` is generated from the shared kernel and `.cursorignore` keeps generated mirrors and deprecated aliases out of discovery.
 - Windsurf: `.windsurf/rules/dcr-kernel.md` is the always-on baseline; generated catalog rules use Windsurf rule activation modes.
 - VS Code Copilot: `.github/copilot-instructions.md` stays concise and points to the shared book, kernel, rules, and skills.
+- OpenCode: root `opencode.json` loads `AGENTS.md` and `.opencode/kernel.md`; `.opencode/agents/` and `.opencode/skills/` are OpenCode-local overlays.
 
 ## Rule
 

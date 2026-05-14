@@ -23,6 +23,10 @@ metadata:
   upstream_url: "https://github.com/sickn33/antigravity-awesome-skills"
   upstream_path: "skills/context-optimization/SKILL.md"
   license: "CC-BY-4.0 content / MIT repository code; adapted summary"
+  upstream_source: "antigravity-awesome-skills skill catalog"
+  upstream_version: "not captured"
+  upstream_last_updated: "not captured"
+  source_notice: "Adapted as a DCR-local summary; inspect upstream_path before expanding or copying source text."
   imported_at: "2026-05-06"
   adapted_from: "Condensed into a DCR reinforcement skill; not a wholesale import."
 ---

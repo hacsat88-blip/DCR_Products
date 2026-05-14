@@ -80,7 +80,7 @@ if ($testExists) {
 }
 
 Write-Host ""
-Write-Host "🔴 TDD違反: 対応テストファイルが存在しません" -ForegroundColor Red
+Write-Host "[STOP] TDD違反: 対応テストファイルが存在しません" -ForegroundColor Red
 Write-Host "   対象: $filePath" -ForegroundColor Yellow
 Write-Host ""
 Write-Host "   先に以下のいずれかを作成してください:" -ForegroundColor Cyan

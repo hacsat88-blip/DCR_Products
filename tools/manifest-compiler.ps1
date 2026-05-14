@@ -93,7 +93,7 @@ foreach ($file in $ruleFiles) {
         description = (Get-FrontmatterField -FilePath $file.FullName -Field "description")
     }
 }
-Write-Host "  ✓ Found $($manifest.rules.Count) rules" -ForegroundColor Green
+Write-Host "  [OK] Found $($manifest.rules.Count) rules" -ForegroundColor Green
 
 Write-Host "[2/3] Scanning $(Get-DcrCanonicalRelativePath -AssetType 'skills')/*/SKILL.md..." -ForegroundColor Yellow
 $skillDirs = @(Get-ChildItem -Path $skillDir -Directory -ErrorAction SilentlyContinue |
@@ -116,7 +116,7 @@ foreach ($dir in $skillDirs) {
         description = (Get-FrontmatterField -FilePath $skillFile -Field "description")
     }
 }
-Write-Host "  ✓ Found $($manifest.skills.Count) skills" -ForegroundColor Green
+Write-Host "  [OK] Found $($manifest.skills.Count) skills" -ForegroundColor Green
 
 Write-Host "[3/3] Scanning $(Get-DcrCanonicalRelativePath -AssetType 'agents-source')/*.md..." -ForegroundColor Yellow
 $agentFiles = @(Get-ChildItem -Path $agentDir -Filter "*.md" -ErrorAction SilentlyContinue |
@@ -134,14 +134,14 @@ foreach ($file in $agentFiles) {
         description = (Get-FrontmatterField -FilePath $file.FullName -Field "description")
     }
 }
-Write-Host "  ✓ Found $($manifest.agents.Count) agents" -ForegroundColor Green
+Write-Host "  [OK] Found $($manifest.agents.Count) agents" -ForegroundColor Green
 
 Write-Host ""
 $json = $manifest | ConvertTo-Json -Depth 10 -Compress:$false
 $utf8 = New-Object System.Text.UTF8Encoding($false)
 [System.IO.File]::WriteAllText($OutputPath, $json, $utf8)
 
-Write-Host "✓ Manifest written: $OutputPath" -ForegroundColor Green
+Write-Host "[OK] Manifest written: $OutputPath" -ForegroundColor Green
 Write-Host "  Rules:  $($manifest.rules.Count)" -ForegroundColor Gray
 Write-Host "  Skills: $($manifest.skills.Count)" -ForegroundColor Gray
 Write-Host "  Agents: $($manifest.agents.Count)" -ForegroundColor Gray

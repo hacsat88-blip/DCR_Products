@@ -11,7 +11,7 @@ Use Devin as a high-signal implementation and verification operator for this rep
 - Rules: `.ai/catalog/rules/`
 - Skills: `.ai/catalog/skills/`
 - Agents: `.ai/catalog/agents-source/`
-- Generated mirrors: `AGENTS.md`, `CLAUDE.md`, `.windsurf/`, `.cursor/`, `.codex/agents/`, `.claude/agents/`
+- Generated mirrors: `AGENTS.md`, `CLAUDE.md`, `opencode.json`, `.opencode/kernel.md`, `.opencode/opencode.json`, `.windsurf/`, `.cursor/`, `.codex/agents/`, `.claude/agents/`
 
 ## Devin Operating Rules
 
@@ -27,6 +27,7 @@ Use Devin as a high-signal implementation and verification operator for this rep
 - Use implementation subagents only for isolated tasks with clear file ownership.
 - Use QA/evidence collection after implementation when completion claims need commands, logs, screenshots, diffs, or reproduction notes.
 - Use specialist QA for UI accessibility, API/CLI contracts, performance, or security when those risks are in scope.
+- When the user enables the project MCP in Devin, prefer the `opencode-bridge` tools for OSS model delegation: `oss_explore`, `oss_document`, and `oss_implement`.
 - Only hand off to a cloud or remote Devin agent when the user explicitly asks for handoff.
 
 ## Hooks and Feedback
@@ -55,6 +56,24 @@ powershell -ExecutionPolicy Bypass -File ./deploy.ps1 -Check
 ```
 
 If verification fails for pre-existing unrelated changes, report that distinction clearly and provide the exact failing evidence.
+
+## Memory Search
+
+このプロジェクトは SQLite FTS5 ベースのメモリ検索システムを使用している。
+
+**制約**: `mem_cli.py` と `mem.db` はユーザーのローカルマシン
+(`%USERPROFILE%\.claude\projects\<slug>\memory\` など) に存在するため、
+クラウドサンドボックスで動作する Devin からは**直接アクセスできない**。
+
+ローカル Hooks は `tools/lib/resolve-claude-memory.ps1` で `mem_cli.py` を解決する。
+複数の Claude プロジェクトフォルダがある場合は、環境変数 **`DCR_MEMORY_ROOT`** に
+`memory` ディレクトリの絶対パスを設定して一意に固定する。
+
+代替手段:
+- ユーザーがセッション開始時に関連メモリを手動で共有する
+- リポジトリ内の `docs/` や既存のコンテキストファイルを参照する
+- メモリに保存すべき知見が生まれた場合は、ユーザーに
+  「これを mem_cli.py に保存してください」と伝える
 
 ## Completion Report
 

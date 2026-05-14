@@ -1,10 +1,11 @@
 """
 opencode_mcp - OpenCode Go API MCP サーバー
 
-FastMCP ベースで3つのOSS委任ツールを提供する:
+FastMCP ベースで4つのOSS委任ツールを提供する:
   - oss_explore  : Kimi K2.6 によるコード探索・要約
   - oss_document : DeepSeek V4 Flash によるドキュメント生成
   - oss_implement: DeepSeek V4 Pro による実装補助
+  - oss_agentic  : GLM-5.1 による複雑なエージェント型実装計画・検証
 
 使用方法:
   python server.py          # MCP stdio サーバーとして起動
@@ -36,6 +37,7 @@ mcp = FastMCP("opencode_mcp")
 MODEL_EXPLORE = "kimi-k2.6"
 MODEL_DOCUMENT = "deepseek-v4-flash"
 MODEL_IMPLEMENT = "deepseek-v4-pro"
+MODEL_AGENTIC = "glm-5.1"
 
 
 @mcp.tool(
@@ -188,6 +190,50 @@ async def oss_implement(
         f"入力: {result.input_tokens} tok / 出力: {result.output_tokens} tok*"
     )
     return "".join(parts)
+
+
+@mcp.tool(
+    name="oss_agentic",
+    annotations={
+        "readOnlyHint": True,
+        "destructiveHint": False,
+        "idempotentHint": True,
+        "openWorldHint": True,
+    },
+)
+async def oss_agentic(
+    task: str,
+    context: str = "",
+    model_override: str = "",
+) -> str:
+    """複雑なエージェント型ソフトウェア実装計画を GLM-5.1 に委任する。
+
+    複数ステップの実装計画、検証方針、リスク分解、長めのツール利用設計など
+    agentic engineering 寄りのタスクに使う。実ファイル変更は主担当AIが行うこと。
+
+    注意: 秘密情報、顧客データ、外部共有できないコードは渡さないこと。
+
+    Args:
+        task: 実装計画・検証設計タスクの説明。
+        context: 追加コンテキスト（必要最小限のコード、制約、ログ等）。省略可。
+        model_override: デフォルトモデル (glm-5.1) の上書き。省略可。
+
+    Returns:
+        GLM-5.1 の応答テキスト（計画・検証観点・リスク）。末尾に使用トークン数を付記。
+    """
+    inp = OssTaskInput(
+        task=task,
+        context=context or None,
+        model_override=model_override or None,
+    )
+    result = await call_oss_model(inp, MODEL_AGENTIC)
+    if result.error:
+        return f"[ERROR] {result.error}"
+    return (
+        f"{result.content}\n\n"
+        f"---\n*モデル: {result.model_used} | "
+        f"入力: {result.input_tokens} tok / 出力: {result.output_tokens} tok*"
+    )
 
 
 async def _self_test() -> None:

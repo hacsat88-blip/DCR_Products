@@ -23,6 +23,10 @@ metadata:
   upstream_url: "https://github.com/sickn33/antigravity-awesome-skills"
   upstream_path: "skills/context-compression/SKILL.md"
   license: "CC-BY-4.0 content / MIT repository code; adapted summary"
+  upstream_source: "Agent Skills for Context Engineering Contributors"
+  upstream_version: "1.1.0"
+  upstream_last_updated: "2025-12-26"
+  source_notice: "Adapted from upstream concepts and headings; no verbatim wholesale import."
   imported_at: "2026-05-06"
   adapted_from: "Condensed into a DCR reinforcement skill; not a wholesale import."
 ---
@@ -73,4 +77,3 @@ metadata:
 - なぜその方針か
 - 何が未検証か
 - 次に実行すべき検証は何か
-

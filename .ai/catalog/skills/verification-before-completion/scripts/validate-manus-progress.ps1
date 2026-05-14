@@ -10,7 +10,7 @@ if (-not $ProgressFilePath) {
 }
 
 if (-not (Test-Path $ProgressFilePath)) {
-    Write-Host "⚠️  progress.md not found; skipping Manus validation"
+    Write-Host "[WARN] progress.md not found; skipping Manus validation"
     exit 0
 }
 
@@ -20,7 +20,7 @@ $content = Get-Content $ProgressFilePath -Raw
 # Extract checklist section (between "## Completion Checklist" and next "##")
 $checklist_match = $content -match '## Completion Checklist\s+([\s\S]*?)(?=\n## |$)'
 if (-not $checklist_match) {
-    Write-Host "⚠️  No checklist found in progress.md"
+    Write-Host "[WARN] No checklist found in progress.md"
     exit 0
 }
 
@@ -37,9 +37,9 @@ foreach ($item in $items) {
     $total++
     if ($item -match '^\s*-\s*\[x\]') {
         $completed++
-        Write-Host "  ✅ $($item.Trim())"
+        Write-Host "  [OK] $($item.Trim())"
     } else {
-        Write-Host "  ❌ $($item.Trim())"
+        Write-Host "  [FAIL] $($item.Trim())"
         $incomplete_items += $item.Trim()
     }
 }
@@ -47,7 +47,7 @@ foreach ($item in $items) {
 Write-Host "`nProgress: $completed/$total items complete"
 
 if ($completed -lt $total) {
-    Write-Host "`n🚫 Blocking completion: $($total - $completed) incomplete items"
+    Write-Host "`n[BLOCK] Blocking completion: $($total - $completed) incomplete items"
     Write-Host "`nIncomplete items:"
     foreach ($item in $incomplete_items) {
         Write-Host "  - $item"
@@ -58,6 +58,6 @@ if ($completed -lt $total) {
     Write-Host "  3. Run verification again"
     exit 1
 } else {
-    Write-Host "`n✅ All checklist items complete! Proceeding with completion verification."
+    Write-Host "`n[OK] All checklist items complete. Proceeding with completion verification."
     exit 0
 }

@@ -32,7 +32,7 @@ class OssTaskInput(BaseModel):
     )
     model_override: Optional[str] = Field(
         default=None,
-        description="デフォルトモデルの上書き。例: 'deepseek-v4-pro', 'kimi-k2.6', 'deepseek-v4-flash'",
+        description="デフォルトモデルの上書き。例: 'glm-5.1', 'deepseek-v4-pro', 'kimi-k2.6', 'deepseek-v4-flash'",
     )
     system_prompt: Optional[str] = Field(
         default=None,

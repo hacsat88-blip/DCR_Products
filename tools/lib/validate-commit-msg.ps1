@@ -63,7 +63,7 @@ $subject = ($msg -split "`n")[0].Trim()
 
 if ($subject -notmatch $ConventionalPattern) {
     Write-Host ""
-    Write-Host "🔴 コミットメッセージが Conventional Commits 規約に違反しています" -ForegroundColor Red
+    Write-Host "[STOP] コミットメッセージが Conventional Commits 規約に違反しています" -ForegroundColor Red
     Write-Host ""
     Write-Host "   入力: $subject" -ForegroundColor Yellow
     Write-Host ""

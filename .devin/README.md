@@ -5,7 +5,7 @@ This directory contains Devin-specific project configuration and operational gui
 ## Purpose
 
 - Keep shared DCR behavior in `.ai/`.
-- Keep generated runtime mirrors in tool-specific folders such as `.windsurf/`, `.cursor/`, `AGENTS.md`, and `CLAUDE.md`.
+- Keep generated runtime mirrors in tool-specific folders and entrypoints such as `.windsurf/`, `.cursor/`, `AGENTS.md`, `CLAUDE.md`, `opencode.json`, and `.opencode/kernel.md`.
 - Keep Devin-only behavior here: session rules, hook examples, workflow shortcuts, and Devin-specific skills.
 
 ## Layout
@@ -28,6 +28,27 @@ This directory contains Devin-specific project configuration and operational gui
 - Hook environment names in `hooks.example.json` are provisional. Verify the current Devin hook payload schema before enabling, and adapt scripts if your runtime uses different names.
 - Workflow verification commands assume PowerShell is available. Prefer `pwsh` when Windows PowerShell lacks required modules such as `Get-FileHash`.
 - For user-level Devin configuration, use `~/.config/devin/`.
+
+## MCP Setup
+
+Devin supports custom MCP servers through Settings > MCP Marketplace > Add Your Own.
+Keep MCP activation in Devin's UI or current user-level configuration; this repository only records the safe project-local example.
+
+Use this STDIO server when enabling the shared OSS delegation bridge:
+
+```json
+{
+  "transport": "STDIO",
+  "command": "python",
+  "args": [
+    "<DEVIN_REPO_ROOT>/tools/mcp-servers/opencode-bridge/server.py"
+  ],
+  "env_variables": {}
+}
+```
+
+Replace `<DEVIN_REPO_ROOT>` with the absolute checkout path visible inside Devin's environment before testing the server.
+After saving the custom MCP, use Devin's Test listing tools action. The expected tools are `oss_explore`, `oss_document`, and `oss_implement`.
 
 ## Source-of-Truth Rule
 

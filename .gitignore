@@ -69,7 +69,6 @@ codex_Product/
 prototypes/blue-planet-globe/
 
 # Personal local overrides (not shared)
-CLAUDE.local.md
 .claude/local/
 .claude/settings.local.json
 

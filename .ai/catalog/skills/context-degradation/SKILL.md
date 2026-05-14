@@ -25,6 +25,10 @@ metadata:
   upstream_url: "https://github.com/sickn33/antigravity-awesome-skills"
   upstream_path: "skills/context-degradation/SKILL.md"
   license: "CC-BY-4.0 content / MIT repository code; adapted summary"
+  upstream_source: "Agent Skills for Context Engineering Contributors"
+  upstream_version: "1.0.0"
+  upstream_last_updated: "2025-12-20"
+  source_notice: "Adapted from upstream concepts and headings; no verbatim wholesale import."
   imported_at: "2026-05-06"
   adapted_from: "Condensed into a DCR reinforcement skill; not a wholesale import."
 ---
@@ -61,4 +65,3 @@ DCR では、これは単体 agent の能力不足ではなく、`pied-piper` �
 - 読む範囲を減らす前: `context-optimization`
 - ツール出力が重いとき: `token-efficiency-advisor`
 - 完了主張の直前: `verification-before-completion`
-

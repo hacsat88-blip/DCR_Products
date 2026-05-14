@@ -7,6 +7,7 @@ triggers:
   - "委任して"
   - "DeepSeekで"
   - "Kimiで"
+  - "GLMで"
   - "コスト削減"
 targets:
   - codex
@@ -18,7 +19,7 @@ mcp_server: opencode-bridge
 
 # OSSモデル委任スキル
 
-OpenCode Go API 経由のOSSモデル（Kimi K2.6 / DeepSeek V4 Flash / DeepSeek V4 Pro）に
+OpenCode Go API 経由のOSSモデル（Kimi K2.6 / DeepSeek V4 Flash / DeepSeek V4 Pro / GLM-5.1）に
 タスクを委任するための判断ルールと実行フローを定義する。
 
 `task` と `context` は外部の OpenCode Go API に送信される。秘密情報、認証情報、顧客データ、
@@ -31,6 +32,7 @@ OpenCode Go API 経由のOSSモデル（Kimi K2.6 / DeepSeek V4 Flash / DeepSeek
 | `oss_explore` | Kimi K2.6 | コード探索・要約・呼び出し関係調査 |
 | `oss_document` | DeepSeek V4 Flash | ドキュメント生成・CHANGELOG・翻訳・コメント |
 | `oss_implement` | DeepSeek V4 Pro | 単体テスト作成・限定実装・リファクタリング提案 |
+| `oss_agentic` | GLM-5.1 | 複数ステップの実装計画・検証戦略・リスク分解 |
 
 ---
 
@@ -38,7 +40,7 @@ OpenCode Go API 経由のOSSモデル（Kimi K2.6 / DeepSeek V4 Flash / DeepSeek
 
 ### パターンA: ユーザーが明示的に要求 → 確認なしで即実行
 
-**トリガーキーワード**: 「OSSに」「安いモデルで」「委任して」「DeepSeekで」「Kimiで」
+**トリガーキーワード**: 「OSSに」「安いモデルで」「委任して」「DeepSeekで」「Kimiで」「GLMで」
 
 ```
 User: 「OSSでこのファイルの関数一覧を出して」
@@ -62,7 +64,7 @@ User:  「委任する」を選択
 質問: 「このタスクを [モデル名] に委任できます。[理由]。委任しますか？」
 選択肢:
   - 「委任する（[モデル名]）」: 推奨、コスト効率が高い
-  - 「別のモデルで委任」: oss_explore / oss_document / oss_implement から選択
+  - 「別のモデルで委任」: oss_explore / oss_document / oss_implement / oss_agentic から選択
   - 「Claude が自分で実行」: コンテキスト依存が強い場合
 ```
 
@@ -98,6 +100,15 @@ User:  「委任する」を選択
 | 単一ファイルのリファクタリング案 | 「この関数を UTC 対応にして」 |
 | ボイラープレート生成 | 「新しい API エンドポイントの雛形を作って」 |
 | コードレビュー補助 | 「このコードの改善点を教えて」 |
+
+### oss_agentic → GLM-5.1
+
+| 条件 | 例 |
+|---|---|
+| 複数ステップの実装計画 | 「この機能を安全に段階実装する計画を作って」 |
+| 検証戦略・リスク分解 | 「MCP追加後の検証観点と失敗時の切り分けを出して」 |
+| ツール利用設計 | 「サブエージェントとMCPをどう組み合わせるか提案して」 |
+| 長い反復が必要な設計補助 | 「複雑なリファクタの進め方を分解して」 |
 
 ---
 

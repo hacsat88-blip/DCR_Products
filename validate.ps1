@@ -10,7 +10,7 @@
     2. .ai/catalog/skills/*/SKILL.md — YAML frontmatter に name: と description: が存在するか
     3. .ai/catalog/skills/*/SKILL.md — frontmatter 以外の本文が存在するか
     4. deploy.ps1 -DryRun が exit 0 で完了するか
-       5. catalog rules の _ROUTING_INDEX.md が生成結果と一致するか
+    5. catalog rules の _ROUTING_INDEX.md が生成結果と一致するか
     6. .ai/catalog/rules/*.md の inherits: が実在する _*.md trait を参照しているか
     7. .ai/catalog/skills/*/SKILL.md の contract: 構造が有効か
     8. .ai/catalog/skills/*/SKILL.md の composable: chains_with が実在するスキルを参照しているか
@@ -20,11 +20,15 @@
    12. .ai/catalog/rules/*.md と .ai/catalog/skills/*/SKILL.md の basename collision がないか
    13. .ai/catalog/rules/*.md の routing_category が許可集合に含まれるか
    14. catalog agents-source/*.toml — version フィールドが存在するか
-    15. .ai/catalog/rules/*.md — description: が空でないか・最低限の品質があるか
+   15. .ai/catalog/rules/*.md — description: が空でないか・最低限の品質があるか
+   16. external Superpowers checkout の drift がないか
+   17. shared book contract が有効か
+   18. routing fixture が一貫しているか
+   19. PowerShell 実行ファイルに絵文字・装飾記号が含まれていないか
 
 .EXAMPLE
-  .\validate.ps1
-  .\validate.ps1 -Verbose
+  pwsh -ExecutionPolicy Bypass -File .\validate.ps1
+  pwsh -ExecutionPolicy Bypass -File .\validate.ps1 -Verbose
 #>
 
 param(
@@ -46,7 +50,16 @@ $ExternalSuperpowersCheckScript = Join-Path $RepoRoot "tools\check-external-supe
 $SharedBookCheckScript = Join-Path $RepoRoot "tools\validate-shared-book.ps1"
 $RoutingAccuracyScript = Join-Path $RepoRoot "tools\eval-routing-accuracy.ps1"
 $RoutingIndexFile = Join-Path $SourceRules "_ROUTING_INDEX.md"
-$PowerShellExe = (Get-Process -Id $PID).Path
+function Resolve-DcrPowerShellExe {
+    $pwshCommand = Get-Command pwsh -ErrorAction SilentlyContinue
+    if ($pwshCommand -and $pwshCommand.Source) {
+        return $pwshCommand.Source
+    }
+
+    return (Get-Process -Id $PID).Path
+}
+
+$PowerShellExe = Resolve-DcrPowerShellExe
 
 $passed = 0
 $failed = 0
@@ -667,6 +680,39 @@ else {
         Write-Fail "routing fixture consistency — failed"
         if ($result) { Write-Host "  $result" -ForegroundColor DarkGray }
     }
+}
+
+# ─────────────────────────────────────────────
+# 19. PowerShell script status glyph check
+# ─────────────────────────────────────────────
+Write-Host ""
+Write-Host "== 19. PowerShell script glyph check =========="
+$PowerShellStatusGlyphPattern = '[\uD800-\uDBFF][\uDC00-\uDFFF]|[\u2600-\u26FF\u2700-\u27BF]'
+$PowerShellScriptFiles = Get-ChildItem -Path $RepoRoot -Recurse -File -Include *.ps1,*.psm1,*.psd1 -ErrorAction SilentlyContinue |
+Where-Object {
+    $_.FullName -notmatch '\\\.git\\' -and
+    $_.FullName -notmatch '\\node_modules\\' -and
+    $_.FullName -notmatch '\\Product\\' -and
+    $_.FullName -notmatch '\\\.venv\\' -and
+    $_.FullName -notmatch '\\__pycache__\\'
+} |
+Sort-Object FullName
+
+$glyphHits = @()
+foreach ($file in $PowerShellScriptFiles) {
+    $matches = Select-String -LiteralPath $file.FullName -Pattern $PowerShellStatusGlyphPattern
+    foreach ($match in $matches) {
+        $relativePath = $match.Path.Replace($RepoRoot + '\', '')
+        $glyphHits += "$($relativePath):$($match.LineNumber)"
+    }
+}
+
+if ($glyphHits.Count -eq 0) {
+    if ($Verbose) { Write-Ok "PowerShell scripts - no emoji/status glyphs" }
+    else { $script:passed++ }
+}
+else {
+    Write-Fail "PowerShell scripts - emoji/status glyphs found: $($glyphHits -join ', ')"
 }
 
 # ─────────────────────────────────────────────

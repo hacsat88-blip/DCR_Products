@@ -58,7 +58,7 @@ $skillList = if ($skills) { (($skills | ForEach-Object { "- [$_](../../.ai/catal
 $content = @"
 <!-- AUTO-GENERATED FILE - DO NOT EDIT DIRECTLY
 Generated from: .ai/book + .ai/kernel + .ai/catalog/rules/ + .ai/catalog/skills/
-To regenerate: Run .\deploy.ps1 or .\tools\deploy-all.ps1
+To regenerate: Run pwsh -ExecutionPolicy Bypass -File .\deploy.ps1 or .\tools\deploy-all.ps1
 Any manual edits will be overwritten on next deploy. -->
 
 # GitHub Copilot Instructions
@@ -72,6 +72,14 @@ $ruleList
 ## Included Skills
 
 $skillList
+
+---
+
+## Runtime Memory Preflight
+
+「これどう？」「サトシ開発目線で」「前と同じ観点で」「入れる価値ある？」「導入して」「置き換える必要ある？」「また同じエラー」「過去判断も踏まえて」など、過去判断が品質に影響する相談では、利用可能な runtime memory を着手前に確認する。
+
+agentmemory 互換 backend が使える場合は、同種タスク、関連ファイルの過去判断、採用/非採用ポリシー、検証済みコマンドを短く検索する。使えない場合は通常の repo 探索へフォールバックする。memory recall は正本ではなく、`.ai/catalog` / `.ai/book` / repo artifact / 現在の git 状態を優先する。
 
 ---
 

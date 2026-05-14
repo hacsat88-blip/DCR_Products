@@ -15,6 +15,9 @@
   "generatedDoNotEdit": [
     "AGENTS.md",
     "CLAUDE.md",
+    "opencode.json",
+    ".opencode/kernel.md",
+    ".opencode/opencode.json",
     ".windsurf/rules/",
     ".cursor/rules/",
     ".codex/agents/",
@@ -30,7 +33,26 @@
   "delegation": {
     "preferReadOnlySubagentsForExploration": true,
     "useQaEvidenceAfterImplementation": true,
-    "cloudHandoffRequiresExplicitUserRequest": true
+    "cloudHandoffRequiresExplicitUserRequest": true,
+    "mcpExamples": {
+      "opencode-bridge": {
+        "status": "example-not-active",
+        "activation": "Enable through Devin Settings > MCP Marketplace > Add Your Own, then run Test listing tools.",
+        "expectedTools": [
+          "oss_explore",
+          "oss_document",
+          "oss_implement"
+        ],
+        "config": {
+          "transport": "STDIO",
+          "command": "python",
+          "args": [
+            "<DEVIN_REPO_ROOT>/tools/mcp-servers/opencode-bridge/server.py"
+          ],
+          "env_variables": {}
+        }
+      }
+    }
   },
   "safety": {
     "blockSecrets": true,

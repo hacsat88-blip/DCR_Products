@@ -5,6 +5,36 @@
 
 ## 決定木（優先順位順）
 
+### Runtime Memory Preflight（任意）
+
+`pied-piper` は通常ルーティングの前後で、過去判断が品質に影響するかを判定する。
+agentmemory などの runtime memory backend が利用可能な場合のみ検索し、利用不可なら通常の repo 探索へフォールバックする。
+
+自然言語 trigger:
+
+- 「これどう？」「サトシ開発目線で」「前と同じ観点で」
+- 「入れる価値ある？」「導入して」「置き換える必要ある？」
+- 「また同じエラー」「前にもあった」「過去判断も踏まえて」
+- 外部 agent pack / skill catalog / MCP / runtime wrapper / memory backend の評価
+- 正本/生成物境界、ファイル削除、採用/非採用ポリシーが関わる相談
+
+検索対象:
+
+- この repo の過去の同種タスク
+- 関連ファイルの過去判断
+- 既存の採用/非採用ポリシー
+- 以前通った検証コマンド、失敗原因、残リスク
+
+優先順位:
+
+1. ユーザーの最新指示
+2. `.ai/catalog` / `.ai/book` / repo 内 artifact
+3. 現在の git 状態
+4. runtime memory の recall
+
+作業後に保存する場合は、決定・理由・検証結果・次回 recall trigger だけに絞る。
+secret、PII、ログ全文、中間推論、正本に書くべき内容は保存しない。
+
 ```
 0. 【必須前処理】Alias 解決
    → 候補名の frontmatter に deprecated: true があれば、
