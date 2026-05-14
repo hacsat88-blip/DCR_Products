@@ -63,6 +63,7 @@ Generates `AGENTS.md` for Codex (GitHub CLI) environment
 #### `adapters/windsurf.ps1`
 Generates `.windsurf/rules/*.md`, `.windsurf/workflows/*.md`, `.windsurf/hooks.json`, and `.windsurf/mcp_config.example.json` for Windsurf Cascade.
 The generated `.windsurf/` mirror is ignored by Git; edit `.ai/kernel/`, `.ai/catalog/rules/`, `.claude/commands/`, or `templates/windsurf/` instead.
+The adapter fails fast if Windsurf templates contain machine-local MCP paths, invalid JSON, unused rule templates, or generated rule files without required frontmatter.
 
 Workflow sources:
 - `.claude/commands/*.md`
