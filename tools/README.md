@@ -15,12 +15,14 @@ Utility scripts for build, deployment, and maintenance operations.
 - `adapters/codex.ps1` → `AGENTS.md`
 - `adapters/windsurf.ps1` → `.windsurf/rules/*.md` + `.windsurf/workflows/*.md` + `.windsurf/hooks.json` + `.windsurf/mcp_config.example.json` (Git 管理外)
 - `adapters/agents.ps1` → `.codex/agents/*.toml` + `.claude/agents/*.md` (Git 管理外)
+- `adapters/opencode.ps1` → `opencode.json` + `.opencode/kernel.md` while preserving `.opencode/agents/` and `.opencode/skills/`
 
 **Usage:**
 ```powershell
 .\deploy-all.ps1                    # Deploy to all targets
 .\deploy-all.ps1 -Target vscode     # Deploy to VS Code only
 .\deploy-all.ps1 -Target agents     # Generate Codex/Claude agent mirrors only
+.\deploy-all.ps1 -Target opencode   # Generate OpenCode project config/kernel only
 .\deploy-all.ps1 -DryRun            # Preview without executing
 ```
 
@@ -69,6 +71,10 @@ Workflow sources:
 #### `adapters/agents.ps1`
 Generates `.codex/agents/*.toml` and `.claude/agents/*.md` from `.ai/catalog/agents-source/`.
 The generated agent mirrors are ignored by Git; edit `.ai/catalog/agents-source/` instead.
+
+#### `adapters/opencode.ps1`
+Generates the root `opencode.json` project config and `.opencode/kernel.md` from `.ai/environments/opencode/`.
+The adapter preserves OpenCode-local `.opencode/agents/` and `.opencode/skills/` overlays.
 
 ---
 

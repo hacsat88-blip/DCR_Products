@@ -34,6 +34,8 @@ disable-model-invocation: true
 | anthropics/skills | selective reference | 重複skillは輸入せず、claude-api/template の設計差分だけ確認 |
 | warpdotdev/oz-skills | selective skill import | Warp/Oz runtime は入れず、Agent Skills互換素材だけ採用 |
 | oh-my-codex | pattern library | doctor / false-green / hook merge の考え方だけ採用 |
+| rohitg00/agentmemory | external-check | runtime memory backend 候補。DCR 正本を置換せず、過去判断 recall と小さな memory_save だけに使う |
+| gsd-build/get-shit-done | adopt patterns only | phase/state/decision/verify/wave/namespace pattern のみ DCR skill 化し、GSD runtime と `.planning/` は入れない |
 | context-mode | external-check | MCP出力オフロードとしてPoC候補、repo正本には混ぜない |
 | ccusage / @ccusage/codex | external-check | 使用量可視化候補、導入前にローカルJSONL範囲を確認 |
 | oraios/serena | external-check | シンボル探索MCP候補、編集権限と対応言語を確認 |

@@ -11,7 +11,7 @@
     Windsurf        : .windsurf/
 
 .PARAMETER Target
-    同期先を指定: all | vscode | cursor | windsurf | agents | dcr
+    同期先を指定: all | vscode | cursor | windsurf | agents | dcr | opencode
   デフォルト: all
 
 .PARAMETER DryRun
@@ -29,7 +29,7 @@
 #>
 
 param(
-    [ValidateSet("all", "vscode", "cursor", "windsurf", "agents", "dcr")]
+    [ValidateSet("all", "vscode", "cursor", "windsurf", "agents", "dcr", "opencode")]
     [string]$Target = "all",
     [switch]$DryRun,
     [switch]$Check,
@@ -68,7 +68,7 @@ if ($EnforceGate) {
 # ── Unified Adapter Framework (new) ──
 $DeployAll = Join-Path $RepoRoot "tools\deploy-all.ps1"
 $WindsurfAdapter = Join-Path $RepoRoot "tools\adapters\windsurf.ps1"
-if ((Test-Path $DeployAll) -and -not $Check -and ($Target -in @("all", "vscode", "cursor", "windsurf", "agents"))) {
+if ((Test-Path $DeployAll) -and -not $Check -and ($Target -in @("all", "vscode", "cursor", "windsurf", "agents", "opencode"))) {
     Write-Host ""
     Write-Host "=== Deploy Adapters (Unified Framework) ===" -ForegroundColor Cyan
     $targetArg = if ($Target -eq "all") { "all" } else { $Target }
@@ -86,12 +86,14 @@ $SourceSkills = Resolve-DcrSourcePath -RepoRoot $RepoRoot -AssetType "skills"
 $SourceRules = Resolve-DcrSourcePath -RepoRoot $RepoRoot -AssetType "rules"
 $SourceRuntimeKernel = Join-Path $RepoRoot ".ai\kernel\dcr-kernel.md"
 $SourceAgents = Resolve-DcrSourcePath -RepoRoot $RepoRoot -AssetType "agents-source"
+$SourceOpenCode = Join-Path $RepoRoot ".ai\environments\opencode"
 
 $DestVSCodeSkills = Join-Path $UserHome ".agents\skills"
 $DestWindsurf = Join-Path $RepoRoot ".windsurf"
 $DestWindsurfMcpConfig = Join-Path $UserHome ".codeium\windsurf\mcp_config.json"
 $DestCodexAgents = Join-Path $RepoRoot ".codex\agents"
 $DestClaudeAgents = Join-Path $RepoRoot ".claude\agents"
+$DestOpenCode = Join-Path $RepoRoot ".opencode"
 
 function Get-TempDirectory {
     $tempDir = Join-Path ([System.IO.Path]::GetTempPath()) ("dcr-deploy-" + [System.Guid]::NewGuid().ToString("N"))
@@ -150,6 +152,50 @@ function Sync-DCRConfig {
     }
     catch {
         Write-Warning "Failed to sync .dcr config: $_"
+    }
+}
+
+function Sync-OpenCodeConfig {
+    param(
+        [string]$SourcePath,
+        [string]$DestinationPath
+    )
+
+    # .ai/environments/opencode/ -> root opencode.json + .opencode/ へ同期
+    # .opencode/agents と .opencode/skills は OpenCode 固有 overlay なので保持する
+    $sourceKernel = Join-Path $SourcePath "kernel.md"
+    $destKernel = Join-Path $DestinationPath "kernel.md"
+    $sourceConfig = Join-Path $SourcePath "opencode.json"
+    $rootConfig = Join-Path $RepoRoot "opencode.json"
+    $compatConfig = Join-Path $DestinationPath "opencode.json"
+
+    if (-not (Test-Path $sourceKernel)) {
+        Write-Warning "OpenCode source not found: $sourceKernel"
+        return
+    }
+    if (-not (Test-Path $sourceConfig)) {
+        Write-Warning "OpenCode config source not found: $sourceConfig"
+        return
+    }
+
+    try {
+        if ($DryRun) {
+            Write-Host "[DRY RUN] OpenCode config : $sourceKernel -> $destKernel" -ForegroundColor Yellow
+            Write-Host "[DRY RUN] OpenCode config : $sourceConfig -> $rootConfig" -ForegroundColor Yellow
+            Write-Host "[DRY RUN] OpenCode config : $sourceConfig -> $compatConfig" -ForegroundColor Yellow
+            return
+        }
+
+        New-Item -ItemType Directory -Force -Path $DestinationPath | Out-Null
+        Copy-Item -Path $sourceKernel -Destination $destKernel -Force
+        Copy-Item -Path $sourceConfig -Destination $rootConfig -Force
+        Copy-Item -Path $sourceConfig -Destination $compatConfig -Force
+        Write-Host "[OK] OpenCode config : kernel.md -> $DestinationPath" -ForegroundColor Green
+        Write-Host "[OK] OpenCode config : opencode.json -> $RepoRoot" -ForegroundColor Green
+        Write-Host "[OK] OpenCode config : opencode.json compatibility mirror -> $DestinationPath" -ForegroundColor Green
+    }
+    catch {
+        Write-Warning "Failed to sync OpenCode config: $_"
     }
 }
 
@@ -652,6 +698,29 @@ if ($Check) {
             }
         }
     }
+    if ($Target -eq "all" -or $Target -eq "opencode") {
+        $openCodeSource = Join-Path $RepoRoot ".ai\environments\opencode\kernel.md"
+        $openCodeDest = Join-Path $RepoRoot ".opencode\kernel.md"
+        $openCodeConfigSource = Join-Path $RepoRoot ".ai\environments\opencode\opencode.json"
+        $openCodeConfigDest = Join-Path $RepoRoot "opencode.json"
+        $openCodeCompatDest = Join-Path $RepoRoot ".opencode\opencode.json"
+        if (-not (Test-Path $openCodeSource)) {
+            Write-Host "[SKIP] OpenCode config : source not found" -ForegroundColor Yellow
+        }
+        else {
+            $openCodeDiffs = @()
+            $openCodeDiffs += Get-FileDrift -SourcePath $openCodeSource -DestinationPath $openCodeDest -Label "OpenCode kernel.md"
+            $openCodeDiffs += Get-FileDrift -SourcePath $openCodeConfigSource -DestinationPath $openCodeConfigDest -Label "opencode.json"
+            $openCodeDiffs += Get-FileDrift -SourcePath $openCodeConfigSource -DestinationPath $openCodeCompatDest -Label "OpenCode compatibility opencode.json"
+            if ($openCodeDiffs.Count -eq 0) {
+                Write-Host "[OK] OpenCode config : in sync" -ForegroundColor Green
+            }
+            else {
+                Write-Host "[DRIFT] OpenCode config : $($openCodeDiffs.Count) differences" -ForegroundColor Red
+                $openCodeDiffs | ForEach-Object { Write-Host "  $_" -ForegroundColor Yellow }
+            }
+        }
+    }
     Write-Host ""
     Write-Host "Drift check complete." -ForegroundColor Cyan
     return
@@ -703,6 +772,35 @@ if ($Target -eq "all" -or $Target -eq "windsurf") {
     Sync-WindsurfMcpConfig -RepoRootPath $RepoRoot -DestinationPath $DestWindsurfMcpConfig
     if (-not $DryRun) {
         Assert-NoDrift -Label "Windsurf MCP config" -Diffs (Get-WindsurfMcpConfigDrift -RepoRootPath $RepoRoot -DestinationPath $DestWindsurfMcpConfig)
+    }
+}
+
+if ($Target -eq "all" -or $Target -eq "opencode") {
+    if (-not $DryRun) {
+        Write-ManagedTargetNotice -Label "OpenCode config" -Destination $DestOpenCode
+        $openCodeSource = Join-Path $RepoRoot ".ai\environments\opencode\kernel.md"
+        $openCodeDest = Join-Path $RepoRoot ".opencode\kernel.md"
+        $openCodeConfigSource = Join-Path $RepoRoot ".ai\environments\opencode\opencode.json"
+        $openCodeConfigDest = Join-Path $RepoRoot "opencode.json"
+        $openCodeCompatDest = Join-Path $RepoRoot ".opencode\opencode.json"
+        $openCodeDiffs = @()
+        $openCodeDiffs += Get-FileDrift -SourcePath $openCodeSource -DestinationPath $openCodeDest -Label "OpenCode kernel.md"
+        $openCodeDiffs += Get-FileDrift -SourcePath $openCodeConfigSource -DestinationPath $openCodeConfigDest -Label "opencode.json"
+        $openCodeDiffs += Get-FileDrift -SourcePath $openCodeConfigSource -DestinationPath $openCodeCompatDest -Label "OpenCode compatibility opencode.json"
+        Write-PrecheckSummary -Label "OpenCode config" -Diffs $openCodeDiffs
+    }
+    Sync-OpenCodeConfig -SourcePath $SourceOpenCode -DestinationPath $DestOpenCode
+    if (-not $DryRun) {
+        $openCodeSource = Join-Path $RepoRoot ".ai\environments\opencode\kernel.md"
+        $openCodeDest = Join-Path $RepoRoot ".opencode\kernel.md"
+        $openCodeConfigSource = Join-Path $RepoRoot ".ai\environments\opencode\opencode.json"
+        $openCodeConfigDest = Join-Path $RepoRoot "opencode.json"
+        $openCodeCompatDest = Join-Path $RepoRoot ".opencode\opencode.json"
+        $openCodeDiffs = @()
+        $openCodeDiffs += Get-FileDrift -SourcePath $openCodeSource -DestinationPath $openCodeDest -Label "OpenCode kernel.md"
+        $openCodeDiffs += Get-FileDrift -SourcePath $openCodeConfigSource -DestinationPath $openCodeConfigDest -Label "opencode.json"
+        $openCodeDiffs += Get-FileDrift -SourcePath $openCodeConfigSource -DestinationPath $openCodeCompatDest -Label "OpenCode compatibility opencode.json"
+        Assert-NoDrift -Label "OpenCode config" -Diffs $openCodeDiffs
     }
 }
 
@@ -764,6 +862,9 @@ if ($Watch) {
                 }
                 if ($Target -eq "all" -or $Target -eq "agents") {
                     & $DeployAll -Target agents
+                }
+                if ($Target -eq "all" -or $Target -eq "opencode") {
+                    Sync-OpenCodeConfig -SourcePath $SourceOpenCode -DestinationPath $DestOpenCode
                 }
 
                 Write-Host "[WATCH] Deploy complete. Watching..." -ForegroundColor Green

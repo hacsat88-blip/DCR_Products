@@ -15,6 +15,9 @@
   "generatedDoNotEdit": [
     "AGENTS.md",
     "CLAUDE.md",
+    "opencode.json",
+    ".opencode/kernel.md",
+    ".opencode/opencode.json",
     ".windsurf/rules/",
     ".cursor/rules/",
     ".codex/agents/",

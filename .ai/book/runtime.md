@@ -103,6 +103,19 @@ Prefer tools in this order when available:
 
 Use tools when they improve accuracy, freshness, or efficiency. If tool limits affect confidence, state the limit.
 
+## Runtime Memory Preflight
+
+When a request depends on prior repo decisions, file history, adoption policy, or repeated failures, check available runtime memory before deep work. Natural-language triggers include: "これどう？", "サトシ開発目線で", "前と同じ観点で", "入れる価値ある？", "導入して", "置き換える必要ある？", "また同じエラー", and "過去判断も踏まえて".
+
+If an agentmemory-compatible MCP/REST backend is available, search for:
+
+- similar past tasks in this repo
+- prior decisions for related files
+- adoption or rejection policy for external packs
+- verified commands, failure causes, and residual risk
+
+Runtime memory is never the source of truth. Prefer the latest user instruction, `.ai/catalog`, `.ai/book`, repo artifacts, and current git state over memory recall. If saving after work, save only the decision, reason, verification result, and future recall trigger. Do not save secrets, PII, full logs, hidden reasoning, or content that belongs in DCR source files.
+
 ## References
 
 - Detailed permissions: [permissions.md](permissions.md)

@@ -1,5 +1,7 @@
 from dataclasses import dataclass
-from datetime import time
+from datetime import date, time
+
+import jpholiday
 
 from .capital_router import TierConfig
 
@@ -19,6 +21,7 @@ class PriceData:
     rsi14: float
     prev_close: float
     current_time: time
+    current_date: date | None = None
 
 
 @dataclass
@@ -29,6 +32,12 @@ class FilterResult:
 
 class TechnicalFilter:
     def check(self, data: PriceData, config: TierConfig) -> FilterResult:
+        if data.current_date is not None:
+            if data.current_date.weekday() >= 5:
+                return FilterResult(False, "土日のため取引なし")
+            if jpholiday.is_holiday(data.current_date):
+                return FilterResult(False, "祝日のため取引なし")
+
         if not self._in_trade_session(data.current_time):
             return FilterResult(False, "取引時間外")
 

@@ -168,6 +168,15 @@ When the user triggers a mode, apply the corresponding behavior:
 - Do not auto-load roles when the match is ambiguous or would require more than two roles
 - Keep auto-routing conservative for security, legal, billing, destructive, or deploy-related work
 
+## Runtime Memory Preflight
+
+- 過去の repo 判断、関連ファイル履歴、採用/非採用ポリシー、または再発障害が判断品質に影響する依頼では、深い作業の前に利用可能な runtime memory を確認する
+- 自然言語 trigger: `これどう？`, `サトシ開発目線で`, `前と同じ観点で`, `入れる価値ある？`, `導入して`, `置き換える必要ある？`, `また同じエラー`, `過去判断も踏まえて`
+- agentmemory 互換の MCP/REST backend が利用可能なら、同種タスク、関連ファイルの過去判断、採用/非採用ポリシー、検証済みコマンドを短く検索する
+- 利用不可なら通常の repo 探索へフォールバックする
+- runtime memory は正本ではない。最新のユーザー指示 -> `.ai/catalog` / `.ai/book` / repo artifact -> 現在の git 状態 -> memory recall の順で優先する
+- 作業後に保存する場合は、決定・理由・検証結果・次回 recall trigger だけに絞り、secret、PII、ログ全文、中間推論、正本化すべき内容は保存しない
+
 ## External capability packs
 
 - DCR Kernel is the control layer; external plugins are optional capability packs

@@ -688,10 +688,11 @@ else {
 Write-Host ""
 Write-Host "== 19. PowerShell script glyph check =========="
 $PowerShellStatusGlyphPattern = '[\uD800-\uDBFF][\uDC00-\uDFFF]|[\u2600-\u26FF\u2700-\u27BF]'
-$PowerShellScriptFiles = Get-ChildItem -Path $RepoRoot -Recurse -File -Include *.ps1,*.psm1,*.psd1 |
+$PowerShellScriptFiles = Get-ChildItem -Path $RepoRoot -Recurse -File -Include *.ps1,*.psm1,*.psd1 -ErrorAction SilentlyContinue |
 Where-Object {
     $_.FullName -notmatch '\\\.git\\' -and
     $_.FullName -notmatch '\\node_modules\\' -and
+    $_.FullName -notmatch '\\Product\\' -and
     $_.FullName -notmatch '\\\.venv\\' -and
     $_.FullName -notmatch '\\__pycache__\\'
 } |

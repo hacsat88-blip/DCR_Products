@@ -5,7 +5,7 @@ This directory contains Devin-specific project configuration and operational gui
 ## Purpose
 
 - Keep shared DCR behavior in `.ai/`.
-- Keep generated runtime mirrors in tool-specific folders such as `.windsurf/`, `.cursor/`, `AGENTS.md`, and `CLAUDE.md`.
+- Keep generated runtime mirrors in tool-specific folders and entrypoints such as `.windsurf/`, `.cursor/`, `AGENTS.md`, `CLAUDE.md`, `opencode.json`, and `.opencode/kernel.md`.
 - Keep Devin-only behavior here: session rules, hook examples, workflow shortcuts, and Devin-specific skills.
 
 ## Layout

@@ -44,7 +44,13 @@ foreach ($token in $tokens) {
     if ([string]::IsNullOrWhiteSpace($t)) {
         continue
     }
-    if ($t -eq 'agents.md' -or $t.EndsWith('/agents.md') -or $t -eq 'claude.md' -or $t.EndsWith('/claude.md')) {
+    if (
+        $t -eq 'agents.md' -or $t.EndsWith('/agents.md') -or
+        $t -eq 'claude.md' -or $t.EndsWith('/claude.md') -or
+        $t -eq 'opencode.json' -or $t.EndsWith('/opencode.json') -or
+        $t -eq '.opencode/kernel.md' -or $t.EndsWith('/.opencode/kernel.md') -or
+        $t -eq '.opencode/opencode.json' -or $t.EndsWith('/.opencode/opencode.json')
+    ) {
         Write-Error "Blocked by Devin generated-file guard. Edit the `.ai/` source of truth or templates, then regenerate mirrors instead of editing generated output directly."
         exit 1
     }

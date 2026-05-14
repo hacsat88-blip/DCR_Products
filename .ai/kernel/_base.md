@@ -139,6 +139,21 @@ skills と rules が両方一致した場合は skills を優先する。
 
 ツールは正確性・最新性・効率に寄与する場合に使う。画像生成・編集が必要な依頼は専用ツールを優先する。ツールを使えない、または使わない判断が結果の信頼性に影響する場合は、その制約を明示する。
 
+## Runtime Memory Preflight
+
+過去の repo 判断、関連ファイル履歴、採用/非採用ポリシー、または再発障害が判断品質に影響する依頼では、深い作業の前に利用可能な runtime memory を確認する。
+
+自然言語 trigger:
+
+- `これどう？`, `サトシ開発目線で`, `前と同じ観点で`
+- `入れる価値ある？`, `導入して`, `置き換える必要ある？`
+- `また同じエラー`, `前にもあった`, `過去判断も踏まえて`
+- 外部 agent pack / skill catalog / MCP / runtime wrapper / memory backend の評価
+
+agentmemory 互換の MCP/REST backend が利用可能なら、同種タスク、関連ファイルの過去判断、採用/非採用ポリシー、検証済みコマンドを短く検索する。利用不可なら通常の repo 探索へフォールバックする。
+
+runtime memory は正本ではない。優先順位は、最新のユーザー指示 -> `.ai/catalog` / `.ai/book` / repo artifact -> 現在の git 状態 -> memory recall とする。作業後に保存する場合は、決定・理由・検証結果・次回 recall trigger だけに絞り、secret、PII、ログ全文、中間推論、正本化すべき内容は保存しない。
+
 ## Pipeline gate chain
 
 標準フローは次の通り。

@@ -129,6 +129,12 @@ Unified entry point for Claude Code environment.
 Rule/Skill/Agent の選定は [.ai/module/unified-router.md](.ai/module/unified-router.md) の決定木に従い、
 採用前に必ず3行報告（採用名・理由・期待効果）を出す。
 
+## Runtime Memory Preflight
+
+「これどう？」「サトシ開発目線で」「前と同じ観点で」「入れる価値ある？」「導入して」「置き換える必要ある？」「また同じエラー」「過去判断も踏まえて」など、過去判断が品質に影響する相談では、利用可能な runtime memory を着手前に確認する。
+
+agentmemory 互換 backend が使える場合は、同種タスク、関連ファイルの過去判断、採用/非採用ポリシー、検証済みコマンドを短く検索する。使えない場合は通常の repo 探索へフォールバックする。memory recall は正本ではなく、`.ai/catalog` / `.ai/book` / repo artifact / 現在の git 状態を優先する。
+
 詳細：
 - [.ai/module/unified-coordinator.md](.ai/module/unified-coordinator.md)
 - [.ai/module/unified-router.md](.ai/module/unified-router.md)

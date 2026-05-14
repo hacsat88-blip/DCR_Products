@@ -11,7 +11,7 @@ Use Devin as a high-signal implementation and verification operator for this rep
 - Rules: `.ai/catalog/rules/`
 - Skills: `.ai/catalog/skills/`
 - Agents: `.ai/catalog/agents-source/`
-- Generated mirrors: `AGENTS.md`, `CLAUDE.md`, `.windsurf/`, `.cursor/`, `.codex/agents/`, `.claude/agents/`
+- Generated mirrors: `AGENTS.md`, `CLAUDE.md`, `opencode.json`, `.opencode/kernel.md`, `.opencode/opencode.json`, `.windsurf/`, `.cursor/`, `.codex/agents/`, `.claude/agents/`
 
 ## Devin Operating Rules
 

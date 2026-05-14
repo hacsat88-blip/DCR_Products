@@ -1,6 +1,5 @@
 from dataclasses import dataclass, field
-from datetime import datetime, time
-from typing import Optional
+from datetime import date, datetime, time
 
 
 RULES = {
@@ -22,6 +21,7 @@ class GuardResult:
 
 @dataclass
 class TradeSession:
+    session_date: date | None = None
     daily_pnl: float = 0.0
     position_count: int = 0
     trading_stopped: bool = False
@@ -29,11 +29,21 @@ class TradeSession:
 
     position_open_times: dict[str, datetime] = field(default_factory=dict)
     position_entry_prices: dict[str, float] = field(default_factory=dict)
+    position_lots: dict[str, int] = field(default_factory=dict)
 
 
 class RiskGuard:
     def __init__(self) -> None:
         self.session = TradeSession()
+
+    def reset_session(self, session_date: date) -> None:
+        self.session = TradeSession(session_date=session_date)
+
+    def ensure_today(self, now: datetime) -> bool:
+        if self.session.session_date != now.date():
+            self.reset_session(now.date())
+            return True
+        return False
 
     def check_entry(
         self, symbol: str, price: float, target_price: float, now: datetime, lot: int = 100
@@ -62,19 +72,21 @@ class RiskGuard:
 
         return GuardResult(True, "エントリー許可")
 
-    def on_entry(self, symbol: str, price: float, now: datetime) -> None:
+    def on_entry(self, symbol: str, price: float, now: datetime, lot: int = 100) -> None:
         self.session.position_count += 1
         self.session.position_open_times[symbol] = now
         self.session.position_entry_prices[symbol] = price
+        self.session.position_lots[symbol] = lot
 
     def check_exit(self, symbol: str, current_price: float, now: datetime) -> GuardResult:
         entry_price = self.session.position_entry_prices.get(symbol)
         if entry_price is None:
             return GuardResult(False, "未保有銘柄")
 
-        unrealized_pnl = current_price - entry_price
-        if unrealized_pnl <= RULES["max_loss_per_trade"] / 100:
-            return GuardResult(True, f"損切り発動 含み損 {unrealized_pnl:+.0f}円")
+        lot = self.session.position_lots.get(symbol, 100)
+        total_unrealized = (current_price - entry_price) * lot
+        if total_unrealized <= RULES["max_loss_per_trade"]:
+            return GuardResult(True, f"損切り発動 含み損 {total_unrealized:+.0f}円")
 
         open_time = self.session.position_open_times.get(symbol)
         if open_time:
@@ -89,6 +101,7 @@ class RiskGuard:
         self.session.position_count = max(0, self.session.position_count - 1)
         self.session.position_open_times.pop(symbol, None)
         self.session.position_entry_prices.pop(symbol, None)
+        self.session.position_lots.pop(symbol, None)
 
         if self.session.daily_pnl <= RULES["max_daily_loss"]:
             self._stop_trading("1日最大損失到達")
