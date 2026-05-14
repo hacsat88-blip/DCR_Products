@@ -92,6 +92,174 @@ function Write-Utf8NoBom {
     [System.IO.File]::WriteAllText($Path, $Content, $utf8NoBom)
 }
 
+function Get-WindsurfMcpJsonIssues {
+    param(
+        [string]$Path,
+        [string]$ExpectedArg,
+        [string]$Label
+    )
+
+    $issues = @()
+    if (-not (Test-Path $Path)) {
+        return @("[MISSING] $Label : $Path")
+    }
+
+    $raw = Get-Content -Path $Path -Raw -Encoding utf8
+    try {
+        $config = $raw | ConvertFrom-Json
+    }
+    catch {
+        return @("[INVALID_JSON] $Label : $Path")
+    }
+
+    $serversProperty = $config.PSObject.Properties["mcpServers"]
+    if (-not $serversProperty) {
+        return @("[MISSING] $Label : mcpServers")
+    }
+
+    $entryProperty = $serversProperty.Value.PSObject.Properties["opencode-bridge"]
+    if (-not $entryProperty) {
+        return @("[MISSING] $Label : opencode-bridge")
+    }
+
+    $entry = $entryProperty.Value
+    if ($entry.command -ne "python") {
+        $issues += "[MODIFIED] $Label : opencode-bridge command must be python"
+    }
+
+    $args = @($entry.args)
+    if ($args.Count -ne 1 -or $args[0] -ne $ExpectedArg) {
+        $issues += "[MODIFIED] $Label : opencode-bridge args must be $ExpectedArg"
+    }
+
+    if ($raw -match '[A-Za-z]:[\\/]' -or $raw -match '\\Users\\') {
+        $issues += "[LOCAL_PATH] $Label : template/generated repo config must not contain machine-local paths"
+    }
+
+    return @($issues)
+}
+
+function Get-WindsurfTemplateQualityIssues {
+    $issues = @()
+
+    $issues += Get-WindsurfMcpJsonIssues `
+        -Path $templateMcpPath `
+        -ExpectedArg "<REPO_ROOT>/tools/mcp-servers/opencode-bridge/server.py" `
+        -Label "Windsurf MCP template"
+
+    if (Test-Path $templateHooksPath) {
+        try {
+            Get-Content -Path $templateHooksPath -Raw -Encoding utf8 | ConvertFrom-Json | Out-Null
+        }
+        catch {
+            $issues += "[INVALID_JSON] Windsurf hooks template : $templateHooksPath"
+        }
+    }
+
+    if (Test-Path $templateWorkflowsDir) {
+        $workflowTemplates = Get-ChildItem -Path $templateWorkflowsDir -File -Filter *.md
+        foreach ($workflowTemplate in $workflowTemplates) {
+            $content = Get-Content -Path $workflowTemplate.FullName -Raw -Encoding utf8
+            if (-not $content.Trim()) {
+                $issues += "[EMPTY] Windsurf workflow template : $($workflowTemplate.FullName)"
+            }
+        }
+    }
+
+    $templateRulesDir = Join-Path $templateRoot "rules"
+    if (Test-Path $templateRulesDir) {
+        $unusedRuleTemplates = Get-ChildItem -Path $templateRulesDir -File -Filter *.md -Recurse
+        foreach ($unusedRuleTemplate in $unusedRuleTemplates) {
+            $issues += "[UNUSED_TEMPLATE_RULE] Windsurf rules are generated from .ai/kernel and .ai/catalog/rules, not templates: $($unusedRuleTemplate.FullName)"
+        }
+    }
+
+    return @($issues)
+}
+
+function Get-WindsurfGeneratedQualityIssues {
+    param(
+        [string]$OutputRoot,
+        [System.Collections.Generic.List[string]]$ManagedFiles,
+        [bool]$RequireDeprecatedAliases
+    )
+
+    $issues = @()
+    $requiredFiles = @(
+        "rules/dcr-kernel.md",
+        "mcp_config.example.json",
+        "mcp_config.json"
+    )
+
+    if ($RequireDeprecatedAliases) {
+        $requiredFiles += "rules/deprecated-aliases.md"
+    }
+
+    foreach ($requiredFile in $requiredFiles) {
+        if (-not ($ManagedFiles -contains $requiredFile)) {
+            $issues += "[MISSING_MANAGED] Windsurf generated manifest missing $requiredFile"
+        }
+        if (-not (Test-Path (Join-Path $OutputRoot $requiredFile))) {
+            $issues += "[MISSING_OUTPUT] Windsurf generated output missing $requiredFile"
+        }
+    }
+
+    $uniqueManaged = @($ManagedFiles | Sort-Object -Unique)
+    if ($uniqueManaged.Count -ne $ManagedFiles.Count) {
+        $issues += "[DUPLICATE_MANAGED] Windsurf generated manifest contains duplicate entries"
+    }
+
+    foreach ($managedFile in $ManagedFiles) {
+        $managedPath = Join-Path $OutputRoot $managedFile
+        if (-not (Test-Path $managedPath)) {
+            $issues += "[MISSING_OUTPUT] Windsurf managed file not written: $managedFile"
+        }
+    }
+
+    $rulesDir = Join-Path $OutputRoot "rules"
+    if (Test-Path $rulesDir) {
+        $ruleOutputs = Get-ChildItem -Path $rulesDir -File -Filter *.md
+        foreach ($ruleOutput in $ruleOutputs) {
+            $content = Get-Content -Path $ruleOutput.FullName -Raw -Encoding utf8
+            if ($content -notmatch '(?s)^---\r?\n.*?\r?\n---') {
+                $issues += "[MISSING_FRONTMATTER] Windsurf rule missing frontmatter: $($ruleOutput.Name)"
+            }
+            if ($content -notmatch '(?m)^trigger:\s*(always_on|model_decision)\s*$') {
+                $issues += "[MISSING_TRIGGER] Windsurf rule missing supported trigger: $($ruleOutput.Name)"
+            }
+            if ($content -notmatch '(?m)^description:\s*\S') {
+                $issues += "[MISSING_DESCRIPTION] Windsurf rule missing description: $($ruleOutput.Name)"
+            }
+        }
+    }
+
+    $kernelPath = Join-Path $OutputRoot "rules/dcr-kernel.md"
+    if ((Test-Path $kernelPath) -and ((Get-Content -Path $kernelPath -Raw -Encoding utf8) -notmatch '(?m)^trigger:\s*always_on\s*$')) {
+        $issues += "[MODIFIED] Windsurf dcr-kernel.md must be always_on"
+    }
+
+    $expectedArg = "<REPO_ROOT>/tools/mcp-servers/opencode-bridge/server.py"
+    $issues += Get-WindsurfMcpJsonIssues -Path (Join-Path $OutputRoot "mcp_config.example.json") -ExpectedArg $expectedArg -Label "Windsurf generated MCP example"
+    $issues += Get-WindsurfMcpJsonIssues -Path (Join-Path $OutputRoot "mcp_config.json") -ExpectedArg $expectedArg -Label "Windsurf generated MCP config"
+
+    return @($issues)
+}
+
+function Assert-WindsurfQuality {
+    param(
+        [string]$Label,
+        [string[]]$Issues
+    )
+
+    if ($Issues.Count -eq 0) {
+        Write-WindsurfStatus -Message "  [OK] $Label"
+        return
+    }
+
+    $Issues | ForEach-Object { Write-WindsurfStatus -Message "  $_" -Color "Yellow" }
+    throw "$Label failed."
+}
+
 function Read-ManagedFiles {
     param([string]$Path)
 
@@ -117,6 +285,8 @@ function Register-ManagedFile {
 
     $ManagedFiles.Add($RelativePath)
 }
+
+Assert-WindsurfQuality -Label "Windsurf template quality" -Issues @(Get-WindsurfTemplateQualityIssues)
 
 New-Item -ItemType Directory -Path $outRulesDir -Force | Out-Null
 New-Item -ItemType Directory -Path $outWorkflowsDir -Force | Out-Null
@@ -293,4 +463,5 @@ foreach ($old in $previous) {
 
 Write-Utf8NoBom -Path $manifestPath -Content ((@($managedFiles) | Sort-Object -Unique | ConvertTo-Json -Depth 3))
     Write-WindsurfStatus -Message "  [OK] .windsurf/.dcr-managed-files.json"
+Assert-WindsurfQuality -Label "Windsurf generated quality" -Issues @(Get-WindsurfGeneratedQualityIssues -OutputRoot $outRoot -ManagedFiles $managedFiles -RequireDeprecatedAliases ($deprecatedRules.Count -gt 0))
 Write-WindsurfStatus -Message "" -Color "Green"

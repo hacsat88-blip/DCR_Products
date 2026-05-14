@@ -645,6 +645,7 @@ if ($Check) {
     }
     if ($Target -eq "all" -or $Target -eq "windsurf") {
         $windsurfDiffs = Get-WindsurfDrift -RepoRootPath $RepoRoot -DestinationPath $DestWindsurf -AdapterScriptPath $WindsurfAdapter
+        Write-Host "[OK] Windsurf quality : template and generated output passed" -ForegroundColor Green
         if ($windsurfDiffs.Count -eq 0) {
             Write-Host "[OK] Windsurf mirror : in sync" -ForegroundColor Green
         }
