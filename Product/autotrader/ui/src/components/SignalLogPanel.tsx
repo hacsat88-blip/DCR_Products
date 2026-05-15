@@ -15,8 +15,8 @@ interface Props {
 
 export default function SignalLogPanel({ logs }: Props) {
   return (
-    <PanelCard title="AI 判断ログ" accentColor="blue" className="h-full">
-      <div className="space-y-2 max-h-full overflow-y-auto pr-1">
+    <PanelCard title="AI 判断ログ" accentColor="blue" className="h-full flex flex-col">
+      <div className="space-y-2 flex-1 overflow-y-auto pr-1 min-h-0">
         {logs.length === 0 ? (
           <div className="text-gray-600 text-sm">判断待機中...</div>
         ) : (

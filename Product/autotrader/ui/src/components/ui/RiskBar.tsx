@@ -9,7 +9,7 @@ export default function RiskBar({ budget, maxRisk = 3000 }: RiskBarProps) {
 
   return (
     <div className="w-full">
-      <div className="flex justify-between text-xs text-gray-400 mb-1">
+      <div className="flex justify-between text-xs text-gray-400 mb-1 mt-1">
         <span>リスク使用量</span>
         <span>残余予算: ¥{Math.abs(budget).toLocaleString()}</span>
       </div>

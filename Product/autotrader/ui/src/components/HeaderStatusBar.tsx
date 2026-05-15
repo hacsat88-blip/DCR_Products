@@ -21,10 +21,10 @@ export default function HeaderStatusBar({ status, onToggleSimulation, onEmergenc
 
   return (
     <header className="flex-none h-16 bg-gray-900/80 backdrop-blur border-b border-gray-800 flex items-center justify-between px-6">
-      <div className="flex items-center gap-8">
+      <div className="flex items-center gap-10">
         <div>
           <div className="text-[10px] text-gray-500 uppercase tracking-wider">本日 P/L</div>
-          <div className={`text-2xl font-mono font-bold ${pnl >= 0 ? "text-green-400" : "text-red-400"}`}>
+          <div className={`text-2xl font-mono font-bold mt-1 ${pnl >= 0 ? "text-green-400" : "text-red-400"}`}>
             {pnl >= 0 ? "+" : ""}¥{pnl.toLocaleString()}
           </div>
         </div>
@@ -33,14 +33,14 @@ export default function HeaderStatusBar({ status, onToggleSimulation, onEmergenc
 
         <div>
           <div className="text-[10px] text-gray-500 uppercase tracking-wider">ティア</div>
-          <div className="text-lg font-bold text-blue-400">{status?.tier ?? "—"}</div>
+          <div className="text-lg font-bold text-blue-400 mt-1">{status?.tier ?? "—"}</div>
         </div>
 
         <div className="w-px h-8 bg-gray-800" />
 
         <div>
           <div className="text-[10px] text-gray-500 uppercase tracking-wider">ポジション</div>
-          <div className="text-lg font-bold font-mono">{status?.positions ?? 0} / 2</div>
+          <div className="text-lg font-bold font-mono mt-1">{status?.positions ?? 0} / 2</div>
         </div>
 
         <div className="w-px h-8 bg-gray-800" />
