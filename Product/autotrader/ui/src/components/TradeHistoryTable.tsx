@@ -14,8 +14,18 @@ interface Trade {
 
 type SortKey = "timestamp" | "symbol" | "pnl";
 
+const MOCK_TRADES: Trade[] = [
+  { id: 1, symbol: "7203", action: "buy", price: 2450, qty: 100, pnl: 0, timestamp: "2025-01-15T09:30:00", session_date: "2025-01-15" },
+  { id: 2, symbol: "7203", action: "sell", price: 2500, qty: 100, pnl: 5000, timestamp: "2025-01-15T10:15:00", session_date: "2025-01-15" },
+  { id: 3, symbol: "6758", action: "buy", price: 12500, qty: 20, pnl: 0, timestamp: "2025-01-15T09:45:00", session_date: "2025-01-15" },
+  { id: 4, symbol: "6758", action: "sell", price: 12300, qty: 20, pnl: -2000, timestamp: "2025-01-15T10:30:00", session_date: "2025-01-15" },
+  { id: 5, symbol: "9984", action: "buy", price: 67800, qty: 5, pnl: 0, timestamp: "2025-01-15T10:00:00", session_date: "2025-01-15" },
+  { id: 6, symbol: "9984", action: "sell", price: 68200, qty: 5, pnl: 3500, timestamp: "2025-01-15T11:00:00", session_date: "2025-01-15" },
+  { id: 7, symbol: "8306", action: "buy", price: 580, qty: 200, pnl: 0, timestamp: "2025-01-15T13:00:00", session_date: "2025-01-15" },
+];
+
 export default function TradeHistoryTable() {
-  const [trades, setTrades] = useState<Trade[]>([]);
+  const [trades, setTrades] = useState<Trade[]>(MOCK_TRADES);
   const [filterSymbol, setFilterSymbol] = useState("");
   const [sortKey, setSortKey] = useState<SortKey>("timestamp");
   const [sortDesc, setSortDesc] = useState(true);
@@ -26,7 +36,7 @@ export default function TradeHistoryTable() {
     const fetchTrades = () =>
       fetch(`/api/trades?limit=500${filterSymbol ? `&symbol=${filterSymbol}` : ""}`)
         .then((r) => r.json())
-        .then((d) => setTrades(d.trades ?? []))
+        .then((d) => setTrades(d.trades ?? MOCK_TRADES))
         .catch(() => {});
     fetchTrades();
     const id = setInterval(fetchTrades, 10000);

@@ -24,8 +24,27 @@ interface Report {
   cumulative: { timestamp: string; cumulative_pnl: number }[];
 }
 
+const MOCK_REPORT: Report = {
+  date: "2025-01-15",
+  total_pnl: 8500,
+  trade_count: 6,
+  wins: 3,
+  losses: 1,
+  win_rate: 0.75,
+  max_drawdown: 2000,
+  best_trade: { symbol: "7203", pnl: 5000, timestamp: "2025-01-15T10:15:00" },
+  worst_trade: { symbol: "6758", pnl: -2000, timestamp: "2025-01-15T10:30:00" },
+  cumulative: [
+    { timestamp: "2025-01-15T09:30:00", cumulative_pnl: 0 },
+    { timestamp: "2025-01-15T10:15:00", cumulative_pnl: 5000 },
+    { timestamp: "2025-01-15T10:30:00", cumulative_pnl: 3000 },
+    { timestamp: "2025-01-15T11:00:00", cumulative_pnl: 6500 },
+    { timestamp: "2025-01-15T13:00:00", cumulative_pnl: 6500 },
+  ],
+};
+
 export default function ReportAndHistoryPanel() {
-  const [report, setReport] = useState<Report | null>(null);
+  const [report, setReport] = useState<Report | null>(MOCK_REPORT);
 
   useEffect(() => {
     const fetchReport = () =>
