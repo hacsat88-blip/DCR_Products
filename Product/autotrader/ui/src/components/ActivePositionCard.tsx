@@ -15,14 +15,19 @@ interface Props {
   livePrices: Record<string, number>;
 }
 
+const MOCK_POSITIONS: Position[] = [
+  { symbol: "8306", entry_price: 580, lot: 100, open_time: "2025-01-15T13:00:00", elapsed_minutes: 32, remaining_minutes: 28 },
+  { symbol: "7203", entry_price: 2470, lot: 50, open_time: "2025-01-15T13:15:00", elapsed_minutes: 17, remaining_minutes: 43 },
+];
+
 export default function ActivePositionCard({ livePrices }: Props) {
-  const [positions, setPositions] = useState<Position[]>([]);
+  const [positions, setPositions] = useState<Position[]>(MOCK_POSITIONS);
 
   useEffect(() => {
     const fetchPositions = () =>
       fetch("/api/positions")
         .then((r) => r.json())
-        .then((d) => setPositions(d.positions ?? []))
+        .then((d) => setPositions(d.positions ?? MOCK_POSITIONS))
         .catch(() => {});
     fetchPositions();
     const id = setInterval(fetchPositions, 3000);
