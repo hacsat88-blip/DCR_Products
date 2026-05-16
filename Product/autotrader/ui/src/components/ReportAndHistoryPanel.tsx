@@ -44,20 +44,31 @@ const MOCK_REPORT: Report = {
 };
 
 export default function ReportAndHistoryPanel() {
-  const [report, setReport] = useState<Report | null>(MOCK_REPORT);
+  // null = 未ロード（初回のみモック）、APIエラー時はnullに戻してモックではなく空表示
+  const [report, setReport] = useState<Report | null>(null);
+  const [apiReady, setApiReady] = useState(false);
 
   useEffect(() => {
     const fetchReport = () =>
       fetch("/api/daily-report")
         .then((r) => r.json())
-        .then(setReport)
-        .catch(() => {});
+        .then((d) => {
+          setReport(d);
+          setApiReady(true);
+        })
+        .catch(() => {
+          if (apiReady) setReport(null);
+        });
     fetchReport();
     const id = setInterval(fetchReport, 15000);
     return () => clearInterval(id);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const chartData = report?.cumulative.map((c) => ({
+  // バックエンド未接続時のみモックを表示
+  const displayReport = apiReady ? report : (report ?? MOCK_REPORT);
+
+  const chartData = displayReport?.cumulative.map((c) => ({
     time: c.timestamp.slice(11, 16),
     pnl: Math.round(c.cumulative_pnl),
   })) ?? [];
@@ -65,7 +76,7 @@ export default function ReportAndHistoryPanel() {
   return (
     <div className="flex flex-col gap-4 h-full overflow-y-auto">
       <PanelCard title="日次レポート" accentColor="blue">
-        <DailyReportSummary report={report} />
+        <DailyReportSummary report={displayReport ?? null} />
         <MiniCumulativeChart data={chartData} />
       </PanelCard>
 

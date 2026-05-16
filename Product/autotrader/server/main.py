@@ -190,6 +190,7 @@ def get_status() -> dict[str, Any]:
         "stop_reason": s.stop_reason,
         "risk_budget": risk_guard.get_remaining_risk_budget(),
         "simulation_mode": _simulation_mode,
+        # tier はWebSocketブロードキャスト経由でフロントエンドに伝達するため省略
         "session_date": s.session_date.isoformat() if s.session_date else None,
     }
 

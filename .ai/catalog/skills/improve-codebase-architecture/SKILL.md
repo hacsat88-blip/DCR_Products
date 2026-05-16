@@ -3,7 +3,15 @@ name: improve-codebase-architecture
 routing_category: devops
 description: コードベースの構造改善ポイントを探索し、浅いモジュールを深くし、テスタビリティと変更容易性を高める改善案を提示する。
 metadata:
-  origin: inspired by mattpocock/skills (adapted for DCR)
+  origin: mattpocock/skills
+  upstream_url: "https://github.com/mattpocock/skills"
+  upstream_paths:
+    - "skills/engineering/improve-codebase-architecture/SKILL.md"
+    - "skills/engineering/zoom-out/SKILL.md"
+  upstream_license: "MIT"
+  imported_at: "2026-05-16"
+  adapted_from: "Architecture improvement and zoom-out context patterns; no skills.sh installer or slash command imported."
+  model_neutral: true
 ---
 
 # Improve Codebase Architecture
@@ -30,11 +38,14 @@ metadata:
 
 ## 調査手順
 
+0. `architecture-zoom-out` で一段上の map が必要か判定する
 1. 主要ユースケースの呼び出し経路を追跡
 2. 変更頻度の高いファイルを特定
 3. 「一緒に変わるコード」をクラスタ化
 4. 循環依存・過剰共有状態を列挙
-5. 小さく安全な改善単位へ分割
+5. 浅いモジュール（呼び出し側に詳細を漏らす薄い wrapper）を探す
+6. 深いモジュール（小さい interface で大きい責務を隠せる単位）へ寄せる案を作る
+7. 小さく安全な改善単位へ分割
 
 ## 出力フォーマット
 
@@ -51,6 +62,8 @@ metadata:
 - 公開 API 互換を壊さない案を優先
 - 各提案に検証手順を必ず含める
 - 1提案 = 1PR で出せるサイズを目安にする
+- 提案前に、既存の用語、ADR、正本/生成物境界を確認する
+- 改善案は「何を隠し、どの interface を深くするか」で説明する
 
 ## 典型的な改善例
 

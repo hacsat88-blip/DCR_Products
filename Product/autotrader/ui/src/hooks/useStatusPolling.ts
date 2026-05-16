@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { Dispatch, SetStateAction, useEffect, useState } from "react";
 
 export interface StatusData {
   daily_pnl: number;
@@ -11,7 +11,9 @@ export interface StatusData {
   session_date?: string | null;
 }
 
-export function useStatusPolling(intervalMs = 5000) {
+export function useStatusPolling(
+  intervalMs = 5000,
+): [StatusData | null, Dispatch<SetStateAction<StatusData | null>>] {
   const [status, setStatus] = useState<StatusData | null>(null);
 
   useEffect(() => {
@@ -25,5 +27,5 @@ export function useStatusPolling(intervalMs = 5000) {
     return () => clearInterval(id);
   }, [intervalMs]);
 
-  return status;
+  return [status, setStatus];
 }

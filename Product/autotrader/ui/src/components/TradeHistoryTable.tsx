@@ -25,7 +25,8 @@ const MOCK_TRADES: Trade[] = [
 ];
 
 export default function TradeHistoryTable() {
-  const [trades, setTrades] = useState<Trade[]>(MOCK_TRADES);
+  // null = 未ロード（初回のみモック）、[] = ロード済みで履歴なし
+  const [trades, setTrades] = useState<Trade[] | null>(null);
   const [filterSymbol, setFilterSymbol] = useState("");
   const [sortKey, setSortKey] = useState<SortKey>("timestamp");
   const [sortDesc, setSortDesc] = useState(true);
@@ -36,15 +37,20 @@ export default function TradeHistoryTable() {
     const fetchTrades = () =>
       fetch(`/api/trades?limit=500${filterSymbol ? `&symbol=${filterSymbol}` : ""}`)
         .then((r) => r.json())
-        .then((d) => setTrades(d.trades ?? MOCK_TRADES))
+        .then((d) => {
+          if (Array.isArray(d.trades)) setTrades(d.trades);
+        })
         .catch(() => {});
     fetchTrades();
     const id = setInterval(fetchTrades, 10000);
     return () => clearInterval(id);
   }, [filterSymbol]);
 
+  // バックエンド未接続時のみモックを表示
+  const displayTrades = trades ?? MOCK_TRADES;
+
   const sorted = useMemo(() => {
-    const arr = [...trades];
+    const arr = [...displayTrades];
     arr.sort((a, b) => {
       const va = a[sortKey];
       const vb = b[sortKey];
@@ -52,7 +58,7 @@ export default function TradeHistoryTable() {
       return sortDesc ? -cmp : cmp;
     });
     return arr;
-  }, [trades, sortKey, sortDesc]);
+  }, [displayTrades, sortKey, sortDesc]);
 
   const paged = sorted.slice(page * pageSize, (page + 1) * pageSize);
   const maxPage = Math.max(0, Math.ceil(sorted.length / pageSize) - 1);

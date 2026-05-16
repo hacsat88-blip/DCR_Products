@@ -25,6 +25,15 @@ package:
   tags:
     - debugging
     - diagnosis
+metadata:
+  origin: superpowers + mattpocock/skills
+  upstream_sources:
+    - "superpowers/systematic-debugging"
+    - "https://github.com/mattpocock/skills/blob/main/skills/engineering/diagnose/SKILL.md"
+  upstream_license: "mixed; preserve original notices when copying upstream text"
+  imported_at: "2026-05-16"
+  adapted_from: "diagnose feedback-loop pattern; no skills.sh installer or slash command imported."
+  model_neutral: true
 ---
 
 # Systematic Debugging
@@ -44,6 +53,32 @@ NO FIXES WITHOUT ROOT CAUSE INVESTIGATION FIRST
 ```
 
 If you haven't completed Phase 1, you cannot propose fixes.
+
+## Feedback Loop First
+
+Before deep hypothesizing, build the fastest reliable pass/fail loop available.
+This is the main work of diagnosis: once a deterministic loop exists, bisection,
+instrumentation, and fixes have something honest to consume.
+
+Prefer loops in this order:
+
+1. Failing automated test at the real bug seam
+2. CLI command with fixture input and expected output
+3. HTTP/curl script against a local service
+4. Headless browser script with DOM, console, or network assertions
+5. Replayed captured artifact: HAR, payload, event log, trace, or core dump
+6. Throwaway harness around the smallest real code path
+7. Repeated stress/property/fuzz loop for intermittent failures
+8. `git bisect run` style harness when the failure appeared between known states
+
+Improve the loop before fixing:
+
+- Faster: cache setup, skip unrelated startup, narrow scope
+- Sharper: assert the specific symptom, not just "did not crash"
+- More deterministic: pin time, seed randomness, isolate filesystem/network
+
+If no correct seam exists for a regression test, record that as an architecture
+finding and hand it to `improve-codebase-architecture` after the fix.
 
 ## When to Use
 
@@ -170,10 +205,12 @@ You MUST complete each phase before proceeding to the next.
 
 **Scientific method:**
 
-1. **Form Single Hypothesis**
+1. **Form 3-5 Ranked Hypotheses**
    - State clearly: "I think X is the root cause because Y"
-   - Write it down
-   - Be specific, not vague
+   - Each hypothesis must be falsifiable
+   - Include the prediction: "If X is the cause, then probe Y changes result Z"
+   - Discard any hypothesis that cannot make a prediction
+   - Show the ranked list when useful; user domain knowledge may reorder it
 
 2. **Test Minimally**
    - Make the SMALLEST possible change to test hypothesis
@@ -212,6 +249,7 @@ You MUST complete each phase before proceeding to the next.
    - Test passes now?
    - No other tests broken?
    - Issue actually resolved?
+   - Original feedback loop no longer reproduces the bug?
 
 4. **If Fix Doesn't Work**
    - STOP
@@ -306,6 +344,13 @@ These techniques are part of systematic debugging and available in this director
 - **`root-cause-tracing.md`** - Trace bugs backward through call stack to find original trigger
 - **`defense-in-depth.md`** - Add validation at multiple layers after finding root cause
 - **`condition-based-waiting.md`** - Replace arbitrary timeouts with condition polling
+
+## Cleanup Requirement
+
+Temporary instrumentation must be easy to remove. Tag debug logs with a unique
+prefix such as `[DEBUG-<short-id>]`, then grep for that prefix before declaring
+completion. Remove throwaway harnesses or move them to a clearly marked debug
+artifact location if they are intentionally retained.
 
 **Related skills:**
 - **test-driven-development** - For creating failing test case (Phase 4, Step 1)

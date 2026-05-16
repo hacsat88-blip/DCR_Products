@@ -1,14 +1,6 @@
+"use client";
+import type { StatusData } from "../hooks/useStatusPolling";
 import RiskBar from "./ui/RiskBar";
-
-interface StatusData {
-  daily_pnl: number;
-  positions: number;
-  trading_stopped: boolean;
-  stop_reason: string;
-  risk_budget: number;
-  simulation_mode: boolean;
-  tier?: string;
-}
 
 interface Props {
   status: StatusData | null;

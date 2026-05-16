@@ -24,9 +24,11 @@ metadata:
   upstream_paths:
     - "README.md"
     - "docs/ARCHITECTURE.md"
+  related_sources:
+    - "https://github.com/mattpocock/skills/blob/main/skills/productivity/handoff/SKILL.md"
   upstream_license: "MIT"
   imported_at: "2026-05-11"
-  adapted_from: "File-based state artifact pattern; mapped to DCR docs and catalog ownership."
+  adapted_from: "File-based state artifact pattern and handoff compression; mapped to DCR docs and catalog ownership."
   model_neutral: true
 ---
 
@@ -54,6 +56,38 @@ DCR では `.planning/` をそのまま導入せず、既存の `docs/dcr/plans/
 3. `Goal / Current state / Decisions / Remaining / Verification` を必須欄にする
 4. phase 終了時に artifact を更新する
 5. 別モデルや別IDEに渡すときは artifact を正本として読む
+
+## Handoff Compression
+
+別 runtime / 別 session / 別 agent に渡すときは、会話全文を保存しない。
+既存 artifact にある情報は複製せず、パスまたは URL で参照する。
+
+handoff に含める:
+
+- 次の session の目的
+- 今回の決定と理由
+- 未完了タスク
+- 参照すべき plan / ADR / issue / diff / test result
+- 次に使うべき skill
+
+handoff に含めない:
+
+- 既存 plan、ADR、PRD、issue の全文コピー
+- ログ全文、巨大 diff、中間推論
+- secret、PII、環境固有 token
+
+## Handoff Template
+
+```markdown
+Handoff
+- Next focus:
+- Current state:
+- Decisions:
+- References:
+- Remaining:
+- Suggested skills:
+- Verification:
+```
 
 ## 非目標
 

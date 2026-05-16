@@ -4,7 +4,8 @@ interface RiskBarProps {
 }
 
 export default function RiskBar({ budget, maxRisk = 3000 }: RiskBarProps) {
-  const used = Math.min(100, Math.max(0, ((-maxRisk - budget) / maxRisk) * 100));
+  // budget は負数: -maxRisk=余裕あり、0=上限到達。使用率: (maxRisk + budget) / maxRisk
+  const used = Math.min(100, Math.max(0, ((maxRisk + budget) / maxRisk) * 100));
   const color = used > 80 ? "bg-red-500" : used > 50 ? "bg-yellow-500" : "bg-green-500";
 
   return (

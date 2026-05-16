@@ -11,15 +11,18 @@ interface Props {
 
 export default function ChartAndPositionPanel({ logs, livePrices }: Props) {
   const symbols = Array.from(new Set(logs.map((l) => l.symbol)));
-  const [chartSymbol, setChartSymbol] = useState(symbols[0] ?? "");
+  const [chartSymbol, setChartSymbol] = useState("");
+
+  // 初回ログ到着時に自動で最初の銘柄を選択
+  const activeSymbol = chartSymbol || symbols[0] || "";
 
   const chartSignals = logs
-    .filter((l) => l.symbol === chartSymbol)
+    .filter((l) => l.symbol === activeSymbol)
     .map((l) => ({ timestamp: l.timestamp, action: l.action, price: l.price }));
 
   return (
     <div className="flex flex-col gap-4 h-full overflow-y-auto">
-      <PanelCard title="価格チャート" accentColor="blue">
+      <PanelCard title={`価格チャート${activeSymbol ? ` — ${activeSymbol}` : ""}`} accentColor="blue">
         {symbols.length > 0 && (
           <div className="flex gap-2 mb-3 overflow-x-auto pb-1">
             {symbols.map((s) => (
@@ -27,7 +30,7 @@ export default function ChartAndPositionPanel({ logs, livePrices }: Props) {
                 key={s}
                 onClick={() => setChartSymbol(s)}
                 className={`px-2.5 py-1 rounded-full text-xs font-mono transition-colors ${
-                  chartSymbol === s
+                  activeSymbol === s
                     ? "bg-blue-600 text-white"
                     : "bg-gray-800 text-gray-400 hover:bg-gray-700"
                 }`}
@@ -37,8 +40,8 @@ export default function ChartAndPositionPanel({ logs, livePrices }: Props) {
             ))}
           </div>
         )}
-        {chartSymbol ? (
-          <PriceChart symbol={chartSymbol} signals={chartSignals} />
+        {activeSymbol ? (
+          <PriceChart symbol={activeSymbol} signals={chartSignals} />
         ) : (
           <div className="text-gray-600 text-sm h-40 flex items-center justify-center">
             データ待機中...

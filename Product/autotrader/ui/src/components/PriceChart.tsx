@@ -79,8 +79,13 @@ export default function PriceChart({ symbol, signals = [] }: Props) {
     };
   }, []);
 
+  // 銘柄変更時: 価格データをフェッチ（signals に依存しないため再フェッチを抑制）
   useEffect(() => {
     if (!symbol) return;
+    setError(null);
+    // 銘柄切替時に前の銘柄のマーカーをクリア
+    seriesRef.current?.setMarkers([]);
+
     let cancelled = false;
     fetch(`/api/history/${symbol}?limit=200`)
       .then(async (r) => {
@@ -95,71 +100,58 @@ export default function PriceChart({ symbol, signals = [] }: Props) {
       .then((data) => {
         if (cancelled || !seriesRef.current) return;
         const points: PricePoint[] = data.points ?? [];
-        if (points.length === 0) {
-          // Fallback to mock data if no points returned
-          const mockPoints = generateMockHistory(symbol);
-          seriesRef.current.setData(
-            mockPoints.map((p) => ({
-              time: (new Date(p.timestamp).getTime() / 1000) as Time,
-              value: p.price,
-            })),
-          );
-        } else {
-          seriesRef.current.setData(
-            points.map((p) => ({
-              time: (new Date(p.timestamp).getTime() / 1000) as Time,
-              value: p.price,
-            })),
-          );
-        }
-        if (signals.length > 0) {
-          seriesRef.current.setMarkers(
-            signals.map((s) => ({
-              time: (new Date(s.timestamp).getTime() / 1000) as Time,
-              position: s.action === "buy" ? "belowBar" : "aboveBar",
-              color: s.action === "buy" ? "#22c55e" : "#ef4444",
-              shape: s.action === "buy" ? "arrowUp" : "arrowDown",
-              text: s.action === "buy" ? "B" : "S",
-            })),
-          );
-        }
+        const src = points.length > 0 ? points : generateMockHistory(symbol);
+        seriesRef.current.setData(
+          src.map((p) => ({
+            time: (new Date(p.timestamp).getTime() / 1000) as Time,
+            value: p.price,
+          })),
+        );
       })
       .catch((e) => {
         if (cancelled) return;
-        // Fallback to mock data on error
         if (seriesRef.current) {
-          const mockPoints = generateMockHistory(symbol);
           seriesRef.current.setData(
-            mockPoints.map((p) => ({
+            generateMockHistory(symbol).map((p) => ({
               time: (new Date(p.timestamp).getTime() / 1000) as Time,
               value: p.price,
             })),
           );
-          if (signals.length > 0) {
-            seriesRef.current.setMarkers(
-              signals.map((s) => ({
-                time: (new Date(s.timestamp).getTime() / 1000) as Time,
-                position: s.action === "buy" ? "belowBar" : "aboveBar",
-                color: s.action === "buy" ? "#22c55e" : "#ef4444",
-                shape: s.action === "buy" ? "arrowUp" : "arrowDown",
-                text: s.action === "buy" ? "B" : "S",
-              })),
-            );
-          }
         }
         setError(`API接続エラー: ${String(e)}`);
       });
     return () => {
       cancelled = true;
     };
-  }, [symbol, signals]);
+  }, [symbol]);
+
+  // シグナル変更時: データロードとは独立してマーカーを更新
+  useEffect(() => {
+    if (!seriesRef.current) return;
+    if (signals.length === 0) {
+      seriesRef.current.setMarkers([]);
+      return;
+    }
+    // lightweight-charts はマーカーを時刻昇順で要求する
+    const sorted = [...signals].sort(
+      (a, b) => new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime(),
+    );
+    seriesRef.current.setMarkers(
+      sorted.map((s) => ({
+        time: (new Date(s.timestamp).getTime() / 1000) as Time,
+        position: s.action === "buy" ? "belowBar" : "aboveBar",
+        color: s.action === "buy" ? "#22c55e" : "#ef4444",
+        shape: s.action === "buy" ? "arrowUp" : "arrowDown",
+        text: s.action === "buy" ? "B" : "S",
+      })),
+    );
+  }, [signals]);
 
   return (
-    <div className="bg-gray-900 rounded-xl p-4 mb-4">
-      <div className="flex items-center justify-between mb-2">
-        <h2 className="text-sm text-gray-400">価格チャート — {symbol || "—"}</h2>
-        {error && <span className="text-red-400 text-xs">{error}</span>}
-      </div>
+    <div>
+      {error && (
+        <span className="text-red-400 text-xs block mb-1">{error}</span>
+      )}
       <div ref={containerRef} className="w-full" />
     </div>
   );

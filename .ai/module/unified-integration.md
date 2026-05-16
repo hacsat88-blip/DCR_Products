@@ -133,6 +133,14 @@ pied-piper
 - DCR との関係: `pied-piper`、`unified-router`、`.ai/book` を置換しない
 - 既存導入: `decision-complete-planning`、`phase-state-artifacts`、`parallel-wave-execution`、`uat-verification-gate`、`namespace-skill-routing`
 
+### Matt Pocock skills pattern imports
+
+- 位置づけ: mattpocock/skills は small, adaptable, composable な engineering method の参照元
+- 採用形態: `skills.sh`、setup command、Claude 固有 slash command は導入せず、DCR skill として薄く移植する
+- DCR との関係: `pied-piper` と `unified-router` を置換せず、pre-plan / pre-impl / debug / handoff の補助 skill として使う
+- 既存導入: `domain-decision-grilling`、`architecture-zoom-out`、`systematic-debugging` 補強、`phase-state-artifacts` handoff 補強、`improve-codebase-architecture` provenance 補強
+- 互換性: Codex / Claude / Copilot / Cursor / Windsurf / OpenCode / Gemini CLI で読めるよう、特定IDEの slash command ではなく自然言語 trigger と DCR metadata に落とす
+
 ### Azure Skills plugin
 
 - 位置づけ: Azure 専用 capability pack
