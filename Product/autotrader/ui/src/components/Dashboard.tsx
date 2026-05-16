@@ -30,7 +30,7 @@ export default function Dashboard() {
   const [logs, setLogs] = useState<TradeLog[]>(MOCK_LOGS);
   const [livePrices, setLivePrices] = useState<Record<string, number>>(MOCK_PRICES);
   const prevStateRef = useRef({ stopped: false, pnl: 0 });
-  const status = useStatusPolling(5000);
+  const [status, setStatus] = useStatusPolling(5000);
   const { lastMessage: wsData } = useWebSocket("ws://localhost:8000/ws");
 
   // WebSocketデータ処理
@@ -38,17 +38,18 @@ export default function Dashboard() {
     if (!wsData) return;
     handleEvent(wsData, prevStateRef.current);
 
-    if (wsData.symbol && wsData.price) {
+    if (wsData.symbol && wsData.price !== undefined) {
       setLivePrices((prev) => ({ ...prev, [wsData.symbol!]: wsData.price! }));
     }
 
-    if (wsData.action && wsData.action !== "hold") {
+    // C3: symbol がない不完全なイベントはログに追加しない
+    if (wsData.action && wsData.action !== "hold" && wsData.symbol) {
       setLogs((prev) =>
         [
           {
             timestamp: wsData.timestamp ?? new Date().toISOString(),
             symbol: wsData.symbol!,
-            action: wsData.action,
+            action: wsData.action!,
             reason: wsData.reason ?? "",
             confidence: wsData.confidence ?? 0,
             price: wsData.price ?? 0,
@@ -58,13 +59,28 @@ export default function Dashboard() {
       );
     }
 
+    // ステータスをWS経由でリアルタイム更新（ポーリング間隔を補完）
+    if (wsData.daily_pnl !== undefined || wsData.tier || wsData.risk_budget !== undefined) {
+      setStatus((prev) => {
+        if (!prev) return prev;
+        return {
+          ...prev,
+          ...(wsData.daily_pnl !== undefined && { daily_pnl: wsData.daily_pnl }),
+          ...(wsData.risk_budget !== undefined && { risk_budget: wsData.risk_budget }),
+          ...(wsData.tier && { tier: wsData.tier }),
+        };
+      });
+    }
+
     if (wsData.daily_pnl !== undefined) {
       prevStateRef.current.pnl = wsData.daily_pnl;
     }
     if (wsData.trading_stopped !== undefined) {
       prevStateRef.current.stopped = wsData.trading_stopped;
     }
-  }, [wsData]);
+  // C2: setStatus は useStatusPolling から来るが安定した参照のため依存配列に含める
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [wsData, setStatus]);
 
   const chartLogs = useMemo(
     () =>
@@ -75,12 +91,13 @@ export default function Dashboard() {
   const toggleSimulation = async () => {
     const next = status?.simulation_mode ? "off" : "on";
     await fetch(`/api/simulation/${next}`, { method: "POST" });
-    // statusはポーリングで更新される
+    setStatus((prev) => (prev ? { ...prev, simulation_mode: next === "on" } : prev));
   };
 
   const emergencyStop = async () => {
     if (!confirm("取引を緊急停止しますか？")) return;
     await fetch("/api/simulation/on", { method: "POST" });
+    setStatus((prev) => (prev ? { ...prev, simulation_mode: true } : prev));
   };
 
   return (

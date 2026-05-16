@@ -213,6 +213,7 @@ pwsh -ExecutionPolicy Bypass -File .\deploy.ps1 -Check             # ドリフ�
 - Windsurf は Superpowers の公式導入先として扱わず、この repo の `.windsurf/` 生成ミラーで運用する
 - `agentmemory` は外部 runtime memory backend 候補として扱う。MCP/REST server、hooks、DB、npm package を repo 正本へ直接取り込まず、利用可能な環境だけで memory preflight / memory save を行う
 - `GSD` は外部 spec-driven workflow 参照元として扱う。GSD command runtime と `.planning/` は入れず、DCR skill の `metadata.origin` に provenance を残す
+- `mattpocock/skills` は外部 engineering-method skill 参照元として扱う。`skills.sh`、setup command、Claude 固有 slash command は入れず、grill / zoom-out / diagnose / handoff の考え方だけを DCR skill として薄く取り込む
 
 ### 設定層（Configuration）- 個人設定のみ
 

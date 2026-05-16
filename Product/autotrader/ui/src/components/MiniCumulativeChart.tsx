@@ -1,3 +1,4 @@
+"use client";
 import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer, ReferenceLine } from "recharts";
 
 interface DataPoint {

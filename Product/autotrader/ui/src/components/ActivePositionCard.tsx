@@ -21,20 +21,26 @@ const MOCK_POSITIONS: Position[] = [
 ];
 
 export default function ActivePositionCard({ livePrices }: Props) {
-  const [positions, setPositions] = useState<Position[]>(MOCK_POSITIONS);
+  // null = ロード中（初回のみモック表示）、[] = ロード済みでポジションなし
+  const [positions, setPositions] = useState<Position[] | null>(null);
 
   useEffect(() => {
     const fetchPositions = () =>
       fetch("/api/positions")
         .then((r) => r.json())
-        .then((d) => setPositions(d.positions ?? MOCK_POSITIONS))
+        .then((d) => {
+          if (Array.isArray(d.positions)) setPositions(d.positions);
+        })
         .catch(() => {});
     fetchPositions();
     const id = setInterval(fetchPositions, 3000);
     return () => clearInterval(id);
   }, []);
 
-  if (positions.length === 0) {
+  // バックエンド未接続時のみモックを表示（開発/シミュレーション確認用）
+  const displayPositions = positions ?? MOCK_POSITIONS;
+
+  if (displayPositions.length === 0) {
     return (
       <div className="text-gray-600 text-sm">ポジションなし</div>
     );
@@ -42,7 +48,7 @@ export default function ActivePositionCard({ livePrices }: Props) {
 
   return (
     <div className="space-y-3">
-      {positions.map((p) => {
+      {displayPositions.map((p) => {
         const current = livePrices[p.symbol] ?? p.entry_price;
         const unrealized = (current - p.entry_price) * p.lot;
         const remainingPct = Math.max(0, (p.remaining_minutes / 60) * 100);

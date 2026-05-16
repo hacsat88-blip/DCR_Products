@@ -3,6 +3,41 @@ Option Explicit
 Private Const API_BASE As String = "http://localhost:8000"
 Private Const SECURE_SHEET As String = "Secure"
 Private Const XOR_KEY As String = "SATOSHI_KEY"
+Private Const TIMER_INTERVAL As Double = 5 / 86400  ' 5秒
+
+Private dtNextRun As Date
+Private bRunning As Boolean
+
+' ブック起動時またはボタンから呼び出す
+Public Sub StartAutoTrader()
+    If bRunning Then
+        MsgBox "自動売買はすでに起動中です", vbInformation
+        Exit Sub
+    End If
+    bRunning = True
+    dtNextRun = Now + TIMER_INTERVAL
+    Application.OnTime dtNextRun, "OnPriceUpdate_Timer"
+    MsgBox "自動売買を開始しました（5秒ごとに価格チェック）", vbInformation
+End Sub
+
+' ブック終了時またはボタンから呼び出す
+Public Sub StopAutoTrader()
+    If Not bRunning Then Exit Sub
+    On Error Resume Next
+    Application.OnTime dtNextRun, "OnPriceUpdate_Timer", , False
+    On Error GoTo 0
+    bRunning = False
+End Sub
+
+' Application.OnTime から定期呼び出しされるラッパー
+Public Sub OnPriceUpdate_Timer()
+    If Not bRunning Then Exit Sub
+    On Error Resume Next
+    Call OnPriceUpdate
+    On Error GoTo 0
+    dtNextRun = Now + TIMER_INTERVAL
+    Application.OnTime dtNextRun, "OnPriceUpdate_Timer"
+End Sub
 
 Public Sub OnPriceUpdate()
     Dim ws As Worksheet

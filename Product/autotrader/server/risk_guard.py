@@ -109,6 +109,8 @@ class RiskGuard:
             self._stop_trading("本日利益目標達成")
 
     def get_remaining_risk_budget(self) -> float:
+        # 戻り値は負数。例: -3000 = 残余¥3,000 / 0 = 上限到達
+        # フロント側: Math.abs(budget) で表示、(maxRisk + budget)/maxRisk で使用率計算
         return RULES["max_daily_loss"] - self.session.daily_pnl
 
     def _stop_trading(self, reason: str) -> None:
