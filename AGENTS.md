@@ -13,7 +13,7 @@ Warp-specific behavior lives in [.ai/environments/warp/kernel.md](.ai/environmen
 ## Scope Summary
 
 - Active rules: 53
-- Active skills: 133
+- Active skills: 137
 - Active agents: 114
 - Deprecated aliases (rules/skills/agents): 10 / 3 / 34
 
