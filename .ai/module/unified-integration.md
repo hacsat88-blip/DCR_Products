@@ -101,13 +101,15 @@ pied-piper
 **全タスクの入口**は [pied-piper](../catalog/agents-source/pied-piper.md) agent で受ける。
 詳細は [unified-coordinator.md](unified-coordinator.md) と [unified-router.md](unified-router.md) を参照。
 
-採用前に以下3行報告を必ず先に出す：
+発火前に以下3行の提案を必ず先に出す：
 
 ```
-🎯 採用：<rule|skill|agent名>（信頼度 0.XX）
-📌 理由：<routing_category 一致 + match keywords/domain>
-✨ 期待効果：<1行で見込まれる成果物・短縮時間・品質ゲート>
+採用候補：<rule|skill|agent名>（信頼度 0.XX / mode）
+理由：<routing_category 一致 + match keywords/domain + risk/scale/ambiguity>
+期待効果：<1行で見込まれる成果物・短縮時間・品質ゲート>
 ```
+
+Skill、Agent、サブエージェント、並列 orchestration、外部 MCP/API、P2/P3 操作は、原則として候補提示 → ユーザー承認 → 発火の順に進める。P1 read-only の単独低リスク探索のみ、事前提案後に自動実行できる。
 
 旧オーケストレーター（workflow-orchestrator / multi-agent-coordinator / task-distributor）は
 すべて pied-piper に統合済み。alias 経由で旧名呼び出しも動作する。

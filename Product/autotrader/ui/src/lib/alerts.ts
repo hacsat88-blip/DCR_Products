@@ -67,6 +67,7 @@ export const Alerts = {
 
 interface BroadcastEvent {
   action?: string;
+  advisor?: { api_error?: boolean; risk_state?: "GREEN" | "YELLOW" | "RED" } | null;
   reason?: string;
   trading_stopped?: boolean;
   stop_reason?: string;
@@ -78,7 +79,9 @@ interface BroadcastEvent {
  * WebSocket イベントを解析して適切なアラートを鳴らす
  */
 export function handleEvent(event: BroadcastEvent, prev: { stopped: boolean; pnl: number }): void {
-  if (event.reason && event.reason.includes("損切り")) {
+  if (event.advisor?.api_error || event.advisor?.risk_state === "RED") {
+    Alerts.emergencyStop();
+  } else if (event.reason && event.reason.includes("損切り")) {
     Alerts.stopLoss();
   } else if (event.trading_stopped && !prev.stopped) {
     if (event.stop_reason?.includes("目標")) {

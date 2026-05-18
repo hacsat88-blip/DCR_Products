@@ -75,7 +75,7 @@ metadata:
 
 - `oh-my-codex` は直接依存にしない。doctor、false-green検知、hook mergeの発想だけを参照する
 - `anthropics/skills` は重複skillを再輸入しない。`claude-api` のcompaction/prompt cachingとtemplate様式だけを参照する
-- `warpdotdev/oz-skills` はWarp/Oz導入ではなく、Agent Skills互換素材として評価する
+- `warpdotdev/oz-skills` は外部 runtime 導入ではなく、Agent Skills互換素材として評価する
 - 星印記事の削減率は自己申告値として扱い、導入前に一次READMEで確認する
 
 ## 応答フォーマット（提案時）

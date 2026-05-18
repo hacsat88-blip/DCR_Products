@@ -24,7 +24,7 @@ metadata:
   upstream_path: ".agents/skills/docs-update/SKILL.md"
   license: "MIT"
   imported_at: "2026-05-09"
-  adapted_from: "Condensed into a DCR documentation synchronization workflow; not a wholesale Warp/Oz import."
+  adapted_from: "Condensed into a DCR documentation synchronization workflow; not a wholesale external runtime import."
 ---
 
 # Docs Update

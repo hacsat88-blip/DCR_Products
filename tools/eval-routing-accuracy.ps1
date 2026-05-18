@@ -13,6 +13,9 @@
     3. Deprecated fixtures route to a successor that exists and is not itself
        deprecated (alias chain integrity)
     4. Hub assets (parent: ...) reference valid variant children
+    5. Safety fixtures declare a valid expected_mode and approval requirement
+    6. Cognitive-load fixtures declare valid status / reply type / option metadata
+    7. Proposal-state fixtures declare valid previous/next status transitions
 
   Exit code: 0 = all pass, 1 = any failure.
 
@@ -132,6 +135,93 @@ foreach ($f in $fixtures) {
         }
         if (-not $matched) {
             Write-Fail "$label — none of match_keywords [$($f.match_keywords -join ', ')] found in frontmatter"
+            continue
+        }
+    }
+
+    # Check 5: safety mode fixture metadata, when present.
+    if ($f.expected_mode) {
+        $allowedModes = @('auto', 'propose', 'approve_required')
+        if ($f.expected_mode -notin $allowedModes) {
+            Write-Fail "$label — expected_mode='$($f.expected_mode)' is not one of: $($allowedModes -join ', ')"
+            continue
+        }
+        if ($f.expected_mode -eq 'approve_required' -and $f.approval_required -ne $true) {
+            Write-Fail "$label — approve_required fixtures must set approval_required=true"
+            continue
+        }
+    }
+
+    # Check 6: cognitive-load fixture metadata, when present.
+    if ($f.expected_status) {
+        $allowedStatuses = @('proposed', 'approved', 'rejected', 'executed')
+        if ($f.expected_status -notin $allowedStatuses) {
+            Write-Fail "$label — expected_status='$($f.expected_status)' is not one of: $($allowedStatuses -join ', ')"
+            continue
+        }
+    }
+    if ($f.expected_user_reply_type) {
+        $allowedReplyTypes = @('approve', 'reject', 'refine', 'ambiguous')
+        if ($f.expected_user_reply_type -notin $allowedReplyTypes) {
+            Write-Fail "$label — expected_user_reply_type='$($f.expected_user_reply_type)' is not one of: $($allowedReplyTypes -join ', ')"
+            continue
+        }
+        if ($f.expected_user_reply_type -eq 'approve' -and $f.expected_status -and $f.expected_status -ne 'approved') {
+            Write-Fail "$label — approve reply fixtures must use expected_status=approved"
+            continue
+        }
+        if ($f.expected_user_reply_type -eq 'ambiguous' -and $f.expected_status -eq 'executed') {
+            Write-Fail "$label — ambiguous reply fixtures must not execute"
+            continue
+        }
+    }
+    if ($null -ne $f.options_count) {
+        if ($f.options_count -lt 0 -or $f.options_count -gt 3) {
+            Write-Fail "$label — options_count='$($f.options_count)' must be 0-3"
+            continue
+        }
+    }
+    if ($f.selected_option) {
+        $allowedOptions = @('A','B','C','1','2','3')
+        if ($f.selected_option -notin $allowedOptions) {
+            Write-Fail "$label — selected_option='$($f.selected_option)' is not one of: $($allowedOptions -join ', ')"
+            continue
+        }
+    }
+
+    # Check 7: proposal-state fixture metadata, when present.
+    $allowedProposalStatuses = @('none', 'proposed', 'approved', 'rejected', 'refined', 'expired')
+    if ($f.proposal_previous_status) {
+        if ($f.proposal_previous_status -notin $allowedProposalStatuses) {
+            Write-Fail "$label — proposal_previous_status='$($f.proposal_previous_status)' is not one of: $($allowedProposalStatuses -join ', ')"
+            continue
+        }
+    }
+    if ($f.proposal_next_status) {
+        if ($f.proposal_next_status -notin $allowedProposalStatuses) {
+            Write-Fail "$label — proposal_next_status='$($f.proposal_next_status)' is not one of: $($allowedProposalStatuses -join ', ')"
+            continue
+        }
+        if ($f.expected_user_reply_type -eq 'approve' -and $f.proposal_next_status -ne 'approved') {
+            Write-Fail "$label — approve proposal replies must use proposal_next_status=approved"
+            continue
+        }
+        if ($f.expected_user_reply_type -eq 'reject' -and $f.proposal_next_status -ne 'rejected') {
+            Write-Fail "$label — reject proposal replies must use proposal_next_status=rejected"
+            continue
+        }
+        if ($f.expected_user_reply_type -eq 'refine' -and $f.proposal_next_status -ne 'refined') {
+            Write-Fail "$label — refine proposal replies must use proposal_next_status=refined"
+            continue
+        }
+        if ($f.expected_user_reply_type -eq 'ambiguous' -and $f.proposal_next_status -in @('approved','rejected')) {
+            Write-Fail "$label — ambiguous proposal replies must not approve or reject"
+            continue
+        }
+    }
+    if ($null -ne $f.has_active_proposal) {
+        if ($f.has_active_proposal -ne $true -and $f.has_active_proposal -ne $false) {
+            Write-Fail "$label — has_active_proposal must be boolean"
             continue
         }
     }

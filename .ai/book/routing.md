@@ -1,6 +1,7 @@
 # Shared Routing
 
 This chapter defines model-independent Rule / Skill / Agent selection.
+The routing experience should reduce cognitive load: shrink candidates, show the recommended path first, and keep detailed scoring in telemetry instead of the normal user response.
 
 The detailed implementation remains in [../module/unified-router.md](../module/unified-router.md). This file is the shared book chapter that every environment should read before applying local capability constraints.
 
@@ -22,9 +23,33 @@ If a requested rule, skill, or agent has `deprecated: true`, silently use its `s
 
 ## Confidence Bands
 
-- `>= 0.8`: automatic dispatch
-- `0.5 - 0.8`: present 2-3 candidates if user choice is needed
-- `< 0.5`: ask a concise clarifying question or proceed directly when safe
+Confidence ranks candidates, but it does not by itself authorize execution.
+
+- `auto`: P1 read-only, single clear candidate, low ambiguity, no external send.
+- `propose`: multiple candidates, ambiguous intent, medium+ scale, or a Skill/Agent would materially help.
+- `approve_required`: P2/P3, subagent, parallel orchestration, external MCP/API, config/deletion/dependency/security/finance/legal work.
+
+When approval is required, present the recommended candidate first and wait for user confirmation before firing the Skill, Agent, subagent, or orchestration path.
+
+## Cognitive Load Contract
+
+- Show at most 3 user-facing candidates; prefer 1 recommended candidate when the route is clear.
+- Use the shared proposal shape: `採用候補 / 理由 / 期待効果`, with `承認が必要な理由` only for `approve_required`.
+- Add a short selection line when multiple paths are plausible: `A) おすすめで進める / B) 軽めに見る / C) 別案を見る`.
+- Treat `それで`, `おすすめで`, `Aで`, `1で`, `進めて`, and `承認` as approval only when the previous proposal target is unambiguous.
+- Treat `いい感じに`, `任せる`, `よさそう`, and `たぶん` as ambiguous; propose or reconfirm instead of firing.
+- Store internal candidate count, status, selected option, and reply classification in `router-decisions.jsonl`.
+
+## Proposal State
+
+When `.ai/kernel/gate-state.json` contains `proposal_state.status = proposed|refined`, short follow-up replies are interpreted as responses to the active proposal before normal routing.
+
+- approve updates the active proposal to `approved` only when one option is clearly selected.
+- reject updates it to `rejected` and does not fire anything.
+- refine keeps the same proposal context and asks for an updated proposal.
+- ambiguous keeps execution blocked and asks a short confirmation.
+
+The active proposal lives in gitignored `gate-state.json`; durable audit history lives in `router-decisions.jsonl`.
 
 ## Parent Hubs
 

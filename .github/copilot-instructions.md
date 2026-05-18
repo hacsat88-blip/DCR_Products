@@ -84,6 +84,7 @@ Entrypoint for VS Code Copilot environment.
 - [changelog-automation](../../.ai/catalog/skills/changelog-automation/SKILL.md)
 - [churn-prevention](../../.ai/catalog/skills/churn-prevention/SKILL.md)
 - [code-review](../../.ai/catalog/skills/code-review/SKILL.md)
+- [codex-app-server-integration](../../.ai/catalog/skills/codex-app-server-integration/SKILL.md)
 - [cold-email](../../.ai/catalog/skills/cold-email/SKILL.md)
 - [competitor-alternatives](../../.ai/catalog/skills/competitor-alternatives/SKILL.md)
 - [content-strategy](../../.ai/catalog/skills/content-strategy/SKILL.md)
@@ -202,6 +203,20 @@ Entrypoint for VS Code Copilot environment.
 - [x-research](../../.ai/catalog/skills/x-research/SKILL.md)
 - [xlsx](../../.ai/catalog/skills/xlsx/SKILL.md)
 - [zero-trust-design](../../.ai/catalog/skills/zero-trust-design/SKILL.md)
+
+---
+
+## Unified Coordinator
+
+全タスクの単一入口は **pied-piper** agent。Rule/Skill/Agent 選定は [.ai/module/unified-router.md](../../.ai/module/unified-router.md) の決定木に従い、候補を増やさず必要十分な候補へ圧縮し、発火前に候補・理由・期待効果を報告する。
+
+Skill、Agent、サブエージェント、並列 orchestration、外部 MCP/API、P2/P3 操作が関わる場合は、原則として **候補提示 → ユーザー承認 → 発火** の順に進める。P1 read-only の単独低リスク探索のみ、短い事前報告後に自動実行できる。
+
+自然言語の承認は柔らかく拾うが、一意でない場合は再確認する。`おすすめで` / `推奨で` / `Aで` / `1で` は対象が一意の直前候補に結びつく場合のみ承認扱い。`それで` / `進めて` / `承認` / `OK` は単独候補の場合のみ承認扱い。
+
+`いい感じに` / `任せる` / `おまかせ` / `よさそう` / `よさげ` / `たぶん` / `多分` は承認にせず、候補提示または再確認に戻す。`キャンセル` / `中止` は却下、`別案` / `別の案` / `軽く` は再提案として扱う。
+
+`.ai/kernel/gate-state.json` に `proposal_state.status = proposed|refined` がある場合、短い次発話は通常ルーティングより先に直前提案への返答として解釈する。承認・却下・修正・曖昧の分類は `tools/lib/gate-state.ps1` の proposal state machine に従う。
 
 ---
 

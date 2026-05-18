@@ -91,9 +91,9 @@ DCR (Dynamic Context Router) は、4つの AI 開発環境に統一的なルー�
 ```text
 ユーザーリクエスト
     │
-    ├─ 明示指定 (/skill-name) -> 即時実行
+    ├─ 明示指定 (/skill-name) -> 候補確定 -> 権限に応じて承認後に実行
     │
-    ├─ Layer 1 (18 skills) -> モデルが自動選択可能
+    ├─ Layer 1 (18 skills) -> モデルが候補提示しやすい
     │   brainstorming, code-review, writing-plans, etc.
     │
     └─ Layer 3 (58+ skills) -> skill-router 経由 or 明示呼び出し

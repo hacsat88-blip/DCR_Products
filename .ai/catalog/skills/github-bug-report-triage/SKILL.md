@@ -24,7 +24,7 @@ metadata:
   upstream_path: ".agents/skills/github-bug-report-triage/SKILL.md"
   license: "MIT"
   imported_at: "2026-05-09"
-  adapted_from: "Condensed into a DCR issue/CI triage workflow; not a wholesale Warp/Oz import."
+  adapted_from: "Condensed into a DCR issue/CI triage workflow; not a wholesale external runtime import."
 ---
 
 # GitHub Bug Report Triage

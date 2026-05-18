@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 
 export interface BroadcastEvent {
+  advisor?: AdvisorAdvice | null;
   action?: string;
   reason?: string;
   trading_stopped?: boolean;
@@ -9,10 +10,21 @@ export interface BroadcastEvent {
   risk_budget?: number;
   symbol?: string;
   price?: number;
-  confidence?: number;
   timestamp?: string;
   tier?: string;
   lot?: number;
+  new_entries_blocked?: boolean;
+  new_entries_block_reason?: string;
+}
+
+export interface AdvisorAdvice {
+  risk_state: "GREEN" | "YELLOW" | "RED";
+  should_stop_new_entries: boolean;
+  should_reduce_size: boolean;
+  reason: string;
+  rule_issue: string;
+  improvement: string;
+  api_error?: boolean;
 }
 
 export function useWebSocket(url: string) {

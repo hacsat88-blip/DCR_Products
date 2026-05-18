@@ -54,6 +54,22 @@ CREATE TABLE IF NOT EXISTS price_snapshots (
     timestamp TEXT NOT NULL
 );
 CREATE INDEX IF NOT EXISTS idx_price_symbol_ts ON price_snapshots(symbol, timestamp);
+
+CREATE TABLE IF NOT EXISTS advisor_reviews (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    session_date TEXT NOT NULL,
+    symbol TEXT NOT NULL DEFAULT '',
+    risk_state TEXT NOT NULL,
+    should_stop_new_entries INTEGER NOT NULL DEFAULT 0,
+    should_reduce_size INTEGER NOT NULL DEFAULT 0,
+    reason TEXT NOT NULL DEFAULT '',
+    rule_issue TEXT NOT NULL DEFAULT '',
+    improvement TEXT NOT NULL DEFAULT '',
+    api_error INTEGER NOT NULL DEFAULT 0,
+    input_snapshot TEXT NOT NULL DEFAULT '{}',
+    timestamp TEXT NOT NULL
+);
+CREATE INDEX IF NOT EXISTS idx_advisor_reviews_date ON advisor_reviews(session_date);
 """
 
 
@@ -79,6 +95,21 @@ class DecisionRecord:
     volume_ratio: float
     timestamp: str
     session_date: str
+
+
+@dataclass
+class AdvisorReviewRecord:
+    session_date: str
+    symbol: str
+    risk_state: str
+    should_stop_new_entries: bool
+    should_reduce_size: bool
+    reason: str
+    rule_issue: str
+    improvement: str
+    api_error: bool
+    input_snapshot: str
+    timestamp: str
 
 
 class TradeStore:
@@ -127,6 +158,22 @@ class TradeStore:
                 (symbol, price, volume, timestamp),
             )
 
+    def insert_advisor_review(self, rec: AdvisorReviewRecord) -> int:
+        with self._connect() as conn:
+            cur = conn.execute(
+                """INSERT INTO advisor_reviews
+                   (session_date, symbol, risk_state, should_stop_new_entries, should_reduce_size,
+                    reason, rule_issue, improvement, api_error, input_snapshot, timestamp)
+                   VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)""",
+                (
+                    rec.session_date, rec.symbol, rec.risk_state,
+                    int(rec.should_stop_new_entries), int(rec.should_reduce_size),
+                    rec.reason, rec.rule_issue, rec.improvement, int(rec.api_error),
+                    rec.input_snapshot, rec.timestamp,
+                ),
+            )
+            return cur.lastrowid or 0
+
     def get_trades(self, session_date: str | None = None, symbol: str | None = None,
                    limit: int = 200) -> list[dict[str, Any]]:
         query = "SELECT * FROM trades WHERE 1=1"
@@ -150,6 +197,28 @@ class TradeStore:
                 (symbol, limit),
             ).fetchall()
             return [dict(r) for r in reversed(rows)]
+
+    def get_recent_trade_summaries(self, session_date: str, limit: int = 5) -> list[dict[str, Any]]:
+        with self._connect() as conn:
+            rows = conn.execute(
+                """SELECT symbol, action, pnl, timestamp
+                   FROM trades
+                   WHERE session_date = ?
+                   ORDER BY timestamp DESC
+                   LIMIT ?""",
+                (session_date, limit),
+            ).fetchall()
+            return [
+                {
+                    "symbol": row["symbol"],
+                    "side": row["action"],
+                    "entry_reason": "local_rule_engine",
+                    "result": row["pnl"],
+                    "exit_reason": "order_result" if row["action"] == "sell" else "entry_record",
+                    "timestamp": row["timestamp"],
+                }
+                for row in rows
+            ]
 
     def compute_daily_report(self, session_date: str) -> dict[str, Any]:
         with self._connect() as conn:

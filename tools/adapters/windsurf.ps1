@@ -286,6 +286,17 @@ function Register-ManagedFile {
     $ManagedFiles.Add($RelativePath)
 }
 
+function ConvertTo-StableJsonStringArray {
+    param([string[]]$Items)
+
+    $quoted = @($Items | Sort-Object -Unique | ForEach-Object { $_ | ConvertTo-Json -Compress })
+    if ($quoted.Count -eq 0) {
+        return "[]"
+    }
+
+    return "[`r`n  " + ($quoted -join ",`r`n  ") + "`r`n]"
+}
+
 Assert-WindsurfQuality -Label "Windsurf template quality" -Issues @(Get-WindsurfTemplateQualityIssues)
 
 New-Item -ItemType Directory -Path $outRulesDir -Force | Out-Null
@@ -461,7 +472,7 @@ foreach ($old in $previous) {
     }
 }
 
-Write-Utf8NoBom -Path $manifestPath -Content ((@($managedFiles) | Sort-Object -Unique | ConvertTo-Json -Depth 3))
+Write-Utf8NoBom -Path $manifestPath -Content (ConvertTo-StableJsonStringArray -Items @($managedFiles))
     Write-WindsurfStatus -Message "  [OK] .windsurf/.dcr-managed-files.json"
 Assert-WindsurfQuality -Label "Windsurf generated quality" -Issues @(Get-WindsurfGeneratedQualityIssues -OutputRoot $outRoot -ManagedFiles $managedFiles -RequireDeprecatedAliases ($deprecatedRules.Count -gt 0))
 Write-WindsurfStatus -Message "" -Color "Green"

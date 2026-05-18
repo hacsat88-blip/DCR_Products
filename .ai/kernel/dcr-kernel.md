@@ -111,6 +111,8 @@ Always get approval before:
 - サブエージェント・マルチエージェント発火前に、使用するエージェント名と目的を一覧で提示する
 - Skill発動前に、どのSkillを使うか明示する
 - 単一エージェント・単一Skillでも省略しない
+- P1 read-only の単独低リスク調査を除き、Skill / Agent / サブエージェント / 並列 orchestration / 外部 MCP/API は候補提示 -> ユーザー承認 -> 発火の順に進める
+- 曖昧な自然言語では、候補を2-3件に絞り、おすすめを先頭にして確認する
 
 ## Footer rule
 
@@ -162,6 +164,7 @@ When the user triggers a mode, apply the corresponding behavior:
 - Prefer explicit user-selected roles over auto-selection
 - Do not auto-load roles when the match is ambiguous or would require more than two roles
 - Keep auto-routing conservative for security, legal, billing, destructive, or deploy-related work
+- Confidence ranks candidates but does not by itself authorize execution. Use `auto` only for P1 read-only, single-candidate, low-ambiguity, no-external-send work.
 
 ## Runtime Memory Preflight
 

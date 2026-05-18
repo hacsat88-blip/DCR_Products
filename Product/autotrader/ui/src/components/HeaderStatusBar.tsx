@@ -53,6 +53,11 @@ export default function HeaderStatusBar({ status, onToggleSimulation, onEmergenc
             STOP: {status.stop_reason}
           </span>
         )}
+        {status?.new_entries_blocked && !status?.trading_stopped && (
+          <span className="bg-yellow-900/50 text-yellow-300 border border-yellow-700/50 px-2 py-1 rounded text-xs font-mono">
+            NO ENTRY: {status.new_entries_block_reason}
+          </span>
+        )}
 
         <button
           onClick={onToggleSimulation}
@@ -62,7 +67,7 @@ export default function HeaderStatusBar({ status, onToggleSimulation, onEmergenc
               : "bg-yellow-800 hover:bg-yellow-700 text-white"
           }`}
         >
-          {status?.simulation_mode ? "本番モード" : "シミュレーション"}
+          {status?.simulation_mode ? "ローカル実行" : "シミュレーション"}
         </button>
 
         <button

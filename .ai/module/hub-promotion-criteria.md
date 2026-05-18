@@ -12,6 +12,7 @@
 2. **共通のフレームワーク・テンプレート** が variant 間で繰り返し記述されている
 3. **router の confidence** が3つ以上の候補で 0.7-0.85 に分散しており、
    ユーザーが毎回選択を求められる
+4. V3/V4 の見える化で `bundle_into_hub` が繰り返し出ており、候補集中が削除ではなく親ハブ化や表示抑制で解けそう
 
 ## ハブを作る判断（5基準すべて満たすこと）
 
@@ -30,6 +31,7 @@
 - 入力分類で分岐できず、AI がほぼランダムに変種を選ぶ
 - 共通 scripts に収まる原則が薄い（記述したらハブ自身がスカスカになる）
 - 個別 variant に圧倒的なボリューム差があり、上位概念が無理筋
+- `pied-piper` のような coordinator が見えすぎているだけ → `expose_underlying_asset` として扱い、ハブ化しない
 
 ## 既存ハブの実例と判断ログ
 
@@ -93,8 +95,9 @@
      - ../<hub-name>/scripts/<name>.md
    ```
 5. `tools/eval-routing-fixtures.json` にハブ用フィクスチャを追加
-6. `.\tools\eval-routing-accuracy.ps1` を実行して 100% を維持
-7. CLAUDE.md / AGENTS.md を再生成
+6. `tools/reduction-advisor.ps1` で `bundle_into_hub` の根拠を確認し、削除や deprecated 追加を同時に行わない
+7. `.\tools\eval-routing-accuracy.ps1` を実行して 100% を維持
+8. CLAUDE.md / AGENTS.md を再生成
 
 ## 関連
 

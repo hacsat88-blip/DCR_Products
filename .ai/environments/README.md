@@ -10,14 +10,13 @@ The shared thinking source of truth is [../book/runtime.md](../book/runtime.md).
 - `claude-code/kernel.md`: Claude Code capability declaration
 - `copilot-cli/kernel.md`: GitHub Copilot CLI capability declaration
 - `codex/kernel.md`: Codex capability declaration
-- `warp/kernel.md`: Warp Project Rules capability declaration
 - `cursor/kernel.md`: Cursor capability declaration
 - `windsurf/kernel.md`: Windsurf capability declaration
 - `opencode/kernel.md`: OpenCode capability declaration
 
 ## Runtime Entrypoints
 
-`AGENTS.md`, `CLAUDE.md`, `.github/copilot-instructions.md`, `.cursor/`, `.windsurf/`, root `opencode.json`, and `.opencode/` remain in their runtime-specific locations because tools auto-load those paths. Warp uses the root `AGENTS.md` as its Project Rules entrypoint.
+`AGENTS.md`, `CLAUDE.md`, `.github/copilot-instructions.md`, `.cursor/`, `.windsurf/`, root `opencode.json`, and `.opencode/` remain in their runtime-specific locations because tools auto-load those paths.
 
 ## Runtime Loading Model
 

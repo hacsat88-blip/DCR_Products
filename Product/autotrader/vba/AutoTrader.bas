@@ -3,24 +3,25 @@ Option Explicit
 Private Const API_BASE As String = "http://localhost:8000"
 Private Const SECURE_SHEET As String = "Secure"
 Private Const XOR_KEY As String = "SATOSHI_KEY"
-Private Const TIMER_INTERVAL As Double = 5 / 86400  ' 5Áßí
+Private Const TIMER_INTERVAL As Double = 5 / 86400  ' 5ïb
 
 Private dtNextRun As Date
 Private bRunning As Boolean
+Private Const UPDATE_TIME_FORMAT As String = "yyyy/mm/dd hh:mm:ss"
 
-' „Éñ„ÉÉ„ÇØËµ∑ÂãïÊôÇ„Åæ„Åü„ÅØ„Éú„Çø„É≥„Åã„ÇâÂëº„Å≥Âá∫„Åô
+' ÉuÉbÉNãNìÆéûÇ‹ÇΩÇÕÉ{É^ÉìÇ©ÇÁåƒÇ—èoÇ∑
 Public Sub StartAutoTrader()
     If bRunning Then
-        MsgBox "Ëá™ÂãïÂ£≤Ë≤∑„ÅØ„Åô„Åß„Å´Ëµ∑Âãï‰∏≠„Åß„Åô", vbInformation
+        MsgBox "é©ìÆîÑîÉÇÕÇ∑Ç≈Ç…ãNìÆíÜÇ≈Ç∑", vbInformation
         Exit Sub
     End If
     bRunning = True
-    dtNextRun = Now + TIMER_INTERVAL
-    Application.OnTime dtNextRun, "OnPriceUpdate_Timer"
-    MsgBox "Ëá™ÂãïÂ£≤Ë≤∑„ÇíÈñãÂßã„Åó„Åæ„Åó„ÅüÔºà5Áßí„Åî„Å®„Å´‰æ°Ê†º„ÉÅ„Çß„ÉÉ„ÇØÔºâ", vbInformation
+    Call OnPriceUpdate
+    ScheduleNextRun
+    MsgBox "é©ìÆîÑîÉÇäJénÇµÇ‹ÇµÇΩÅi5ïbÇ≤Ç∆Ç…âøäiÉ`ÉFÉbÉNÅj", vbInformation
 End Sub
 
-' „Éñ„ÉÉ„ÇØÁµÇ‰∫ÜÊôÇ„Åæ„Åü„ÅØ„Éú„Çø„É≥„Åã„ÇâÂëº„Å≥Âá∫„Åô
+' ÉuÉbÉNèIóπéûÇ‹ÇΩÇÕÉ{É^ÉìÇ©ÇÁåƒÇ—èoÇ∑
 Public Sub StopAutoTrader()
     If Not bRunning Then Exit Sub
     On Error Resume Next
@@ -29,52 +30,100 @@ Public Sub StopAutoTrader()
     bRunning = False
 End Sub
 
-' Application.OnTime „Åã„ÇâÂÆöÊúüÂëº„Å≥Âá∫„Åó„Åï„Çå„Çã„É©„ÉÉ„Éë„Éº
+' Application.OnTime Ç©ÇÁíËä˙åƒÇ—èoÇµÇ≥ÇÍÇÈÉâÉbÉpÅ[
 Public Sub OnPriceUpdate_Timer()
     If Not bRunning Then Exit Sub
-    On Error Resume Next
+    On Error GoTo TimerError
     Call OnPriceUpdate
-    On Error GoTo 0
+TimerDone:
+    If bRunning Then ScheduleNextRun
+    Exit Sub
+TimerError:
+    Resume TimerDone
+End Sub
+
+Private Sub ScheduleNextRun()
     dtNextRun = Now + TIMER_INTERVAL
     Application.OnTime dtNextRun, "OnPriceUpdate_Timer"
 End Sub
 
 Public Sub OnPriceUpdate()
     Dim ws As Worksheet
+    On Error GoTo ExitUpdate
     Set ws = ThisWorkbook.Sheets("WatchList")
+
+    Dim availCash As Double
+    availCash = GetAvailableCash()
 
     Dim i As Long
     For i = 2 To ws.Cells(ws.Rows.Count, 1).End(xlUp).Row
-        Dim symbol As String
-        symbol = ws.Cells(i, 1).Value
-        If symbol = "" Then GoTo NextRow
-
-        Dim price As Double, volume As Long, prevClose As Double, availCash As Double
-        price     = ws.Cells(i, 2).Value
-        volume    = ws.Cells(i, 3).Value
-        prevClose = ws.Cells(i, 4).Value
-        availCash = ThisWorkbook.Sheets("Config").Range("B1").Value
-
-        Dim result As String
-        result = PostPrice(symbol, price, volume, prevClose, availCash)
-
-        Dim action As String, lot As Long, simMode As Boolean
-        ParseResponse result, action, lot, simMode
-
-        If Not simMode Then
-            If action = "buy" Then Call SubmitOrder(symbol, "buy", lot, price)
-            If action = "sell" Then Call SubmitOrder(symbol, "sell", lot, price)
-        End If
-
-        ws.Cells(i, 7).Value = action
-        ws.Cells(i, 8).Value = Now()
-NextRow:
+        ProcessWatchRow ws, i, availCash
     Next i
+ExitUpdate:
 End Sub
 
+Private Sub ProcessWatchRow(ws As Worksheet, rowIndex As Long, availCash As Double)
+    On Error GoTo RowError
+
+    Dim symbol As String
+    symbol = Trim(CStr(ws.Cells(rowIndex, 1).Value))
+    If symbol = "" Then Exit Sub
+
+    TouchWatchRow ws, rowIndex
+
+    Dim price As Double, volume As Long, prevClose As Double
+    price = CellDouble(ws.Cells(rowIndex, 2).Value)
+    volume = CellLong(ws.Cells(rowIndex, 3).Value)
+    prevClose = CellDouble(ws.Cells(rowIndex, 4).Value)
+
+    Dim result As String
+    result = PostPrice(symbol, price, volume, prevClose, availCash)
+
+    Dim action As String, lot As Long, simMode As Boolean
+    ParseResponse result, action, lot, simMode
+
+    ' Codex Advisor ÇÕèïåæêÍópÅBî≠íçÇÕÉTÅ[ÉoÅ[ÇÃÉçÅ[ÉJÉãÉãÅ[Éã action ÇÃÇ›ÇégÇ§ÅB
+    ' APIÉGÉâÅ[ÅEÉ^ÉCÉÄÉAÉEÉgÅEadvisor api_error éûÇÕ ParseResponse ë§Ç≈ hold Ç…ì|Ç∑ÅB
+    If Not simMode Then
+        If action = "buy" And lot > 0 Then Call SubmitOrder(symbol, "buy", lot, price)
+        If action = "sell" Then Call SubmitOrder(symbol, "sell", lot, price)
+    End If
+
+    ws.Cells(rowIndex, 7).Value = action
+    TouchWatchRow ws, rowIndex
+    Exit Sub
+
+RowError:
+    On Error Resume Next
+    ws.Cells(rowIndex, 7).Value = "hold"
+    TouchWatchRow ws, rowIndex
+End Sub
+
+Private Sub TouchWatchRow(ws As Worksheet, rowIndex As Long)
+    ws.Cells(rowIndex, 8).NumberFormat = UPDATE_TIME_FORMAT
+    ws.Cells(rowIndex, 8).Value = Now()
+End Sub
+
+Private Function GetAvailableCash() As Double
+    On Error GoTo UseZero
+    GetAvailableCash = CellDouble(ThisWorkbook.Sheets("Config").Range("B1").Value)
+    Exit Function
+UseZero:
+    GetAvailableCash = 0
+End Function
+
+Private Function CellDouble(value As Variant) As Double
+    If IsNumeric(value) Then CellDouble = CDbl(value) Else CellDouble = 0
+End Function
+
+Private Function CellLong(value As Variant) As Long
+    If IsNumeric(value) Then CellLong = CLng(value) Else CellLong = 0
+End Function
+
 Private Function PostPrice(symbol As String, price As Double, volume As Long, prevClose As Double, availCash As Double) As String
+    On Error GoTo FailClosed
     Dim http As Object
-    Set http = CreateObject("MSXML2.XMLHTTP")
+    Set http = CreateObject("MSXML2.ServerXMLHTTP.6.0")
     Dim body As String
     body = "{""symbol"":""" & symbol & """" & _
            ",""price"":" & price & _
@@ -82,13 +131,21 @@ Private Function PostPrice(symbol As String, price As Double, volume As Long, pr
            ",""prev_close"":" & prevClose & _
            ",""available_cash"":" & availCash & _
            ",""timestamp"":""" & Format(Now(), "yyyy-mm-ddThh:nn:ss") & """}"
+    http.setTimeouts 1000, 1000, 2000, 2000
     http.Open "POST", API_BASE & "/api/price", False
     http.setRequestHeader "Content-Type", "application/json"
     http.Send body
+    If http.Status < 200 Or http.Status >= 300 Then GoTo FailClosed
     PostPrice = http.responseText
+    Exit Function
+FailClosed:
+    PostPrice = "{""action"":""hold"",""reason"":""APIÉGÉâÅ[Ç‹ÇΩÇÕÉ^ÉCÉÄÉAÉEÉg"",""simulation"":true,""advisor"":{""api_error"":true}}"
 End Function
 
 Public Sub SubmitOrder(symbol As String, action As String, lot As Long, price As Double)
+    If action <> "buy" And action <> "sell" Then Exit Sub
+    If action = "buy" And lot <= 0 Then Exit Sub
+
     Dim rss As Object
     On Error GoTo FallbackSendKeys
     Set rss = GetObject(, "RSS2.Application")
@@ -143,8 +200,11 @@ Private Sub ParseResponse(json As String, action As String, lot As Long, simMode
     action = "hold" : lot = 0 : simMode = True
     Dim s As String
     s = ExtractJsonString(json, "action") : If s <> "" Then action = s
-    s = ExtractJsonString(json, "lot") : If s <> "" Then lot = CLng(s)
+    s = ExtractJsonString(json, "lot") : If s <> "" And IsNumeric(s) Then lot = CLng(s)
     s = ExtractJsonString(json, "simulation") : simMode = (s = "true")
+    s = ExtractJsonString(json, "api_error") : If s = "true" Then action = "hold" : simMode = True
+    s = ExtractJsonString(json, "new_entries_blocked") : If action = "buy" And s = "true" Then action = "hold"
+    If action <> "buy" And action <> "sell" Then action = "hold"
 End Sub
 
 Private Function ExtractJsonString(json As String, key As String) As String

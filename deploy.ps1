@@ -1,4 +1,4 @@
-<#
+﻿<#
 .SYNOPSIS
   DCR Products - Deploy script
   サトシ開発 (Git管理) から各エディタのユーザーレベルパスへ一方向同期

@@ -64,6 +64,44 @@
         }
       }
     },
+    "proposal_state": {
+      "type": "object",
+      "description": "直前の発火前提案を自然言語返答で承認・修正・却下するための一時状態",
+      "properties": {
+        "proposal_id": { "type": "string" },
+        "status": {
+          "type": "string",
+          "enum": ["none", "proposed", "approved", "rejected", "refined", "expired"]
+        },
+        "mode": {
+          "type": "string",
+          "enum": ["", "auto", "propose", "approve_required"]
+        },
+        "options": {
+          "type": "array",
+          "maxItems": 3,
+          "items": {
+            "type": "object",
+            "required": ["id", "kind", "name", "reason", "expected_effect"],
+            "properties": {
+              "id": { "type": "string", "enum": ["A", "B", "C"] },
+              "kind": { "type": "string", "enum": ["rule", "skill", "agent"] },
+              "name": { "type": "string" },
+              "reason": { "type": "string" },
+              "expected_effect": { "type": "string" }
+            }
+          }
+        },
+        "recommended_option": { "type": "string" },
+        "selected_option": { "type": "string" },
+        "created_at": { "type": "string" },
+        "updated_at": { "type": "string" },
+        "last_user_reply_type": {
+          "type": "string",
+          "enum": ["none", "approve", "reject", "refine", "ambiguous"]
+        }
+      }
+    },
     "updated_at": {
       "type": "string",
       "format": "date-time"
@@ -89,6 +127,25 @@
           "expected_effect": "全タスクの単一入口"
         }
       ],
+      "proposal_state": {
+        "proposal_id": "rt-20260517-120000-a1b2",
+        "status": "proposed",
+        "mode": "propose",
+        "options": [
+          {
+            "id": "A",
+            "kind": "agent",
+            "name": "pied-piper",
+            "reason": "recommended route",
+            "expected_effect": "候補を束ねて承認待ちにする"
+          }
+        ],
+        "recommended_option": "A",
+        "selected_option": "",
+        "created_at": "2026-04-26T12:00:00Z",
+        "updated_at": "2026-04-26T12:00:00Z",
+        "last_user_reply_type": "none"
+      },
       "updated_at": "2026-04-26T12:00:00Z"
     }
   ]
