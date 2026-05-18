@@ -9,15 +9,24 @@ import ReportAndHistoryPanel from "./ReportAndHistoryPanel";
 import { unlockAudio, handleEvent } from "../lib/alerts";
 
 const MOCK_LOGS: TradeLog[] = [
-  { timestamp: "2025-01-15T09:30:00", symbol: "7203", action: "buy", reason: "RSI30割れ+出来高2倍", confidence: 0.85, price: 2450 },
-  { timestamp: "2025-01-15T09:45:00", symbol: "6758", action: "buy", reason: "トレンド転換確認", confidence: 0.78, price: 12500 },
-  { timestamp: "2025-01-15T10:15:00", symbol: "7203", action: "sell", reason: "利益確定（+¥5,000）", confidence: 0.92, price: 2500 },
-  { timestamp: "2025-01-15T10:30:00", symbol: "9984", action: "buy", reason: "押し目買いシグナル", confidence: 0.81, price: 67800 },
-  { timestamp: "2025-01-15T11:00:00", symbol: "6758", action: "sell", reason: "損切り（-¥2,000）", confidence: 0.88, price: 12300 },
-  { timestamp: "2025-01-15T11:30:00", symbol: "9984", action: "sell", reason: "利益確定（+¥3,500）", confidence: 0.90, price: 68200 },
-  { timestamp: "2025-01-15T13:00:00", symbol: "7203", action: "buy", reason: "午後の反発パターン", confidence: 0.75, price: 2470 },
-  { timestamp: "2025-01-15T13:30:00", symbol: "8306", action: "buy", reason: "金融株シナリオ", confidence: 0.82, price: 580 },
+  {
+    timestamp: "2025-01-15T09:30:00",
+    symbol: "7203",
+    risk_state: "GREEN",
+    should_stop_new_entries: false,
+    should_reduce_size: false,
+    reason: "ローカルルール継続",
+    rule_issue: "なし",
+    improvement: "記録を継続",
+  },
 ];
+
+interface ActionLog {
+  timestamp: string;
+  symbol: string;
+  action: string;
+  price: number;
+}
 
 const MOCK_PRICES: Record<string, number> = {
   "7203": 2480,
@@ -28,6 +37,7 @@ const MOCK_PRICES: Record<string, number> = {
 
 export default function Dashboard() {
   const [logs, setLogs] = useState<TradeLog[]>(MOCK_LOGS);
+  const [actionLogs, setActionLogs] = useState<ActionLog[]>([]);
   const [livePrices, setLivePrices] = useState<Record<string, number>>(MOCK_PRICES);
   const prevStateRef = useRef({ stopped: false, pnl: 0 });
   const [status, setStatus] = useStatusPolling(5000);
@@ -42,16 +52,33 @@ export default function Dashboard() {
       setLivePrices((prev) => ({ ...prev, [wsData.symbol!]: wsData.price! }));
     }
 
-    // C3: symbol がない不完全なイベントはログに追加しない
-    if (wsData.action && wsData.action !== "hold" && wsData.symbol) {
+    if (wsData.advisor && wsData.symbol) {
       setLogs((prev) =>
         [
           {
             timestamp: wsData.timestamp ?? new Date().toISOString(),
             symbol: wsData.symbol!,
+            risk_state: wsData.advisor!.risk_state,
+            should_stop_new_entries: wsData.advisor!.should_stop_new_entries,
+            should_reduce_size: wsData.advisor!.should_reduce_size,
+            reason: wsData.advisor!.reason,
+            rule_issue: wsData.advisor!.rule_issue,
+            improvement: wsData.advisor!.improvement,
+            api_error: wsData.advisor!.api_error,
+          },
+          ...prev,
+        ].slice(0, 100),
+      );
+    }
+
+    // C3: symbol がない不完全なイベントはチャートログに追加しない
+    if (wsData.action && wsData.action !== "hold" && wsData.symbol) {
+      setActionLogs((prev) =>
+        [
+          {
+            timestamp: wsData.timestamp ?? new Date().toISOString(),
+            symbol: wsData.symbol!,
             action: wsData.action!,
-            reason: wsData.reason ?? "",
-            confidence: wsData.confidence ?? 0,
             price: wsData.price ?? 0,
           },
           ...prev,
@@ -60,7 +87,12 @@ export default function Dashboard() {
     }
 
     // ステータスをWS経由でリアルタイム更新（ポーリング間隔を補完）
-    if (wsData.daily_pnl !== undefined || wsData.tier || wsData.risk_budget !== undefined) {
+    if (
+      wsData.daily_pnl !== undefined ||
+      wsData.tier ||
+      wsData.risk_budget !== undefined ||
+      wsData.new_entries_blocked !== undefined
+    ) {
       setStatus((prev) => {
         if (!prev) return prev;
         return {
@@ -68,6 +100,8 @@ export default function Dashboard() {
           ...(wsData.daily_pnl !== undefined && { daily_pnl: wsData.daily_pnl }),
           ...(wsData.risk_budget !== undefined && { risk_budget: wsData.risk_budget }),
           ...(wsData.tier && { tier: wsData.tier }),
+          ...(wsData.new_entries_blocked !== undefined && { new_entries_blocked: wsData.new_entries_blocked }),
+          ...(wsData.new_entries_block_reason !== undefined && { new_entries_block_reason: wsData.new_entries_block_reason }),
         };
       });
     }
@@ -84,8 +118,8 @@ export default function Dashboard() {
 
   const chartLogs = useMemo(
     () =>
-      logs.map((l) => ({ symbol: l.symbol, timestamp: l.timestamp, action: l.action, price: l.price })),
-    [logs],
+      actionLogs.map((l) => ({ symbol: l.symbol, timestamp: l.timestamp, action: l.action, price: l.price })),
+    [actionLogs],
   );
 
   const toggleSimulation = async () => {

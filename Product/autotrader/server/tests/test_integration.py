@@ -1,5 +1,5 @@
 """
-統合テスト: 価格受信 → フィルタ → AI判断 → RiskGuard → 発注判断 の全ワークフローを検証
+統合テスト: 価格受信 → フィルタ → Codex助言 → RiskGuard → 発注判断 の全ワークフローを検証
 """
 from datetime import datetime, time
 from unittest.mock import MagicMock, patch
@@ -7,8 +7,8 @@ from unittest.mock import MagicMock, patch
 import pytest
 from fastapi.testclient import TestClient
 
-from ..ai_trader import TradeSignal
 from ..capital_router import CapitalRouter, Tier
+from ..codex_advisor import CodexAdvice
 from ..risk_guard import RiskGuard
 from ..technical_filter import PriceData, TechnicalFilter
 from ..capital_router import TIER_CONFIGS
@@ -91,7 +91,7 @@ class TestTierSwitching:
 # ── フルパイプライン統合テスト ────────────────────────────────────────────────
 
 class TestFullPipeline:
-    """価格受信 → フィルタ → リスクチェック → AI判断 の全フロー"""
+    """価格受信 → フィルタ → リスクチェック → Codex助言 の全フロー"""
 
     def _make_pipeline(self):
         router = CapitalRouter()
@@ -217,10 +217,17 @@ class TestFastAPIEndpoints:
         # テスト用に状態をリセット
         m.risk_guard = RiskGuard()
         m._simulation_mode = True
-        with patch.object(m.ai_trader, "judge") as mock_judge:
-            mock_judge.return_value = TradeSignal(action="buy", reason="テスト買いシグナル", confidence=0.85)
+        with patch.object(m.codex_advisor, "review") as mock_review:
+            mock_review.return_value = CodexAdvice(
+                risk_state="GREEN",
+                should_stop_new_entries=False,
+                should_reduce_size=False,
+                reason="ローカルルール継続",
+                rule_issue="なし",
+                improvement="記録を継続する",
+            )
             with TestClient(m.app) as c:
-                yield c, mock_judge
+                yield c, mock_review
 
     def test_status_endpoint_returns_defaults(self, client):
         c, _ = client
@@ -237,16 +244,61 @@ class TestFastAPIEndpoints:
         assert resp.status_code == 200
         assert resp.json()["action"] == "hold"
 
-    def test_price_endpoint_buy_signal_in_simulation(self, client):
-        c, mock_judge = client
+    def test_price_endpoint_exit_check_runs_before_entry_filters(self, client):
+        c, mock_review = client
+        from .. import main as m
+        m.risk_guard.reset_session(datetime(2026, 5, 12).date())
+        m.risk_guard.on_entry("7203", 2310, datetime(2026, 5, 12, 9, 30), lot=100)
+        payload = make_price_payload(
+            symbol="7203",
+            price=2280.0,
+            prev_close=2310.0,
+            available_cash=600_000,
+            timestamp="2026-05-12T12:10:00",  # 昼休みでも保有中の損切りを優先
+        )
+
+        resp = c.post("/api/price", json=payload)
+
+        assert resp.status_code == 200
+        data = resp.json()
+        assert data["action"] == "sell"
+        assert "損切り" in data["reason"]
+        assert data["advisor"] is None
+        assert not mock_review.called
+
+    def test_price_endpoint_local_buy_with_advisor_reference(self, client):
+        c, mock_review = client
         payload = make_price_payload(timestamp="2026-05-12T10:00:00")
         resp = c.post("/api/price", json=payload)
         assert resp.status_code == 200
         data = resp.json()
-        # シミュレーションモードでAIがbuyを返す場合
+        # 発注アクションはローカルルール、Codexはadvisorとして返る
+        assert data["action"] == "buy"
         assert data["simulation"] is True
+        assert data["advisor"]["risk_state"] == "GREEN"
+        assert mock_review.called
         assert "tier" in data
         assert data["tier"] == "MID"  # 60万円 → MID
+
+    def test_price_endpoint_blocks_new_entry_when_advisor_api_fails(self, client):
+        c, mock_review = client
+        from .. import main as m
+        mock_review.return_value = CodexAdvice(
+            risk_state="RED",
+            should_stop_new_entries=True,
+            should_reduce_size=True,
+            reason="Codex app-serverが利用できないため新規建て禁止",
+            rule_issue="app-server失敗",
+            improvement="codex login を確認",
+            api_error=True,
+        )
+        payload = make_price_payload(timestamp="2026-05-12T10:00:00")
+        resp = c.post("/api/price", json=payload)
+        assert resp.status_code == 200
+        data = resp.json()
+        assert data["action"] == "hold"
+        assert data["advisor"]["api_error"] is True
+        assert m.risk_guard.session.new_entries_blocked
 
     def test_tier_reflected_in_response(self, client):
         c, _ = client
@@ -276,6 +328,7 @@ class TestFastAPIEndpoints:
     def test_order_result_updates_pnl(self, client):
         c, _ = client
         from .. import main as m
+        m.risk_guard.reset_session(datetime(2026, 5, 12).date())
         m.risk_guard.on_entry("7203", 2310, datetime(2026, 5, 12, 9, 30))
 
         order = {
@@ -288,3 +341,34 @@ class TestFastAPIEndpoints:
         resp = c.post("/api/order-result", json=order)
         assert resp.status_code == 200
         assert m.risk_guard.session.daily_pnl == (2360 - 2310) * 100  # +5000円
+
+    def test_duplicate_order_result_is_ignored(self, client):
+        c, _ = client
+        order = {
+            "symbol": "7203",
+            "action": "buy",
+            "executed_price": 2310.0,
+            "qty": 100,
+            "timestamp": "2026-05-12T09:30:00",
+        }
+        first = c.post("/api/order-result", json=order)
+        duplicate = c.post("/api/order-result", json=order)
+
+        assert first.status_code == 200
+        assert duplicate.status_code == 200
+        assert first.json()["status"] == "ok"
+        assert duplicate.json()["status"] == "ignored"
+
+    def test_unknown_sell_order_result_is_ignored(self, client):
+        c, _ = client
+        order = {
+            "symbol": "7203",
+            "action": "sell",
+            "executed_price": 2300.0,
+            "qty": 100,
+            "timestamp": "2026-05-12T10:00:00",
+        }
+        resp = c.post("/api/order-result", json=order)
+
+        assert resp.status_code == 200
+        assert resp.json()["status"] == "ignored"

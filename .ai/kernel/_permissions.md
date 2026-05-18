@@ -58,3 +58,12 @@
 - GO / FIX / STOP は応答品質表示であり、権限判定ではない
 - 実装途中で P2 から P3 に昇格する場合は、その時点で停止して承認を取る
 - 不明な場合は低く見積もらず、P3 として扱う
+
+## Routing approval overlay
+
+Skill / Agent / subagent / orchestration の発火は、操作権限に重ねて判定する。
+
+- P1 read-only かつ単独候補かつ曖昧さ低なら、発火前提案後に自動実行できる
+- Skill / Agent の利用が作業フローを切り替える場合は、候補提示して確認する
+- subagent、並列 orchestration、外部 MCP/API、書き込み可能 agent、P2/P3 操作は承認必須
+- 曖昧な自然言語依頼では、候補を2-3件に絞り、ユーザー確認後に発火する

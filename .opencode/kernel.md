@@ -66,6 +66,16 @@ The canonical project config is the repository-root `opencode.json`. The `.openc
 
 ## Integration with DCR Kernel
 
+### Unified Coordinator
+
+All task routing enters through the shared **pied-piper** coordinator and the `unified-router` decision tree. OpenCode-local agents and skills are overlays; they do not replace the DCR source of truth.
+
+For Skill, Agent, subagent, parallel orchestration, external MCP/API, or P2/P3 work, use **proposal -> user approval -> execution**. Only a single low-risk P1 read-only exploration may run after a short visible preflight.
+
+Natural-language replies are accepted only when the target is unique. `おすすめで` / `推奨で` / `Aで` / `1で` approve a uniquely selected option. `それで` / `進めて` / `承認` / `OK` approve only when there is exactly one active option. `任せる` / `おまかせ` / `よさそう` / `よさげ` / `たぶん` / `多分` remain ambiguous and must not execute. `キャンセル` / `中止` reject; `別案` / `別の案` / `軽く` refine.
+
+When `.ai/kernel/gate-state.json` has `proposal_state.status = proposed|refined`, interpret a short next utterance as a proposal reply before normal routing. The final approve/reject/refine/ambiguous transition follows `tools/lib/gate-state.ps1`.
+
 ### Signal Protocol
 
 OpenCode agents use the DCR signal protocol:
@@ -97,11 +107,6 @@ For 3+ step tasks, OpenCode follows the DCR pipeline:
 - Claude Code uses `CLAUDE.md` as entrypoint
 - OpenCode uses root `opencode.json` + `AGENTS.md` + `.opencode/kernel.md`
 - OpenCode has a native `skill` tool
-
-### vs. Warp
-- Warp reads `AGENTS.md` as Project Rules
-- OpenCode reads root `opencode.json` for project config
-- OpenCode supports `opencode.jsonc` (JSON with comments)
 
 ### vs. Cursor
 - Cursor uses `.cursor/rules/` directory

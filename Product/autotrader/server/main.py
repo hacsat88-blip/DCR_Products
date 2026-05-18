@@ -1,5 +1,6 @@
 """FastAPI entry point — SP-4 拡張版（永続化・日次レポート・祝日対応）"""
 import asyncio
+import json
 import os
 from datetime import datetime
 from typing import Any
@@ -10,19 +11,25 @@ load_dotenv()
 from fastapi import FastAPI, WebSocket, WebSocketDisconnect
 from pydantic import BaseModel
 
-from .ai_trader import AITrader
 from .capital_router import CapitalRouter
+from .codex_advisor import AdvisorContext, CodexAdvice, CodexAdvisor
 from .price_history import HistoryStore
-from .risk_guard import RiskGuard
+from .risk_guard import RULES, RiskGuard
 from .technical_filter import PriceData, TechnicalFilter
-from .trade_store import DecisionRecord, TradeRecord, TradeStore, session_date_str
+from .trade_store import (
+    AdvisorReviewRecord,
+    DecisionRecord,
+    TradeRecord,
+    TradeStore,
+    session_date_str,
+)
 
 app = FastAPI(title="Autotrader API")
 
 capital_router = CapitalRouter()
 technical_filter = TechnicalFilter()
 risk_guard = RiskGuard()
-ai_trader = AITrader()
+codex_advisor = CodexAdvisor()
 history_store = HistoryStore()
 trade_store = TradeStore(os.environ.get("AUTOTRADER_DB_PATH", "data/autotrader.db"))
 
@@ -77,41 +84,34 @@ async def handle_price(req: PriceRequest) -> dict[str, Any]:
         current_date=now.date(),
     )
 
-    filter_result = technical_filter.check(price_data, config)
-    if not filter_result.passed:
-        response = {"action": "hold", "reason": filter_result.reason, "simulation": _simulation_mode}
-        _persist_decision(req, "hold", filter_result.reason, 0.0, rsi14, volume_ratio, session_date)
-        return response
-
-    lot = capital_router.calc_lot(req.available_cash, req.price)
-    if lot == 0:
-        reason = "株価がティア上限超過（取引不可）"
-        _persist_decision(req, "hold", reason, 0.0, rsi14, volume_ratio, session_date)
-        return {"action": "hold", "reason": reason, "simulation": _simulation_mode}
-
+    advice: CodexAdvice | None = None
     in_position = req.symbol in risk_guard.session.position_entry_prices
-    position_pnl = None
     if in_position:
-        entry = risk_guard.session.position_entry_prices[req.symbol]
-        held_lot = risk_guard.session.position_lots.get(req.symbol, lot)
-        position_pnl = (req.price - entry) * held_lot
+        held_lot = risk_guard.session.position_lots.get(req.symbol, 100)
+        lot = held_lot
 
         exit_check = risk_guard.check_exit(req.symbol, req.price, now)
         if exit_check.allowed:
             signal_action = "sell"
             signal_reason = exit_check.reason
-            signal_confidence = 1.0
+            signal_confidence = 0.0
         else:
-            signal = ai_trader.judge(
-                req.symbol, req.price, rsi14,
-                volume_ratio,
-                (req.price - req.prev_close) / max(req.prev_close, 1) * 100,
-                position_pnl, tier.value,
-            )
-            signal_action = signal.action
-            signal_reason = signal.reason
-            signal_confidence = signal.confidence
+            signal_action = "hold"
+            signal_reason = "ローカル決済条件未達"
+            signal_confidence = 0.0
     else:
+        filter_result = technical_filter.check(price_data, config)
+        if not filter_result.passed:
+            response = {"action": "hold", "reason": filter_result.reason, "simulation": _simulation_mode}
+            _persist_decision(req, "hold", filter_result.reason, 0.0, rsi14, volume_ratio, session_date)
+            return response
+
+        lot = capital_router.calc_lot(req.available_cash, req.price)
+        if lot == 0:
+            reason = "株価がティア上限超過（取引不可）"
+            _persist_decision(req, "hold", reason, 0.0, rsi14, volume_ratio, session_date)
+            return {"action": "hold", "reason": reason, "simulation": _simulation_mode}
+
         min_gain_per_share = 2_000 * 1.5 / lot
         target_price = req.price + min_gain_per_share
         entry_check = risk_guard.check_entry(req.symbol, req.price, target_price, now, lot)
@@ -119,15 +119,18 @@ async def handle_price(req: PriceRequest) -> dict[str, Any]:
             _persist_decision(req, "hold", entry_check.reason, 0.0, rsi14, volume_ratio, session_date)
             return {"action": "hold", "reason": entry_check.reason, "simulation": _simulation_mode}
 
-        signal = ai_trader.judge(
-            req.symbol, req.price, rsi14,
-            volume_ratio,
-            (req.price - req.prev_close) / max(req.prev_close, 1) * 100,
-            None, tier.value,
-        )
-        signal_action = signal.action
-        signal_reason = signal.reason
-        signal_confidence = signal.confidence
+        advisor_context = _build_advisor_context(now, session_date)
+        advice = await asyncio.to_thread(codex_advisor.review, advisor_context)
+        _persist_advisor_review(req, advice, advisor_context, session_date)
+        if advice.api_error:
+            risk_guard.block_new_entries("Codex app-serverエラー")
+            signal_action = "hold"
+            signal_reason = "Codex app-serverエラーのため新規建て禁止"
+            signal_confidence = 0.0
+        else:
+            signal_action = "buy"
+            signal_reason = "ローカルルールでエントリー許可"
+            signal_confidence = 0.0
 
     _persist_decision(req, signal_action, signal_reason, signal_confidence,
                       rsi14, volume_ratio, session_date)
@@ -135,11 +138,15 @@ async def handle_price(req: PriceRequest) -> dict[str, Any]:
     response = {
         "action": signal_action,
         "reason": signal_reason,
-        "confidence": signal_confidence,
         "lot": lot,
         "tier": tier.value,
         "daily_pnl": risk_guard.session.daily_pnl,
         "risk_budget": risk_guard.get_remaining_risk_budget(),
+        "trading_stopped": risk_guard.session.trading_stopped,
+        "stop_reason": risk_guard.session.stop_reason,
+        "new_entries_blocked": risk_guard.session.new_entries_blocked,
+        "new_entries_block_reason": risk_guard.session.new_entries_block_reason,
+        "advisor": advice.to_dict() if advice else None,
         "simulation": _simulation_mode,
     }
 
@@ -158,18 +165,73 @@ def _persist_decision(req: PriceRequest, action: str, reason: str,
     ))
 
 
+def _build_advisor_context(now: datetime, session_date: str) -> AdvisorContext:
+    s = risk_guard.session
+    rules_triggered: list[str] = []
+    if s.daily_pnl <= RULES["max_daily_loss"]:
+        rules_triggered.append("daily_loss_limit_reached")
+    elif s.daily_pnl <= RULES["max_daily_loss"] * 0.7:
+        rules_triggered.append("near_daily_loss_limit")
+    if s.consecutive_losses >= 2:
+        rules_triggered.append("loss_streak_warning")
+    if s.new_entries_blocked:
+        rules_triggered.append("new_entries_blocked")
+    if s.daily_pnl >= RULES["daily_profit_target"]:
+        rules_triggered.append("daily_profit_target_reached")
+
+    return AdvisorContext(
+        date=now.date().isoformat(),
+        daily_target_profit=RULES["daily_profit_target"],
+        max_daily_loss=abs(RULES["max_daily_loss"]),
+        trade_count=s.trade_count,
+        daily_pnl=s.daily_pnl,
+        consecutive_losses=s.consecutive_losses,
+        rules_triggered=rules_triggered,
+        recent_trades=trade_store.get_recent_trade_summaries(session_date, 5),
+    )
+
+
+def _persist_advisor_review(
+    req: PriceRequest,
+    advice: CodexAdvice,
+    context: AdvisorContext,
+    session_date: str,
+) -> None:
+    trade_store.insert_advisor_review(AdvisorReviewRecord(
+        session_date=session_date,
+        symbol=req.symbol,
+        risk_state=advice.risk_state,
+        should_stop_new_entries=advice.should_stop_new_entries,
+        should_reduce_size=advice.should_reduce_size,
+        reason=advice.reason,
+        rule_issue=advice.rule_issue,
+        improvement=advice.improvement,
+        api_error=advice.api_error,
+        input_snapshot=json.dumps(context.__dict__, ensure_ascii=False),
+        timestamp=req.timestamp,
+    ))
+
+
 @app.post("/api/order-result")
 async def handle_order_result(result: OrderResult) -> dict[str, str]:
     now = datetime.fromisoformat(result.timestamp)
+    risk_guard.ensure_today(now)
     session_date = session_date_str(now)
     pnl = 0.0
 
     if result.action == "buy":
-        risk_guard.on_entry(result.symbol, result.executed_price, now, result.qty)
+        record_result = risk_guard.on_entry(result.symbol, result.executed_price, now, result.qty)
     elif result.action == "sell":
-        entry = risk_guard.session.position_entry_prices.get(result.symbol, result.executed_price)
+        entry = risk_guard.session.position_entry_prices.get(result.symbol)
+        if entry is None:
+            return {"status": "ignored", "reason": f"未保有銘柄の決済通知を無視: {result.symbol}"}
         pnl = (result.executed_price - entry) * result.qty
-        risk_guard.on_exit(result.symbol, pnl)
+        record_result = risk_guard.on_exit(result.symbol, pnl)
+    else:
+        return {"status": "ignored", "reason": f"未対応の約定種別: {result.action}"}
+
+    if not record_result.allowed:
+        return {"status": "ignored", "reason": record_result.reason}
 
     trade_store.insert_trade(TradeRecord(
         symbol=result.symbol, action=result.action,
@@ -185,9 +247,13 @@ def get_status() -> dict[str, Any]:
     s = risk_guard.session
     return {
         "daily_pnl": s.daily_pnl,
+        "trade_count": s.trade_count,
+        "consecutive_losses": s.consecutive_losses,
         "positions": s.position_count,
         "trading_stopped": s.trading_stopped,
         "stop_reason": s.stop_reason,
+        "new_entries_blocked": s.new_entries_blocked,
+        "new_entries_block_reason": s.new_entries_block_reason,
         "risk_budget": risk_guard.get_remaining_risk_budget(),
         "simulation_mode": _simulation_mode,
         # tier はWebSocketブロードキャスト経由でフロントエンドに伝達するため省略

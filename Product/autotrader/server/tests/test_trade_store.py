@@ -1,7 +1,7 @@
 """SQLite トレードストアの検証"""
 import pytest
 
-from ..trade_store import DecisionRecord, TradeRecord, TradeStore
+from ..trade_store import AdvisorReviewRecord, DecisionRecord, TradeRecord, TradeStore
 
 
 @pytest.fixture
@@ -96,3 +96,33 @@ def test_upsert_daily_stats(store):
     store.upsert_daily_stats("2026-05-13")
     # 再実行しても重複しないこと
     store.upsert_daily_stats("2026-05-13")
+
+
+def test_insert_advisor_review(store):
+    review_id = store.insert_advisor_review(AdvisorReviewRecord(
+        session_date="2026-05-13",
+        symbol="7203",
+        risk_state="YELLOW",
+        should_stop_new_entries=True,
+        should_reduce_size=True,
+        reason="連敗",
+        rule_issue="連敗制限",
+        improvement="2連敗で停止",
+        api_error=False,
+        input_snapshot="{}",
+        timestamp="2026-05-13T10:00:00",
+    ))
+
+    assert review_id > 0
+
+
+def test_recent_trade_summaries(store):
+    store.insert_trade(TradeRecord(
+        symbol="7203", action="sell", price=2360, qty=100, pnl=-900,
+        timestamp="2026-05-13T10:30:00", session_date="2026-05-13",
+    ))
+
+    summaries = store.get_recent_trade_summaries("2026-05-13")
+
+    assert summaries[0]["symbol"] == "7203"
+    assert summaries[0]["result"] == -900

@@ -24,7 +24,16 @@
    16. external Superpowers checkout の drift がないか
    17. shared book contract が有効か
    18. routing fixture が一貫しているか
-   19. PowerShell 実行ファイルに絵文字・装飾記号が含まれていないか
+   19. proposal reply vocabulary の V5 自然語返答が一貫しているか
+   20. routing entrypoint contract の V6 CLI/IDE 生成物が一貫しているか
+   21. router decision report の V3 見える化が一貫しているか
+   22. reduction advisor の V7 実ログ削減判断が一貫しているか
+   23. shadow routing trial の V7.1 実ログ収集が一貫しているか
+   24. display policy advisor の V8 表示抑制判断が一貫しているか
+   25. display policy proposal の V9 承認待ち変換が一貫しているか
+   26. bundle advisor の V10 親候補提案が一貫しているか
+   27. bundle proposal の V10.1 承認待ち変換が一貫しているか
+   28. PowerShell 実行ファイルに絵文字・装飾記号が含まれていないか
 
 .EXAMPLE
   pwsh -ExecutionPolicy Bypass -File .\validate.ps1
@@ -49,6 +58,15 @@ $RoutingIndexScript = Join-Path $RepoRoot "tools\generate-routing-index.ps1"
 $ExternalSuperpowersCheckScript = Join-Path $RepoRoot "tools\check-external-superpowers.ps1"
 $SharedBookCheckScript = Join-Path $RepoRoot "tools\validate-shared-book.ps1"
 $RoutingAccuracyScript = Join-Path $RepoRoot "tools\eval-routing-accuracy.ps1"
+$ProposalReplyVocabularyTestScript = Join-Path $RepoRoot "tools\test-proposal-reply-vocabulary.ps1"
+$RoutingEntrypointContractTestScript = Join-Path $RepoRoot "tools\test-routing-entrypoint-contract.ps1"
+$RouterDecisionReportTestScript = Join-Path $RepoRoot "tools\test-router-decisions-report.ps1"
+$ReductionAdvisorTestScript = Join-Path $RepoRoot "tools\test-reduction-advisor.ps1"
+$ShadowRoutingTrialTestScript = Join-Path $RepoRoot "tools\test-shadow-routing-trial.ps1"
+$DisplayPolicyAdvisorTestScript = Join-Path $RepoRoot "tools\test-display-policy-advisor.ps1"
+$DisplayPolicyProposalTestScript = Join-Path $RepoRoot "tools\test-display-policy-proposal.ps1"
+$BundleAdvisorTestScript = Join-Path $RepoRoot "tools\test-bundle-advisor.ps1"
+$BundleProposalTestScript = Join-Path $RepoRoot "tools\test-bundle-proposal.ps1"
 $RoutingIndexFile = Join-Path $SourceRules "_ROUTING_INDEX.md"
 function Resolve-DcrPowerShellExe {
     $pwshCommand = Get-Command pwsh -ErrorAction SilentlyContinue
@@ -683,10 +701,190 @@ else {
 }
 
 # ─────────────────────────────────────────────
-# 19. PowerShell script status glyph check
+# 19. proposal reply vocabulary V5 smoke check
 # ─────────────────────────────────────────────
 Write-Host ""
-Write-Host "== 19. PowerShell script glyph check =========="
+Write-Host "== 19. proposal reply vocabulary check ========"
+if (-not (Test-Path $ProposalReplyVocabularyTestScript)) {
+    Write-Fail "tools/test-proposal-reply-vocabulary.ps1 — file not found"
+}
+else {
+    $result = & $PowerShellExe -ExecutionPolicy Bypass -File $ProposalReplyVocabularyTestScript -RepoRoot $RepoRoot 2>&1
+    if ($LASTEXITCODE -eq 0) {
+        if ($Verbose -and $result) { Write-Host "  $result" -ForegroundColor DarkGray }
+        $script:passed++
+    }
+    else {
+        Write-Fail "proposal reply vocabulary V5 smoke — failed"
+        if ($result) { Write-Host "  $result" -ForegroundColor DarkGray }
+    }
+}
+
+# ─────────────────────────────────────────────
+# 20. routing entrypoint contract V6 smoke check
+# ─────────────────────────────────────────────
+Write-Host ""
+Write-Host "== 20. routing entrypoint contract check ======"
+if (-not (Test-Path $RoutingEntrypointContractTestScript)) {
+    Write-Fail "tools/test-routing-entrypoint-contract.ps1 — file not found"
+}
+else {
+    $result = & $PowerShellExe -ExecutionPolicy Bypass -File $RoutingEntrypointContractTestScript -RepoRoot $RepoRoot 2>&1
+    if ($LASTEXITCODE -eq 0) {
+        if ($Verbose -and $result) { Write-Host "  $result" -ForegroundColor DarkGray }
+        $script:passed++
+    }
+    else {
+        Write-Fail "routing entrypoint contract V6 smoke — failed"
+        if ($result) { Write-Host "  $result" -ForegroundColor DarkGray }
+    }
+}
+
+# ─────────────────────────────────────────────
+# 21. router decisions report V3 smoke check
+# ─────────────────────────────────────────────
+Write-Host ""
+Write-Host "== 21. router decision report check ==========="
+if (-not (Test-Path $RouterDecisionReportTestScript)) {
+    Write-Fail "tools/test-router-decisions-report.ps1 — file not found"
+}
+else {
+    $result = & $PowerShellExe -ExecutionPolicy Bypass -File $RouterDecisionReportTestScript -RepoRoot $RepoRoot 2>&1
+    if ($LASTEXITCODE -eq 0) {
+        if ($Verbose -and $result) { Write-Host "  $result" -ForegroundColor DarkGray }
+        $script:passed++
+    }
+    else {
+        Write-Fail "router decision report V3 smoke — failed"
+        if ($result) { Write-Host "  $result" -ForegroundColor DarkGray }
+    }
+}
+
+# ─────────────────────────────────────────────
+# 22. reduction advisor V7 smoke check
+# ─────────────────────────────────────────────
+Write-Host ""
+Write-Host "== 22. reduction advisor check ================"
+if (-not (Test-Path $ReductionAdvisorTestScript)) {
+    Write-Fail "tools/test-reduction-advisor.ps1 — file not found"
+}
+else {
+    $result = & $PowerShellExe -ExecutionPolicy Bypass -File $ReductionAdvisorTestScript -RepoRoot $RepoRoot 2>&1
+    if ($LASTEXITCODE -eq 0) {
+        if ($Verbose -and $result) { Write-Host "  $result" -ForegroundColor DarkGray }
+        $script:passed++
+    }
+    else {
+        Write-Fail "reduction advisor V7 smoke — failed"
+        if ($result) { Write-Host "  $result" -ForegroundColor DarkGray }
+    }
+}
+
+# ─────────────────────────────────────────────
+# 23. shadow routing trial V7.1 smoke check
+# ─────────────────────────────────────────────
+Write-Host ""
+Write-Host "== 23. shadow routing trial check ============="
+if (-not (Test-Path $ShadowRoutingTrialTestScript)) {
+    Write-Fail "tools/test-shadow-routing-trial.ps1 — file not found"
+}
+else {
+    $result = & $PowerShellExe -ExecutionPolicy Bypass -File $ShadowRoutingTrialTestScript -RepoRoot $RepoRoot 2>&1
+    if ($LASTEXITCODE -eq 0) {
+        if ($Verbose -and $result) { Write-Host "  $result" -ForegroundColor DarkGray }
+        $script:passed++
+    }
+    else {
+        Write-Fail "shadow routing trial V7.1 smoke — failed"
+        if ($result) { Write-Host "  $result" -ForegroundColor DarkGray }
+    }
+}
+
+# ─────────────────────────────────────────────
+# 24. display policy advisor V8 smoke check
+# ─────────────────────────────────────────────
+Write-Host ""
+Write-Host "== 24. display policy advisor check =========="
+if (-not (Test-Path $DisplayPolicyAdvisorTestScript)) {
+    Write-Fail "tools/test-display-policy-advisor.ps1 — file not found"
+}
+else {
+    $result = & $PowerShellExe -ExecutionPolicy Bypass -File $DisplayPolicyAdvisorTestScript -RepoRoot $RepoRoot 2>&1
+    if ($LASTEXITCODE -eq 0) {
+        if ($Verbose -and $result) { Write-Host "  $result" -ForegroundColor DarkGray }
+        $script:passed++
+    }
+    else {
+        Write-Fail "display policy advisor V8 smoke — failed"
+        if ($result) { Write-Host "  $result" -ForegroundColor DarkGray }
+    }
+}
+
+# ─────────────────────────────────────────────
+# 25. display policy proposal V9 smoke check
+# ─────────────────────────────────────────────
+Write-Host ""
+Write-Host "== 25. display policy proposal check ========="
+if (-not (Test-Path $DisplayPolicyProposalTestScript)) {
+    Write-Fail "tools/test-display-policy-proposal.ps1 — file not found"
+}
+else {
+    $result = & $PowerShellExe -ExecutionPolicy Bypass -File $DisplayPolicyProposalTestScript -RepoRoot $RepoRoot 2>&1
+    if ($LASTEXITCODE -eq 0) {
+        if ($Verbose -and $result) { Write-Host "  $result" -ForegroundColor DarkGray }
+        $script:passed++
+    }
+    else {
+        Write-Fail "display policy proposal V9 smoke — failed"
+        if ($result) { Write-Host "  $result" -ForegroundColor DarkGray }
+    }
+}
+
+# ─────────────────────────────────────────────
+# 26. bundle advisor V10 smoke check
+# ─────────────────────────────────────────────
+Write-Host ""
+Write-Host "== 26. bundle advisor check =================="
+if (-not (Test-Path $BundleAdvisorTestScript)) {
+    Write-Fail "tools/test-bundle-advisor.ps1 — file not found"
+}
+else {
+    $result = & $PowerShellExe -ExecutionPolicy Bypass -File $BundleAdvisorTestScript -RepoRoot $RepoRoot 2>&1
+    if ($LASTEXITCODE -eq 0) {
+        if ($Verbose -and $result) { Write-Host "  $result" -ForegroundColor DarkGray }
+        $script:passed++
+    }
+    else {
+        Write-Fail "bundle advisor V10 smoke — failed"
+        if ($result) { Write-Host "  $result" -ForegroundColor DarkGray }
+    }
+}
+
+# ─────────────────────────────────────────────
+# 27. bundle proposal V10.1 smoke check
+# ─────────────────────────────────────────────
+Write-Host ""
+Write-Host "== 27. bundle proposal check ================="
+if (-not (Test-Path $BundleProposalTestScript)) {
+    Write-Fail "tools/test-bundle-proposal.ps1 — file not found"
+}
+else {
+    $result = & $PowerShellExe -ExecutionPolicy Bypass -File $BundleProposalTestScript -RepoRoot $RepoRoot 2>&1
+    if ($LASTEXITCODE -eq 0) {
+        if ($Verbose -and $result) { Write-Host "  $result" -ForegroundColor DarkGray }
+        $script:passed++
+    }
+    else {
+        Write-Fail "bundle proposal V10.1 smoke — failed"
+        if ($result) { Write-Host "  $result" -ForegroundColor DarkGray }
+    }
+}
+
+# ─────────────────────────────────────────────
+# 28. PowerShell script status glyph check
+# ─────────────────────────────────────────────
+Write-Host ""
+Write-Host "== 28. PowerShell script glyph check =========="
 $PowerShellStatusGlyphPattern = '[\uD800-\uDBFF][\uDC00-\uDFFF]|[\u2600-\u26FF\u2700-\u27BF]'
 $PowerShellScriptFiles = Get-ChildItem -Path $RepoRoot -Recurse -File -Include *.ps1,*.psm1,*.psd1 -ErrorAction SilentlyContinue |
 Where-Object {

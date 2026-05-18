@@ -23,9 +23,13 @@ class GuardResult:
 class TradeSession:
     session_date: date | None = None
     daily_pnl: float = 0.0
+    trade_count: int = 0
+    consecutive_losses: int = 0
     position_count: int = 0
     trading_stopped: bool = False
     stop_reason: str = ""
+    new_entries_blocked: bool = False
+    new_entries_block_reason: str = ""
 
     position_open_times: dict[str, datetime] = field(default_factory=dict)
     position_entry_prices: dict[str, float] = field(default_factory=dict)
@@ -51,6 +55,9 @@ class RiskGuard:
         if self.session.trading_stopped:
             return GuardResult(False, f"取引停止中: {self.session.stop_reason}")
 
+        if self.session.new_entries_blocked:
+            return GuardResult(False, f"新規建て禁止: {self.session.new_entries_block_reason}")
+
         if now.time() >= RULES["no_new_entry_after"]:
             return GuardResult(False, "14:50以降は新規エントリー禁止")
 
@@ -72,11 +79,16 @@ class RiskGuard:
 
         return GuardResult(True, "エントリー許可")
 
-    def on_entry(self, symbol: str, price: float, now: datetime, lot: int = 100) -> None:
-        self.session.position_count += 1
+    def on_entry(self, symbol: str, price: float, now: datetime, lot: int = 100) -> GuardResult:
+        if symbol in self.session.position_entry_prices:
+            return GuardResult(False, f"重複エントリー通知を無視: {symbol}")
+
+        self.session.trade_count += 1
         self.session.position_open_times[symbol] = now
         self.session.position_entry_prices[symbol] = price
         self.session.position_lots[symbol] = lot
+        self.session.position_count = len(self.session.position_entry_prices)
+        return GuardResult(True, "エントリー記録")
 
     def check_exit(self, symbol: str, current_price: float, now: datetime) -> GuardResult:
         entry_price = self.session.position_entry_prices.get(symbol)
@@ -96,24 +108,42 @@ class RiskGuard:
 
         return GuardResult(False, "保有継続")
 
-    def on_exit(self, symbol: str, pnl: float) -> None:
+    def on_exit(self, symbol: str, pnl: float) -> GuardResult:
+        if symbol not in self.session.position_entry_prices:
+            return GuardResult(False, f"未保有銘柄の決済通知を無視: {symbol}")
+
         self.session.daily_pnl += pnl
-        self.session.position_count = max(0, self.session.position_count - 1)
+        if pnl < 0:
+            self.session.consecutive_losses += 1
+            if self.session.consecutive_losses >= 2:
+                self.block_new_entries("連敗2回到達")
+        elif pnl > 0:
+            self.session.consecutive_losses = 0
+
         self.session.position_open_times.pop(symbol, None)
         self.session.position_entry_prices.pop(symbol, None)
         self.session.position_lots.pop(symbol, None)
+        self.session.position_count = len(self.session.position_entry_prices)
 
         if self.session.daily_pnl <= RULES["max_daily_loss"]:
             self._stop_trading("1日最大損失到達")
         elif self.session.daily_pnl >= RULES["daily_profit_target"]:
             self._stop_trading("本日利益目標達成")
 
+        return GuardResult(True, "決済記録")
+
     def get_remaining_risk_budget(self) -> float:
         # 戻り値は負数。例: -3000 = 残余¥3,000 / 0 = 上限到達
         # フロント側: Math.abs(budget) で表示、(maxRisk + budget)/maxRisk で使用率計算
         return RULES["max_daily_loss"] - self.session.daily_pnl
 
+    def block_new_entries(self, reason: str) -> None:
+        if not self.session.new_entries_blocked:
+            self.session.new_entries_blocked = True
+            self.session.new_entries_block_reason = reason
+
     def _stop_trading(self, reason: str) -> None:
         if not self.session.trading_stopped:
             self.session.trading_stopped = True
             self.session.stop_reason = reason
+        self.block_new_entries(reason)

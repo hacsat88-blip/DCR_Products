@@ -186,5 +186,155 @@
     "expected_alias_from": "workflow-orchestrator",
     "match_keywords": ["orchestrat", "pipeline", "coordinator"],
     "note": "Step-0 alias: workflow-orchestrator(deprecated) -> pied-piper"
+  },
+  {
+    "input": "いい感じに見て、必要なら専門家使って",
+    "kind": "agent",
+    "expected": "pied-piper",
+    "match_keywords": ["Coordinator", "調整"],
+    "expected_mode": "propose",
+    "approval_required": false,
+    "note": "Ambiguous natural language should propose candidates instead of firing specialists automatically."
+  },
+  {
+    "input": "設定ファイルを削除して整理して",
+    "kind": "skill",
+    "expected": "repo-boundary-hygiene",
+    "match_keywords": ["cleanup", "source-of-truth", "generated"],
+    "expected_mode": "approve_required",
+    "approval_required": true,
+    "note": "Deletion/config cleanup is P3 and must wait for approval."
+  },
+  {
+    "input": "大きめなら分担してサブエージェントで進めて",
+    "kind": "skill",
+    "expected": "parallel-wave-execution",
+    "match_keywords": ["複数", "wave", "並列"],
+    "expected_mode": "approve_required",
+    "approval_required": true,
+    "note": "Subagent or parallel orchestration must be approved before firing."
+  },
+  {
+    "input": "いい感じに見て",
+    "kind": "agent",
+    "expected": "pied-piper",
+    "match_keywords": ["候補", "承認"],
+    "expected_mode": "propose",
+    "expected_status": "proposed",
+    "expected_user_reply_type": "ambiguous",
+    "options_count": 3,
+    "note": "Vague natural language should become a short proposal, not execution."
+  },
+  {
+    "input": "おすすめで進めて",
+    "kind": "agent",
+    "expected": "pied-piper",
+    "match_keywords": ["候補", "承認"],
+    "expected_status": "approved",
+    "expected_user_reply_type": "approve",
+    "selected_option": "A",
+    "requires_unambiguous_previous_proposal": true,
+    "note": "Soft approval is accepted only when the previous proposal is unambiguous."
+  },
+  {
+    "input": "Aで",
+    "kind": "agent",
+    "expected": "pied-piper",
+    "match_keywords": ["候補", "承認"],
+    "expected_status": "approved",
+    "expected_user_reply_type": "approve",
+    "selected_option": "A",
+    "requires_unambiguous_previous_proposal": true,
+    "note": "Letter selection maps to selected_option=A."
+  },
+  {
+    "input": "任せる",
+    "kind": "agent",
+    "expected": "pied-piper",
+    "match_keywords": ["候補", "承認"],
+    "expected_mode": "propose",
+    "expected_status": "proposed",
+    "expected_user_reply_type": "ambiguous",
+    "options_count": 3,
+    "note": "Ambiguous delegation language should ask or propose instead of approving."
+  },
+  {
+    "input": "大きめなら分担して",
+    "kind": "skill",
+    "expected": "parallel-wave-execution",
+    "match_keywords": ["複数", "wave", "並列"],
+    "expected_mode": "approve_required",
+    "approval_required": true,
+    "expected_status": "proposed",
+    "options_count": 3,
+    "note": "Large or distributed work requires approval before parallel firing."
+  },
+  {
+    "input": "おすすめで進めて",
+    "kind": "agent",
+    "expected": "pied-piper",
+    "match_keywords": ["候補", "承認"],
+    "expected_user_reply_type": "approve",
+    "selected_option": "A",
+    "has_active_proposal": true,
+    "proposal_previous_status": "proposed",
+    "proposal_next_status": "approved",
+    "note": "Active proposal plus recommended approval moves to approved."
+  },
+  {
+    "input": "Aで",
+    "kind": "agent",
+    "expected": "pied-piper",
+    "match_keywords": ["候補", "承認"],
+    "expected_user_reply_type": "approve",
+    "selected_option": "A",
+    "has_active_proposal": true,
+    "proposal_previous_status": "proposed",
+    "proposal_next_status": "approved",
+    "note": "Active proposal plus explicit option A moves to approved."
+  },
+  {
+    "input": "Aで",
+    "kind": "agent",
+    "expected": "pied-piper",
+    "match_keywords": ["候補", "承認"],
+    "expected_user_reply_type": "ambiguous",
+    "has_active_proposal": false,
+    "proposal_previous_status": "none",
+    "proposal_next_status": "none",
+    "note": "Option selection without an active proposal must not approve."
+  },
+  {
+    "input": "任せる",
+    "kind": "agent",
+    "expected": "pied-piper",
+    "match_keywords": ["候補", "承認"],
+    "expected_user_reply_type": "ambiguous",
+    "has_active_proposal": true,
+    "proposal_previous_status": "proposed",
+    "proposal_next_status": "proposed",
+    "note": "Ambiguous delegation keeps execution blocked."
+  },
+  {
+    "input": "別案",
+    "kind": "agent",
+    "expected": "pied-piper",
+    "match_keywords": ["候補", "承認"],
+    "expected_user_reply_type": "refine",
+    "has_active_proposal": true,
+    "proposal_previous_status": "proposed",
+    "proposal_next_status": "refined",
+    "note": "Refine keeps the proposal context and asks for an updated proposal."
+  },
+  {
+    "input": "やめて",
+    "kind": "agent",
+    "expected": "pied-piper",
+    "match_keywords": ["候補", "承認"],
+    "expected_user_reply_type": "reject",
+    "has_active_proposal": true,
+    "proposal_previous_status": "proposed",
+    "proposal_next_status": "rejected",
+    "note": "Reject vocabulary stops execution."
   }
 ]

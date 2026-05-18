@@ -9,12 +9,8 @@
   - 1件成功（+2000円）、1件損切り（-1500円）、1件時間切れ（-300円）
   - 合計 +200円 → 目標5000円未達だが損失上限(-3000円)には達していないことを確認
 """
-import json
 from dataclasses import dataclass
 from datetime import datetime, time, timedelta
-from unittest.mock import patch
-
-from .ai_trader import AITrader, TradeSignal
 from .capital_router import CapitalRouter
 from .risk_guard import RiskGuard
 from .technical_filter import PriceData, TechnicalFilter
@@ -45,15 +41,15 @@ def run_simulation() -> None:
     print("=" * 45)
 
     scenarios = [
-        # (銘柄, 現在値, 出来高, 5日平均出来高, RSI, 前日終値, 時刻, AIシグナル, 終了価格, 終了理由)
-        ("7203", 2_310, 1_600_000, 1_000_000, 43.0, 2_280, time(9, 20), "buy", 2_330, "利確"),
-        ("6758", 12_500, 2_000_000, 1_300_000, 48.0, 12_350, time(10, 15), "buy", 12_280, "損切り"),
-        ("9984", 8_900, 3_000_000, 2_000_000, 41.0, 8_800, time(13, 0), "buy", 8_880, "時間切れ"),
+        # (銘柄, 現在値, 出来高, 5日平均出来高, RSI, 前日終値, 時刻, 終了価格, 終了理由)
+        ("7203", 2_310, 1_600_000, 1_000_000, 43.0, 2_280, time(9, 20), 2_330, "利確"),
+        ("6758", 12_500, 2_000_000, 1_300_000, 48.0, 12_350, time(10, 15), 12_280, "損切り"),
+        ("9984", 8_900, 3_000_000, 2_000_000, 41.0, 8_800, time(13, 0), 8_880, "時間切れ"),
     ]
 
     trades: list[SimTrade] = []
 
-    for symbol, price, vol, avg_vol, rsi, prev_close, t, ai_action, exit_price, exit_reason in scenarios:
+    for symbol, price, vol, avg_vol, rsi, prev_close, t, exit_price, exit_reason in scenarios:
         now = datetime(2026, 5, 12, t.hour, t.minute)
         print(f"\n[{t}] {symbol} 現在値 ¥{price:,}")
 
@@ -74,15 +70,12 @@ def run_simulation() -> None:
         if not entry_check.allowed:
             continue
 
-        # Step 3: AI判断（シミュレーションではモック）
-        signal = TradeSignal(action=ai_action, reason="テストシグナル", confidence=0.82)
-        print(f"  AI判断: {signal.action} (confidence {signal.confidence:.2f})")
-        if signal.action != "buy":
-            continue
+        # Step 3: 発注可否はローカルルールのみで確定する
+        print("  ローカル判断: エントリー許可（AI助言は発注に使わない）")
 
         # Step 4: ロット計算 & エントリー
         lot = router.calc_lot(available_cash, price)
-        guard.on_entry(symbol, price, now)
+        guard.on_entry(symbol, price, now, lot)
         print(f"  エントリー: {lot}株 @ ¥{price:,}  最大投入 ¥{lot*price:,}")
 
         # Step 5: 決済シミュレーション
