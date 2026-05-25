@@ -1,7 +1,7 @@
 ---
 name: structured-output
 routing_category: devops
-description: "LLM構造化出力設計：Pydantic/Zodスキーマ・JSON mode・Structured Outputs・バリデーション・型安全パース"
+description: "LLM構造化出力設計：Pydantic/Zodスキーマ・JSON mode・Structured Outputs・Generative UI DSL・バリデーション・型安全パース"
 disable-model-invocation: true
 ---
 
@@ -21,6 +21,23 @@ disable-model-invocation: true
 | Structured Outputs | 厳密なスキーマ強制 | OpenAI gpt-4o以降 |
 | Tool use / Function calling | ツール呼び出し形式 | 全主要プロバイダ |
 | Instructor ライブラリ | Pydantic統合 | 全プロバイダ対応 |
+| Generative UI DSL | UIをストリーミング表示したい出力 | OpenUI型パターン |
+
+## Generative UI 出力パターン
+
+OpenUI は DCR の runtime や orchestration を置き換える共通基盤ではなく、UI を生成する LLM 出力形式の参考実装として扱う。採用するのは runtime ではなく、次の設計パターンに限る。
+
+- 生成可能な UI component を allowlist し、LLM が自由な HTML/JSX を出さないようにする
+- component schema から system prompt または出力仕様を生成し、prompt と runtime validation のずれを減らす
+- `root` 相当の単一 entry point を決め、streaming 中でも先頭から段階表示できる構造にする
+- schema の key order、必須/任意 props、version を API 契約として扱い、UI 出力の後方互換を守る
+- JSON が冗長になる UI tree では、line-oriented DSL や compact AST も候補にする。ただし parser と validator がない形式は採用しない
+
+OpenUI 由来の参考観点:
+
+- component library -> generated prompt -> LLM output -> parser -> renderer の流れで責務を分ける
+- forward reference / hoisting は streaming UX には有効だが、未解決参照の placeholder と timeout を設計する
+- prompt だけに依存せず、renderer 側でも未知 component、過剰 props、危険 URL、イベント handler を拒否する
 
 ## Pydantic スキーマ設計（Python）
 
@@ -84,3 +101,5 @@ except instructor.exceptions.InstructorRetryException as e:
 - [ ] バリデーション失敗のリトライ回数を設定（推奨: 3回）
 - [ ] 最終失敗時のフォールバック処理を実装
 - [ ] スキーマをAPIドキュメントと同期
+- [ ] UI 出力では component allowlist と renderer 側 validation を設定
+- [ ] Generative UI DSL を使う場合は parser、schema version、fallback 表示を実装

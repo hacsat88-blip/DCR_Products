@@ -135,9 +135,14 @@ NEXT sh/ でリリース判定に進めます
    - 重大バグなし
    - セキュリティ（外部入力、シークレット）
    - Git 状態（未コミット変更、ブランチ）
-3. リリース判定: GO Ship可能 / STOP ブロッカーあり
-4. コミットメッセージ案の提示
-5. 必要時は `harness-audit` を実行し、運用負債を次サイクルに繰り越さない
+3. DCR preflight:
+   - `.ai/catalog` / `.ai/book` / `.ai/kernel` / `.ai/environments` / templates の正本変更が generated mirror へ反映済みか
+   - routing index や generated entrypoint の drift が残っていないか
+   - `deploy.ps1 -Check` と `validate.ps1` の最新結果を確認したか
+   - 広範囲 cleanup / runtime removal / provider-reference removal では `dcr-surface-reviewer` 相当の表面レビューを済ませたか
+4. リリース判定: GO Ship可能 / STOP ブロッカーあり
+5. コミットメッセージ案の提示
+6. 必要時は `harness-audit` を実行し、運用負債を次サイクルに繰り越さない
 
 ### 出口条件
 - ユーザーがコミット/マージを承認

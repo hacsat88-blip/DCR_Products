@@ -143,6 +143,43 @@ Skill、Agent、サブエージェント、並列 orchestration、外部 MCP/API
 - 既存導入: `domain-decision-grilling`、`architecture-zoom-out`、`systematic-debugging` 補強、`phase-state-artifacts` handoff 補強、`improve-codebase-architecture` provenance 補強
 - 互換性: Codex / Claude / Copilot / Cursor / Windsurf / OpenCode / Gemini CLI で読めるよう、特定IDEの slash command ではなく自然言語 trigger と DCR metadata に落とす
 
+### OpenUI Generative UI pattern import
+
+- 位置づけ: thesysdev/openui は UI 生成 runtime ではなく、Generative UI 出力設計の参考実装として扱う
+- 採用形態: `npx skills add`、scaffolded app、`@openuidev/*` runtime dependency は共通資産へ導入せず、component allowlist / schema-driven prompt / streaming renderer pattern だけを DCR skill に薄く記録する
+- DCR との関係: rule / Skill / agent / orchestration / pipeline の制御層は置換しない。UI を生成する Product / prototype で必要になった場合だけ runtime 採用を個別判断する
+- 既存導入: `structured-output` に Generative UI DSL の validation 観点、`web-artifacts-builder` に GenUI artifact の component schema / parser / fallback 観点を追加
+- provenance: https://github.com/thesysdev/openui
+
+### React Doctor quality gate import
+
+- 位置づけ: millionco/react-doctor は React 専用 diagnostic CLI / CI action であり、DCR の制御層や汎用 QA framework ではない
+- 採用形態: `npx react-doctor@latest install` や自動 agent skill 配置は使わず、React 変更後の advisory quality gate として DCR skill に薄く記録する
+- DCR との関係: `static-analysis`、`webapp-testing`、`performance-profiling`、`accessibility-auditor` の前段または補助に置く。React / Next.js / Expo / React Native Product 単位でのみ実行する
+- 既存導入: `react-quality-gate` を追加し、diff scan、score regression、`--no-score`、advisory-first CI 判断を明文化する
+- provenance: https://github.com/millionco/react-doctor
+
+### 12-factor-agents principle imports
+
+- 位置づけ: humanlayer/12-factor-agents は agent framework ではなく、production-grade agentic software の設計原則として参照する
+- 採用形態: dependency、installer、runtime wrapper、外部 command は導入せず、DCR の判断基準として薄く要約する
+- DCR との関係: `.ai/catalog` / `.ai/book` / `.ai/kernel` を正本にし、外部原則は source-of-truth を置換しない
+- provenance: https://github.com/humanlayer/12-factor-agents
+
+採用する設計チェック:
+
+1. Own prompts/context: durable な prompt、routing、context 仕様は DCR 正本に置き、黒箱 framework に隠さない
+2. State/control flow: `gate-state.json` は現在の proposal、`router-decisions.jsonl` は監査履歴として分離し、tool selection と invocation の間で停止できる
+3. Human approval: P2/P3、外部送信、設定変更、削除、並列 orchestration は approval event を経てから実行する
+4. Small focused agents: agent は小さく責務を明確にし、万能化しそうなものは親ハブ化、表示抑制、bundle proposal で束ねる
+5. Trigger from anywhere: CLI/IDE 差分は薄くし、自然言語 trigger と proposal state machine を共通正本から読む
+
+非採用:
+
+- 12要素の文言をそのまま正本へコピーしない
+- 既存 DCR の V10.1 proposal / bundle / telemetry pipeline を置き換えない
+- 新しい orchestration runtime や自動実行 layer を増やさない
+
 ### Azure Skills plugin
 
 - 位置づけ: Azure 専用 capability pack

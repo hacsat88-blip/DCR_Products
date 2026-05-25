@@ -5,7 +5,10 @@ triggers:
   - "OSSに"
   - "安いモデルで"
   - "委任して"
+  - "OpenCodeで"
   - "DeepSeekで"
+  - "DeepSeek Flashで"
+  - "DeepSeek Proで"
   - "Kimiで"
   - "GLMで"
   - "コスト削減"
@@ -40,12 +43,19 @@ OpenCode Go API 経由のOSSモデル（Kimi K2.6 / DeepSeek V4 Flash / DeepSeek
 
 ### パターンA: ユーザーが明示的に要求 → 確認なしで即実行
 
-**トリガーキーワード**: 「OSSに」「安いモデルで」「委任して」「DeepSeekで」「Kimiで」「GLMで」
+**トリガーキーワード**: 「OSSに」「安いモデルで」「委任して」「OpenCodeで」「DeepSeekで」「DeepSeek Flashで」「DeepSeek Proで」「Kimiで」「GLMで」
 
 ```
 User: 「OSSでこのファイルの関数一覧を出して」
 Claude: → oss_explore ツールを直接呼び出す → 結果を報告
 ```
+
+明示モデル名がある場合（例: `OpenCodeの glm-5.1 で...`）は、タスク種別に合うツールを選び、
+指定モデル名を `model_override` に渡す。
+
+`DeepSeek Flashで...` は `oss_document`、`DeepSeek Proで...` は `oss_implement` を優先する。
+`DeepSeekで...` のように曖昧な場合は、要約・文書化なら `oss_document`、コード・テスト案なら
+`oss_implement` を使う。
 
 ### パターンB: 主担当AIが自動判断 → ユーザー確認 → 承認後に実行
 
