@@ -1,7 +1,7 @@
 ---
 name: web-artifacts-builder
 routing_category: devops
-description: Suite of tools for creating elaborate, multi-component claude.ai HTML artifacts using modern frontend web technologies (React, Tailwind CSS, shadcn/ui). Use for complex artifacts requiring state management, routing, or shadcn/ui components - not for simple single-file HTML/JSX artifacts.
+description: Suite of tools for creating elaborate, multi-component claude.ai HTML artifacts using modern frontend web technologies (React, Tailwind CSS, shadcn/ui). Use for complex artifacts requiring state management, routing, shadcn/ui components, or Generative UI prototypes - not for simple single-file HTML/JSX artifacts.
 license: Complete terms in LICENSE.txt
 disable-model-invocation: true
 ---
@@ -20,6 +20,19 @@ To build powerful frontend claude.ai artifacts, follow these steps:
 ## Design & Style Guidelines
 
 VERY IMPORTANT: To avoid what is often referred to as "AI slop", avoid using excessive centered layouts, purple gradients, uniform rounded corners, and Inter font.
+
+## Generative UI Artifact Pattern
+
+When an artifact needs LLM-generated dashboards, forms, tables, or workflow panels, use OpenUI as a reference pattern rather than a required runtime dependency.
+
+- Define a small component library first: layout, text, table, chart, form, action, and status components only as needed.
+- Treat component props as a schema contract. Required props come first, optional props trail, and changes must be versioned.
+- Generate or write the model instruction from the component library, not from ad hoc examples alone.
+- Render model output through a parser/adapter that rejects unknown components, unsafe URLs, inline scripts, arbitrary event handlers, and props outside the schema.
+- For streaming UI, render from a single root and use placeholders for unresolved forward references.
+- Prefer a compact DSL or AST only when it has deterministic parsing, validation, and a fallback path. Otherwise use strict JSON or tool calls.
+
+Use the OpenUI packages only in product/prototype work where React runtime integration is explicitly useful. Do not add `@openuidev/*` dependencies to DCR shared assets just to document the pattern.
 
 ## Quick Start
 
@@ -74,3 +87,4 @@ To test/visualize the artifact, use available tools (including other Skills or b
 ## Reference
 
 - **shadcn/ui components**: https://ui.shadcn.com/docs/components
+- **OpenUI pattern reference**: https://github.com/thesysdev/openui

@@ -40,6 +40,15 @@ When approval is required, present the recommended candidate first and wait for 
 - Treat `いい感じに`, `任せる`, `よさそう`, and `たぶん` as ambiguous; propose or reconfirm instead of firing.
 - Store internal candidate count, status, selected option, and reply classification in `router-decisions.jsonl`.
 
+## Agent Design Lens
+
+12-factor-agents is treated as a principle source, not a runtime dependency.
+
+- Keep prompts, routing, and approval rules owned by DCR source-of-truth files.
+- Keep selection, approval, rejection, refinement, and execution visible through proposal state and router decision logs.
+- Stop between asset selection and invocation when risk, scale, external send, or ambiguity requires approval.
+- Prefer small focused agents; when a candidate is too broad, use parent hubs, display policy, or bundle proposal before adding more visible choices.
+
 ## Proposal State
 
 When `.ai/kernel/gate-state.json` contains `proposal_state.status = proposed|refined`, short follow-up replies are interpreted as responses to the active proposal before normal routing.

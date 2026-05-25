@@ -105,6 +105,17 @@ confidence は候補順位を決める指標であり、単独では実行許可
 - `approve_required` の場合だけ、4行目に `承認が必要な理由` を追加する。
 - 選択肢は `A) おすすめで進める / B) 軽めに見る / C) 別案を見る` を基本形にする。該当しない場合だけ短く言い換える。
 
+### 12-factor alignment guard
+
+外部設計原則 humanlayer/12-factor-agents は、DCR の runtime ではなく判断軸として参照する。
+`pied-piper` は次の観点を満たす場合だけ Skill / Agent / orchestration の採用を強く推奨する。
+
+- prompt と routing 仕様が DCR 正本に残る
+- proposal state と telemetry から、選定、承認、実行、却下を追跡できる
+- tool selection と invocation の間で、必要な承認待ちにできる
+- agent が大きくなりすぎる場合は、親ハブ化、表示抑制、bundle proposal を優先する
+- CLI/IDE 固有の便利機能は、共通正本へ還元できる範囲に留める
+
 ### 自然言語承認ルール
 
 次の語彙は、直前の提案候補が一意に特定できる場合だけ承認として扱う。
