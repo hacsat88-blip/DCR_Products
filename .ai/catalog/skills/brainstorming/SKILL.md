@@ -15,7 +15,14 @@ composable:
   output_type: spec
   chains_with:
     - writing-plans
-    - code-review
+    - dcr-pipeline
+baseline:
+  upstream: "openai/skills"
+  role: overlay
+  local_delta:
+    - "DCR proposal gate"
+    - "docs/dcr/specs artifact path"
+    - "source-of-truth governance"
 package:
   version: "1.0.0"
   compat: "dcr >= 2.0"
@@ -28,6 +35,14 @@ package:
 ---
 
 # Brainstorming Ideas Into Designs
+
+## OpenAI Baseline Overlay
+
+Use the OpenAI official brainstorming skill as the behavioral baseline. This
+DCR skill only adds local constraints: proposal-gate discipline, `docs/dcr/specs`
+artifact placement, source-of-truth awareness, and the DCR review handoff. Do
+not duplicate upstream examples here unless they are changed by DCR-specific
+governance.
 
 Help turn ideas into fully formed designs and specs through natural collaborative dialogue.
 

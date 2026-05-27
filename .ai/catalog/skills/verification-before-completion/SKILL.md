@@ -15,7 +15,14 @@ composable:
   input_type: code
   output_type: report
   chains_with:
-    - code-review
+    - dcr-pipeline
+baseline:
+  upstream: "openai/skills"
+  role: overlay
+  local_delta:
+    - "DCR deploy/check/validate evidence"
+    - "generated mirror drift evidence"
+    - "P3 approval constraints"
 package:
   version: "1.0.0"
   compat: "dcr >= 2.0"
@@ -28,6 +35,13 @@ package:
 ---
 
 # Verification Before Completion
+
+## OpenAI Baseline Overlay
+
+Use the OpenAI official verification-before-completion skill as the behavioral
+baseline. This DCR skill only adds local evidence requirements: `deploy.ps1`,
+`deploy.ps1 -Check`, `validate.ps1`, generated mirror drift checks, and DCR
+approval constraints. Keep generic verification doctrine upstream.
 
 ## Overview
 

@@ -6,9 +6,24 @@ audit_depth: shallow
 audit_scope: config-and-secrets
 sibling: security-deepdive
 disable-model-invocation: true
+baseline:
+  upstream: "openai/skills"
+  role: overlay
+  local_delta:
+    - "DCR catalog/config shallow scan"
+    - "external skill/plugin collision checks"
+    - "source-of-truth replacement guardrails"
 ---
 
 # Security Scan
+
+## OpenAI Baseline Overlay
+
+Use the OpenAI official `codex-security:security-scan` skill for full security
+scan behavior. This DCR skill is only the shallow catalog/config overlay for
+rules, skills, hooks, external packs, and source-of-truth replacement risks. Use
+`security-deepdive` or the OpenAI security baseline for code-level OWASP,
+authentication, crypto, or dependency analysis.
 
 ## いつ使うか
 

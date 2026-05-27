@@ -3,9 +3,23 @@ name: using-git-worktrees
 routing_category: devops
 description: Use when starting feature work that needs isolation from current workspace or before executing implementation plans - creates isolated git worktrees with smart directory selection and safety verification
 disable-model-invocation: true
+baseline:
+  upstream: "openai/skills"
+  role: overlay
+  local_delta:
+    - "DCR branch/worktree naming"
+    - "source-of-truth and generated mirror safety"
+    - "Windows path checks"
 ---
 
 # Using Git Worktrees
+
+## OpenAI Baseline Overlay
+
+Use the OpenAI official using-git-worktrees skill as the behavioral baseline.
+This DCR skill only adds local directory choices, branch/worktree naming,
+generated mirror safety checks, and Windows path handling. Keep generic worktree
+workflow upstream.
 
 ## Overview
 

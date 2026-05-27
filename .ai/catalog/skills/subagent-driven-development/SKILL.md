@@ -2,9 +2,23 @@
 name: subagent-driven-development
 routing_category: devops
 description: Use when executing implementation plans with independent tasks in the current session, or dispatching parallel agents for concurrent problem-solving
+baseline:
+  upstream: "openai/skills"
+  role: overlay
+  local_delta:
+    - "DCR review handoff"
+    - "local agent boundary rules"
+    - "repo-specific verification gates"
 ---
 
 # Subagent-Driven Development
+
+## OpenAI Baseline Overlay
+
+Use the OpenAI official subagent-driven-development skill as the behavioral
+baseline. This DCR skill only adds local boundaries: DCR agent routing,
+source-of-truth constraints, review handoff, and repository-specific verification
+gates. Keep generic delegation mechanics upstream.
 
 Execute plan by dispatching fresh subagent per task, with two-stage review after each: spec compliance review first, then code quality review.
 

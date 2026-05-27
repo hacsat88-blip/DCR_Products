@@ -3,9 +3,23 @@ name: finishing-a-development-branch
 routing_category: devops
 description: Use when implementation is complete, all tests pass, and you need to decide how to integrate the work - guides completion of development work by presenting structured options for merge, PR, or cleanup
 disable-model-invocation: true
+baseline:
+  upstream: "openai/skills"
+  role: overlay
+  local_delta:
+    - "DCR deploy/check/validate finish gates"
+    - "Windows/PowerShell command forms"
+    - "generated mirror drift awareness"
 ---
 
 # Finishing a Development Branch
+
+## OpenAI Baseline Overlay
+
+Use the OpenAI official finishing-a-development-branch skill as the behavioral
+baseline. This DCR skill only adds local finish checks: `deploy.ps1`,
+`deploy.ps1 -Check`, `validate.ps1`, generated mirror drift handling, and
+PowerShell-safe command variants.
 
 ## Overview
 

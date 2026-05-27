@@ -392,5 +392,6 @@ if ($ShowCandidates) {
 Write-Host "Next steps:" -ForegroundColor Cyan
 Write-Host "  1. Use reviewed exact-overlap decisions before adding deprecated metadata."
 Write-Host "  2. Keep DCR-only source-of-truth and mirror governance as local overlay."
-Write-Host "  3. Review remaining active overlays before any physical deletion wave."
+Write-Host "  3. Run tools/deprecation-dashboard.ps1 before any physical deletion wave."
+Write-Host "  4. Delete only Stage 4 candidates with ELIGIBLE-FOR-REMOVAL."
 Write-Host ""

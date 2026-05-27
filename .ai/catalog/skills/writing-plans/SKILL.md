@@ -16,6 +16,13 @@ composable:
   chains_with:
     - tdd-workflow
     - subagent-driven-development
+baseline:
+  upstream: "openai/skills"
+  role: overlay
+  local_delta:
+    - "docs/dcr/plans artifact path"
+    - "DCR source-of-truth and mirror checks"
+    - "PowerShell verification commands"
 package:
   version: "1.0.0"
   compat: "dcr >= 2.0"
@@ -33,6 +40,14 @@ targets:
 ---
 
 # Writing Plans
+
+## OpenAI Baseline Overlay
+
+Use the OpenAI official writing-plans skill as the behavioral baseline. This DCR
+skill only adds local planning constraints: `docs/dcr/plans` placement,
+source-of-truth versus generated mirror handling, Windows/PowerShell command
+forms, and DCR verification gates. Keep upstream planning mechanics upstream
+unless DCR changes the required artifact or check.
 
 ## Overview
 

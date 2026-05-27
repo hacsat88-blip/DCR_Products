@@ -15,7 +15,14 @@ composable:
   output_type: code
   chains_with:
     - verification-before-completion
-    - code-review
+    - dcr-pipeline
+baseline:
+  upstream: "openai/skills"
+  role: overlay
+  local_delta:
+    - "DCR feedback-loop ordering"
+    - "generated mirror drift checks"
+    - "PowerShell/Windows diagnosis paths"
 package:
   version: "1.0.0"
   compat: "dcr >= 2.0"
@@ -37,6 +44,13 @@ metadata:
 ---
 
 # Systematic Debugging
+
+## OpenAI Baseline Overlay
+
+Use the OpenAI official systematic-debugging skill as the behavioral baseline.
+This DCR skill only adds local diagnosis constraints: generated mirror drift,
+Windows/PowerShell failure modes, DCR feedback-loop ordering, and source-of-truth
+checks. Keep generic debugging doctrine upstream.
 
 ## Overview
 
