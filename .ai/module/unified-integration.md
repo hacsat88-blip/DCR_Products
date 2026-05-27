@@ -159,6 +159,20 @@ Skill、Agent、サブエージェント、並列 orchestration、外部 MCP/API
 - 既存導入: `react-quality-gate` を追加し、diff scan、score regression、`--no-score`、advisory-first CI 判断を明文化する
 - provenance: https://github.com/millionco/react-doctor
 
+### OpenAI Skills official baseline
+
+- 位置づけ: openai/skills は DCR skill catalog の置換用コピー元ではなく、公式 baseline として扱う
+- 採用形態: curated / system / primary-runtime 相当を比較対象にし、DCR skill は `keep`、`replace-with-openai`、`merge-into-overlay`、`fold-into-pipeline`、`deprecate` に分類する
+- DCR との関係: `.ai/catalog/skills` を正本に保ち、OpenAI official skill は plugin/cache または upstream として参照する。user-level installer や generated mirror を正本化しない
+- Exact overlap: 同名 skill は自動置換しない。比較済み decision を優先し、DCR の `docs/dcr/*`、proposal/approval gate、source-of-truth/mirror governance が残る場合は `merge-into-overlay` とする
+- Pipeline consolidation: QA / ship / review / drift / security / performance 系の個別 skill は、物理削除前に `successor: dcr-pipeline` の deprecated alias として畳む
+- Growth umbrella: marketing / CRO / SEO / copy / email / analytics / pricing 系は `growth-ops` を active umbrella にし、旧 skill は `successor: growth-ops` の deprecated alias として残す。金融データ連携など DCR 固有のものは keep する
+- Documents umbrella: docs / ADR / API docs / diagrams / Office / PDF / spreadsheet / research 系は `documents-ops` を active umbrella にし、旧 skill は `successor: documents-ops` の deprecated alias として残す。`writing-plans` は OpenAI Superpowers baseline + DCR plans overlay として active に保つ
+- Governance umbrella: 汎用 evaluation / context / planning / routing pattern / parallel wave 系は `governance-ops` を active umbrella にし、DCR source-of-truth、routing、memory、model-route、harness audit は active overlay として残す
+- 既存導入: `openai-skills-catalog-audit` と `tools/audit-openai-skills.ps1` で、約 140 skill から約 70 skill へ向かう段階移行候補を出す
+- 非採用: `.experimental` の初回採用、公式 skill の wholesale copy、内容比較前の同名 skill deprecated 化
+- provenance: https://github.com/openai/skills
+
 ### 12-factor-agents principle imports
 
 - 位置づけ: humanlayer/12-factor-agents は agent framework ではなく、production-grade agentic software の設計原則として参照する

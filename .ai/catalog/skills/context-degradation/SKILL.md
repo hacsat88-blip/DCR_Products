@@ -1,6 +1,9 @@
 ---
 name: context-degradation
 routing_category: governance
+deprecated: true
+successor: governance-ops
+deprecation_reason: "Folded into governance-ops Agent Load and Context lane for OpenAI Skills baseline slimming."
 description: "長い会話、巨大ログ、複数タスク混在、古い前提の混入で agent の判断品質が落ちている疑いがあるときに使う。lost-in-middle、context poisoning、context clash、文脈劣化、前提ズレ、同じ失敗の反復を診断し、圧縮・分離・再検証へつなぐ。"
 contract:
   preconditions:

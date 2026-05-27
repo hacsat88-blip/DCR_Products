@@ -1,6 +1,9 @@
 ---
 name: multimodal-pipeline
 routing_category: devops
+deprecated: true
+successor: dcr-pipeline
+deprecation_reason: "Folded into dcr-pipeline p/ Multimodal Pipeline Plan for OpenAI Skills baseline slimming."
 description: "マルチモーダルパイプライン設計：画像前処理・音声転写・PDF分離処理・モデル選定・コスト最適化"
 disable-model-invocation: true
 ---

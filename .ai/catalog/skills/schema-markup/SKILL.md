@@ -1,15 +1,15 @@
 ---
 name: schema-markup
-description: '[DEPRECATED — merged into seo-audit] Schema markup / structured data / JSON-LD / rich snippets はすべて seo-audit に統合。本スキルは alias 期間中のみ存在。'
+description: '[DEPRECATED — merged into growth-ops] Schema markup / structured data / JSON-LD / rich snippets は growth-ops の Acquisition lane に統合。本スキルは alias 期間中のみ存在。'
 metadata:
   version: 1.0.0
 deprecated: true
-successor: seo-audit
-deprecation_reason: SEO関連スキルの統合（A-2b）。schema markup は seo-audit の構造化データ観点として吸収
+successor: growth-ops
+deprecation_reason: SEO関連スキルの統合。schema markup は growth-ops の Acquisition lane として吸収
 disable-model-invocation: true
 ---
 
-> **DEPRECATED**: このスキルは [seo-audit](../seo-audit/SKILL.md) に統合されました。新規参照には seo-audit を使用してください。
+> **DEPRECATED**: このスキルは [growth-ops](../growth-ops/SKILL.md) に統合されました。新規参照には growth-ops を使用してください。
 
 
 # Schema Markup

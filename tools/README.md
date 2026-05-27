@@ -98,6 +98,26 @@ The adapter preserves OpenCode-local `.opencode/agents/` and `.opencode/skills/`
 
 ---
 
+### `audit-openai-skills.ps1`
+
+**Purpose:** Compare DCR `.ai/catalog/skills/` against the local OpenAI official skills baseline and classify slimming candidates.
+
+**Input:** `.ai/catalog/skills/`, OpenAI curated plugin cache, OpenAI primary runtime skills, and local system skills.
+
+**Output:** Read-only console report by default; JSON when `-AsJson` is provided. The report
+includes reviewed exact-overlap decisions, deprecated pipeline aliases, and deprecated growth /
+documents / governance umbrella aliases so same-name OpenAI skills and consolidated local skills are
+not treated as automatic replacement/deletion candidates.
+
+**Usage:**
+```powershell
+.\tools\audit-openai-skills.ps1
+.\tools\audit-openai-skills.ps1 -ShowCandidates
+.\tools\audit-openai-skills.ps1 -AsJson
+```
+
+---
+
 ### `skill-package.ps1`
 
 **Purpose:** Package skills for distribution and versioning

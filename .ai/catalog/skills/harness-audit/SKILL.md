@@ -38,6 +38,7 @@ disable-model-invocation: true
 | gsd-build/get-shit-done | adopt patterns only | phase/state/decision/verify/wave/namespace pattern のみ DCR skill 化し、GSD runtime と `.planning/` は入れない |
 | mattpocock/skills | selective pattern import | grill-with-docs / zoom-out / diagnose / handoff など engineering method だけを DCR skill 化し、skills.sh runtime と setup command は入れない |
 | millionco/react-doctor | selective quality gate | React 専用 diagnostic CLI は Product 単位の advisory gate とし、agent install や root 共通 CI への即導入はしない |
+| openai/skills | official baseline | curated/system skills を DCR skill 整理の基準線にし、DCR 固有要素だけ overlay / pipeline / local-only として残す |
 | context-mode | external-check | MCP出力オフロードとしてPoC候補、repo正本には混ぜない |
 | ccusage / @ccusage/codex | external-check | 使用量可視化候補、導入前にローカルJSONL範囲を確認 |
 | oraios/serena | external-check | シンボル探索MCP候補、編集権限と対応言語を確認 |

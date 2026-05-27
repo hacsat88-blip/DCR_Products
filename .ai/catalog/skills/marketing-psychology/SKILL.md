@@ -1,6 +1,9 @@
 ---
 name: marketing-psychology
 routing_category: growth
+deprecated: true
+successor: growth-ops
+deprecation_reason: "Folded into growth-ops Messaging lane for OpenAI Skills baseline slimming."
 description: "When the user wants to apply psychological principles, mental models, or behavioral science to marketing. Also use when the user mentions 'psychology,' 'mental models,' 'cognitive bias,' 'persuasion,' 'behavioral science,' 'why people buy,' 'decision-making,' or 'consumer behavior.' Covers foundational thinking, buyer psychology, persuasion, and pricing psychology."
 metadata:
   version: 1.0.0

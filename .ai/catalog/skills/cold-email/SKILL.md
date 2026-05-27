@@ -1,6 +1,9 @@
 ---
 name: cold-email
 routing_category: growth
+deprecated: true
+successor: growth-ops
+deprecation_reason: "Folded into growth-ops Email and Retention lane for OpenAI Skills baseline slimming."
 description: Write B2B cold emails and follow-up sequences that get replies. Use when the user wants to write cold outreach emails, prospecting emails, cold email campaigns, sales development emails, or SDR emails. Covers subject lines, opening lines, body copy, CTAs, personalization, and multi-touch follow-up sequences.
 parent: email-marketing-flow
 variant_role: b2b-cold-outreach

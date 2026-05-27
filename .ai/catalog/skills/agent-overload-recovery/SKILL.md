@@ -1,6 +1,9 @@
 ---
 name: agent-overload-recovery
 routing_category: governance
+deprecated: true
+successor: governance-ops
+deprecation_reason: "Folded into governance-ops Agent Load and Context lane for OpenAI Skills baseline slimming."
 description: "候補 agent / skill / tool が多すぎてルーティングが散る、複数 agent の出力が衝突する、pied-piper の判断前後で役割過多になっているときに使う。単体 agent の追加ではなく、前後に挟む補助役へ戻すための回復スキル。"
 contract:
   preconditions:

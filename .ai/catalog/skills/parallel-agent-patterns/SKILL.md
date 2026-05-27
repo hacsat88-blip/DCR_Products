@@ -1,6 +1,9 @@
 ---
 name: parallel-agent-patterns
 routing_category: governance
+deprecated: true
+successor: governance-ops
+deprecation_reason: "Folded into governance-ops Parallel Work lane for OpenAI Skills baseline slimming."
 description: "並列エージェント実行の設計パターン：Fan-out/Fan-in・依存グラフ・競合解決・部分失敗ハンドリング"
 disable-model-invocation: true
 ---

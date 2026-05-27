@@ -1,6 +1,9 @@
 ---
 name: phase-state-artifacts
 routing_category: governance
+deprecated: true
+successor: governance-ops
+deprecation_reason: "Folded into governance-ops Decision and Planning lane for OpenAI Skills baseline slimming."
 description: "長い開発、複数 phase、複数 IDE/CLI、セッション再開をまたぐ作業で、状態を会話だけに置くと危険なときに使う。人間可読の計画・状態・決定・検証 artifact を残し、Codex以外のモデルでも継続できるようにする。"
 contract:
   preconditions:

@@ -1,6 +1,9 @@
 ---
 name: supply-chain-security
 routing_category: governance
+deprecated: true
+successor: dcr-pipeline
+deprecation_reason: "Folded into dcr-pipeline q/ Supply Chain Gate for OpenAI Skills baseline slimming."
 description: "ソフトウェアサプライチェーンセキュリティ：SBOM生成・依存関係監査・GitHub Actionsピン留め・パッケージ改ざん検知"
 disable-model-invocation: true
 ---

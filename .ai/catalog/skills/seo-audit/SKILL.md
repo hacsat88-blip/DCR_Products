@@ -1,6 +1,9 @@
 ---
 name: seo-audit
 routing_category: growth
+deprecated: true
+successor: growth-ops
+deprecation_reason: "Folded into growth-ops Acquisition lane for OpenAI Skills baseline slimming."
 description: When the user wants to audit, review, or diagnose SEO issues on their site — including technical SEO, on-page SEO, meta tags, structured data (schema markup, JSON-LD, rich snippets, FAQ/product/review/breadcrumb schema), and SEO health checks. Also use for "why am I not ranking," "SEO issues." For building pages at scale to target keywords, see programmatic-seo. Schema markup is now part of this audit (formerly schema-markup skill).
 metadata:
   version: 1.0.0

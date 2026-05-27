@@ -1,6 +1,9 @@
 ---
 name: persuasive-content-craft
 routing_category: growth
+deprecated: true
+successor: growth-ops
+deprecation_reason: "Folded into growth-ops Copy and Creative lane for OpenAI Skills baseline slimming."
 description: 説得型コピー全般の親ハブ。新規ライティング（copywriting）・既存改善（copy-editing）・広告コピー（ad-creative）の3変種を統合し、共通の説得構造（PAS / AIDA / 4U / Before-After-Bridge）と心理レバー、共有テンプレートを提供する。トリガー：「コピーを書いて／直して」「広告コピー」「LPコピー」「ヘッドライン」「CTA」など。
 metadata:
   version: 1.0.0

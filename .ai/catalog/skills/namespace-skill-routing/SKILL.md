@@ -1,6 +1,9 @@
 ---
 name: namespace-skill-routing
 routing_category: governance
+deprecated: true
+successor: governance-ops
+deprecation_reason: "Folded into governance-ops Routing Patterns lane for OpenAI Skills baseline slimming."
 description: "スキル数が増えて routing token cost や選択迷いが大きくなったときに、namespace router / hub skill / routing table で候補を整理する。Codex以外のモデルでも過剰なスキル一覧に引っ張られないようにするための設計スキル。"
 contract:
   preconditions:

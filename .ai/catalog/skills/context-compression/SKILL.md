@@ -1,6 +1,9 @@
 ---
 name: context-compression
 routing_category: governance
+deprecated: true
+successor: governance-ops
+deprecation_reason: "Folded into governance-ops Agent Load and Context lane for OpenAI Skills baseline slimming."
 description: "長時間セッション、巨大コードベース探索、複数 agent の結果統合、引き継ぎ前に、会話や作業履歴を圧縮する必要があるときに使う。要約でファイル履歴、意思決定、検証結果、未完了タスクを落としたくない場面では必ず候補に入れる。"
 contract:
   preconditions:

@@ -1,6 +1,9 @@
 ---
 name: adr-management
 routing_category: documents
+deprecated: true
+successor: documents-ops
+deprecation_reason: "Folded into documents-ops Docs and Governance lane for OpenAI Skills baseline slimming."
 description: "Architecture Decision Records管理：Nygard形式・ステータス管理・ADR検索・設計漂流防止"
 disable-model-invocation: true
 ---

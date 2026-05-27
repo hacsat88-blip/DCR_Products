@@ -1,6 +1,9 @@
 ---
 name: uat-verification-gate
 routing_category: devops
+deprecated: true
+successor: dcr-pipeline
+deprecation_reason: "Folded into dcr-pipeline q/ UAT Gate for OpenAI Skills baseline slimming."
 description: "実装がユーザー体験、画面、CLI操作、業務フローに影響するとき、完了前に人間が確認できる受け入れ検証を設計する。テスト通過だけでは不十分で、UAT、証跡、再実行手順、残リスクを残す必要がある場面で使う。"
 contract:
   preconditions:

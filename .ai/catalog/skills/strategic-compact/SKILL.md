@@ -1,6 +1,9 @@
 ---
 name: strategic-compact
 routing_category: governance
+deprecated: true
+successor: governance-ops
+deprecation_reason: "Folded into governance-ops Agent Load and Context lane for OpenAI Skills baseline slimming."
 description: Suggests manual context compaction at logical intervals to preserve context through task phases rather than arbitrary auto-compaction.
 metadata:
   origin: ECC (adapted for DCR)

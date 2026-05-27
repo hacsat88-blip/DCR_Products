@@ -1,6 +1,9 @@
 ---
 name: context-optimization
 routing_category: governance
+deprecated: true
+successor: governance-ops
+deprecation_reason: "Folded into governance-ops Agent Load and Context lane for OpenAI Skills baseline slimming."
 description: "repo 探索、ログ確認、外部カタログ比較、長い設計レビューで、読み込む情報を減らしつつ判断精度を保ちたいときに使う。compaction、masking、caching、just-in-time loading、generated mirror の除外を選ぶ場面で使う。"
 contract:
   preconditions:

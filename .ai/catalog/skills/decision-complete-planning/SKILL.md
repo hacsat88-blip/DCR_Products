@@ -1,6 +1,9 @@
 ---
 name: decision-complete-planning
 routing_category: governance
+deprecated: true
+successor: governance-ops
+deprecation_reason: "Folded into governance-ops Decision and Planning lane for OpenAI Skills baseline slimming."
 description: "実装前の計画が曖昧で、実装者に判断を残しすぎているときに使う。仕様、制約、未決定事項、検証条件を整理し、どのモデル/IDE/CLIでも同じ実装判断に到達できる Decision Complete な計画へ落とす。"
 contract:
   preconditions:

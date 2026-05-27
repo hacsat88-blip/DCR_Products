@@ -1,6 +1,9 @@
 ---
 name: strategic-messaging
 routing_category: growth
+deprecated: true
+successor: growth-ops
+deprecation_reason: "Folded into growth-ops Messaging lane for OpenAI Skills baseline slimming."
 description: コンテンツ戦略・トピッククラスタ設計と、行動心理学・認知バイアス・購買心理を統合した「メッセージ設計の基盤層」。コピーライティング・メールシーケンス・広告コピー・LPコピー・ソーシャル投稿のすべてが参照する上位スキル。「何を伝えるか／どう伝えるか／なぜ刺さるか」の3層を統一して扱う。トリガー：「メッセージ戦略」「ポジショニング」「コア訴求」「なぜ買うのか」「説得の構造」「コンテンツ戦略の土台」など。
 metadata:
   version: 1.0.0
