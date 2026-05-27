@@ -1,6 +1,9 @@
 ---
 name: webapp-testing
 routing_category: devops
+deprecated: true
+successor: dcr-pipeline
+deprecation_reason: "Folded into dcr-pipeline q/ UI Evidence Gate for OpenAI Skills baseline slimming."
 description: Toolkit for interacting with and testing local web applications using Playwright. Supports verifying frontend functionality, debugging UI behavior, capturing browser screenshots, and viewing browser logs.
 license: Complete terms in LICENSE.txt
 disable-model-invocation: true

@@ -65,62 +65,31 @@ Entrypoint for VS Code Copilot environment.
 
 ## Included Skills
 
-- [ad-creative](../../.ai/catalog/skills/ad-creative/SKILL.md)
-- [adr-management](../../.ai/catalog/skills/adr-management/SKILL.md)
-- [advanced-evaluation](../../.ai/catalog/skills/advanced-evaluation/SKILL.md)
-- [agent-evaluation](../../.ai/catalog/skills/agent-evaluation/SKILL.md)
 - [agent-memory-design](../../.ai/catalog/skills/agent-memory-design/SKILL.md)
-- [agent-overload-recovery](../../.ai/catalog/skills/agent-overload-recovery/SKILL.md)
 - [ai-prompt-manager](../../.ai/catalog/skills/ai-prompt-manager/SKILL.md)
-- [ai-seo](../../.ai/catalog/skills/ai-seo/SKILL.md)
-- [analytics-tracking](../../.ai/catalog/skills/analytics-tracking/SKILL.md)
 - [api-design](../../.ai/catalog/skills/api-design/SKILL.md)
-- [api-docs-automation](../../.ai/catalog/skills/api-docs-automation/SKILL.md)
-- [architecture-diagram-generator](../../.ai/catalog/skills/architecture-diagram-generator/SKILL.md)
 - [architecture-zoom-out](../../.ai/catalog/skills/architecture-zoom-out/SKILL.md)
-- [autonomous-qa-loop](../../.ai/catalog/skills/autonomous-qa-loop/SKILL.md)
 - [brainstorming](../../.ai/catalog/skills/brainstorming/SKILL.md)
-- [canvas-design](../../.ai/catalog/skills/canvas-design/SKILL.md)
 - [changelog-automation](../../.ai/catalog/skills/changelog-automation/SKILL.md)
-- [churn-prevention](../../.ai/catalog/skills/churn-prevention/SKILL.md)
-- [code-review](../../.ai/catalog/skills/code-review/SKILL.md)
 - [codex-app-server-integration](../../.ai/catalog/skills/codex-app-server-integration/SKILL.md)
-- [cold-email](../../.ai/catalog/skills/cold-email/SKILL.md)
-- [competitor-alternatives](../../.ai/catalog/skills/competitor-alternatives/SKILL.md)
-- [content-strategy](../../.ai/catalog/skills/content-strategy/SKILL.md)
-- [context-compression](../../.ai/catalog/skills/context-compression/SKILL.md)
-- [context-degradation](../../.ai/catalog/skills/context-degradation/SKILL.md)
-- [context-optimization](../../.ai/catalog/skills/context-optimization/SKILL.md)
 - [continuous-learning-v2](../../.ai/catalog/skills/continuous-learning-v2/SKILL.md)
-- [contract-testing](../../.ai/catalog/skills/contract-testing/SKILL.md)
-- [conversion-optimization-hub](../../.ai/catalog/skills/conversion-optimization-hub/SKILL.md)
-- [copy-editing](../../.ai/catalog/skills/copy-editing/SKILL.md)
-- [copywriting](../../.ai/catalog/skills/copywriting/SKILL.md)
 - [cost-aware-routing](../../.ai/catalog/skills/cost-aware-routing/SKILL.md)
-- [data-pipeline-orchestration](../../.ai/catalog/skills/data-pipeline-orchestration/SKILL.md)
 - [data-quality](../../.ai/catalog/skills/data-quality/SKILL.md)
 - [database-schema-design](../../.ai/catalog/skills/database-schema-design/SKILL.md)
-- [dcf-valuation](../../.ai/catalog/skills/dcf-valuation/SKILL.md)
 - [dcr-generated-mirror-drift](../../.ai/catalog/skills/dcr-generated-mirror-drift/SKILL.md)
 - [dcr-pipeline](../../.ai/catalog/skills/dcr-pipeline/SKILL.md)
-- [decision-complete-planning](../../.ai/catalog/skills/decision-complete-planning/SKILL.md)
 - [deployment-patterns](../../.ai/catalog/skills/deployment-patterns/SKILL.md)
 - [design-an-interface](../../.ai/catalog/skills/design-an-interface/SKILL.md)
 - [disaster-recovery](../../.ai/catalog/skills/disaster-recovery/SKILL.md)
-- [doc-coauthoring](../../.ai/catalog/skills/doc-coauthoring/SKILL.md)
-- [docs-update](../../.ai/catalog/skills/docs-update/SKILL.md)
-- [docx](../../.ai/catalog/skills/docx/SKILL.md)
-- [domain-decision-grilling](../../.ai/catalog/skills/domain-decision-grilling/SKILL.md)
-- [email-marketing-flow](../../.ai/catalog/skills/email-marketing-flow/SKILL.md)
-- [email-sequence](../../.ai/catalog/skills/email-sequence/SKILL.md)
+- [documents-ops](../../.ai/catalog/skills/documents-ops/SKILL.md)
 - [eval-harness](../../.ai/catalog/skills/eval-harness/SKILL.md)
 - [event-driven-agents](../../.ai/catalog/skills/event-driven-agents/SKILL.md)
 - [find-skills](../../.ai/catalog/skills/find-skills/SKILL.md)
 - [finishing-a-development-branch](../../.ai/catalog/skills/finishing-a-development-branch/SKILL.md)
 - [finops](../../.ai/catalog/skills/finops/SKILL.md)
-- [form-cro](../../.ai/catalog/skills/form-cro/SKILL.md)
-- [free-tool-strategy](../../.ai/catalog/skills/free-tool-strategy/SKILL.md)
 - [github-bug-report-triage](../../.ai/catalog/skills/github-bug-report-triage/SKILL.md)
+- [governance-ops](../../.ai/catalog/skills/governance-ops/SKILL.md)
+- [growth-ops](../../.ai/catalog/skills/growth-ops/SKILL.md)
 - [harness-audit](../../.ai/catalog/skills/harness-audit/SKILL.md)
 - [human-in-the-loop](../../.ai/catalog/skills/human-in-the-loop/SKILL.md)
 - [improve-codebase-architecture](../../.ai/catalog/skills/improve-codebase-architecture/SKILL.md)
@@ -128,99 +97,66 @@ Entrypoint for VS Code Copilot environment.
 - [j-quants](../../.ai/catalog/skills/j-quants/SKILL.md)
 - [japanese-legal-compliance](../../.ai/catalog/skills/japanese-legal-compliance/SKILL.md)
 - [japanese-ux-patterns](../../.ai/catalog/skills/japanese-ux-patterns/SKILL.md)
-- [launch-strategy](../../.ai/catalog/skills/launch-strategy/SKILL.md)
 - [llmops-monitoring](../../.ai/catalog/skills/llmops-monitoring/SKILL.md)
-- [marketing-ideas](../../.ai/catalog/skills/marketing-ideas/SKILL.md)
-- [marketing-psychology](../../.ai/catalog/skills/marketing-psychology/SKILL.md)
 - [mcp-builder](../../.ai/catalog/skills/mcp-builder/SKILL.md)
 - [mem-search](../../.ai/catalog/skills/mem-search/SKILL.md)
-- [mobile-cicd](../../.ai/catalog/skills/mobile-cicd/SKILL.md)
-- [mobile-performance](../../.ai/catalog/skills/mobile-performance/SKILL.md)
-- [model-debate-stress-test](../../.ai/catalog/skills/model-debate-stress-test/SKILL.md)
 - [model-route](../../.ai/catalog/skills/model-route/SKILL.md)
 - [multi-repo-sync](../../.ai/catalog/skills/multi-repo-sync/SKILL.md)
-- [multimodal-pipeline](../../.ai/catalog/skills/multimodal-pipeline/SKILL.md)
-- [namespace-skill-routing](../../.ai/catalog/skills/namespace-skill-routing/SKILL.md)
 - [observability-design](../../.ai/catalog/skills/observability-design/SKILL.md)
 - [okr-framework](../../.ai/catalog/skills/okr-framework/SKILL.md)
-- [onboarding-cro](../../.ai/catalog/skills/onboarding-cro/SKILL.md)
+- [openai-skills-catalog-audit](../../.ai/catalog/skills/openai-skills-catalog-audit/SKILL.md)
 - [oss-delegate](../../.ai/catalog/skills/oss-delegate/SKILL.md)
-- [page-cro](../../.ai/catalog/skills/page-cro/SKILL.md)
-- [paid-ads](../../.ai/catalog/skills/paid-ads/SKILL.md)
-- [parallel-agent-patterns](../../.ai/catalog/skills/parallel-agent-patterns/SKILL.md)
-- [parallel-wave-execution](../../.ai/catalog/skills/parallel-wave-execution/SKILL.md)
-- [paywall-upgrade-cro](../../.ai/catalog/skills/paywall-upgrade-cro/SKILL.md)
-- [pdf](../../.ai/catalog/skills/pdf/SKILL.md)
-- [performance-profiling](../../.ai/catalog/skills/performance-profiling/SKILL.md)
-- [persuasive-content-craft](../../.ai/catalog/skills/persuasive-content-craft/SKILL.md)
-- [phase-state-artifacts](../../.ai/catalog/skills/phase-state-artifacts/SKILL.md)
 - [platform-engineering](../../.ai/catalog/skills/platform-engineering/SKILL.md)
-- [popup-cro](../../.ai/catalog/skills/popup-cro/SKILL.md)
-- [pptx](../../.ai/catalog/skills/pptx/SKILL.md)
-- [prd-to-issues](../../.ai/catalog/skills/prd-to-issues/SKILL.md)
-- [pricing-strategy](../../.ai/catalog/skills/pricing-strategy/SKILL.md)
-- [product-analytics](../../.ai/catalog/skills/product-analytics/SKILL.md)
-- [product-marketing-context](../../.ai/catalog/skills/product-marketing-context/SKILL.md)
-- [programmatic-seo](../../.ai/catalog/skills/programmatic-seo/SKILL.md)
 - [prompt-master](../../.ai/catalog/skills/prompt-master/SKILL.md)
 - [rag-design](../../.ai/catalog/skills/rag-design/SKILL.md)
 - [react-quality-gate](../../.ai/catalog/skills/react-quality-gate/SKILL.md)
-- [referral-program](../../.ai/catalog/skills/referral-program/SKILL.md)
 - [remotion-best-practices](../../.ai/catalog/skills/remotion-best-practices/SKILL.md)
 - [repo-boundary-hygiene](../../.ai/catalog/skills/repo-boundary-hygiene/SKILL.md)
-- [rules-distill](../../.ai/catalog/skills/rules-distill/SKILL.md)
 - [search-first](../../.ai/catalog/skills/search-first/SKILL.md)
-- [security-deepdive](../../.ai/catalog/skills/security-deepdive/SKILL.md)
 - [security-scan](../../.ai/catalog/skills/security-scan/SKILL.md)
 - [semgrep-rule-creator](../../.ai/catalog/skills/semgrep-rule-creator/SKILL.md)
-- [seo-audit](../../.ai/catalog/skills/seo-audit/SKILL.md)
 - [setup-pre-commit](../../.ai/catalog/skills/setup-pre-commit/SKILL.md)
-- [signup-flow-cro](../../.ai/catalog/skills/signup-flow-cro/SKILL.md)
 - [skill-creator](../../.ai/catalog/skills/skill-creator/SKILL.md)
-- [social-content](../../.ai/catalog/skills/social-content/SKILL.md)
-- [static-analysis](../../.ai/catalog/skills/static-analysis/SKILL.md)
 - [stock-skills-sla](../../.ai/catalog/skills/stock-skills-sla/SKILL.md)
-- [strategic-compact](../../.ai/catalog/skills/strategic-compact/SKILL.md)
-- [strategic-messaging](../../.ai/catalog/skills/strategic-messaging/SKILL.md)
 - [streaming-design](../../.ai/catalog/skills/streaming-design/SKILL.md)
 - [structured-output](../../.ai/catalog/skills/structured-output/SKILL.md)
 - [subagent-driven-development](../../.ai/catalog/skills/subagent-driven-development/SKILL.md)
-- [supply-chain-security](../../.ai/catalog/skills/supply-chain-security/SKILL.md)
 - [systematic-debugging](../../.ai/catalog/skills/systematic-debugging/SKILL.md)
 - [tdd-workflow](../../.ai/catalog/skills/tdd-workflow/SKILL.md)
 - [tech-debt-tracker](../../.ai/catalog/skills/tech-debt-tracker/SKILL.md)
 - [theme-factory](../../.ai/catalog/skills/theme-factory/SKILL.md)
 - [threat-modeling](../../.ai/catalog/skills/threat-modeling/SKILL.md)
 - [token-efficiency-advisor](../../.ai/catalog/skills/token-efficiency-advisor/SKILL.md)
-- [uat-verification-gate](../../.ai/catalog/skills/uat-verification-gate/SKILL.md)
-- [ubiquitous-language](../../.ai/catalog/skills/ubiquitous-language/SKILL.md)
 - [ui-ux-pro-max](../../.ai/catalog/skills/ui-ux-pro-max/SKILL.md)
 - [unified-router](../../.ai/catalog/skills/unified-router/SKILL.md)
 - [user-interview](../../.ai/catalog/skills/user-interview/SKILL.md)
 - [using-git-worktrees](../../.ai/catalog/skills/using-git-worktrees/SKILL.md)
 - [verification-before-completion](../../.ai/catalog/skills/verification-before-completion/SKILL.md)
 - [web-artifacts-builder](../../.ai/catalog/skills/web-artifacts-builder/SKILL.md)
-- [webapp-testing](../../.ai/catalog/skills/webapp-testing/SKILL.md)
 - [writing-plans](../../.ai/catalog/skills/writing-plans/SKILL.md)
-- [x-research](../../.ai/catalog/skills/x-research/SKILL.md)
-- [xlsx](../../.ai/catalog/skills/xlsx/SKILL.md)
 - [zero-trust-design](../../.ai/catalog/skills/zero-trust-design/SKILL.md)
 
 ---
 
 ## Unified Coordinator
 
-蜈ｨ繧ｿ繧ｹ繧ｯ縺ｮ蜊倅ｸ蜈･蜿｣縺ｯ **pied-piper** agent縲３ule/Skill/Agent 驕ｸ螳壹・ [.ai/module/unified-router.md](../../.ai/module/unified-router.md) 縺ｮ豎ｺ螳壽惠縺ｫ蠕薙＞縲∝呵｣懊ｒ蠅励ｄ縺輔★蠢・ｦ∝香蛻・↑蛟呵｣懊∈蝨ｧ邵ｮ縺励∫匱轣ｫ蜑阪↓蛟呵｣懊・逅・罰繝ｻ譛溷ｾ・柑譫懊ｒ蝣ｱ蜻翫☆繧九・
-Skill縲、gent縲√し繝悶お繝ｼ繧ｸ繧ｧ繝ｳ繝医∽ｸｦ蛻・orchestration縲∝､夜Κ MCP/API縲￣2/P3 謫堺ｽ懊′髢｢繧上ｋ蝣ｴ蜷医・縲∝次蜑・→縺励※ **蛟呵｣懈署遉ｺ 竊・繝ｦ繝ｼ繧ｶ繝ｼ謇ｿ隱・竊・逋ｺ轣ｫ** 縺ｮ鬆・↓騾ｲ繧√ｋ縲１1 read-only 縺ｮ蜊倡峡菴弱Μ繧ｹ繧ｯ謗｢邏｢縺ｮ縺ｿ縲∫洒縺・ｺ句燕蝣ｱ蜻雁ｾ後↓閾ｪ蜍募ｮ溯｡後〒縺阪ｋ縲・
-閾ｪ辟ｶ險隱槭・謇ｿ隱阪・譟斐ｉ縺九￥諡ｾ縺・′縲∽ｸ諢上〒縺ｪ縺・ｴ蜷医・蜀咲｢ｺ隱阪☆繧九・{MarkdownTick}縺翫☆縺吶ａ縺ｧ` / `謗ｨ螂ｨ縺ｧ` / `A縺ｧ` / `1縺ｧ` 縺ｯ蟇ｾ雎｡縺御ｸ諢上・逶ｴ蜑榊呵｣懊↓邨舌・縺､縺丞ｴ蜷医・縺ｿ謇ｿ隱肴桶縺・・{MarkdownTick}縺昴ｌ縺ｧ` / `騾ｲ繧√※` / `謇ｿ隱・{MarkdownTick} / `OK` 縺ｯ蜊倡峡蛟呵｣懊・蝣ｴ蜷医・縺ｿ謇ｿ隱肴桶縺・・
-`縺・＞諢溘§縺ｫ` / `莉ｻ縺帙ｋ` / `縺翫∪縺九○` / `繧医＆縺昴≧` / `繧医＆縺・{MarkdownTick} / `縺溘・繧・{MarkdownTick} / `螟壼・` 縺ｯ謇ｿ隱阪↓縺帙★縲∝呵｣懈署遉ｺ縺ｾ縺溘・蜀咲｢ｺ隱阪↓謌ｻ縺吶・{MarkdownTick}繧ｭ繝｣繝ｳ繧ｻ繝ｫ` / `荳ｭ豁｢` 縺ｯ蜊ｴ荳九・{MarkdownTick}蛻･譯・{MarkdownTick} / `蛻･縺ｮ譯・{MarkdownTick} / `霆ｽ縺・{MarkdownTick} 縺ｯ蜀肴署譯医→縺励※謇ｱ縺・・
-`.ai/kernel/gate-state.json` 縺ｫ `proposal_state.status = proposed|refined` 縺後≠繧句ｴ蜷医∫洒縺・ｬ｡逋ｺ隧ｱ縺ｯ騾壼ｸｸ繝ｫ繝ｼ繝・ぅ繝ｳ繧ｰ繧医ｊ蜈医↓逶ｴ蜑肴署譯医∈縺ｮ霑皮ｭ斐→縺励※隗｣驥医☆繧九よ価隱阪・蜊ｴ荳九・菫ｮ豁｣繝ｻ譖匁乂縺ｮ蛻・｡槭・ `tools/lib/gate-state.ps1` 縺ｮ proposal state machine 縺ｫ蠕薙≧縲・
+全タスクの単一入口は **pied-piper** agent。Rule/Skill/Agent 選定は [.ai/module/unified-router.md](../../.ai/module/unified-router.md) の決定木に従い、候補を増やさず必要十分な候補へ圧縮し、発火前に候補・理由・期待効果を報告する。
+
+Skill、Agent、サブエージェント、並列 orchestration、外部 MCP/API、P2/P3 操作が関わる場合は、原則として **候補提示 → ユーザー承認 → 発火** の順に進める。P1 read-only の単独低リスク探索のみ、短い事前報告後に自動実行できる。
+
+自然言語の承認は柔らかく拾うが、一意でない場合は再確認する。`おすすめで` / `推奨で` / `Aで` / `1で` は対象が一意の直前候補に結びつく場合のみ承認扱い。`それで` / `進めて` / `承認` / `OK` は単独候補の場合のみ承認扱い。
+
+`いい感じに` / `任せる` / `おまかせ` / `よさそう` / `よさげ` / `たぶん` / `多分` は承認にせず、候補提示または再確認に戻す。`キャンセル` / `中止` は却下、`別案` / `別の案` / `軽く` は再提案として扱う。
+
+`.ai/kernel/gate-state.json` に `proposal_state.status = proposed|refined` がある場合、短い次発話は通常ルーティングより先に直前提案への返答として解釈する。承認・却下・修正・曖昧の分類は `tools/lib/gate-state.ps1` の proposal state machine に従う。
+
 ---
 
 ## Runtime Memory Preflight
 
-縲後％繧後←縺・ｼ溘阪後し繝医す髢狗匱逶ｮ邱壹〒縲阪悟燕縺ｨ蜷後§隕ｳ轤ｹ縺ｧ縲阪悟・繧後ｋ萓｡蛟､縺ゅｋ・溘阪悟ｰ主・縺励※縲阪檎ｽｮ縺肴鋤縺医ｋ蠢・ｦ√≠繧具ｼ溘阪後∪縺溷酔縺倥お繝ｩ繝ｼ縲阪碁℃蜴ｻ蛻､譁ｭ繧りｸ上∪縺医※縲阪↑縺ｩ縲・℃蜴ｻ蛻､譁ｭ縺悟刀雉ｪ縺ｫ蠖ｱ髻ｿ縺吶ｋ逶ｸ隲・〒縺ｯ縲∝茜逕ｨ蜿ｯ閭ｽ縺ｪ runtime memory 繧堤捩謇句燕縺ｫ遒ｺ隱阪☆繧九・
-agentmemory 莠呈鋤 backend 縺御ｽｿ縺医ｋ蝣ｴ蜷医・縲∝酔遞ｮ繧ｿ繧ｹ繧ｯ縲・未騾｣繝輔ぃ繧､繝ｫ縺ｮ驕主悉蛻､譁ｭ縲∵治逕ｨ/髱樊治逕ｨ繝昴Μ繧ｷ繝ｼ縲∵､懆ｨｼ貂医∩繧ｳ繝槭Φ繝峨ｒ遏ｭ縺乗､懃ｴ｢縺吶ｋ縲ゆｽｿ縺医↑縺・ｴ蜷医・騾壼ｸｸ縺ｮ repo 謗｢邏｢縺ｸ繝輔か繝ｼ繝ｫ繝舌ャ繧ｯ縺吶ｋ縲Ｎemory recall 縺ｯ豁｣譛ｬ縺ｧ縺ｯ縺ｪ縺上～.ai/catalog / .ai/book / repo artifact / 迴ｾ蝨ｨ縺ｮ git 迥ｶ諷九ｒ蜆ｪ蜈医☆繧九・
+「これどう？」「サトシ開発目線で」「前と同じ観点で」「入れる価値ある？」「導入して」「置き換える必要ある？」「また同じエラー」「過去判断も踏まえて」など、過去判断が品質に影響する相談では、利用可能な runtime memory を着手前に確認する。
+
+agentmemory 互換 backend が使える場合は、同種タスク、関連ファイルの過去判断、採用/非採用ポリシー、検証済みコマンドを短く検索する。使えない場合は通常の repo 探索へフォールバックする。memory recall は正本ではなく、.ai/catalog / .ai/book / repo artifact / 現在の git 状態を優先する。
 
 ---
 

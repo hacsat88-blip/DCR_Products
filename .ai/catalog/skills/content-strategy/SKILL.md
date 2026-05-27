@@ -1,6 +1,9 @@
 ---
 name: content-strategy
 routing_category: growth
+deprecated: true
+successor: growth-ops
+deprecation_reason: "Folded into growth-ops Messaging lane for OpenAI Skills baseline slimming."
 description: When the user wants to plan a content strategy, decide what content to create, or figure out what topics to cover. Also use when the user mentions "content strategy," "what should I write about," "content ideas," "blog strategy," "topic clusters," or "content planning." For writing individual pieces, see copywriting. For SEO-specific audits, see seo-audit.
 metadata:
   version: 1.0.0

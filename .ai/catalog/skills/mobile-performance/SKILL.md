@@ -1,6 +1,9 @@
 ---
 name: mobile-performance
 routing_category: devops
+deprecated: true
+successor: dcr-pipeline
+deprecation_reason: "Folded into dcr-pipeline q/ Mobile Performance Gate for OpenAI Skills baseline slimming."
 description: "モバイルパフォーマンス最適化：ANR/Crash分析・Profilerツール・バッテリー最適化・UIジャンク解消"
 disable-model-invocation: true
 ---

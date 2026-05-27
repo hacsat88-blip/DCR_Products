@@ -2,19 +2,22 @@
   {
     "input": "LP のCV改善を考えて",
     "kind": "skill",
-    "expected": "conversion-optimization-hub",
+    "expected": "growth-ops",
+    "expected_alias_from": "conversion-optimization-hub",
     "match_keywords": ["CRO", "conversion", "親"]
   },
   {
     "input": "ポップアップを作って離脱を防ぎたい",
     "kind": "skill",
-    "expected": "popup-cro",
+    "expected": "growth-ops",
+    "expected_alias_from": "popup-cro",
     "match_keywords": ["popup", "modal", "exit"]
   },
   {
     "input": "サインアップフローを最適化して",
     "kind": "skill",
-    "expected": "signup-flow-cro",
+    "expected": "growth-ops",
+    "expected_alias_from": "signup-flow-cro",
     "match_keywords": ["signup", "registration"]
   },
   {
@@ -44,31 +47,35 @@
   {
     "input": "新機能のメッセージを作りたい",
     "kind": "skill",
-    "expected": "strategic-messaging",
+    "expected": "growth-ops",
+    "expected_alias_from": "strategic-messaging",
     "match_keywords": ["message", "戦略", "心理"]
   },
   {
     "input": "コピーを書いて",
     "kind": "skill",
-    "expected": "persuasive-content-craft",
+    "expected": "growth-ops",
+    "expected_alias_from": "persuasive-content-craft",
     "match_keywords": ["copy", "content", "コピー", "説得"]
   },
   {
     "input": "コールドメールを書きたい",
     "kind": "skill",
-    "expected": "email-marketing-flow",
+    "expected": "growth-ops",
+    "expected_alias_from": "email-marketing-flow",
     "match_keywords": ["email", "cold", "outreach", "メール"]
   },
   {
     "input": "SEO の構造化データを確認したい",
     "kind": "skill",
-    "expected": "seo-audit",
+    "expected": "growth-ops",
+    "expected_alias_from": "seo-audit",
     "match_keywords": ["SEO", "schema", "structured"]
   },
   {
     "input": "schema-markup を使って",
     "kind": "skill",
-    "expected": "seo-audit",
+    "expected": "growth-ops",
     "expected_alias_from": "schema-markup",
     "match_keywords": ["SEO", "schema"]
   },
@@ -160,7 +167,8 @@
   {
     "input": "OWASP脅威モデリングを深掘りしたい",
     "kind": "skill",
-    "expected": "security-deepdive",
+    "expected": "dcr-pipeline",
+    "expected_alias_from": "security-deepdive",
     "match_keywords": ["security", "OWASP", "暗号"]
   },
   {
@@ -208,7 +216,8 @@
   {
     "input": "大きめなら分担してサブエージェントで進めて",
     "kind": "skill",
-    "expected": "parallel-wave-execution",
+    "expected": "governance-ops",
+    "expected_alias_from": "parallel-wave-execution",
     "match_keywords": ["複数", "wave", "並列"],
     "expected_mode": "approve_required",
     "approval_required": true,
@@ -261,7 +270,8 @@
   {
     "input": "大きめなら分担して",
     "kind": "skill",
-    "expected": "parallel-wave-execution",
+    "expected": "governance-ops",
+    "expected_alias_from": "parallel-wave-execution",
     "match_keywords": ["複数", "wave", "並列"],
     "expected_mode": "approve_required",
     "approval_required": true,

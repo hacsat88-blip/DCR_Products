@@ -1,6 +1,9 @@
 ---
 name: performance-profiling
 routing_category: devops
+deprecated: true
+successor: dcr-pipeline
+deprecation_reason: "Folded into dcr-pipeline q/ Performance Gate for OpenAI Skills baseline slimming."
 description: 言語別プロファイリング手法、ボトルネック分析、最適化戦略の実践ガイド。測定に基づく性能改善を実現する。
 contract:
   preconditions:

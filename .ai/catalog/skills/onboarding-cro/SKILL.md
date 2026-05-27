@@ -1,6 +1,9 @@
 ---
 name: onboarding-cro
 routing_category: growth
+deprecated: true
+successor: growth-ops
+deprecation_reason: "Folded into growth-ops CRO lane for OpenAI Skills baseline slimming."
 description: When the user wants to optimize post-signup onboarding, user activation, first-run experience, or time-to-value. Also use when the user mentions "onboarding flow," "activation rate," "user activation," "first-run experience," "empty states," "onboarding checklist," "aha moment," or "new user experience." For signup/registration optimization, see signup-flow-cro. For ongoing email sequences, see email-sequence.
 metadata:
   version: 1.0.0

@@ -1,6 +1,9 @@
 ---
 name: domain-decision-grilling
 routing_category: governance
+deprecated: true
+successor: governance-ops
+deprecation_reason: "Folded into governance-ops Decision and Planning lane for OpenAI Skills baseline slimming."
 description: "実装前の計画や外部候補が曖昧なとき、ユーザーに長い仕様文を書かせず、既存コード・用語・ADR・過去判断を照合しながら一問ずつ判断を固める。grill-with-docs 型の質問設計を DCR の .ai/book / docs / ADR 運用へ薄く適用する。"
 contract:
   preconditions:

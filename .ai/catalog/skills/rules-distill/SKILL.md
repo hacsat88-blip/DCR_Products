@@ -1,6 +1,9 @@
 ---
 name: rules-distill
 routing_category: governance
+deprecated: true
+successor: governance-ops
+deprecation_reason: "Folded into governance-ops Routing Patterns lane for OpenAI Skills baseline slimming."
 description: "複数 skill に分散した実践知を抽出し、rule に昇格すべき原則を特定する。what と how の境界を維持する。"
 disable-model-invocation: true
 ---

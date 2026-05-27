@@ -1,6 +1,9 @@
 ---
 name: advanced-evaluation
 routing_category: governance
+deprecated: true
+successor: governance-ops
+deprecation_reason: "Folded into governance-ops Evaluation lane for OpenAI Skills baseline slimming."
 description: "LLM-as-judge、pairwise comparison、rubric generation、評価バイアス対策、複数モデル比較、品質スコアリングの設計が必要なときに使う。単純な validate では測れない出力品質を評価するときに使う。"
 contract:
   preconditions:

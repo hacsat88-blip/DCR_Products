@@ -1,6 +1,9 @@
 ---
 name: contract-testing
 routing_category: devops
+deprecated: true
+successor: dcr-pipeline
+deprecation_reason: "Folded into dcr-pipeline q/ Contract Gate for OpenAI Skills baseline slimming."
 description: "APIコントラクトテスト：Consumer-Driven Contract Testing・Pact・Pact Broker・OpenAPI Contract Validation"
 disable-model-invocation: true
 ---

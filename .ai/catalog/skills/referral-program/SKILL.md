@@ -1,6 +1,9 @@
 ---
 name: referral-program
 routing_category: growth
+deprecated: true
+successor: growth-ops
+deprecation_reason: "Folded into growth-ops Email and Retention lane for OpenAI Skills baseline slimming."
 description: "When the user wants to create, optimize, or analyze a referral program, affiliate program, or word-of-mouth strategy. Also use when the user mentions 'referral,' 'affiliate,' 'ambassador,' 'word of mouth,' 'viral loop,' 'refer a friend,' or 'partner program.' This skill covers program design, incentive structure, and growth optimization."
 metadata:
   version: 1.0.0

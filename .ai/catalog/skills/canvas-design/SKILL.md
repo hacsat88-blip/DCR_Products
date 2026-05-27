@@ -1,6 +1,9 @@
 ---
 name: canvas-design
 routing_category: documents
+deprecated: true
+successor: documents-ops
+deprecation_reason: "Folded into documents-ops Visual Artifacts lane for OpenAI Skills baseline slimming."
 description: "Use when the user asks to create a poster, piece of art, visual design, or other static design piece using design philosophy. Outputs .png and .pdf files only. This skill creates original visual designs via a two-step process: design philosophy document + canvas expression."
 license: Complete terms in LICENSE.txt
 disable-model-invocation: true

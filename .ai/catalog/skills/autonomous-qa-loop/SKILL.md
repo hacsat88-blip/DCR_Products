@@ -1,6 +1,9 @@
 ---
 name: autonomous-qa-loop
 routing_category: governance
+deprecated: true
+successor: dcr-pipeline
+deprecation_reason: "Folded into dcr-pipeline q/ Fix Loop for OpenAI Skills baseline slimming."
 description: "自律QAループ設計：テスト→失敗検出→修正試行→再テストの自律サイクル定義と脱出条件"
 disable-model-invocation: true
 ---

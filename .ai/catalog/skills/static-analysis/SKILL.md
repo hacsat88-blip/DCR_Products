@@ -1,6 +1,9 @@
 ---
 name: static-analysis
 routing_category: devops
+deprecated: true
+successor: dcr-pipeline
+deprecation_reason: "Folded into dcr-pipeline q/ Static Gate for OpenAI Skills baseline slimming."
 description: "コードや設定を実行せずに解析し、lint、型、依存、危険パターン、生成物と正本の混在を確認したいときに使う。実装後の軽量 QA、セキュリティ前段、Semgrep ルール適用前の棚卸しで使う。"
 contract:
   preconditions:

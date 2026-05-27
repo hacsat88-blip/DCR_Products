@@ -1,6 +1,9 @@
 ---
 name: docs-update
 routing_category: documents
+deprecated: true
+successor: documents-ops
+deprecation_reason: "Folded into documents-ops Docs and Governance lane for OpenAI Skills baseline slimming."
 description: "コード、設定、運用フローの変更に合わせてユーザー向けドキュメントとDCR正本を同期する。README、運用手順、生成ミラーの説明が実装からずれた可能性があるときに使う。"
 contract:
   preconditions:

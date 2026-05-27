@@ -1,6 +1,9 @@
 ---
 name: conversion-optimization-hub
 routing_category: growth
+deprecated: true
+successor: growth-ops
+deprecation_reason: "Folded into growth-ops CRO lane for OpenAI Skills baseline slimming."
 description: Conversion Rate Optimization (CRO) の親ハブ。ユーザーが「CV改善」「コンバージョン」「離脱が多い」「もっと申込を増やしたい」等を訴えた際の単一エントリポイント。文脈を判定して適切な variant スキル（page / popup / form / signup-flow / onboarding / paywall-upgrade）に分岐させる。共通の CRO 原則（価値提案・摩擦軽減・心理的ハードル・社会的証明・緊急性）を一元管理し、variant が参照する基盤層となる。
 metadata:
   version: 1.0.0

@@ -1,6 +1,9 @@
 ---
 name: product-marketing-context
 routing_category: growth
+deprecated: true
+successor: growth-ops
+deprecation_reason: "Folded into growth-ops Messaging lane for OpenAI Skills baseline slimming."
 description: "When the user wants to create or update their product marketing context document. Also use when the user mentions 'product context,' 'marketing context,' 'set up context,' 'positioning,' or wants to avoid repeating foundational information across marketing tasks. Creates `.claude/product-marketing-context.md` that other marketing skills reference."
 metadata:
   version: 1.0.0

@@ -1,6 +1,9 @@
 ---
 name: data-pipeline-orchestration
 routing_category: devops
+deprecated: true
+successor: dcr-pipeline
+deprecation_reason: "Folded into dcr-pipeline p/ Data Pipeline Plan for OpenAI Skills baseline slimming."
 description: "データパイプラインオーケストレーション：DAG設計・Airflow/Prefect/Dagster選定・バックフィル・SLAアラート"
 disable-model-invocation: true
 ---

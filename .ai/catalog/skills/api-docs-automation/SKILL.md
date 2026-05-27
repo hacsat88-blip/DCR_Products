@@ -1,6 +1,9 @@
 ---
 name: api-docs-automation
 routing_category: documents
+deprecated: true
+successor: documents-ops
+deprecation_reason: "Folded into documents-ops API and Architecture lane for OpenAI Skills baseline slimming."
 description: "APIドキュメント自動生成：OpenAPI 3.x・Redoc/Swagger UI・スキーマ駆動開発・ドキュメントCI"
 disable-model-invocation: true
 ---

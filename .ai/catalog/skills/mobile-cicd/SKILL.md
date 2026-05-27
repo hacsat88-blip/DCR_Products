@@ -1,6 +1,9 @@
 ---
 name: mobile-cicd
 routing_category: devops
+deprecated: true
+successor: dcr-pipeline
+deprecation_reason: "Folded into dcr-pipeline sh/ Mobile Ship Gate for OpenAI Skills baseline slimming."
 description: "モバイルCI/CD：コード署名管理・Fastlane lane設計・EAS Build・TestFlight/Play Console自動配布"
 disable-model-invocation: true
 ---

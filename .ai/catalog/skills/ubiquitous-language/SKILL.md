@@ -1,6 +1,9 @@
 ---
 name: ubiquitous-language
 routing_category: documents
+deprecated: true
+successor: documents-ops
+deprecation_reason: "Folded into documents-ops Docs and Governance lane for OpenAI Skills baseline slimming."
 description: "会話・docs・コードに散らばっているドメイン用語を抽出し、DDD のユビキタス言語用語集として統一する。同じ語が repo 内で複数の意味で使われている『language drift』を検出し、glossary を .ai/book / docs に正本化する。コード生成前にドメイン語彙を固定することで、agent と人間が同じ言葉でやり取りできるようにする。"
 contract:
   preconditions:

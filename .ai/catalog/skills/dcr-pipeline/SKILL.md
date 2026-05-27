@@ -1,7 +1,7 @@
 ---
 name: dcr-pipeline
 routing_category: governance
-description: "DCR Kernel のゲート連鎖 (p/ -> 実装 -> q/ -> sh/) を自動管理するパイプラインSkill。実装タスク開始時・完了時・リリース判定時に自動的に次ゲートへ誘導し、各ゲート通過条件をチェックする。Use when starting implementation tasks, completing features, or preparing for release."
+description: "DCR Kernel のゲート連鎖 (p/ -> 実装 -> q/ -> sh/) を自動管理するパイプラインSkill。実装タスク開始時・完了時・リリース判定時に自動的に次ゲートへ誘導し、各ゲート通過条件をチェックする。Review、QA、security、OWASP、暗号、static analysis、webapp testing、performance、UAT、mobile CI/CD などの旧 pipeline alias skill もここへ畳む。Use when starting implementation tasks, completing features, or preparing for release."
 ---
 
 # DCR Pipeline Skill
@@ -17,12 +17,34 @@ p/ (Plan Gate) -> 実装 -> q/ (QA Gate) -> sh/ (Ship Gate)
   スコープ確定    チャンク実行   証拠ベース検証   リリース判定
 ```
 
+## Consolidated Pipeline Aliases
+
+OpenAI Skills baseline へのスリム化では、個別 QA / review / security / performance skill を削除せず、まずこの pipeline の phase alias として扱う。旧 skill は参照用に残し、routing は `dcr-pipeline` を優先する。
+
+| Former skill | Pipeline phase | 扱い |
+|---|---|---|
+| `code-review` | q/ Review Gate | severity-ordered findings と approve/request-changes 判定 |
+| `contract-testing` | q/ Contract Gate | API / schema / consumer-provider compatibility の検証 |
+| `static-analysis` | q/ Static Gate | lint / typecheck / generated mirror drift / dangerous pattern scan |
+| `webapp-testing` | q/ UI Evidence Gate | local web app の browser / Playwright / screenshot 検証 |
+| `autonomous-qa-loop` | q/ Fix Loop | test -> classify failure -> minimal fix -> re-test の脱出条件付きループ |
+| `uat-verification-gate` | q/ UAT Gate | 人間が確認できる受け入れ検証、証跡、再実行手順 |
+| `security-deepdive` | q/ Security Gate | deep security review。軽量 scan は `security-scan`、公式 baseline は OpenAI `codex-security` |
+| `supply-chain-security` | q/ Supply Chain Gate | SBOM、dependency audit、CI pinning、package integrity |
+| `performance-profiling` | q/ Performance Gate | measurement-first bottleneck analysis and regression checks |
+| `mobile-cicd` | sh/ Mobile Ship Gate | signing、EAS/Fastlane、TestFlight/Play Console release checks |
+| `mobile-performance` | q/ Mobile Performance Gate | ANR/crash/battery/jank profiling before mobile release |
+| `data-pipeline-orchestration` | p/ Data Pipeline Plan | DAG、backfill、freshness、SLA alerting を Plan Gate で扱う |
+| `multimodal-pipeline` | p/ Multimodal Pipeline Plan | image/audio/PDF/model/cost path を Plan Gate で扱う |
+| `model-debate-stress-test` | p/ Decision Stress Test | major options の前提・反論・judge を planning artifact に畳む |
+
 ## When to Activate
 
 - ユーザーが実装タスクを依頼したとき（3ステップ以上の変更）
 - `p/` トリガーが使われたとき
 - 実装が完了し、次のゲートへの誘導が必要なとき
 - Spec-first の clarify / analyze / checklist / doctor 相当の確認が必要なとき
+- 旧 pipeline alias skill (`code-review`, `static-analysis`, `webapp-testing`, `security-deepdive` など) に一致する依頼が来たとき
 
 ## Phase 1: Plan Gate (p/)
 
@@ -42,6 +64,7 @@ p/ (Plan Gate) -> 実装 -> q/ (QA Gate) -> sh/ (Ship Gate)
    - analyze: spec / plan / tasks / code の矛盾を検出
    - checklist: 受け入れ条件を検証可能な項目へ分解
    - doctor: 正本、生成物、検証コマンド、外部依存の健全性を確認
+8. データ / multimodal / mobile / model-debate 系の旧 skill に一致する場合は、上の Consolidated Pipeline Aliases の phase に検証項目として畳む
 
 ### 出口条件
 - ユーザーがプランを承認した
@@ -88,6 +111,7 @@ NEXT q/ でQA検証を実行することを推奨します
 6. 必要に応じて spec-kit review / threatmodel 相当の観点を追加する:
    - review: 実装品質、テスト、エラー処理、単純性
    - threatmodel: LLM/agent artifact、外部入力、権限、注入リスク
+7. 旧 QA / review / security / performance skill に一致する場合は、専用 skill を個別発火せず、この gate の検証項目として扱う
 
 ### 報告フォーマット
 ```markdown

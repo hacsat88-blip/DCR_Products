@@ -1,6 +1,9 @@
 ---
 name: parallel-wave-execution
 routing_category: governance
+deprecated: true
+successor: governance-ops
+deprecation_reason: "Folded into governance-ops Parallel Work lane for OpenAI Skills baseline slimming."
 description: "複数タスクを依存関係ごとの wave に分けて、安全に並列または逐次実行したいときに使う。subagent が使える環境でも使えない環境でも、同じ dependency wave と検証順序を保つための実行設計。"
 contract:
   preconditions:

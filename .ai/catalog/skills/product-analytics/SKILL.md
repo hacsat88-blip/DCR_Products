@@ -1,6 +1,9 @@
 ---
 name: product-analytics
 routing_category: growth
+deprecated: true
+successor: growth-ops
+deprecation_reason: "Folded into growth-ops Measurement and Monetization lane for OpenAI Skills baseline slimming."
 description: "プロダクトアナリティクス：NSM定義・AARRR・コホート分析・A/Bテスト設計・Mixpanel/Amplitude実装"
 disable-model-invocation: true
 ---

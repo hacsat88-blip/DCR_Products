@@ -1,6 +1,9 @@
 ---
 name: model-debate-stress-test
 routing_category: governance
+deprecated: true
+successor: dcr-pipeline
+deprecation_reason: "Folded into dcr-pipeline p/ Decision Stress Test for OpenAI Skills baseline slimming."
 description: "2〜3 個の大きな選択肢（採用判断・アーキテクチャ分岐・ADR 候補）の間で迷っているとき、複数モデル or 複数役割インスタンスにディベートさせ、各案の前提と反論をストレステストする。並列マルチエージェントが使えるランタイムでは複数インスタンス並列、不可なランタイムでは Proposer / Opponent / Judge の役割切替で順次実行する。"
 contract:
   preconditions:

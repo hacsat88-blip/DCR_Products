@@ -1,6 +1,9 @@
 ---
 name: x-research
 routing_category: documents
+deprecated: true
+successor: documents-ops
+deprecation_reason: "Folded into documents-ops Research lane for OpenAI Skills baseline slimming."
 description: >
   X/Twitter public sentiment research. Searches X for real-time perspectives,
   market sentiment, expert opinions, breaking news, and community discourse.

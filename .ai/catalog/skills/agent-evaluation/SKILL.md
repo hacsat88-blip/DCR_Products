@@ -1,6 +1,9 @@
 ---
 name: agent-evaluation
 routing_category: governance
+deprecated: true
+successor: governance-ops
+deprecation_reason: "Folded into governance-ops Evaluation lane for OpenAI Skills baseline slimming."
 description: "agent、skill、routing、tool-use の品質を評価したいときに使う。単発の印象ではなく、行動契約、回帰、ばらつき、実運用サンプルで agent の信頼性を測る必要がある場面で使う。"
 contract:
   preconditions:
