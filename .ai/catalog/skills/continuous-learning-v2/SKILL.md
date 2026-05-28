@@ -4,6 +4,26 @@ routing_category: governance
 description: "project/global スコープと confidence を持つ instinct 運用。学びを status/export/import/evolve/promote で管理し、再利用可能な skill/rule 候補へ昇格する。"
 metadata:
   origin: ECC continuous-learning-v2 (lightweight adaptation for DCR)
+contract:
+  preconditions:
+    - "The request matches this skill's description or routing category."
+  postconditions:
+    - "The response names the result, reasoning, and verification or handoff path."
+  invariants:
+    - "Do not treat generated mirrors or runtime caches as DCR source of truth."
+composable:
+  input_type: task
+  output_type: artifact-or-decision
+  chains_with:
+    - verification-before-completion
+runtime_targets:
+  - codex
+  - claude
+  - copilot
+  - cursor
+  - windsurf
+  - opencode
+  - gemini-cli
 ---
 
 # Continuous Learning v2 (Light)

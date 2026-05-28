@@ -44,6 +44,13 @@ if (-not (Test-Path $FixturePath)) {
 $rulesDir = Join-Path $RepoRoot ".ai/catalog/rules"
 $skillsDir = Join-Path $RepoRoot ".ai/catalog/skills"
 $agentsDir = Join-Path $RepoRoot ".ai/catalog/agents-source"
+$DeprecatedAliases = Join-Path $RepoRoot "tools\lib\deprecated-aliases.ps1"
+. $DeprecatedAliases
+$deprecatedAliasRows = @(Get-DcrDeprecatedAliases -RepoRoot $RepoRoot)
+$deprecatedAliasByKey = @{}
+foreach ($alias in $deprecatedAliasRows) {
+    $deprecatedAliasByKey["$($alias.kind):$($alias.name)"] = $alias
+}
 
 $passed = 0; $failed = 0; $errors = @()
 function Write-Ok { param($msg) if ($Verbose) { Write-Host "[OK]   $msg" -ForegroundColor Green }; $script:passed++ }
@@ -105,18 +112,14 @@ foreach ($f in $fixtures) {
 
     # Check 3: alias integrity if testing deprecated fixture
     if ($f.expected_alias_from) {
-        $aliasPath = Resolve-AssetPath -Kind $f.kind -Name $f.expected_alias_from
-        if (-not (Test-Path $aliasPath)) {
-            Write-Fail "$label — expected_alias_from='$($f.expected_alias_from)' file not found"
+        $aliasKey = "$($f.kind):$($f.expected_alias_from)"
+        if (-not $deprecatedAliasByKey.ContainsKey($aliasKey)) {
+            Write-Fail "$label — expected_alias_from='$($f.expected_alias_from)' not found in deprecated frontmatter or tombstone registry"
             continue
         }
-        $aliasFm = Get-Frontmatter -Path $aliasPath
-        if ($aliasFm['deprecated'] -ne 'true') {
-            Write-Fail "$label — alias '$($f.expected_alias_from)' is not marked deprecated"
-            continue
-        }
-        if ($aliasFm['successor'] -ne $f.expected) {
-            Write-Fail "$label — alias '$($f.expected_alias_from)' has successor='$($aliasFm['successor'])', expected '$($f.expected)'"
+        $aliasInfo = $deprecatedAliasByKey[$aliasKey]
+        if ($aliasInfo.successor -ne $f.expected) {
+            Write-Fail "$label — alias '$($f.expected_alias_from)' has successor='$($aliasInfo.successor)', expected '$($f.expected)'"
             continue
         }
     }

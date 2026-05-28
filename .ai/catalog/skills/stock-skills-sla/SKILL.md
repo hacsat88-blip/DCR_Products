@@ -6,6 +6,26 @@ description: |
   stock_skills_2 の Agentic AI Pattern に シナリオ・レンズ v1.0 の分析品質契約を統合。
   「いい株ある？」「トヨタどう？」「PF大丈夫？」「割安成長株を5年目線で」等、自然な日本語で動作。
 user_invocable: true
+contract:
+  preconditions:
+    - "The request matches this skill's description or routing category."
+  postconditions:
+    - "The response names the result, reasoning, and verification or handoff path."
+  invariants:
+    - "Do not treat generated mirrors or runtime caches as DCR source of truth."
+composable:
+  input_type: task
+  output_type: artifact-or-decision
+  chains_with:
+    - verification-before-completion
+runtime_targets:
+  - codex
+  - claude
+  - copilot
+  - cursor
+  - windsurf
+  - opencode
+  - gemini-cli
 ---
 
 # Stock Skills SLA — Scenario Lens × Agentic

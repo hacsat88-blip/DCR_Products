@@ -18,8 +18,8 @@ composable:
   chains_with:
     - improve-codebase-architecture
     - repo-boundary-hygiene
-    - context-optimization
-    - code-review
+    - governance-ops
+    - dcr-pipeline
 metadata:
   origin: mattpocock/skills
   upstream_url: "https://github.com/mattpocock/skills"
@@ -82,8 +82,8 @@ Architecture Zoom Out
 |---|---|
 | 構造改善が必要 | `improve-codebase-architecture` |
 | 正本/生成物境界が怪しい | `repo-boundary-hygiene` |
-| 読み込み対象が多すぎる | `context-optimization` |
-| レビュー前の整理 | `code-review` |
+| 読み込み対象が多すぎる | `governance-ops` |
+| レビュー前の整理 | `dcr-pipeline` |
 
 ## 非目標
 

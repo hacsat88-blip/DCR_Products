@@ -15,7 +15,7 @@ composable:
   input_type: growth-brief
   output_type: growth-plan-or-asset
   chains_with:
-    - product-marketing-context
+    - documents-ops
     - verification-before-completion
 metadata:
   origin: DCR local

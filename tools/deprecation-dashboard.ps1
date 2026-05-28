@@ -41,6 +41,8 @@ $rulesDir = Join-Path $RepoRoot ".ai/catalog/rules"
 $skillsDir = Join-Path $RepoRoot ".ai/catalog/skills"
 $agentsDir = Join-Path $RepoRoot ".ai/catalog/agents-source"
 $decisionsPath = Join-Path $RepoRoot ".ai/kernel/router-decisions.jsonl"
+$DeprecatedAliases = Join-Path $RepoRoot "tools\lib\deprecated-aliases.ps1"
+. $DeprecatedAliases
 
 # ── Load decisions log ──
 $callCounts = @{}
@@ -100,7 +102,7 @@ function Get-DeprecationAge {
 }
 
 function Get-ExternalRefs {
-    param([string]$Name, [string]$Kind)
+    param([string]$Name, [string]$Kind, [string]$SourcePath)
     Push-Location $RepoRoot
     try {
         # Scan for references in markdown / config / scripts (exclude self file, .git, generated, history)
@@ -110,12 +112,10 @@ function Get-ExternalRefs {
                 $f = $_
                 $skip = $false
                 foreach ($ex in $exclude) { if ($f -like "$ex/*") { $skip = $true } }
-                # Skip self
-                if ($Kind -eq 'rule' -and $f -eq ".ai/catalog/rules/$Name.md") { $skip = $true }
-                if ($Kind -eq 'skill' -and $f -eq ".ai/catalog/skills/$Name/SKILL.md") { $skip = $true }
-                if ($Kind -eq 'agent' -and ($f -eq ".ai/catalog/agents-source/$Name.md" -or $f -eq ".ai/catalog/agents-source/$Name.toml")) { $skip = $true }
-                # Skip generated documentation that lists deprecated aliases
-                if ($f -in @('CLAUDE.md', 'AGENTS.md', '.ai/catalog/rules/_ROUTING_INDEX.md')) { $skip = $true }
+                if ($SourcePath -and $f -eq $SourcePath) { $skip = $true }
+                if ($Kind -eq 'agent' -and $f -eq ".ai/catalog/agents-source/$Name.toml") { $skip = $true }
+                # Skip generated docs and lifecycle ledgers that intentionally list aliases.
+                if ($f -in @('CLAUDE.md', 'AGENTS.md', '.ai/catalog/rules/_ROUTING_INDEX.md', '.ai/catalog/_deprecated-aliases.json', 'docs/deprecation-removed.md', 'docs/deprecation-candidates.md')) { $skip = $true }
                 -not $skip
             }
         return @($refs)
@@ -127,69 +127,25 @@ function Get-ExternalRefs {
 # ── Collect ──
 $report = New-Object System.Collections.Generic.List[object]
 
-# Rules
-foreach ($f in Get-ChildItem -Path $rulesDir -Filter '*.md' | Where-Object { -not $_.BaseName.StartsWith('_') }) {
-    $fm = Get-Frontmatter -Path $f.FullName
-    if ($fm -and $fm['deprecated'] -eq 'true') {
-        $name = $f.BaseName
-        $age = Get-DeprecationAge -RelativePath ".ai/catalog/rules/$($f.Name)"
-        $refs = Get-ExternalRefs -Name $name -Kind 'rule'
-        $calls = if ($callCounts.ContainsKey($name)) { $callCounts[$name] } else { 0 }
-        $report.Add([pscustomobject]@{
-            kind = 'rule'
-            name = $name
-            successor = $fm['successor']
-            days_deprecated = $age.days
-            since = $age.date
-            calls_window = $calls
-            external_refs = $refs.Count
-            ref_files = ($refs -join '; ')
-        })
+foreach ($alias in Get-DcrDeprecatedAliases -RepoRoot $RepoRoot) {
+    $age = Get-DeprecationAge -RelativePath $alias.source_path
+    if ($alias.state -eq 'removed' -and $alias.removed_at) {
+        $age = @{ days = 0; date = $alias.removed_at }
     }
-}
-
-# Skills
-foreach ($d in Get-ChildItem -Path $skillsDir -Directory | Where-Object { -not $_.Name.StartsWith('_') }) {
-    $sf = Join-Path $d.FullName "SKILL.md"
-    if (-not (Test-Path $sf)) { continue }
-    $fm = Get-Frontmatter -Path $sf
-    if ($fm -and $fm['deprecated'] -eq 'true') {
-        $name = $d.Name
-        $age = Get-DeprecationAge -RelativePath ".ai/catalog/skills/$name/SKILL.md"
-        $refs = Get-ExternalRefs -Name $name -Kind 'skill'
-        $calls = if ($callCounts.ContainsKey($name)) { $callCounts[$name] } else { 0 }
-        $report.Add([pscustomobject]@{
-            kind = 'skill'
-            name = $name
-            successor = $fm['successor']
-            days_deprecated = $age.days
-            since = $age.date
-            calls_window = $calls
-            external_refs = $refs.Count
-            ref_files = ($refs -join '; ')
-        })
-    }
-}
-
-# Agents
-foreach ($f in Get-ChildItem -Path $agentsDir -Filter '*.md' | Where-Object { -not $_.BaseName.StartsWith('_') -and $_.BaseName -ne 'README' }) {
-    $fm = Get-Frontmatter -Path $f.FullName
-    if ($fm -and $fm['deprecated'] -eq 'true') {
-        $name = $f.BaseName
-        $age = Get-DeprecationAge -RelativePath ".ai/catalog/agents-source/$($f.Name)"
-        $refs = Get-ExternalRefs -Name $name -Kind 'agent'
-        $calls = if ($callCounts.ContainsKey($name)) { $callCounts[$name] } else { 0 }
-        $report.Add([pscustomobject]@{
-            kind = 'agent'
-            name = $name
-            successor = $fm['successor']
-            days_deprecated = $age.days
-            since = $age.date
-            calls_window = $calls
-            external_refs = $refs.Count
-            ref_files = ($refs -join '; ')
-        })
-    }
+    $refs = Get-ExternalRefs -Name $alias.name -Kind $alias.kind -SourcePath $alias.source_path
+    $calls = if ($callCounts.ContainsKey($alias.name)) { $callCounts[$alias.name] } else { 0 }
+    $report.Add([pscustomobject]@{
+        kind = $alias.kind
+        name = $alias.name
+        successor = $alias.successor
+        state = $alias.state
+        source_path = $alias.source_path
+        days_deprecated = $age.days
+        since = $age.date
+        calls_window = $calls
+        external_refs = $refs.Count
+        ref_files = ($refs -join '; ')
+    })
 }
 
 # ── Verdict per .ai/module/deprecation-lifecycle.md ──
@@ -227,7 +183,7 @@ if ($Verbose -or $eligible.Count -gt 0 -or $oldButUsed.Count -gt 0) {
     Write-Host ""
     $tableText = $report |
         Sort-Object verdict, days_deprecated -Descending |
-        Select-Object kind, name, successor, days_deprecated, calls_window, external_refs, verdict |
+        Select-Object kind, name, successor, state, days_deprecated, calls_window, external_refs, verdict |
         Format-Table -AutoSize | Out-String
     Write-Host $tableText
 }

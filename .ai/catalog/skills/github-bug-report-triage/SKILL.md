@@ -16,7 +16,6 @@ composable:
   output_type: triage
   chains_with:
     - systematic-debugging
-    - static-analysis
     - dcr-pipeline
 metadata:
   origin: warpdotdev/oz-skills
@@ -25,6 +24,14 @@ metadata:
   license: "MIT"
   imported_at: "2026-05-09"
   adapted_from: "Condensed into a DCR issue/CI triage workflow; not a wholesale external runtime import."
+runtime_targets:
+  - codex
+  - claude
+  - copilot
+  - cursor
+  - windsurf
+  - opencode
+  - gemini-cli
 ---
 
 # GitHub Bug Report Triage

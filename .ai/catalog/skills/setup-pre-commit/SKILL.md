@@ -18,7 +18,7 @@ composable:
   input_type: repo-state
   output_type: hook-config
   chains_with:
-    - supply-chain-security
+    - dcr-pipeline
     - changelog-automation
     - repo-boundary-hygiene
     - tdd-workflow

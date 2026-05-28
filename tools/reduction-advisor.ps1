@@ -46,6 +46,10 @@ param(
 
 $ErrorActionPreference = "Stop"
 $RepoRoot = (Resolve-Path (Join-Path $PSScriptRoot "..")).Path
+$deprecatedAliasLib = Join-Path $RepoRoot "tools/lib/deprecated-aliases.ps1"
+if (Test-Path $deprecatedAliasLib) {
+    . $deprecatedAliasLib
+}
 if ([string]::IsNullOrWhiteSpace($LogPath)) {
     $LogPath = Join-Path $RepoRoot ".ai/kernel/router-decisions.jsonl"
 }
@@ -139,6 +143,27 @@ function Get-CatalogIndex {
     if (Test-Path $agentsDir) {
         foreach ($file in Get-ChildItem -Path $agentsDir -File -Filter "*.md" | Where-Object { -not $_.BaseName.StartsWith("_") -and $_.BaseName -ne "README" }) {
             Add-CatalogAsset -Catalog $catalog -Kind "agent" -Name $file.BaseName -Path $file.FullName -Frontmatter (Get-Frontmatter -Path $file.FullName)
+        }
+    }
+    if (Get-Command Get-DcrDeprecatedAliases -ErrorAction SilentlyContinue) {
+        $existing = @{}
+        foreach ($item in @($catalog)) {
+            $existing["$($item.kind):$($item.name)"] = $true
+        }
+        foreach ($alias in @(Get-DcrDeprecatedAliases -RepoRoot $Root)) {
+            $key = "$($alias.kind):$($alias.name)"
+            if ($existing.ContainsKey($key)) { continue }
+            $successor = @($catalog | Where-Object { $_.kind -eq $alias.kind -and $_.name -eq $alias.successor } | Select-Object -First 1)
+            $catalog.Add([pscustomobject]@{
+                kind = $alias.kind
+                name = $alias.name
+                path = $alias.source_path
+                deprecated = $true
+                successor = $alias.successor
+                parent = ""
+                routing_category = $(if ($successor.Count -gt 0) { $successor[0].routing_category } else { "" })
+                has_hub_metadata = $false
+            }) | Out-Null
         }
     }
     return @($catalog)

@@ -2,6 +2,26 @@
 name: dcr-pipeline
 routing_category: governance
 description: "DCR Kernel のゲート連鎖 (p/ -> 実装 -> q/ -> sh/) を自動管理するパイプラインSkill。実装タスク開始時・完了時・リリース判定時に自動的に次ゲートへ誘導し、各ゲート通過条件をチェックする。Review、QA、security、OWASP、暗号、static analysis、webapp testing、performance、UAT、mobile CI/CD などの旧 pipeline alias skill もここへ畳む。Use when starting implementation tasks, completing features, or preparing for release."
+contract:
+  preconditions:
+    - "The request matches this skill's description or routing category."
+  postconditions:
+    - "The response names the result, reasoning, and verification or handoff path."
+  invariants:
+    - "Do not treat generated mirrors or runtime caches as DCR source of truth."
+composable:
+  input_type: task
+  output_type: artifact-or-decision
+  chains_with:
+    - verification-before-completion
+runtime_targets:
+  - codex
+  - claude
+  - copilot
+  - cursor
+  - windsurf
+  - opencode
+  - gemini-cli
 ---
 
 # DCR Pipeline Skill

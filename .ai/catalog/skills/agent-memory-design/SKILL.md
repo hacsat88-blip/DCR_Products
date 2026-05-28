@@ -16,8 +16,7 @@ composable:
   input_type: context
   output_type: memory-policy
   chains_with:
-    - context-optimization
-    - phase-state-artifacts
+    - governance-ops
     - harness-audit
 metadata:
   origin: rohitg00/agentmemory

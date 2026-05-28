@@ -5,11 +5,11 @@ description: "DCR の skill catalog が飽和している、OpenAI 公式 skills
 contract:
   preconditions:
     - "DCR skill catalog または OpenAI skills cache を参照できる"
-    - "削除ではなく分類・移行方針を先に決める段階である"
+    - "分類・移行方針を先に決め、物理削除は lifecycle 判定後に行う段階である"
   postconditions:
     - "DCR skill が keep / replace-with-openai / merge-into-overlay / fold-into-pipeline / deprecate に分類される"
     - "OpenAI official baseline と DCR local overlay の境界が残る"
-    - "物理削除や user-level installer 実行をせず、次の migration wave が明確になる"
+    - "Stage 4 削除候補は deprecation dashboard で確認され、次の migration wave が明確になる"
   invariants:
     - "OpenAI official skill を丸ごと DCR 正本にコピーしない"
     - "generated mirror や user-level install を source-of-truth にしない"
@@ -71,11 +71,14 @@ DCR の skill catalog を OpenAI 公式 skills を土台にスリム化する。
 3. DCR 固有 skill は `keep` または `merge-into-overlay` に残す。
 4. QA / ship / review / drift / verification 系は `fold-into-pipeline` を優先する。
 5. OpenAI official と同名の skill は内容比較前に deprecated 化しない。
-6. 初回 wave では metadata 追加までに止め、物理削除は次 wave に回す。
+6. `tools/deprecation-dashboard.ps1` を実行し、Stage 4 削除候補だけを物理削除候補にする。
+7. `Removal eligible: 0` のときは、削除ではなく alias を寝かせて次の観測 window に回す。
 
 ## Exact overlap policy
 
 同名 skill は自動置換しない。OpenAI official と名前が一致しても、DCR 側の `docs/dcr/*` パス、proposal/approval gate、source-of-truth/mirror governance、Windows/PowerShell 運用が残る場合は `merge-into-overlay` とする。
+
+同名 overlay は、DCR 固有差分を frontmatter の `baseline.role: overlay` と `baseline.local_delta` に明記する。本文は OpenAI official の汎用手順を再コピーせず、DCR 固有の成果物、承認、検証、Windows/PowerShell 差分だけを保つ。
 
 比較済みの初回 exact overlap は次の扱いにする。
 
@@ -130,12 +133,32 @@ Governance 系は DCR 中核を残し、外部由来・汎用 pattern だけを 
 |---|---|
 | `governance-ops` | `advanced-evaluation`, `agent-evaluation`, `agent-overload-recovery`, `context-compression`, `context-degradation`, `context-optimization`, `decision-complete-planning`, `domain-decision-grilling`, `namespace-skill-routing`, `parallel-agent-patterns`, `parallel-wave-execution`, `phase-state-artifacts`, `rules-distill`, `strategic-compact` |
 
+## Physical deletion wave
+
+物理削除は OpenAI baseline 移行とは別の Stage 4 操作として扱う。`deprecated: true` と `successor` があるだけでは削除しない。
+
+Deprecated alias は live frontmatter と tombstone registry の両方から読む。通常は live frontmatter が正本で、物理削除後だけ `.ai/catalog/_deprecated-aliases.json` に `state: removed` の tombstone を残す。registry は `tools/lib/deprecated-aliases.ps1` 経由で読む。
+
+削除候補の条件:
+
+- `tools/deprecation-dashboard.ps1` が `ELIGIBLE-FOR-REMOVAL` を返す
+- `docs/deprecation-candidates.md` に候補として出る
+- 直近 window の alias 呼び出しが 0
+- 外部参照が 0
+- `.ai/catalog/_deprecated-aliases.json` に `removed` tombstone を残せる
+- `docs/deprecation-removed.md` に削除実績を追記できる
+
+`Removal eligible: 0` のときは削除を進めず、alias を残して routing の安定性を観測する。
+
 ## コマンド
 
 ```powershell
 .\tools\audit-openai-skills.ps1
 .\tools\audit-openai-skills.ps1 -ShowCandidates
 .\tools\audit-openai-skills.ps1 -AsJson
+.\tools\deprecation-dashboard.ps1
+.\tools\deprecation-dashboard.ps1 -OutputMarkdown
+. .\tools\lib\deprecated-aliases.ps1; Get-DcrDeprecatedAliases -RepoRoot .
 ```
 
 ## 出力テンプレート
@@ -151,6 +174,7 @@ OPENAI SKILLS CATALOG AUDIT
 - deprecated growth umbrella aliases:
 - deprecated documents umbrella aliases:
 - deprecated governance umbrella aliases:
+- Stage 4 removal candidates:
 - target reduction:
 - replace-with-openai:
 - merge-into-overlay:

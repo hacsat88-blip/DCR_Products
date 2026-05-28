@@ -4,6 +4,26 @@ routing_category: devops
 description: Test-driven development workflow. Write tests first, then implement, with 80%+ coverage target. Use when implementing any feature or bugfix, before writing implementation code.
 metadata:
   origin: ECC (adapted for DCR)
+contract:
+  preconditions:
+    - "The request matches this skill's description or routing category."
+  postconditions:
+    - "The response names the result, reasoning, and verification or handoff path."
+  invariants:
+    - "Do not treat generated mirrors or runtime caches as DCR source of truth."
+composable:
+  input_type: task
+  output_type: artifact-or-decision
+  chains_with:
+    - verification-before-completion
+runtime_targets:
+  - codex
+  - claude
+  - copilot
+  - cursor
+  - windsurf
+  - opencode
+  - gemini-cli
 ---
 
 # TDD Workflow — テスト駆動開発

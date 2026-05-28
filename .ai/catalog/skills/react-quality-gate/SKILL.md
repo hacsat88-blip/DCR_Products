@@ -18,9 +18,7 @@ composable:
   input_type: react-codebase
   output_type: quality-report
   chains_with:
-    - static-analysis
-    - webapp-testing
-    - performance-profiling
+    - dcr-pipeline
     - verification-before-completion
 metadata:
   origin: millionco/react-doctor
@@ -54,7 +52,7 @@ React Doctor は外部 diagnostic CLI として扱う。DCR の正本、agent ro
 - agent が生成した React に不安がある
 - hooks、effects、state、memoization、bundle size、accessibility、security の劣化を見たい
 - PR 前に React 専用の regression gate を足したい
-- `webapp-testing` の前に静的な React 品質チェックを済ませたい
+- `dcr-pipeline` の前に静的な React 品質チェックを済ませたい
 
 ## 基本方針
 
@@ -125,9 +123,7 @@ Action 側が内部で `npx react-doctor@latest` を使う可能性があるた�
 
 ## 他 skill とのつなぎ
 
-- `static-analysis`: lint / typecheck / dependency scan と合わせて判断する
-- `webapp-testing`: ブラウザ上の挙動、console、DOM、スクショ確認へ進む
-- `performance-profiling`: React Doctor が performance / bundle size を示したら測定で裏付ける
+- `dcr-pipeline`: lint / typecheck / browser QA / performance 測定と合わせて判断する
 - `accessibility-auditor`: accessibility 診断は自動検査だけで完了扱いにしない
 
 ## 出力テンプレート
