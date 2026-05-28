@@ -1,7 +1,7 @@
 ---
 name: verification-before-completion
 routing_category: devops
-description: Use when about to claim work is complete, fixed, or passing, before committing or creating PRs - requires running verification commands and confirming output before making any success claims; evidence before assertions always
+description: "OpenAI verification-before-completion baseline with a thin DCR overlay for deploy/check/validate evidence, generated mirror drift evidence, and P3 approval constraints."
 contract:
   preconditions:
     - "implementation work is believed to be complete"
@@ -39,155 +39,20 @@ package:
 ## OpenAI Baseline Overlay
 
 Use the OpenAI official verification-before-completion skill as the behavioral
-baseline. This DCR skill only adds local evidence requirements: `deploy.ps1`,
-`deploy.ps1 -Check`, `validate.ps1`, generated mirror drift checks, and DCR
-approval constraints. Keep generic verification doctrine upstream.
+baseline. This DCR overlay only adds local proof requirements.
 
-## Overview
+## Activation Boundary
 
-Claiming work is complete without verification is dishonesty, not efficiency.
+- Use before claiming work is done, fixed, deployed, synced, or safe.
+- Do not rely on prior runs, generated text, or agent reports as proof.
+- If verification requires deletion, push, external write, or P3 action, confirm approval first.
 
-**Core principle:** Evidence before claims, always.
+## DCR Local Delta
 
-**Violating the letter of this rule is violating the spirit of this rule.**
+- For catalog/routing changes, verify `_SKILLS_ROUTING_INDEX.md`, `deploy.ps1`, `deploy.ps1 -Check`, and `validate.ps1`.
+- For generated mirrors, report whether drift is in tracked entrypoints or user-level mirrors.
+- For Windows permission failures, state whether the rerun required elevated/out-of-sandbox execution.
 
-## The Iron Law
+## Output
 
-```
-NO COMPLETION CLAIMS WITHOUT FRESH VERIFICATION EVIDENCE
-```
-
-If you haven't run the verification command in this message, you cannot claim it passes.
-
-## The Gate Function
-
-```
-BEFORE claiming any status or expressing satisfaction:
-
-1. IDENTIFY: What command proves this claim?
-2. RUN: Execute the FULL command (fresh, complete)
-3. READ: Full output, check exit code, count failures
-4. VERIFY: Does output confirm the claim?
-   - If NO: State actual status with evidence
-   - If YES: State claim WITH evidence
-5. ONLY THEN: Make the claim
-
-Skip any step = lying, not verifying
-```
-
-## Common Failures
-
-| Claim | Requires | Not Sufficient |
-|-------|----------|----------------|
-| Tests pass | Test command output: 0 failures | Previous run, "should pass" |
-| Linter clean | Linter output: 0 errors | Partial check, extrapolation |
-| Build succeeds | Build command: exit 0 | Linter passing, logs look good |
-| Bug fixed | Test original symptom: passes | Code changed, assumed fixed |
-| Regression test works | Red-green cycle verified | Test passes once |
-| Agent completed | VCS diff shows changes | Agent reports "success" |
-| Requirements met | Line-by-line checklist | Tests passing |
-
-## Red Flags - STOP
-
-- Using "should", "probably", "seems to"
-- Expressing satisfaction before verification ("Great!", "Perfect!", "Done!", etc.)
-- About to commit/push/PR without verification
-- Trusting agent success reports
-- Relying on partial verification
-- Thinking "just this once"
-- Tired and wanting work over
-- **ANY wording implying success without having run verification**
-
-## Rationalization Prevention
-
-| Excuse | Reality |
-|--------|---------|
-| "Should work now" | RUN the verification |
-| "I'm confident" | Confidence ≠ evidence |
-| "Just this once" | No exceptions |
-| "Linter passed" | Linter ≠ compiler |
-| "Agent said success" | Verify independently |
-| "I'm tired" | Exhaustion ≠ excuse |
-| "Partial check is enough" | Partial proves nothing |
-| "Different words so rule doesn't apply" | Spirit over letter |
-
-## Key Patterns
-
-**Tests:**
-```
-✅ [Run test command] [See: 34/34 pass] "All tests pass"
-❌ "Should pass now" / "Looks correct"
-```
-
-**Regression tests (TDD Red-Green):**
-```
-✅ Write → Run (pass) → Revert fix → Run (MUST FAIL) → Restore → Run (pass)
-❌ "I've written a regression test" (without red-green verification)
-```
-
-**Build:**
-```
-✅ [Run build] [See: exit 0] "Build passes"
-❌ "Linter passed" (linter doesn't check compilation)
-```
-
-**Requirements:**
-```
-✅ Re-read plan → Create checklist → Verify each → Report gaps or completion
-❌ "Tests pass, phase complete"
-```
-
-**Agent delegation:**
-```
-✅ Agent reports success → Check VCS diff → Verify changes → Report actual state
-❌ Trust agent report
-```
-
-## Why This Matters
-
-From 24 failure memories:
-- your human partner said "I don't believe you" - trust broken
-- Undefined functions shipped - would crash
-- Missing requirements shipped - incomplete features
-- Time wasted on false completion → redirect → rework
-- Violates: "Honesty is a core value. If you lie, you'll be replaced."
-
-## When To Apply
-
-**ALWAYS before:**
-- ANY variation of success/completion claims
-- ANY expression of satisfaction
-- ANY positive statement about work state
-- Committing, PR creation, task completion
-- Moving to next task
-- Delegating to agents
-
-**Rule applies to:**
-- Exact phrases
-- Paraphrases and synonyms
-- Implications of success
-- ANY communication suggesting completion/correctness
-
-## The Bottom Line
-
-**No shortcuts for verification.**
-
-Run the command. Read the output. THEN claim the result.
-
-This is non-negotiable.
-
-## Manus Pattern Validation (Phase 1+)
-
-If a `progress.md` file exists in the current session directory, verification-before-completion MUST validate the Manus checklist before allowing completion.
-
-**Validation Steps:**
-1. Check if progress.md exists in session directory (e.g., ~/.config/dcr/worktrees/<project>/<task>/)
-2. Parse "## Completion Checklist" section
-3. Count completed items (marked `- [x]`)
-4. If any items are incomplete (`- [ ]`): BLOCK completion, list incomplete items
-5. If all items complete: ALLOW completion, proceed with git commit (if .dcr/config.json: commit_session_files=true)
-
-**User Error Prevention:**
-- Incomplete items show red ❌ with item name
-- Completed items show green ✅
-- Clear next steps: "Complete [item X] in task_plan.md"
+Report each command with pass/fail status, the relevant count or success line, and any residual risk. If a command was skipped, state why.

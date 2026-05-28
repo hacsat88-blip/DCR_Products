@@ -346,5 +346,88 @@
     "proposal_previous_status": "proposed",
     "proposal_next_status": "rejected",
     "note": "Reject vocabulary stops execution."
+  },
+  {
+    "input": "ADRを作って設計判断を残したい",
+    "kind": "skill",
+    "expected": "documents-ops",
+    "expected_alias_from": "adr-management",
+    "match_keywords": ["ADR", "docs"],
+    "note": "Documents umbrella should absorb ADR/documentation aliases."
+  },
+  {
+    "input": "PDFの内容を確認して要約したい",
+    "kind": "skill",
+    "expected": "documents-ops",
+    "expected_alias_from": "pdf",
+    "match_keywords": ["PDF", "document"],
+    "note": "Documents umbrella should absorb Office/PDF aliases while OpenAI runtime is the baseline."
+  },
+  {
+    "input": "context-compression で長い会話を圧縮したい",
+    "kind": "skill",
+    "expected": "governance-ops",
+    "expected_alias_from": "context-compression",
+    "match_keywords": ["context", "compression"],
+    "note": "Governance umbrella should absorb context-health aliases."
+  },
+  {
+    "input": "static-analysis で lint と危険パターンを見たい",
+    "kind": "skill",
+    "expected": "dcr-pipeline",
+    "expected_alias_from": "static-analysis",
+    "match_keywords": ["static analysis", "QA"],
+    "note": "Pipeline umbrella should absorb static analysis aliases."
+  },
+  {
+    "input": "contract-testing でAPI互換性を確認したい",
+    "kind": "skill",
+    "expected": "dcr-pipeline",
+    "expected_alias_from": "contract-testing",
+    "match_keywords": ["QA", "gate"],
+    "note": "Pipeline umbrella should absorb contract-testing aliases."
+  },
+  {
+    "input": "OpenAI baseline に寄せた skill audit をしたい",
+    "kind": "skill",
+    "expected": "openai-skills-catalog-audit",
+    "match_keywords": ["OpenAI", "baseline"],
+    "note": "OpenAI catalog audit remains an active DCR overlay."
+  },
+  {
+    "input": "ブレストしてからDCRのspecに落としたい",
+    "kind": "skill",
+    "expected": "brainstorming",
+    "match_keywords": ["baseline", "spec"],
+    "note": "Exact overlap brainstorming remains active as a DCR overlay."
+  },
+  {
+    "input": "実装計画をdocs/dcr/plansに残したい",
+    "kind": "skill",
+    "expected": "writing-plans",
+    "match_keywords": ["plans", "source-of-truth"],
+    "note": "Exact overlap writing-plans remains active as a DCR overlay."
+  },
+  {
+    "input": "worktree を切って安全に作業したい",
+    "kind": "skill",
+    "expected": "using-git-worktrees",
+    "match_keywords": ["worktree", "source-of-truth"],
+    "note": "Exact overlap worktree guidance remains active as a DCR overlay."
+  },
+  {
+    "input": "設定ファイルのシークレットだけ浅くスキャンしたい",
+    "kind": "skill",
+    "expected": "security-scan",
+    "match_keywords": ["secrets", "shallow"],
+    "note": "Shallow config security stays in security-scan."
+  },
+  {
+    "input": "OWASPと暗号まで深くセキュリティレビューしたい",
+    "kind": "skill",
+    "expected": "dcr-pipeline",
+    "expected_alias_from": "security-deepdive",
+    "match_keywords": ["security", "OWASP", "暗号"],
+    "note": "Deep security routes through the pipeline/OpenAI security baseline rather than shallow security-scan."
   }
 ]

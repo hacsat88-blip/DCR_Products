@@ -1,0 +1,5 @@
+{
+  "version": 1,
+  "description": "Tombstone registry for deprecated DCR aliases after their source files are physically removed. Live deprecated aliases are still discovered from frontmatter and merged with this registry.",
+  "aliases": []
+}

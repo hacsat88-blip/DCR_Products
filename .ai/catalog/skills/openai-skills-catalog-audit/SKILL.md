@@ -137,12 +137,15 @@ Governance 系は DCR 中核を残し、外部由来・汎用 pattern だけを 
 
 物理削除は OpenAI baseline 移行とは別の Stage 4 操作として扱う。`deprecated: true` と `successor` があるだけでは削除しない。
 
+Deprecated alias は live frontmatter と tombstone registry の両方から読む。通常は live frontmatter が正本で、物理削除後だけ `.ai/catalog/_deprecated-aliases.json` に `state: removed` の tombstone を残す。registry は `tools/lib/deprecated-aliases.ps1` 経由で読む。
+
 削除候補の条件:
 
 - `tools/deprecation-dashboard.ps1` が `ELIGIBLE-FOR-REMOVAL` を返す
 - `docs/deprecation-candidates.md` に候補として出る
 - 直近 window の alias 呼び出しが 0
 - 外部参照が 0
+- `.ai/catalog/_deprecated-aliases.json` に `removed` tombstone を残せる
 - `docs/deprecation-removed.md` に削除実績を追記できる
 
 `Removal eligible: 0` のときは削除を進めず、alias を残して routing の安定性を観測する。
@@ -155,6 +158,7 @@ Governance 系は DCR 中核を残し、外部由来・汎用 pattern だけを 
 .\tools\audit-openai-skills.ps1 -AsJson
 .\tools\deprecation-dashboard.ps1
 .\tools\deprecation-dashboard.ps1 -OutputMarkdown
+. .\tools\lib\deprecated-aliases.ps1; Get-DcrDeprecatedAliases -RepoRoot .
 ```
 
 ## 出力テンプレート
