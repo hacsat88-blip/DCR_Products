@@ -37,6 +37,14 @@ targets:
   - cursor
   - claude
   - codex
+runtime_targets:
+  - codex
+  - claude
+  - copilot
+  - cursor
+  - windsurf
+  - opencode
+  - gemini-cli
 ---
 
 # Writing Plans

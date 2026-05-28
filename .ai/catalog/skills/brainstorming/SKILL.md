@@ -32,6 +32,14 @@ package:
   tags:
     - planning
     - ideation
+runtime_targets:
+  - codex
+  - claude
+  - copilot
+  - cursor
+  - windsurf
+  - opencode
+  - gemini-cli
 ---
 
 # Brainstorming Ideas Into Designs

@@ -4,6 +4,26 @@ routing_category: ui-ux
 description: Toolkit for styling artifacts with a theme. These artifacts can be slides, docs, reportings, HTML landing pages, etc. There are 10 pre-set themes with colors/fonts that you can apply to any artifact that has been creating, or can generate a new theme on-the-fly.
 license: Complete terms in LICENSE.txt
 disable-model-invocation: true
+contract:
+  preconditions:
+    - "The request matches this skill's description or routing category."
+  postconditions:
+    - "The response names the result, reasoning, and verification or handoff path."
+  invariants:
+    - "Do not treat generated mirrors or runtime caches as DCR source of truth."
+composable:
+  input_type: task
+  output_type: artifact-or-decision
+  chains_with:
+    - verification-before-completion
+runtime_targets:
+  - codex
+  - claude
+  - copilot
+  - cursor
+  - windsurf
+  - opencode
+  - gemini-cli
 ---
 
 

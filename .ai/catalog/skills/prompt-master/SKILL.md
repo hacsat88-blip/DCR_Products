@@ -4,6 +4,26 @@ routing_category: governance
 description: Use this skill whenever the user asks to create, rewrite, optimize, compare, or systematize prompts for chat-style use, GPTs/custom assistants, project instructions, system prompts, agent prompts, or prompt templates. Trigger on phrases like "prompt generator", "prompt-master", "system prompt", "GPTs", "project prompt", "rewrite this prompt", "improve my prompt", or "prompt template".
 metadata:
   origin: prompt-master (adapted for DCR unified operation)
+contract:
+  preconditions:
+    - "The request matches this skill's description or routing category."
+  postconditions:
+    - "The response names the result, reasoning, and verification or handoff path."
+  invariants:
+    - "Do not treat generated mirrors or runtime caches as DCR source of truth."
+composable:
+  input_type: task
+  output_type: artifact-or-decision
+  chains_with:
+    - verification-before-completion
+runtime_targets:
+  - codex
+  - claude
+  - copilot
+  - cursor
+  - windsurf
+  - opencode
+  - gemini-cli
 ---
 
 # Prompt Master

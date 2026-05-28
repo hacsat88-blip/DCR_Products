@@ -4,6 +4,26 @@ routing_category: devops
 description: Suite of tools for creating elaborate, multi-component claude.ai HTML artifacts using modern frontend web technologies (React, Tailwind CSS, shadcn/ui). Use for complex artifacts requiring state management, routing, shadcn/ui components, or Generative UI prototypes - not for simple single-file HTML/JSX artifacts.
 license: Complete terms in LICENSE.txt
 disable-model-invocation: true
+contract:
+  preconditions:
+    - "The request matches this skill's description or routing category."
+  postconditions:
+    - "The response names the result, reasoning, and verification or handoff path."
+  invariants:
+    - "Do not treat generated mirrors or runtime caches as DCR source of truth."
+composable:
+  input_type: task
+  output_type: artifact-or-decision
+  chains_with:
+    - verification-before-completion
+runtime_targets:
+  - codex
+  - claude
+  - copilot
+  - cursor
+  - windsurf
+  - opencode
+  - gemini-cli
 ---
 
 # Web Artifacts Builder

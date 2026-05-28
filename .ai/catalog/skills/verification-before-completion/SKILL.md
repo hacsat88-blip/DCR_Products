@@ -32,6 +32,14 @@ package:
   tags:
     - verification
     - quality
+runtime_targets:
+  - codex
+  - claude
+  - copilot
+  - cursor
+  - windsurf
+  - opencode
+  - gemini-cli
 ---
 
 # Verification Before Completion

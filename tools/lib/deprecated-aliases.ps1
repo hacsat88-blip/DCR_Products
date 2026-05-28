@@ -34,7 +34,10 @@ function New-DcrDeprecatedAliasRow {
         [string]$State,
         [string]$SourcePath,
         [string]$Reason,
-        [string]$Source
+        [string]$Source,
+        [string]$RemovedAt = "",
+        [string]$RemovalPolicy = "",
+        [string]$RemovedBy = ""
     )
 
     [pscustomobject]@{
@@ -45,6 +48,9 @@ function New-DcrDeprecatedAliasRow {
         source_path = $SourcePath
         reason = $Reason
         source = $Source
+        removed_at = $RemovedAt
+        removal_policy = $RemovalPolicy
+        removed_by = $RemovedBy
     }
 }
 
@@ -102,7 +108,10 @@ function Get-DcrDeprecatedAliases {
                 -State $alias.state `
                 -SourcePath $alias.source_path `
                 -Reason $alias.reason `
-                -Source "registry")
+                -Source "registry" `
+                -RemovedAt $alias.removed_at `
+                -RemovalPolicy $alias.removal_policy `
+                -RemovedBy $alias.removed_by)
         }
     }
 

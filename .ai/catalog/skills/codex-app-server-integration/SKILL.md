@@ -22,7 +22,7 @@ composable:
     - structured-output
     - streaming-design
     - security-scan
-    - docs-update
+    - documents-ops
 metadata:
   origin: local-dcr
   reference_url: "https://note.com/masa_wunder/n/n53f45b621510"

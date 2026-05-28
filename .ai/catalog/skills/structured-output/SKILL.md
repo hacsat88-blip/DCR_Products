@@ -3,6 +3,26 @@ name: structured-output
 routing_category: devops
 description: "LLM構造化出力設計：Pydantic/Zodスキーマ・JSON mode・Structured Outputs・Generative UI DSL・バリデーション・型安全パース"
 disable-model-invocation: true
+contract:
+  preconditions:
+    - "The request matches this skill's description or routing category."
+  postconditions:
+    - "The response names the result, reasoning, and verification or handoff path."
+  invariants:
+    - "Do not treat generated mirrors or runtime caches as DCR source of truth."
+composable:
+  input_type: task
+  output_type: artifact-or-decision
+  chains_with:
+    - verification-before-completion
+runtime_targets:
+  - codex
+  - claude
+  - copilot
+  - cursor
+  - windsurf
+  - opencode
+  - gemini-cli
 ---
 
 # Structured Output

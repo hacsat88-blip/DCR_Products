@@ -18,9 +18,8 @@ composable:
   input_type: design-intent
   output_type: design-alternatives
   chains_with:
-    - domain-decision-grilling
-    - decision-complete-planning
-    - adr-management
+    - governance-ops
+    - documents-ops
     - improve-codebase-architecture
 metadata:
   origin: mattpocock/skills
@@ -65,7 +64,7 @@ API・UI コンポーネント・モジュール境界の設計で、最初に�
 
 ### Step 1: スコープ確定
 
-設計対象を 1 文で書く。曖昧なら `domain-decision-grilling` に戻る。
+設計対象を 1 文で書く。曖昧なら `governance-ops` に戻る。
 
 ```
 対象: <module / component / API>
@@ -123,7 +122,7 @@ Interface Design Alternatives
 - Recommended: A (reason)
 - Rejected: B (reason), C (reason)
 - ADR candidate: yes/no
-- Next skill: decision-complete-planning | adr-management
+- Next skill: governance-ops | documents-ops
 ```
 
 ## 失敗モード

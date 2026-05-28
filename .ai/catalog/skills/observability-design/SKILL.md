@@ -28,6 +28,14 @@ package:
     - observability
     - monitoring
     - operations
+runtime_targets:
+  - codex
+  - claude
+  - copilot
+  - cursor
+  - windsurf
+  - opencode
+  - gemini-cli
 ---
 
 # Observability Design

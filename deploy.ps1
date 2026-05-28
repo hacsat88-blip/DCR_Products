@@ -43,6 +43,8 @@ $RepoRoot = $PSScriptRoot
 $UserHome = $env:USERPROFILE
 $CatalogPaths = Join-Path $RepoRoot "tools\lib\catalog-paths.ps1"
 . $CatalogPaths
+$DeprecatedAliases = Join-Path $RepoRoot "tools\lib\deprecated-aliases.ps1"
+. $DeprecatedAliases
 
 # ── Gate enforcement ──
 if ($EnforceGate) {
@@ -297,7 +299,7 @@ function Sync-Directory {
         return
     }
 
-    $sourceItems = Get-ChildItem $Source -Directory |
+    $sourceItems = Get-ChildItem $Source -Directory -Force |
     Where-Object { $_.Name -notlike "_*" }
     $sourceNames = @($sourceItems | Select-Object -ExpandProperty Name)
     $count = $sourceItems.Count
@@ -306,7 +308,7 @@ function Sync-Directory {
         Write-Host "[DRY RUN] $Label : $count items -> $Destination" -ForegroundColor Yellow
         $sourceItems | ForEach-Object { Write-Host "  $_" }
         if (Test-Path $Destination) {
-            $extraItems = Get-ChildItem $Destination -Directory | Where-Object { $_.Name -notin $sourceNames }
+            $extraItems = Get-ChildItem $Destination -Directory -Force | Where-Object { $_.Name -notin $sourceNames }
             $extraItems | ForEach-Object { Write-Host "  [REMOVE] $($_.FullName)" -ForegroundColor DarkYellow }
         }
         return
@@ -321,7 +323,7 @@ function Sync-Directory {
     }
 
     $destinationRoot = (Resolve-Path -LiteralPath $Destination).Path
-    $extraItems = Get-ChildItem $destinationRoot -Directory | Where-Object { $_.Name -notin $sourceNames }
+    $extraItems = Get-ChildItem $destinationRoot -Directory -Force | Where-Object { $_.Name -notin $sourceNames }
     foreach ($extra in $extraItems) {
         $resolvedExtra = (Resolve-Path -LiteralPath $extra.FullName).Path
         if (-not $resolvedExtra.StartsWith($destinationRoot + [System.IO.Path]::DirectorySeparatorChar, [System.StringComparison]::OrdinalIgnoreCase)) {
@@ -338,45 +340,15 @@ function Write-DeprecationSummary {
         [string]$CatalogRoot
     )
 
-    if (-not (Test-Path $CatalogRoot)) {
-        Write-Host "[WARN] Catalog root not found: $CatalogRoot" -ForegroundColor Yellow
-        return
-    }
-
-    $deprecatedEntries = @()
-    $ruleFiles = Get-ChildItem -Path (Join-Path $CatalogRoot "rules") -File -Filter *.md -Recurse -ErrorAction SilentlyContinue
-    $skillFiles = Get-ChildItem -Path (Join-Path $CatalogRoot "skills") -File -Filter SKILL.md -Recurse -ErrorAction SilentlyContinue
-    $agentFiles = Get-ChildItem -Path (Join-Path $CatalogRoot "agents-source") -File -Filter *.md -Recurse -ErrorAction SilentlyContinue
-
-    foreach ($file in $ruleFiles) {
-        $content = Get-Content -Path $file.FullName -Raw -Encoding utf8
-        if ($content -match '(?m)^\s*deprecated\s*:\s*true\s*$') {
-            $name = $file.BaseName
-            $successor = ''
-            if ($content -match '(?m)^\s*successor\s*:\s*(.+)\s*$') { $successor = $matches[1].Trim() }
-            $deprecatedEntries += [pscustomobject]@{ Kind = 'rule'; Name = $name; Successor = $successor }
-        }
-    }
-
-    foreach ($file in $skillFiles) {
-        $content = Get-Content -Path $file.FullName -Raw -Encoding utf8
-        if ($content -match '(?m)^\s*deprecated\s*:\s*true\s*$') {
-            $name = Split-Path $file.DirectoryName -Leaf
-            $successor = ''
-            if ($content -match '(?m)^\s*successor\s*:\s*(.+)\s*$') { $successor = $matches[1].Trim() }
-            $deprecatedEntries += [pscustomobject]@{ Kind = 'skill'; Name = $name; Successor = $successor }
-        }
-    }
-
-    foreach ($file in $agentFiles) {
-        $content = Get-Content -Path $file.FullName -Raw -Encoding utf8
-        if ($content -match '(?m)^\s*deprecated\s*:\s*true\s*$') {
-            $name = $file.BaseName
-            $successor = ''
-            if ($content -match '(?m)^\s*successor\s*:\s*(.+)\s*$') { $successor = $matches[1].Trim() }
-            $deprecatedEntries += [pscustomobject]@{ Kind = 'agent'; Name = $name; Successor = $successor }
-        }
-    }
+    $deprecatedEntries = @(Get-DcrDeprecatedAliases -RepoRoot $RepoRoot |
+        ForEach-Object {
+            [pscustomobject]@{
+                Kind = $_.kind
+                Name = $_.name
+                Successor = $_.successor
+                State = $_.state
+            }
+        })
 
     if ($deprecatedEntries.Count -eq 0) {
         Write-Host "No deprecated aliases found." -ForegroundColor DarkGray
@@ -391,6 +363,7 @@ function Write-DeprecationSummary {
     foreach ($entry in $deprecatedEntries | Sort-Object Kind, Name) {
         $line = "  - $($entry.Kind): $($entry.Name)"
         if ($entry.Successor) { $line += " -> $($entry.Successor)" }
+        if ($entry.State -eq "removed") { $line += " [removed]" }
         Write-Host $line -ForegroundColor DarkGray
     }
 }
@@ -415,7 +388,7 @@ function Get-DirectoryDrift {
         return $diffs
     }
 
-    $destFiles = Get-ChildItem $Destination -Recurse -File | Where-Object { $_.Name -notin $IgnoreNames }
+    $destFiles = Get-ChildItem $Destination -Recurse -File -Force | Where-Object { $_.Name -notin $IgnoreNames }
     foreach ($df in $destFiles) {
         $relativePath = $df.FullName.Substring($Destination.Length + 1)
         $sourceFile = Join-Path $Source $relativePath
@@ -431,7 +404,7 @@ function Get-DirectoryDrift {
         }
     }
 
-    $sourceFiles = Get-ChildItem $Source -Recurse -File | Where-Object { $_.Name -notin $IgnoreNames }
+    $sourceFiles = Get-ChildItem $Source -Recurse -File -Force | Where-Object { $_.Name -notin $IgnoreNames }
     foreach ($sf in $sourceFiles) {
         $relativePath = $sf.FullName.Substring($Source.Length + 1)
         # Skip root-level _* files - Sync-Directory copies only subdirectories (not root files)
@@ -465,8 +438,8 @@ function Get-FlatFileDrift {
         return $diffs
     }
 
-    $sourceFiles = Get-ChildItem $Source -File -Filter $Filter | Where-Object { $_.Name -notin $IgnoreNames }
-    $destFiles = Get-ChildItem $Destination -File -Filter $Filter | Where-Object { $_.Name -notin $IgnoreNames }
+    $sourceFiles = Get-ChildItem $Source -File -Filter $Filter -Force | Where-Object { $_.Name -notin $IgnoreNames }
+    $destFiles = Get-ChildItem $Destination -File -Filter $Filter -Force | Where-Object { $_.Name -notin $IgnoreNames }
 
     foreach ($sf in $sourceFiles) {
         $destFile = Join-Path $Destination $sf.Name

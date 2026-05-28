@@ -27,6 +27,8 @@ $ErrorActionPreference = "Stop"
 $resolvedRoot = (Resolve-Path $RepoRoot).Path
 $CatalogPaths = Join-Path $resolvedRoot "tools\lib\catalog-paths.ps1"
 . $CatalogPaths
+$DeprecatedAliases = Join-Path $resolvedRoot "tools\lib\deprecated-aliases.ps1"
+. $DeprecatedAliases
 
 $skillsRoot = Resolve-DcrSourcePath -RepoRoot $resolvedRoot -AssetType "skills"
 
@@ -245,6 +247,7 @@ function Get-Classification {
 }
 
 $dcrSkills = @(Get-DcrSkills)
+$deprecatedSkillAliases = @(Get-DcrDeprecatedAliases -RepoRoot $resolvedRoot -Kind skill)
 $openAiSkills = @(Get-OpenAiBaselineSkills)
 $openAiByName = @{}
 foreach ($skill in $openAiSkills) {
@@ -318,10 +321,12 @@ $report = [pscustomobject]@{
     OpenAiBaselineSkillCount = ($openAiSkills | Select-Object -ExpandProperty Name -Unique).Count
     ExactOverlapCount = @($classified | Where-Object { $_.OpenAiExactMatch }).Count
     ReviewedExactOverlapCount = @($classified | Where-Object { $_.ReviewedExactOverlap }).Count
-    PipelineAliasCount = @($classified | Where-Object { $_.Deprecated -and $_.Successor -eq "dcr-pipeline" }).Count
-    GrowthUmbrellaAliasCount = @($classified | Where-Object { $_.Deprecated -and $_.Successor -eq "growth-ops" }).Count
-    DocumentsUmbrellaAliasCount = @($classified | Where-Object { $_.Deprecated -and $_.Successor -eq "documents-ops" }).Count
-    GovernanceUmbrellaAliasCount = @($classified | Where-Object { $_.Deprecated -and $_.Successor -eq "governance-ops" }).Count
+    RemovedSkillAliasCount = @($deprecatedSkillAliases | Where-Object { $_.state -eq "removed" }).Count
+    LiveDeprecatedSkillAliasCount = @($deprecatedSkillAliases | Where-Object { $_.state -eq "live" }).Count
+    PipelineAliasCount = @($deprecatedSkillAliases | Where-Object { $_.Successor -eq "dcr-pipeline" }).Count
+    GrowthUmbrellaAliasCount = @($deprecatedSkillAliases | Where-Object { $_.Successor -eq "growth-ops" }).Count
+    DocumentsUmbrellaAliasCount = @($deprecatedSkillAliases | Where-Object { $_.Successor -eq "documents-ops" }).Count
+    GovernanceUmbrellaAliasCount = @($deprecatedSkillAliases | Where-Object { $_.Successor -eq "governance-ops" }).Count
     TargetSkillCount = 70
     CandidateReductionCount = @($classified | Where-Object { $_.Classification -in @("replace-with-openai", "merge-into-overlay", "fold-into-pipeline", "deprecate") }).Count
     ClassificationSummary = @($classificationSummary)
@@ -343,6 +348,8 @@ Write-Host "DCR skills: $($report.DcrSkillCount)"
 Write-Host "OpenAI baseline skills: $($report.OpenAiBaselineSkillCount)"
 Write-Host "Exact overlaps: $($report.ExactOverlapCount)"
 Write-Host "Reviewed exact overlaps: $($report.ReviewedExactOverlapCount)"
+Write-Host "Live deprecated skill aliases: $($report.LiveDeprecatedSkillAliasCount)"
+Write-Host "Removed skill alias tombstones: $($report.RemovedSkillAliasCount)"
 Write-Host "Deprecated pipeline aliases: $($report.PipelineAliasCount)"
 Write-Host "Deprecated growth umbrella aliases: $($report.GrowthUmbrellaAliasCount)"
 Write-Host "Deprecated documents umbrella aliases: $($report.DocumentsUmbrellaAliasCount)"

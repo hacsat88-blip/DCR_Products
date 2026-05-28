@@ -3,6 +3,26 @@ name: ui-ux-pro-max
 routing_category: ui-ux
 description: "Use when: designing UI, building landing pages, dashboards, reviewing code for UX issues, checking accessibility, auditing design systems. Generates design system recommendations, suggests styles/colors/typography by product type, provides stack-specific guidelines (React, Next.js, Vue, Svelte, Tailwind, shadcn, mobile). Actions: plan, build, create, design, implement, review, fix, improve, check accessibility. Also use when asked 'review my UI', 'design system', 'should this be accessible', 'pick a style'."
 disable-model-invocation: true
+contract:
+  preconditions:
+    - "The request matches this skill's description or routing category."
+  postconditions:
+    - "The response names the result, reasoning, and verification or handoff path."
+  invariants:
+    - "Do not treat generated mirrors or runtime caches as DCR source of truth."
+composable:
+  input_type: task
+  output_type: artifact-or-decision
+  chains_with:
+    - verification-before-completion
+runtime_targets:
+  - codex
+  - claude
+  - copilot
+  - cursor
+  - windsurf
+  - opencode
+  - gemini-cli
 ---
 
 # UI/UX Pro Max - Design Intelligence

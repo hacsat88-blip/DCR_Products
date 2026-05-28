@@ -41,6 +41,14 @@ metadata:
   imported_at: "2026-05-16"
   adapted_from: "diagnose feedback-loop pattern; no skills.sh installer or slash command imported."
   model_neutral: true
+runtime_targets:
+  - codex
+  - claude
+  - copilot
+  - cursor
+  - windsurf
+  - opencode
+  - gemini-cli
 ---
 
 # Systematic Debugging

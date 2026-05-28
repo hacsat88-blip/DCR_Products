@@ -3,6 +3,26 @@ name: human-in-the-loop
 routing_category: governance
 description: "AI自動化と人間判断の境界設計：エスカレーション条件・承認フロー・監査ログ・タイムアウト処理"
 disable-model-invocation: true
+contract:
+  preconditions:
+    - "The request matches this skill's description or routing category."
+  postconditions:
+    - "The response names the result, reasoning, and verification or handoff path."
+  invariants:
+    - "Do not treat generated mirrors or runtime caches as DCR source of truth."
+composable:
+  input_type: task
+  output_type: artifact-or-decision
+  chains_with:
+    - verification-before-completion
+runtime_targets:
+  - codex
+  - claude
+  - copilot
+  - cursor
+  - windsurf
+  - opencode
+  - gemini-cli
 ---
 
 # Human-in-the-Loop

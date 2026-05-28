@@ -4,6 +4,26 @@ routing_category: governance
 description: "DCR リポジトリの構造品質を validate.ps1 で機械的に検証する Eval Harness スキル。q/ ゲートで validate.ps1 を実行し、rules/skills の frontmatter・H1・body・deploy整合を確認する。Use during q/ QA gate, before ship gate, or to verify structural integrity of rules and skills."
 metadata:
   origin: ECC eval-harness (adapted for DCR)
+contract:
+  preconditions:
+    - "The request matches this skill's description or routing category."
+  postconditions:
+    - "The response names the result, reasoning, and verification or handoff path."
+  invariants:
+    - "Do not treat generated mirrors or runtime caches as DCR source of truth."
+composable:
+  input_type: task
+  output_type: artifact-or-decision
+  chains_with:
+    - verification-before-completion
+runtime_targets:
+  - codex
+  - claude
+  - copilot
+  - cursor
+  - windsurf
+  - opencode
+  - gemini-cli
 ---
 
 # Eval Harness — 構造品質の継続検証

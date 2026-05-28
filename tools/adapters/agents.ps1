@@ -34,13 +34,31 @@ $mdFiles = Get-ChildItem -Path $source -File -Filter '*.md' |
 
 New-Item -ItemType Directory -Force -Path $codexDest, $claudeDest | Out-Null
 
-foreach ($file in $tomlFiles) {
-    Copy-Item -Path $file.FullName -Destination (Join-Path $codexDest $file.Name) -Force
+function Sync-AgentFlatFiles {
+    param(
+        [object[]]$SourceFiles,
+        [string]$Destination,
+        [string]$Filter
+    )
+
+    $sourceNames = @($SourceFiles | Select-Object -ExpandProperty Name)
+    foreach ($file in $SourceFiles) {
+        Copy-Item -Path $file.FullName -Destination (Join-Path $Destination $file.Name) -Force
+    }
+
+    $destinationRoot = (Resolve-Path -LiteralPath $Destination).Path
+    $extraFiles = Get-ChildItem -Path $destinationRoot -File -Filter $Filter | Where-Object { $_.Name -notin $sourceNames }
+    foreach ($extra in $extraFiles) {
+        $resolvedExtra = (Resolve-Path -LiteralPath $extra.FullName).Path
+        if (-not $resolvedExtra.StartsWith($destinationRoot + [System.IO.Path]::DirectorySeparatorChar, [System.StringComparison]::OrdinalIgnoreCase)) {
+            throw "Refusing to remove path outside agent mirror: $resolvedExtra"
+        }
+        Remove-Item -LiteralPath $resolvedExtra -Force
+    }
 }
 
-foreach ($file in $mdFiles) {
-    Copy-Item -Path $file.FullName -Destination (Join-Path $claudeDest $file.Name) -Force
-}
+Sync-AgentFlatFiles -SourceFiles $tomlFiles -Destination $codexDest -Filter '*.toml'
+Sync-AgentFlatFiles -SourceFiles $mdFiles -Destination $claudeDest -Filter '*.md'
 
 Write-AgentsStatus -Message "  [OK] Codex agents : $($tomlFiles.Count) files"
 Write-AgentsStatus -Message "  [OK] Claude agents : $($mdFiles.Count) files"

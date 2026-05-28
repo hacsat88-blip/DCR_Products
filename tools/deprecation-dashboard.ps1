@@ -114,8 +114,8 @@ function Get-ExternalRefs {
                 foreach ($ex in $exclude) { if ($f -like "$ex/*") { $skip = $true } }
                 if ($SourcePath -and $f -eq $SourcePath) { $skip = $true }
                 if ($Kind -eq 'agent' -and $f -eq ".ai/catalog/agents-source/$Name.toml") { $skip = $true }
-                # Skip generated documentation that lists deprecated aliases
-                if ($f -in @('CLAUDE.md', 'AGENTS.md', '.ai/catalog/rules/_ROUTING_INDEX.md')) { $skip = $true }
+                # Skip generated docs and lifecycle ledgers that intentionally list aliases.
+                if ($f -in @('CLAUDE.md', 'AGENTS.md', '.ai/catalog/rules/_ROUTING_INDEX.md', '.ai/catalog/_deprecated-aliases.json', 'docs/deprecation-removed.md', 'docs/deprecation-candidates.md')) { $skip = $true }
                 -not $skip
             }
         return @($refs)
@@ -129,6 +129,9 @@ $report = New-Object System.Collections.Generic.List[object]
 
 foreach ($alias in Get-DcrDeprecatedAliases -RepoRoot $RepoRoot) {
     $age = Get-DeprecationAge -RelativePath $alias.source_path
+    if ($alias.state -eq 'removed' -and $alias.removed_at) {
+        $age = @{ days = 0; date = $alias.removed_at }
+    }
     $refs = Get-ExternalRefs -Name $alias.name -Kind $alias.kind -SourcePath $alias.source_path
     $calls = if ($callCounts.ContainsKey($alias.name)) { $callCounts[$alias.name] } else { 0 }
     $report.Add([pscustomobject]@{
