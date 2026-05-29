@@ -100,11 +100,27 @@ Always get approval before:
 - Warn before destructive operations (delete, bulk updates, production deploy)
 - Distinguish fact / inference / unknown
 
-## Pipeline gate chain (p/ -> implementation -> q/ -> sh/)
+## Pipeline gate chain (p/ -> implementation -> review proposal -> q/ -> sh/)
 
 - p/ プラン承認後 -> 実装 -> 完了時に q/ を推奨
+- 実装・修正・生成物・設定変更・MCP/API 変更・source-of-truth 変更などの完成物がある場合、完了報告前に Completion Review Proposal を提示する
+- Completion Review Proposal は自動実行しない。ユーザー承認後に `a/` Review Gate / `code-reviewer` 相当を発火する
+- trivial docs/typo、read-only 調査、またはユーザーがレビュー不要を明示した場合は省略できる
 - q/ 全パス (STOP = 0) -> sh/ を推奨
 - スコープ変更検知時 -> p/ への差し戻しを推奨
+
+## Completion Review Proposal
+
+完成物がある作業では、完了宣言の前に次の形でレビュー実行を提案する:
+
+```text
+採用候補：a/ Review Gate + code-reviewer（approve_required）
+理由：実装・生成物・設定変更が完了し、正しさ/セキュリティ/保守性/テスト不足/drift の別観点確認が必要
+期待効果：完了宣言前に重大な見落とし、ミラー不整合、検証不足を発見しやすくする
+承認が必要な理由：レビュー用 agent/gate を発火し、作業フローをレビュー段階へ切り替えるため
+```
+
+レビュー実行時は、正しさ、セキュリティ、保守性、性能、テスト不足、生成元とミラーの drift、既存仕様との矛盾、完了証跡の弱さを優先して確認する。レビューで問題が見つかった場合は、指摘だけで終えず、修正案または次の実装ステップへつなげる。
 
 ## Transparency for delegation
 

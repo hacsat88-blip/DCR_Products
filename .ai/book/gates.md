@@ -10,7 +10,7 @@ Trigger parsing is defined in [runtime.md](runtime.md). Detailed handler templat
 
 Standard delivery flow:
 
-`p/` Plan Gate -> implementation -> `q/` QA Gate -> `sh/` Ship Gate
+`p/` Plan Gate -> implementation -> review proposal -> `q/` QA Gate -> `sh/` Ship Gate
 
 ## Plan Gate
 
@@ -27,6 +27,15 @@ Standard delivery flow:
 - Check the plan checklist item by item.
 - Report findings in risk order.
 - State what was verified and what could not be verified.
+
+## Completion Review Proposal
+
+When implementation, generated artifacts, configuration changes, MCP/API changes, or source-of-truth changes produce a completed artifact, propose review before claiming completion.
+
+- Use `採用候補 / 理由 / 期待効果 / 承認が必要な理由`.
+- Do not run review automatically; run `a/` Review Gate or `code-reviewer` only after user approval.
+- May skip for trivial docs/typos, read-only investigation, or explicit user opt-out.
+- Prioritize correctness, security, maintainability, test gaps, source/generated drift, spec conflicts, and weak verification evidence.
 
 ## Ship Gate
 

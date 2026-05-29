@@ -28,12 +28,15 @@
    - 3ステップ以上は計画を明示してから実装
 2. 実装
    - 既存の skill と rules の優先順位に従う
-3. `a/` Review Gate
-   - 既存 review/debug ルールを適用
-4. `q/` QA Gate
+3. Completion Review Proposal
+   - 完成物がある場合は `a/` Review Gate / `code-reviewer` の実行を提案する
+   - 自動実行せず、既存の候補提示 -> ユーザー承認 -> 発火に従う
+4. `a/` Review Gate
+   - ユーザー承認後に既存 review/debug ルールを適用
+5. `q/` QA Gate
    - `.ai/catalog/skills/webapp-testing` を優先
    - 画面検証は証跡を残す
-5. `sh/` Ship Gate
+6. `sh/` Ship Gate
     - `.ai/catalog/skills/verification-before-completion` と
        `.ai/catalog/skills/finishing-a-development-branch` を優先
 
