@@ -6,6 +6,8 @@ param(
 
 $CatalogPaths = Join-Path (Split-Path $PSScriptRoot -Parent) "lib\catalog-paths.ps1"
 . $CatalogPaths
+$DeprecatedAliases = Join-Path (Split-Path $PSScriptRoot -Parent) "lib\deprecated-aliases.ps1"
+. $DeprecatedAliases
 
 $rulesDir = Resolve-DcrSourcePath -RepoRoot $RepoRoot -AssetType "rules"
 $commandsDir = Join-Path $RepoRoot ".claude\commands"
@@ -328,6 +330,7 @@ if (Test-Path $runtimeKernel) {
 # 2) Catalog rules -> Windsurf rules (model_decision)
 $ruleFiles = Get-ChildItem -Path $rulesDir -File -Filter *.md | Where-Object { -not $_.BaseName.StartsWith("_") } | Sort-Object Name
 $deprecatedRules = New-Object System.Collections.Generic.List[object]
+$deprecatedRuleNames = @{}
 foreach ($ruleFile in $ruleFiles) {
     $targets = @(Get-Targets -Path $ruleFile.FullName)
     if ($targets.Count -eq 0) {
@@ -344,6 +347,7 @@ foreach ($ruleFile in $ruleFiles) {
             Name = $ruleFile.BaseName
             Successor = $successor
         })
+        $deprecatedRuleNames[$ruleFile.BaseName] = $true
         Write-WindsurfStatus -Message "  [SKIP] rules/$($ruleFile.BaseName).md (deprecated -> $successor)" -Color "DarkGray"
         continue
     }
@@ -374,6 +378,15 @@ foreach ($ruleFile in $ruleFiles) {
     Write-Utf8NoBom -Path $destPath -Content $content
     Register-ManagedFile -ManagedFiles $managedFiles -RelativePath "rules/$destName"
     Write-WindsurfStatus -Message "  [OK] rules/$destName"
+}
+
+foreach ($alias in @(Get-DcrDeprecatedAliases -RepoRoot $RepoRoot -Kind rule | Where-Object { $_.state -eq "removed" })) {
+    if ($deprecatedRuleNames.ContainsKey($alias.name)) { continue }
+    $deprecatedRules.Add([pscustomobject]@{
+        Name = $alias.name
+        Successor = $alias.successor
+    })
+    $deprecatedRuleNames[$alias.name] = $true
 }
 
 if ($deprecatedRules.Count -gt 0) {

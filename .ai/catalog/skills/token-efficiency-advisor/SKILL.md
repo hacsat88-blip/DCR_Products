@@ -17,6 +17,14 @@ composable:
     - writing-plans
 metadata:
   origin: DCR custom
+runtime_targets:
+  - codex
+  - claude
+  - copilot
+  - cursor
+  - windsurf
+  - opencode
+  - gemini-cli
 ---
 
 # Token Efficiency Advisor

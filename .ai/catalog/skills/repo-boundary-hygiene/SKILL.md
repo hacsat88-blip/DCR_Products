@@ -20,7 +20,7 @@ composable:
   chains_with:
     - writing-plans
     - verification-before-completion
-    - continuous-learning
+    - continuous-learning-v2
 package:
   version: "1.0.0"
   compat: "dcr >= 2.0"
@@ -31,6 +31,14 @@ package:
     - governance
     - architecture
     - cleanup
+runtime_targets:
+  - codex
+  - claude
+  - copilot
+  - cursor
+  - windsurf
+  - opencode
+  - gemini-cli
 ---
 
 # Repo Boundary Hygiene
@@ -148,7 +156,7 @@ package:
 
 - `writing-plans`: spec を implementation plan へ落とす
 - `verification-before-completion`: cleanup 完了主張前の証拠を取る
-- `continuous-learning`: 再発防止の instinct を repo memory に残す
+- `continuous-learning-v2`: 再発防止の instinct を repo memory に残す
 
 ## Deliverables
 

@@ -15,7 +15,7 @@ composable:
   input_type: code
   output_type: rule
   chains_with:
-    - static-analysis
+    - dcr-pipeline
     - security-scan
     - verification-before-completion
 metadata:
@@ -29,6 +29,14 @@ metadata:
   source_notice: "Adapted as a DCR-local summary; inspect upstream_path before expanding or copying source text."
   imported_at: "2026-05-06"
   adapted_from: "Condensed into a DCR reinforcement skill; not a wholesale import."
+runtime_targets:
+  - codex
+  - claude
+  - copilot
+  - cursor
+  - windsurf
+  - opencode
+  - gemini-cli
 ---
 
 # Semgrep Rule Creator

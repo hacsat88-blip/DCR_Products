@@ -12,9 +12,9 @@ This file defines OpenCode-specific behavior for the DCR (サトシ開発) proje
 
 ## Scope
 
-- **Active rules**: 71 (from `.ai/catalog/rules/`)
-- **Active skills**: DCR skills from deploy-managed `~/.agents/skills/` plus OpenCode-specific `.opencode/skills/`
-- **Active agents**: OpenCode-specific `.opencode/agents/`; shared agent source remains `.ai/catalog/agents-source/`
+- **Active rules**: 53 (from `.ai/catalog/rules/`)
+- **Active skills**: 70 DCR skills from deploy-managed `~/.agents/skills/` plus OpenCode-specific `.opencode/skills/`
+- **Active agents**: OpenCode-specific `.opencode/agents/`; shared agent source remains `.ai/catalog/agents-source/` with 116 active shared agents
 
 ## OpenCode-Specific Configuration
 

@@ -2,6 +2,8 @@ param([string]$RepoRoot = ".")
 
 $CatalogPaths = Join-Path (Split-Path $PSScriptRoot -Parent) "lib\catalog-paths.ps1"
 . $CatalogPaths
+$DeprecatedAliases = Join-Path (Split-Path $PSScriptRoot -Parent) "lib\deprecated-aliases.ps1"
+. $DeprecatedAliases
 
 $rulesDir = Resolve-DcrSourcePath -RepoRoot $RepoRoot -AssetType "rules"
 $skillsDir = Resolve-DcrSourcePath -RepoRoot $RepoRoot -AssetType "skills"
@@ -15,19 +17,6 @@ function Get-Targets($file) {
         return [regex]::Matches($Matches[1], '^\s*-\s*(.+)$', 'Multiline') | % { $_.Groups[1].Value }
     }
     return @()
-}
-
-function Get-DeprecationInfo($file) {
-    $text = Get-Content $file.FullName -Raw
-    if ($text -match '(?ms)^---(.*?)^---') {
-        $fm = $Matches[1]
-        if ($fm -match '(?m)^\s*deprecated\s*:\s*true\s*$') {
-            $succ = $null
-            if ($fm -match '(?m)^\s*successor\s*:\s*(\S+)') { $succ = $Matches[1].Trim() }
-            return @{ Deprecated = $true; Successor = $succ }
-        }
-    }
-    return @{ Deprecated = $false; Successor = $null }
 }
 
 function Get-RoutingCategory($file) {
@@ -45,13 +34,26 @@ $activeAgents = @()
 $deprecatedRules = @()
 $deprecatedSkills = @()
 $deprecatedAgents = @()
+$deprecatedAliasRows = @(Get-DcrDeprecatedAliases -RepoRoot $RepoRoot)
+$deprecatedAliasByKey = @{}
+foreach ($alias in $deprecatedAliasRows) {
+    $deprecatedAliasByKey["$($alias.kind):$($alias.name)"] = $alias
+}
+
+function Get-DeprecationInfo($kind, $name) {
+    $key = "$kind`:$name"
+    if ($deprecatedAliasByKey.ContainsKey($key)) {
+        return @{ Deprecated = $true; Successor = $deprecatedAliasByKey[$key].successor; State = $deprecatedAliasByKey[$key].state }
+    }
+    return @{ Deprecated = $false; Successor = $null; State = $null }
+}
 
 # Collect claude-targeted items (separate active vs deprecated)
 foreach ($f in Get-ChildItem $rulesDir -Filter "*.md" | Where-Object { -not $_.BaseName.StartsWith("_") }) {
     $targets = Get-Targets $f
     if (-not $targets) { $targets = @("vscode", "claude", "codex") }
     if ($targets -contains "claude") {
-        $dep = Get-DeprecationInfo $f
+        $dep = Get-DeprecationInfo "rule" $f.BaseName
         if ($dep.Deprecated) {
             $deprecatedRules += [pscustomobject]@{ Name = $f.BaseName; Successor = $dep.Successor }
         } else {
@@ -67,7 +69,7 @@ foreach ($dir in Get-ChildItem $skillsDir -Directory | Where-Object { -not $_.Na
         $targets = Get-Targets $sfItem
         if (-not $targets) { $targets = @("vscode", "claude", "codex") }
         if ($targets -contains "claude") {
-            $dep = Get-DeprecationInfo $sfItem
+            $dep = Get-DeprecationInfo "skill" $dir.Name
             if ($dep.Deprecated) {
                 $deprecatedSkills += [pscustomobject]@{ Name = $dir.Name; Successor = $dep.Successor }
             } else {
@@ -81,13 +83,18 @@ foreach ($f in Get-ChildItem $agentsDir -Filter "*.md" | Where-Object { $_.Name 
     $targets = Get-Targets $f
     if (-not $targets) { $targets = @("codex", "claude") }
     if ($targets -contains "claude") {
-        $dep = Get-DeprecationInfo $f
+        $dep = Get-DeprecationInfo "agent" $f.BaseName
         if ($dep.Deprecated) {
             $deprecatedAgents += [pscustomobject]@{ Name = $f.BaseName; Successor = $dep.Successor }
         } else {
             $activeAgents += $f.BaseName
         }
     }
+}
+foreach ($alias in $deprecatedAliasRows | Where-Object { $_.state -eq "removed" }) {
+    if ($alias.kind -eq "rule") { $deprecatedRules += [pscustomobject]@{ Name = $alias.name; Successor = $alias.successor } }
+    if ($alias.kind -eq "skill") { $deprecatedSkills += [pscustomobject]@{ Name = $alias.name; Successor = $alias.successor } }
+    if ($alias.kind -eq "agent") { $deprecatedAgents += [pscustomobject]@{ Name = $alias.name; Successor = $alias.successor } }
 }
 $activeRuleCount = $activeRules.Count
 $activeSkillCount = $activeSkills.Count

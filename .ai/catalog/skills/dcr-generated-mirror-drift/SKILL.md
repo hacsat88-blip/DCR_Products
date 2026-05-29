@@ -16,11 +16,19 @@ composable:
   chains_with:
     - systematic-debugging
     - verification-before-completion
-    - docs-update
+    - documents-ops
 metadata:
   origin: local-codex-sessions
   adapted_from: "runtime memory skill deploy-vscode-mirror-drift plus May 2026 DCR mirror/CI cleanup rollouts"
   imported_at: "2026-05-24"
+runtime_targets:
+  - codex
+  - claude
+  - copilot
+  - cursor
+  - windsurf
+  - opencode
+  - gemini-cli
 ---
 
 # DCR Generated Mirror Drift

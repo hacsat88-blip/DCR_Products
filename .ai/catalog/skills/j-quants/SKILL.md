@@ -4,6 +4,26 @@ routing_category: growth
 description: J-Quants 関連タスクのルーティング用エントリ。CLI 実行・データ取得・プラン制約確認は `jquants-cli-usage` を利用する。
 metadata:
   origin: DCR local
+contract:
+  preconditions:
+    - "The request matches this skill's description or routing category."
+  postconditions:
+    - "The response names the result, reasoning, and verification or handoff path."
+  invariants:
+    - "Do not treat generated mirrors or runtime caches as DCR source of truth."
+composable:
+  input_type: task
+  output_type: artifact-or-decision
+  chains_with:
+    - verification-before-completion
+runtime_targets:
+  - codex
+  - claude
+  - copilot
+  - cursor
+  - windsurf
+  - opencode
+  - gemini-cli
 ---
 
 # J-Quants Skill Router

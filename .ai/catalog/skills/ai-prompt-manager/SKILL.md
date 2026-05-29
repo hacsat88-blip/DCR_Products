@@ -2,6 +2,26 @@
 name: ai-prompt-manager
 routing_category: governance
 description: Chrome拡張 Product/ai-prompt-manager の開発・改修・検証を行う専用スキル。manifest v3、sidepanel、content script、AIチャットDOM差分吸収を含む。
+contract:
+  preconditions:
+    - "The request matches this skill's description or routing category."
+  postconditions:
+    - "The response names the result, reasoning, and verification or handoff path."
+  invariants:
+    - "Do not treat generated mirrors or runtime caches as DCR source of truth."
+composable:
+  input_type: task
+  output_type: artifact-or-decision
+  chains_with:
+    - verification-before-completion
+runtime_targets:
+  - codex
+  - claude
+  - copilot
+  - cursor
+  - windsurf
+  - opencode
+  - gemini-cli
 ---
 
 # AI Prompt Manager Skill

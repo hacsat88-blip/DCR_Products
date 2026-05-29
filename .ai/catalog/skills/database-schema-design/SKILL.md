@@ -28,6 +28,14 @@ package:
     - database
     - schema
     - migration
+runtime_targets:
+  - codex
+  - claude
+  - copilot
+  - cursor
+  - windsurf
+  - opencode
+  - gemini-cli
 ---
 
 # Database Schema Design
