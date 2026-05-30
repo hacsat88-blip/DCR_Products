@@ -76,6 +76,10 @@ Natural-language replies are accepted only when the target is unique. `おすす
 
 When `.ai/kernel/gate-state.json` has `proposal_state.status = proposed|refined`, interpret a short next utterance as a proposal reply before normal routing. The final approve/reject/refine/ambiguous transition follows `tools/lib/gate-state.ps1`.
 
+### Completion Review Proposal
+
+When implementation, generated artifacts, configuration changes, MCP/API changes, or source-of-truth changes produce a completed artifact, propose `a/` Review Gate + `@dcr-code-reviewer` before claiming completion. Do not run review automatically; show candidate, reason, expected effect, and why approval is required, then execute only after user approval. This may be skipped for trivial docs/typos, read-only investigation, or explicit user opt-out.
+
 ### Signal Protocol
 
 OpenCode agents use the DCR signal protocol:
@@ -98,8 +102,9 @@ OpenCode permissions align with DCR safety boundaries:
 For 3+ step tasks, OpenCode follows the DCR pipeline:
 1. **Plan Gate (p/)**: Scope definition, checklist generation
 2. **Implementation**: Chunked execution with progress reports
-3. **QA Gate (q/)**: Evidence-based verification
-4. **Ship Gate (sh/)**: Release decision
+3. **Completion Review Proposal**: Ask before running `a/` Review Gate / `@dcr-code-reviewer`
+4. **QA Gate (q/)**: Evidence-based verification
+5. **Ship Gate (sh/)**: Release decision
 
 ## Differences from Other Environments
 
