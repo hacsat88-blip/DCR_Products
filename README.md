@@ -205,6 +205,8 @@ pwsh -ExecutionPolicy Bypass -File .\deploy.ps1 -Check             # ドリフ�
 
 ### 外部 capability pack - DCR に取り込まない
 
+- 外部 Skill / Agent / MCP / CLI / workflow repo を提示された場合は、まず `external-capability-intake` で `skip / concept-import / selective-source-import / immutable-upstream / external-tool-poc` に分類する
+- かなり有用だが DCR 側で改修すると upstream 追随が壊れるものは、Superpowers 型の `immutable-upstream` として扱い、改修不可の外部正本・drift/update check・provenance だけを DCR に置く
 - `Superpowers` は外部公式パッケージとして扱う
 - 既定の upstream mirror: `%USERPROFILE%/.codex/superpowers`
 - 更新は upstream への fast-forward のみを許可し、DCR の `.ai/catalog/` へコピーして正本化しない
@@ -214,6 +216,9 @@ pwsh -ExecutionPolicy Bypass -File .\deploy.ps1 -Check             # ドリフ�
 - `agentmemory` は外部 runtime memory backend 候補として扱う。MCP/REST server、hooks、DB、npm package を repo 正本へ直接取り込まず、利用可能な環境だけで memory preflight / memory save を行う
 - `GSD` は外部 spec-driven workflow 参照元として扱う。GSD command runtime と `.planning/` は入れず、DCR skill の `metadata.origin` に provenance を残す
 - `mattpocock/skills` は外部 engineering-method skill 参照元として扱う。`skills.sh`、setup command、Claude 固有 slash command は入れず、grill / zoom-out / diagnose / handoff の考え方だけを DCR skill として薄く取り込む
+- `addyosmani/agent-skills` は lifecycle skill pack の比較対象として扱う。installer、plugin、slash command、agent persona は入れず、DCR / Superpowers / OpenAI Skills で未充足の checklist / workflow 観点だけを selective reference とする
+- `colbymchenry/codegraph` は skill 正本ではなく optional external code intelligence / MCP tool 候補として扱う。`.ai/catalog` へ取り込まず、必要時に `codegraph install --print-config codex` などの非破壊確認と小さな PoC 後に採用判断する
+- `multica-ai/andrej-karpathy-skills` は単体 `CLAUDE.md` として導入しない。推測しない、単純さ優先、surgical change、目標駆動の原則は既存の AGENTS / kernel / editing constraints で covered-by-existing-policy とする
 
 ### 設定層（Configuration）- 個人設定のみ
 

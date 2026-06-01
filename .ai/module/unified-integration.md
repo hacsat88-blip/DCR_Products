@@ -121,6 +121,8 @@ Skill、Agent、サブエージェント、並列 orchestration、外部 MCP/API
 
 外部 plugin / skill pack は DCR の置換ではなく、ドメイン特化の拡張として扱う。
 
+外部 Skill / Agent / MCP / CLI / workflow repo を提示された場合は、まず `external-capability-intake` で `skip / concept-import / selective-source-import / immutable-upstream / external-tool-poc` に分類する。かなり有用だが DCR 側で改修すると upstream 追随が壊れるものは `immutable-upstream` とし、Superpowers 型の「改修不可の外部正本」として扱う。
+
 ### Runtime memory backend
 
 - 位置づけ: agentmemory などの MCP/REST memory backend は任意の外部補助層
@@ -145,6 +147,28 @@ Skill、Agent、サブエージェント、並列 orchestration、外部 MCP/API
 - DCR との関係: `pied-piper` と `unified-router` を置換せず、pre-plan / pre-impl / debug / handoff の補助 skill として使う
 - 既存導入: `domain-decision-grilling`、`architecture-zoom-out`、`systematic-debugging` 補強、`phase-state-artifacts` handoff 補強、`improve-codebase-architecture` provenance 補強
 - 互換性: Codex / Claude / Copilot / Cursor / Windsurf / OpenCode / Gemini CLI で読めるよう、特定IDEの slash command ではなく自然言語 trigger と DCR metadata に落とす
+
+### Addy Osmani agent-skills selective reference
+
+- 位置づけ: addyosmani/agent-skills は 23 skills と lifecycle slash commands を含む agent workflow pack の比較対象
+- 採用形態: installer、plugin、slash command、agent persona は導入せず、未充足の checklist / workflow 観点だけを DCR skill や gate の改善候補として比較する
+- DCR との関係: `pied-piper`、`p/ q/ sh/`、Superpowers、OpenAI Skills official baseline を置換しない
+- provenance: https://github.com/addyosmani/agent-skills
+
+### CodeGraph external tool candidate
+
+- 位置づけ: colbymchenry/codegraph は skill pack ではなく、local code knowledge graph / MCP code intelligence tool 候補
+- 採用形態: `.ai/catalog` 正本、generated mirror、user-level MCP config へ直接入れず、必要時に `codegraph install --print-config codex` などで非破壊確認してから Product / repo 単位で PoC する
+- DCR との関係: source-of-truth、routing、agent persona、memory backend を置換しない。採用する場合も optional external capability として扱う
+- 禁止: この段階で `.codegraph/`、MCP 設定、PATH、依存関係を作らない
+- provenance: https://github.com/colbymchenry/codegraph
+
+### Karpathy skills covered-by-existing-policy
+
+- 位置づけ: multica-ai/andrej-karpathy-skills は Think Before Coding / Simplicity First / Surgical Changes / Goal-Driven Execution などの単体原則集
+- 採用形態: 単体 `CLAUDE.md` や追加 runtime として導入しない
+- DCR との関係: 推測しない、過剰抽象化しない、関係ない変更をしない、検証してから完了主張する方針は既存の AGENTS / kernel / editing constraints でカバーする
+- provenance: https://github.com/multica-ai/andrej-karpathy-skills
 
 ### OpenUI Generative UI pattern import
 

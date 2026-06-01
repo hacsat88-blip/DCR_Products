@@ -84,6 +84,7 @@ Entrypoint for VS Code Copilot environment.
 - [documents-ops](../../.ai/catalog/skills/documents-ops/SKILL.md)
 - [eval-harness](../../.ai/catalog/skills/eval-harness/SKILL.md)
 - [event-driven-agents](../../.ai/catalog/skills/event-driven-agents/SKILL.md)
+- [external-capability-intake](../../.ai/catalog/skills/external-capability-intake/SKILL.md)
 - [find-skills](../../.ai/catalog/skills/find-skills/SKILL.md)
 - [finishing-a-development-branch](../../.ai/catalog/skills/finishing-a-development-branch/SKILL.md)
 - [finops](../../.ai/catalog/skills/finops/SKILL.md)
