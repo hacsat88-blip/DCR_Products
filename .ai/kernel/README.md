@@ -54,7 +54,6 @@
 | **VS Code Copilot Chat**     | `.github/copilot-instructions.md` | `.ai/kernel/_base.md` + `.ai/environments/vscode-copilot/kernel.md` | Chat 統合        |
 | **Claude Code**              | `CLAUDE.md`                       | `.ai/kernel/_base.md` + `.ai/environments/claude-code/kernel.md`    | Code 通合        |
 | **GitHub Copilot CLI**       | `AGENTS.md`                       | `.ai/kernel/_base.md` + `.ai/environments/copilot-cli/kernel.md`    | CLI 起動時       |
-| **Windsurf**                 | `.windsurf/rules/dcr-kernel.md`   | `.ai/kernel/dcr-kernel.md`                               | ルール自動ロード |
 | **Codex**                    | `AGENTS.md`                       | `.ai/kernel/_base.md` + `.ai/environments/codex/kernel.md`          | リファレンス     |
 
 ---
@@ -91,8 +90,8 @@
 - その他トリガーの詳細ハンドラ
 
 #### `dcr-kernel.md`
-- Windsurf など inline runtime が必要な環境へ配る共有 kernel
-- `.windsurf/` ではなく、このファイルを正本として編集する
+- inline runtime が必要な環境へ配る共有 kernel
+- 生成先ではなく、このファイルを正本として編集する
 - `deploy.ps1` / `tools/adapters/*.ps1` が各環境の形式へ同期する
 
 ---
@@ -167,12 +166,6 @@
     ├─ GitHub Copilot CLI
     │   ↓
     │   AGENTS.md（共通入口）
-    │   ↓
-    │   .ai/kernel/ 参照
-    │
-    ├─ Windsurf
-    │   ↓
-    │   .windsurf/rules/dcr-kernel.md（自動ロード）
     │   ↓
     │   .ai/kernel/ 参照
     │
@@ -307,7 +300,7 @@ PASS gates/trigger-*.md を生成（.commands/ から移行完了、.commands/ �
 [ ] copilot-instructions.md -> 参照層に縮約
 [ ] CLAUDE.md -> 参照層に縮約
 [ ] AGENTS.md -> 参照層に縮約
-PASS .windsurf/rules/dcr-kernel.md -> `.ai/kernel/dcr-kernel.md` から同期
+PASS generated entrypoints -> `.ai/kernel/dcr-kernel.md` から同期
 ```
 
 ### Phase 5-7: 検証・デプロイ
@@ -322,7 +315,7 @@ PASS .windsurf/rules/dcr-kernel.md -> `.ai/kernel/dcr-kernel.md` から同期
 
 - **統合元仕様**: `.ai/module/unified-integration.md`
 - **検証スクリプト**: `validate.ps1` / `deploy.ps1`
-- **モデルファイル**: `AGENTS.md` / `CLAUDE.md` / `.windsurf/rules/dcr-kernel.md` / `.github/copilot-instructions.md`
+- **モデルファイル**: `AGENTS.md` / `CLAUDE.md` / `.github/copilot-instructions.md`
 
 ---
 

@@ -29,8 +29,6 @@ metadata:
     - claude
     - copilot
     - cursor
-    - windsurf
-    - opencode
     - gemini-cli
 absorbs:
   - adr-management

@@ -21,8 +21,6 @@ runtime_targets:
   - claude
   - copilot
   - cursor
-  - windsurf
-  - opencode
   - gemini-cli
 ---
 
@@ -48,7 +46,7 @@ rules/*.md と skills/*/SKILL.md の構造品質を機械的に保証する。
 | frontmatter `name:` | `skills/*/SKILL.md` | `name: <値>` が存在 |
 | frontmatter `description:` | `skills/*/SKILL.md` | `description: <値>` が存在 |
 | body 非空 | `skills/*/SKILL.md` | frontmatter 以降に内容あり |
-| deploy DryRun | 全ターゲット (vscode/cursor/windsurf/agents/dcr) | exit 0 |
+| deploy DryRun | 全ターゲット (vscode/cursor/agents/dcr) | exit 0 |
 
 ## q/ ゲートでの使い方
 

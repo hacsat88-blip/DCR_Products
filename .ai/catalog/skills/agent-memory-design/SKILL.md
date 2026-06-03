@@ -31,9 +31,7 @@ metadata:
     - codex
     - claude
     - cursor
-    - windsurf
     - copilot
-    - opencode
     - gemini-cli
 ---
 
@@ -102,7 +100,7 @@ user request
 
 ## agentmemory の位置づけ
 
-- 役割: Codex / Claude / Cursor / Windsurf などの runtime をまたぐ共有 memory backend
+- 役割: Codex / Claude / Cursor などの runtime をまたぐ共有 memory backend
 - 採用形態: optional external capability pack
 - DCR との関係: `.ai/catalog`、`.ai/book`、docs の正本を補助する検索・保存層
 - 禁止: agentmemory の hook、DB、server、npm runtime をこの repo の正本として直接取り込まない

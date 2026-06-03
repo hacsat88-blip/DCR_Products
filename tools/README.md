@@ -13,16 +13,13 @@ Utility scripts for build, deployment, and maintenance operations.
 - `adapters/vscode.ps1` → `.github/copilot-instructions.md`
 - `adapters/claude.ps1` → `CLAUDE.md`
 - `adapters/codex.ps1` → `AGENTS.md`
-- `adapters/windsurf.ps1` → `.windsurf/rules/*.md` + `.windsurf/workflows/*.md` + `.windsurf/hooks.json` + `.windsurf/mcp_config.example.json` (Git 管理外)
 - `adapters/agents.ps1` → `.codex/agents/*.toml` + `.claude/agents/*.md` (Git 管理外)
-- `adapters/opencode.ps1` → `opencode.json` + `.opencode/kernel.md` while preserving `.opencode/agents/` and `.opencode/skills/`
 
 **Usage:**
 ```powershell
 .\deploy-all.ps1                    # Deploy to all targets
 .\deploy-all.ps1 -Target vscode     # Deploy to VS Code only
 .\deploy-all.ps1 -Target agents     # Generate Codex/Claude agent mirrors only
-.\deploy-all.ps1 -Target opencode   # Generate OpenCode project config/kernel only
 .\deploy-all.ps1 -DryRun            # Preview without executing
 ```
 
@@ -34,7 +31,7 @@ Utility scripts for build, deployment, and maintenance operations.
 
 **Purpose:** Compile frontmatter from `.ai/catalog/rules/*.md`, `.ai/catalog/skills/*/SKILL.md`, and `.ai/catalog/agents-source/` into a unified JSON manifest
 
-**Input:** YAML frontmatter with `targets: [vscode, claude, codex, windsurf]` field
+**Input:** YAML frontmatter with `targets: [vscode, claude, codex]` field
 
 **Output:** `manifest.json` (generated artifact, not versioned)
 
@@ -60,22 +57,9 @@ Generates `CLAUDE.md` for Claude Code environment
 #### `adapters/codex.ps1`
 Generates `AGENTS.md` for Codex (GitHub CLI) environment
 
-#### `adapters/windsurf.ps1`
-Generates `.windsurf/rules/*.md`, `.windsurf/workflows/*.md`, `.windsurf/hooks.json`, and `.windsurf/mcp_config.example.json` for Windsurf Cascade.
-The generated `.windsurf/` mirror is ignored by Git; edit `.ai/kernel/`, `.ai/catalog/rules/`, `.claude/commands/`, or `templates/windsurf/` instead.
-The adapter fails fast if Windsurf templates contain machine-local MCP paths, invalid JSON, unused rule templates, or generated rule files without required frontmatter.
-
-Workflow sources:
-- `.claude/commands/*.md`
-- `templates/windsurf/.windsurf/workflows/*.md`
-
 #### `adapters/agents.ps1`
 Generates `.codex/agents/*.toml` and `.claude/agents/*.md` from `.ai/catalog/agents-source/`.
 The generated agent mirrors are ignored by Git; edit `.ai/catalog/agents-source/` instead.
-
-#### `adapters/opencode.ps1`
-Generates the root `opencode.json` project config and `.opencode/kernel.md` from `.ai/environments/opencode/`.
-The adapter preserves OpenCode-local `.opencode/agents/` and `.opencode/skills/` overlays.
 
 ---
 
@@ -270,7 +254,7 @@ powershell.exe -NoProfile -File .\tools\test-proposal-reply-vocabulary.ps1
 
 Expected: recommended or explicit option replies approve, generic approvals with multiple options stay ambiguous, and vague replies never execute.
 
-**V6 routing entrypoint contract check:** use this after deploy to verify that Codex, Claude Code, VS Code Copilot, and OpenCode generated entrypoints expose the same proposal reply contract.
+**V6 routing entrypoint contract check:** use this after deploy to verify that Codex, Claude Code, and VS Code Copilot generated entrypoints expose the same proposal reply contract.
 
 ```powershell
 powershell.exe -NoProfile -File .\tools\test-routing-entrypoint-contract.ps1

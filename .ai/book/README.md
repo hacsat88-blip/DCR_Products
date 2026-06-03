@@ -42,6 +42,6 @@ All AI environments should read this book first. Environment files may describe 
 The legacy runtime files under `.ai/kernel/` remain available for adapters and tools that already load them.
 
 - `.ai/kernel/_base.md` mirrors the runtime chapter for common execution behavior.
-- `.ai/kernel/dcr-kernel.md` is the inline runtime distributed to Cursor/Windsurf-style rule loaders.
+- `.ai/kernel/dcr-kernel.md` is the inline runtime distributed to rule-loader style adapters.
 - `.ai/module/unified-router.md` remains the detailed router implementation referenced by [routing.md](routing.md).
 

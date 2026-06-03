@@ -1,4 +1,4 @@
-# Shared by Devin / Windsurf hooks. Resolves Claude Code memory dir without hardcoded users/paths.
+# Resolves Claude Code memory dir without hardcoded users/paths.
 # Pin exact folder when multiple repos exist: set env DCR_MEMORY_ROOT to the .../memory directory.
 
 function Get-ClaudeMemoryPaths {

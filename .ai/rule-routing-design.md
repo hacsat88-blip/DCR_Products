@@ -14,7 +14,6 @@
 - ルートに `AGENTS.md` と `CLAUDE.md` がある
 - `.ai/catalog/rules/` にロール別のMarkdownがある
 - `.github/copilot-instructions.md` がある
-- `.windsurf/` に Windsurf 用の rules/workflows/config が展開済み
 - `deploy.ps1` が同期の中心になっている
 
 ## 制約
@@ -33,8 +32,7 @@
 - ロールの正本: `.ai/catalog/rules/*.md`
 - エディタ固有ファイルは生成物または薄い入口に寄せる
 
-`AGENTS.md`、`CLAUDE.md`、`.github/copilot-instructions.md`、
-`.windsurf/` は
+`AGENTS.md`、`CLAUDE.md`、`.github/copilot-instructions.md` は
 できるだけ正本ではなく配布形にする。
 
 ### 2. 自動参照の安全条件
@@ -109,13 +107,6 @@
 - ロール適用: まず共通カーネルを読み、必要時のみ `.ai/catalog/rules/*.md` を追加参照する
 - 方針: Copilot 固有の `.instructions.md` を増やしすぎない
 
-### Windsurf
-
-- 入口: `.windsurf/rules/dcr-kernel.md` と `.windsurf/rules/*.md`
-- 方式: `.ai/kernel/dcr-kernel.md` と `.ai/catalog/rules/*.md` から生成する
-- ロール適用: `model_decision` を基本とし、always-on は kernel に限定する
-- 方針: `.windsurf/` を手編集の正本にしない
-
 ### Antigravity / Gemini
 
 - 状態: 現行 adapter なし
@@ -144,7 +135,7 @@
 
 - `.ai/catalog/rules/` を正本とする方針を文書化する
 - `AGENTS.md` と `CLAUDE.md` に動的参照ポリシーを追記する
-- Windsurf / Codex / Claude / Copilot の入口だけを現行対応範囲にする
+- Codex / Claude / Copilot / Cursor の入口だけを現行対応範囲にする
 
 ### Phase 2: ずれ防止
 

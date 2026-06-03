@@ -1332,6 +1332,17 @@
       "removed_at": "2026-05-28",
       "removal_policy": "human_override_bulk",
       "removed_by": "codex"
+    },
+    {
+      "kind": "skill",
+      "name": "oss-delegate",
+      "successor": "model-route",
+      "state": "removed",
+      "source_path": ".ai/catalog/skills/oss-delegate/SKILL.md",
+      "reason": "Provider-specific external delegation path retired; use local model selection guidance instead.",
+      "removed_at": "2026-06-03",
+      "removal_policy": "human_override_vendor_cleanup",
+      "removed_by": "codex"
     }
   ]
 }

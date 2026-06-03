@@ -58,14 +58,7 @@ Write-Host "  [OK] .cursor/README.md" -ForegroundColor Green
 
 $mcpConfig = @"
 {
-  "mcpServers": {
-    "opencode-bridge": {
-      "command": "python",
-      "args": [
-        "`${workspaceFolder}/tools/mcp-servers/opencode-bridge/server.py"
-      ]
-    }
-  }
+  "mcpServers": {}
 }
 "@
 
@@ -75,7 +68,6 @@ Write-Host "  [OK] .cursor/mcp.json" -ForegroundColor Green
 $cursorIgnore = @"
 # Generated/runtime mirrors
 .cursor/
-.windsurf/
 .codex/agents/
 .claude/agents/
 

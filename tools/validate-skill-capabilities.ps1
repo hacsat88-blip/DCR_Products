@@ -89,7 +89,7 @@ $packageCount = 0
 $absorbsCount = 0
 $baselineOverlayCount = 0
 $runtimeTargetCount = 0
-$requiredRuntimeTargets = @("codex", "claude", "copilot", "cursor", "windsurf", "opencode", "gemini-cli")
+$requiredRuntimeTargets = @("codex", "claude", "copilot", "cursor", "gemini-cli")
 
 foreach ($dir in Get-ChildItem -Path $skillsDir -Directory | Where-Object { -not $_.Name.StartsWith("_") } | Sort-Object Name) {
     $skillFile = Join-Path $dir.FullName "SKILL.md"

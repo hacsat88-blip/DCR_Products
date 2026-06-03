@@ -139,6 +139,7 @@ git 履歴と異なり、本ファイルは **「いつ・なぜ・誰が」削�
 | 2026-05-28 | rule | tiktok-strategist | social-media-strategist | lifecycle override | n/a | n/a | Rule/agent alias tombstone bulk removal with registry |
 | 2026-05-28 | rule | twitter-engager | social-media-strategist | lifecycle override | n/a | n/a | Rule/agent alias tombstone bulk removal with registry |
 | 2026-05-28 | rule | ux-architect | ui-designer | lifecycle override | n/a | n/a | Rule/agent alias tombstone bulk removal with registry |
+| 2026-06-03 | skill | oss-delegate | model-route | lifecycle override | n/a | n/a | Provider-specific external delegation path retired with tombstone registry |
 
 
 ## 関連

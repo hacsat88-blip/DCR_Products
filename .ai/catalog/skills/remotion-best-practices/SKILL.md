@@ -22,8 +22,6 @@ runtime_targets:
   - claude
   - copilot
   - cursor
-  - windsurf
-  - opencode
   - gemini-cli
 ---
 
