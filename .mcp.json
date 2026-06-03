@@ -30,12 +30,6 @@
       "headers": {
         "x-sm-project": "product-stock-skills-sla"
       }
-    },
-    "opencode-bridge": {
-      "command": "python",
-      "args": [
-        "tools/mcp-servers/opencode-bridge/server.py"
-      ]
     }
   }
 }

@@ -28,7 +28,7 @@ jobs:
       - name: Ensure generated mirrors stay untracked
         shell: pwsh
         run: |
-          $tracked = @(git ls-files .windsurf .codex/agents .claude/agents)
+          $tracked = @(git ls-files .codex/agents .claude/agents)
           if ($tracked.Count -gt 0) {
             $tracked | ForEach-Object { Write-Host $_ }
             throw "Generated mirrors must stay untracked."
@@ -37,7 +37,7 @@ jobs:
       - name: Check generated entrypoint drift
         shell: pwsh
         run: |
-          $diff = @(git status --short AGENTS.md CLAUDE.md .github/copilot-instructions.md opencode.json .opencode/kernel.md .opencode/opencode.json .ai/catalog/rules/_ROUTING_INDEX.md)
+          $diff = @(git status --short AGENTS.md CLAUDE.md .github/copilot-instructions.md .ai/catalog/rules/_ROUTING_INDEX.md)
           if ($diff.Count -gt 0) {
             $diff | ForEach-Object { Write-Host $_ }
             throw "Generated tracked entrypoints are stale."

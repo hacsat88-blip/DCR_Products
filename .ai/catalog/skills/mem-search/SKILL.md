@@ -1,7 +1,7 @@
 ---
 name: mem-search
 routing_category: governance
-description: Use when you need to recall past work, save new memories, or manage the SQLite FTS5 memory index shared across Claude Code, Cursor, Windsurf, and Codex.
+description: Use when you need to recall past work, save new memories, or manage the SQLite FTS5 memory index shared across Claude Code, Cursor, and Codex.
 contract:
   preconditions:
     - "The request matches this skill's description or routing category."
@@ -19,8 +19,6 @@ runtime_targets:
   - claude
   - copilot
   - cursor
-  - windsurf
-  - opencode
   - gemini-cli
 ---
 
@@ -29,7 +27,7 @@ runtime_targets:
 ## Overview
 
 `mem_cli.py` は SQLite FTS5（trigram + BM25）ベースのメモリ検索CLIで、
-Claude Code / Cursor / Windsurf / Codex 間で**同一DBを共有**する。
+Claude Code / Cursor / Codex 間で**同一DBを共有**する。
 外部依存ゼロ（Python stdlib のみ）。
 
 **CLIパス（ユーザー固有 — 環境に合わせて置き換える）:**
@@ -124,11 +122,11 @@ python -X utf8 "...mem_cli.py" reindex
 
 ---
 
-## 他ツールでの利用（Cursor / Windsurf / Codex）
+## 他ツールでの利用（Cursor / Codex）
 
 `mem_cli.py` と `mem.db` はツール非依存。フック登録だけがツール固有。
 
-### Cursor / Windsurf
+### Cursor
 `.cursorrules` または `AGENTS.md` に下記を追加：
 
 ```markdown

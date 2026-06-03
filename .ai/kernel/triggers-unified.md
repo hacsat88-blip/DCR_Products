@@ -1,6 +1,6 @@
 # Unified Trigger System
 
-> **Source of Truth for All Environments** (VS Code, Claude Code, Codex, Copilot CLI, Cursor, Windsurf)
+> **Source of Truth for All Environments** (VS Code, Claude Code, Codex, Copilot CLI, Cursor)
 > Included by: `.github/copilot-instructions.md`, `CLAUDE.md`, `AGENTS.md`
 
 ## コマンド処理（Triggers）

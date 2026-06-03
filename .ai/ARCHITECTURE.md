@@ -2,7 +2,7 @@
 
 ## 概要
 
-DCR (Dynamic Context Router) は、4つの AI 開発環境に統一的なルール・スキル・エージェント設定を配信するシステムです。
+DCR (Dynamic Context Router) は、現行の AI 開発環境に統一的なルール・スキル・エージェント設定を配信するシステムです。
 
 ## システム構成図
 
@@ -34,7 +34,7 @@ DCR (Dynamic Context Router) は、4つの AI 開発環境に統一的なルー�
          ┌────────────┼────────────┐          │
          │            │            │          │
     ┌────┴────┐  ┌────┴────┐  ┌───┴────┐  ┌──┴──────────┐
-    │ VS Code │  │Windsurf │  │ CLI/   │  │ .codex/     │
+    │ VS Code │  │ Cursor  │  │ CLI/   │  │ .codex/     │
     │ Copilot │  │ rules   │  │ Codex  │  │ .claude/    │
     └─────────┘  └─────────┘  └────────┘  └─────────────┘
 ```
@@ -74,13 +74,11 @@ DCR (Dynamic Context Router) は、4つの AI 開発環境に統一的なルー�
 | Copilot CLI     | `AGENTS.md`                       |
 | Codex           | `AGENTS.md`                       |
 | Claude Code     | `CLAUDE.md`                       |
-| Windsurf        | `.windsurf/rules/dcr-kernel.md`   |
 
 ### 4. Generated Layer
 
 `deploy.ps1` が自動生成。手編集禁止。大量生成 mirror は Git 管理外。`sync-agents.ps1` は `deploy.ps1 -Target agents` を呼ぶ互換 shim。
 
-- `.windsurf/` - Windsurf rules/workflows/config (deploy.ps1 生成、Git 管理外)
 - `.codex/agents/` - Codex agent files (deploy.ps1 -Target agents 生成、Git 管理外)
 - `.claude/agents/` - Claude agent files (deploy.ps1 -Target agents 生成、Git 管理外)
 

@@ -1,15 +1,8 @@
 {
     "$schema": "https://raw.githubusercontent.com/modelcontextprotocol/spec/main/schema/mcp.schema.json",
-    "mcpServers": {
-        "opencode-bridge": {
-            "command": "python",
-            "args": [
-                "tools/mcp-servers/opencode-bridge/server.py"
-            ]
-        }
-    },
+    "mcpServers": {},
     "notes": {
         "usage": "Adapt this example to your Codex runtime if MCP is enabled. The repository .codex/config.toml is the local working config.",
-        "security": "Do not include API keys here. opencode-bridge loads its local .env file."
+        "security": "Do not include API keys here."
     }
 }

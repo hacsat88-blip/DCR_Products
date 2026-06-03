@@ -1,7 +1,7 @@
 ---
 name: token-efficiency-advisor
 routing_category: governance
-description: Use when tasks risk context bloat, excessive tool output, or broad codebase scanning; proactively suggest code-review-graph, context-mode, Serena, or usage monitoring before token-heavy operations across Claude Code, Copilot CLI, Codex, Cursor, and Windsurf.
+description: Use when tasks risk context bloat, excessive tool output, or broad codebase scanning; proactively suggest code-review-graph, context-mode, Serena, or usage monitoring before token-heavy operations across Claude Code, Copilot CLI, Codex, and Cursor.
 contract:
   preconditions:
     - "user is doing coding work with terminal output, repository exploration, or repeated multi-step sessions"
@@ -22,8 +22,6 @@ runtime_targets:
   - claude
   - copilot
   - cursor
-  - windsurf
-  - opencode
   - gemini-cli
 ---
 
@@ -76,7 +74,7 @@ runtime_targets:
 ## クライアント別の現実的ガイド
 
 - Claude Code: hook/MCP 機能を使いやすい。提案優先度は高い
-- Codex / Cursor / Windsurf: まず既存シェル要約と source-of-truth 選択を優先し、MCP 連携が使える環境では段階導入する
+- Codex / Cursor: まず既存シェル要約と source-of-truth 選択を優先し、MCP 連携が使える環境では段階導入する
 - Copilot CLI: 機能差があるため、まず既存シェル要約と正本優先探索を使う
 
 ## Adoption Boundaries

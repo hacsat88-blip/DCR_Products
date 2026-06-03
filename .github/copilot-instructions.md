@@ -106,7 +106,6 @@ Entrypoint for VS Code Copilot environment.
 - [observability-design](../../.ai/catalog/skills/observability-design/SKILL.md)
 - [okr-framework](../../.ai/catalog/skills/okr-framework/SKILL.md)
 - [openai-skills-catalog-audit](../../.ai/catalog/skills/openai-skills-catalog-audit/SKILL.md)
-- [oss-delegate](../../.ai/catalog/skills/oss-delegate/SKILL.md)
 - [platform-engineering](../../.ai/catalog/skills/platform-engineering/SKILL.md)
 - [prompt-master](../../.ai/catalog/skills/prompt-master/SKILL.md)
 - [rag-design](../../.ai/catalog/skills/rag-design/SKILL.md)

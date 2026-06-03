@@ -30,7 +30,6 @@
 - `AGENTS.md`
 - `CLAUDE.md`
 - `.github/copilot-instructions.md`
-- `.windsurf/` (Git 管理外)
 - `.claude/agents/` (Git 管理外)
 - `.codex/agents/` (Git 管理外)
 

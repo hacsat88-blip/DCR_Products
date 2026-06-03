@@ -177,7 +177,7 @@ confidence は候補順位を決める指標であり、単独では実行許可
 
 ## V6 CLI/IDE 統合仕上げ
 
-Codex / Claude Code / VS Code Copilot / OpenCode の生成 entrypoint は、同じ自然語返答契約を短く読める状態にする。
+Codex / Claude Code / VS Code Copilot の生成 entrypoint は、同じ自然語返答契約を短く読める状態にする。
 
 - 入口には `pied-piper` が単一 coordinator であることを載せる
 - `proposal_state.status = proposed|refined` の短い次発話を proposal reply として優先解釈することを載せる

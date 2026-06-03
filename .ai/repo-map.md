@@ -27,7 +27,7 @@ DCR Products — AI prompt and agent configuration management system.
 Main purpose:
 Manage and deploy AI system prompts, agent rules, and operational configurations
 across multiple editors and CLIs (VS Code Copilot, Copilot CLI, Claude Code,
-Codex, Windsurf, OpenCode).
+Codex, Cursor).
 
 Tech stack:
 Markdown-based configuration, GitHub for version control, PowerShell deploy.
@@ -52,8 +52,6 @@ for each tool's reading conventions.
 | Copilot CLI     | AGENTS.md                           | .ai/repo-map.md, .ai/catalog/rules/, .ai/catalog/skills/         |
 | Codex           | AGENTS.md                           | .ai/catalog/rules/ (by reference)                                |
 | Claude Code     | CLAUDE.md                           | .ai/catalog/rules/ (by reference)                                |
-| Windsurf        | .windsurf/rules/dcr-kernel.md       | Generated from .ai/kernel/ + .ai/catalog/rules/                  |
-| OpenCode        | opencode.json                       | AGENTS.md + .opencode/kernel.md + OpenCode-local overlays        |
 
 ---
 
@@ -63,7 +61,7 @@ Repository governance model:
 
 - Source layer: editable canonical assets (`.ai/kernel/`, `.ai/catalog/rules/`, `.ai/catalog/skills/`, `templates/`, `.ai/catalog/agents-source/`)
 - Runtime layer: tool entrypoints read directly by each editor (`.github/`, `AGENTS.md`, `CLAUDE.md`)
-- Generated layer: deploy outputs and mirrors (`.windsurf/`, `.claude/agents/`, `.codex/agents/`; large mirrors are Git-ignored)
+- Generated layer: deploy outputs and mirrors (`.claude/agents/`, `.codex/agents/`; large mirrors are Git-ignored)
 - Workspace layer: editor settings, docs, and operations scripts (`.vscode/`, `docs/`, `deploy.ps1`, `validate.ps1`, `init-project.ps1`)
 
 Unsafe migration rule:
@@ -108,7 +106,7 @@ Trigger-activated gate definitions (a/, i/, r/, s/, d/, p/, q/, sh/).
 旧 `.commands/` は `.ai/kernel/gates/` に統合済み。
 
 .ai/kernel/dcr-kernel.md
-Shared runtime kernel source. Windsurf runtime entrypoints are generated from this file.
+Shared runtime kernel source. Runtime entrypoints are generated from this file.
 
 .vscode/
 VS Code workspace settings (useInstructionFiles: true).
@@ -156,11 +154,10 @@ deploy.ps1
 一方向同期スクリプト。サトシ開発 → 各エディタのユーザーレベルパスへ配布。
 
 - .ai/catalog/skills/ → ~/.agents/skills/ (VS Code Copilot)
-- .ai/kernel/dcr-kernel.md + .ai/catalog/rules/*.md → .windsurf/ (Windsurf)
 - .ai/catalog/agents-source/*.toml → .codex/agents/ (Codex, Git 管理外)
 - .ai/catalog/agents-source/*.md → .claude/agents/ (Claude Code, Git 管理外)
 
-オプション: -Target (all/vscode/windsurf/agents/dcr), -DryRun, -Check (drift検出)。
+オプション: -Target (all/vscode/cursor/agents/dcr), -DryRun, -Check (drift検出)。
 
 sync-agents.ps1
 レガシー: deploy.ps1 -Target agents に統合済み。互換性維持のため残存。
@@ -199,5 +196,5 @@ When modifying this repository:
 - preserve existing naming conventions
 - do not create files in templates/ unless archiving a new editor config or managing project init templates
 - do not modify ~/.agents/ directly
-- do not treat `.windsurf/`, `.claude/agents/`, or `.codex/agents/` as editable source paths
+- do not treat `.claude/agents/` or `.codex/agents/` as editable source paths
 - do not perform one-shot move + overwrite + delete migrations for folder restructuring

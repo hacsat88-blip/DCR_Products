@@ -44,7 +44,6 @@ __pycache__/
 
 # Generated adapter outputs (not source of truth)
 /.cursor/
-/.windsurf/
 /.codex/agents/
 /.claude/agents/
 

@@ -8,12 +8,6 @@ command = "npx"
 [mcp_servers.github.env]
 GITHUB_PERSONAL_ACCESS_TOKEN = "SET_IN_LOCAL_ENV"
 
-[mcp_servers.opencode-bridge]
-args = [
-    "tools/mcp-servers/opencode-bridge/server.py",
-]
-command = "python"
-
 [mcp_servers.supermemory-dcr-core]
 url = "https://mcp.supermemory.ai/mcp"
 

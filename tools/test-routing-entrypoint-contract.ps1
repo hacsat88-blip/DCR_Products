@@ -38,7 +38,6 @@ $files = @(
     @{ label = "Codex entrypoint"; path = "AGENTS.md" },
     @{ label = "Claude entrypoint"; path = "CLAUDE.md" },
     @{ label = "VS Code Copilot entrypoint"; path = ".github\copilot-instructions.md" },
-    @{ label = "OpenCode entrypoint"; path = ".opencode\kernel.md" },
     @{ label = "unified-router skill"; path = ".ai\catalog\skills\unified-router\SKILL.md" }
 )
 

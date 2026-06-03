@@ -1,7 +1,7 @@
 ---
 name: design-an-interface
 routing_category: ui-ux
-description: "API・UI コンポーネント・モジュール境界の設計で、単一案に飛びつく前に 3〜5 個の根本的に異なる代替案をトレードオフ付きで生成する。並列サブエージェントが確実に使えるランタイム（Claude Code Task / opencode 等）では並列実行、それ以外（Codex CLI / Cursor / Copilot CLI / Windsurf / gemini-cli 等）では順次思考で同じ多視点比較を作る。"
+description: "API・UI コンポーネント・モジュール境界の設計で、単一案に飛びつく前に 3〜5 個の根本的に異なる代替案をトレードオフ付きで生成する。並列サブエージェントが確実に使えるランタイムでは並列実行、それ以外（Codex CLI / Cursor / Copilot CLI / gemini-cli 等）では順次思考で同じ多視点比較を作る。"
 contract:
   preconditions:
     - "設計対象のモジュール、コンポーネント、API、または UI 単位が特定されている"
@@ -35,8 +35,6 @@ metadata:
     - claude
     - copilot
     - cursor
-    - windsurf
-    - opencode
     - gemini-cli
 ---
 
@@ -82,13 +80,13 @@ API・UI コンポーネント・モジュール境界の設計で、最初に�
 
 ### Step 3: 代替案の生成（ランタイム別）
 
-**並列サブエージェントが確実に使えるランタイム** (Claude Code の `Task` tool, opencode の並列 agent 等):
+**並列サブエージェントが確実に使えるランタイム** (Claude Code の `Task` tool 等):
 
 - 3〜5 個のサブエージェントを並列ディスパッチ
 - 各サブエージェントに「他案と根本的に異なる形」を制約として渡す
 - 例: agent A は関数 API、agent B はクラス API、agent C は宣言的 DSL、agent D は config-driven
 
-**並列サブエージェントが無い／確実でないランタイム** (Codex CLI, Copilot CLI agent mode, Cursor composer, Windsurf, gemini-cli 等 — multi-instance を手動起動できる場合はそれでも可、不確実なら順次へ):
+**並列サブエージェントが無い／確実でないランタイム** (Codex CLI, Copilot CLI agent mode, Cursor composer, gemini-cli 等 — multi-instance を手動起動できる場合はそれでも可、不確実なら順次へ):
 
 - 順次思考で 3〜5 案を出す
 - 各案を出した直後に「これと根本的に違う形は？」と自問してから次案へ

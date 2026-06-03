@@ -15,7 +15,6 @@
     "**/.superpowers/**": true,
     "**/.next/**": true,
     "**/node_modules/**": true,
-    ".windsurf/**": true,
     "**/.cursor/**": true
   },
   "files.exclude": {
@@ -29,7 +28,6 @@
     ".codex/agents/**": true,
     "**/.next/**": true,
     "**/node_modules/**": true,
-    ".windsurf/**": true,
     "**/.cursor/**": true
   },
   "[markdown]": {

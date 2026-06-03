@@ -12,7 +12,6 @@
 | `codex/`                        | Codex 用 project context 断片と周辺設定    | `<project>/AGENTS.md`                          |
 | `product/`                      | 新規 Product 用の最小構成テンプレート      | `Product/<name>/` へ手動コピー                 |
 | `vscode-copilot/`               | VS Code Copilot 用 project context 断片と周辺設定 | `<project>/.github/copilot-instructions.md`    |
-| `windsurf/`                     | Windsurf 用の project context 断片と周辺設定 | `<project>/.windsurf/rules/dcr-kernel.md` ほか |
 | `project-context.md`            | プレースホルダーのキー一覧サンプル         | プロジェクトごとにコピーして編集               |
 | `supermemory-project-policy.md` | project 単位の memory 運用方針テンプレート | プロジェクトごとにコピーして編集               |
 

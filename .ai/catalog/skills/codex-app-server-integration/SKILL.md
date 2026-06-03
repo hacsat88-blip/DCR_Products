@@ -33,9 +33,7 @@ metadata:
     - codex
     - claude
     - cursor
-    - windsurf
     - copilot
-    - opencode
     - gemini-cli
 ---
 
@@ -157,7 +155,7 @@ schema をコード生成に使う場合は、生成物を正本にしない。�
 ## DCR での扱い
 
 - この skill の正本は `.ai/catalog/skills/codex-app-server-integration/SKILL.md`。
-- `.codex/agents/`、`.agents/skills/`、`.windsurf/` などの generated mirror を正本として編集しない。
+- `.codex/agents/`、`.agents/skills/` などの generated mirror を正本として編集しない。
 - 共通化する場合は `.ai/catalog` に追加し、deploy/check で各 runtime へ反映する。
 - Codex 以外の runtime では、app-server 実行ではなく設計・レビューの知識として使う。
 
