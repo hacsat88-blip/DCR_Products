@@ -42,5 +42,7 @@
   // commit/push はエージェントに任せっぱなしにしない（誤コミット・誤プッシュの抑止）。ステージのみ自動承認。
   "chat.tools.terminal.autoApprove": {
     "git add": true
-  }
+  },
+  // GPG 未設定時にコミット横の鍵アイコンでブロックされないよう署名を無効化（global commit.gpgsign=false と併用）
+  "git.enableCommitSigning": false
 }
