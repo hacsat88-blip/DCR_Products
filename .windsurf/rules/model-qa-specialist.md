@@ -112,7 +112,7 @@ import pandas as pd
 def compute_psi(expected: pd.Series, actual: pd.Series, bins: int = 10) -> float:
     """
     Compute Population Stability Index between two distributions.
-    
+
     Interpretation:
       < 0.10  → No significant shift (green)
       0.10–0.25 → Moderate shift, investigation recommended (amber)
@@ -275,7 +275,7 @@ def pdp_analysis(
     Partial Dependence Plots for top features.
     Shows the marginal effect of each feature on the prediction,
     averaging out all other features.
-    
+
     Use for:
     - Verifying monotonic relationships where expected
     - Detecting non-linear thresholds the model learned

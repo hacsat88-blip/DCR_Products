@@ -62,7 +62,7 @@ gdpr_compliance:
     name: "Data Protection Officer"
     email: "dpo@company.com"
     phone: "+1-555-0123"
-    
+
   legal_basis:
     consent: "Article 6(1)(a) - Consent of the data subject"
     contract: "Article 6(1)(b) - Performance of a contract"
@@ -70,7 +70,7 @@ gdpr_compliance:
     vital_interests: "Article 6(1)(d) - Protection of vital interests"
     public_task: "Article 6(1)(e) - Performance of public task"
     legitimate_interests: "Article 6(1)(f) - Legitimate interests"
-    
+
   data_categories:
     personal_identifiers:
       - name
@@ -79,14 +79,14 @@ gdpr_compliance:
       - ip_address
       retention_period: "2 years"
       legal_basis: "contract"
-      
+
     behavioral_data:
       - website_interactions
       - purchase_history
       - preferences
       retention_period: "3 years"
       legal_basis: "legitimate_interests"
-      
+
     sensitive_data:
       - health_information
       - financial_data
@@ -94,38 +94,38 @@ gdpr_compliance:
       retention_period: "1 year"
       legal_basis: "explicit_consent"
       special_protection: true
-      
+
   data_subject_rights:
     right_of_access:
       response_time: "30 days"
       procedure: "automated_data_export"
-      
+
     right_to_rectification:
       response_time: "30 days"
       procedure: "user_profile_update"
-      
+
     right_to_erasure:
       response_time: "30 days"
       procedure: "account_deletion_workflow"
       exceptions:
         - legal_compliance
         - contractual_obligations
-        
+
     right_to_portability:
       response_time: "30 days"
       format: "JSON"
       procedure: "data_export_api"
-      
+
     right_to_object:
       response_time: "immediate"
       procedure: "opt_out_mechanism"
-      
+
   breach_response:
     detection_time: "72 hours"
     authority_notification: "72 hours"
     data_subject_notification: "without undue delay"
     documentation_required: true
-    
+
   privacy_by_design:
     data_minimization: true
     purpose_limitation: true
@@ -144,7 +144,7 @@ class PrivacyPolicyGenerator:
         self.data_categories = []
         self.processing_purposes = []
         self.third_parties = []
-        
+
     def generate_privacy_policy(self):
         """
         Generate comprehensive privacy policy based on data processing activities
@@ -162,30 +162,30 @@ class PrivacyPolicyGenerator:
             'policy_updates': self.generate_updates_section(),
             'contact': self.generate_contact_section()
         }
-        
+
         return self.compile_policy(policy_sections)
-    
+
     def generate_data_collection_section(self):
         """
         Generate data collection section based on GDPR requirements
         """
         section = f"""
         ## Data We Collect
-        
+
         We collect the following categories of personal data:
-        
+
         ### Information You Provide Directly
         - **Account Information**: Name, email address, phone number
         - **Profile Data**: Preferences, settings, communication choices
         - **Transaction Data**: Purchase history, payment information, billing address
         - **Communication Data**: Messages, support inquiries, feedback
-        
+
         ### Information Collected Automatically
         - **Usage Data**: Pages visited, features used, time spent
         - **Device Information**: Browser type, operating system, device identifiers
         - **Location Data**: IP address, general geographic location
         - **Cookie Data**: Preferences, session information, analytics data
-        
+
         ### Legal Basis for Processing
         We process your personal data based on the following legal grounds:
         - **Contract Performance**: To provide our services and fulfill agreements
@@ -193,25 +193,25 @@ class PrivacyPolicyGenerator:
         - **Consent**: Where you have explicitly agreed to processing
         - **Legal Compliance**: To comply with applicable laws and regulations
         """
-        
+
         # Add jurisdiction-specific requirements
         if 'GDPR' in self.jurisdictions:
             section += self.add_gdpr_specific_collection_terms()
         if 'CCPA' in self.jurisdictions:
             section += self.add_ccpa_specific_collection_terms()
-            
+
         return section
-    
+
     def generate_user_rights_section(self):
         """
         Generate user rights section with jurisdiction-specific rights
         """
         rights_section = """
         ## Your Rights and Choices
-        
+
         You have the following rights regarding your personal data:
         """
-        
+
         if 'GDPR' in self.jurisdictions:
             rights_section += """
             ### GDPR Rights (EU Residents)
@@ -222,11 +222,11 @@ class PrivacyPolicyGenerator:
             - **Right to Data Portability**: Receive your data in a portable format
             - **Right to Object**: Opt out of certain types of processing
             - **Right to Withdraw Consent**: Revoke previously given consent
-            
+
             To exercise these rights, contact our Data Protection Officer at dpo@company.com
             Response time: 30 days maximum
             """
-            
+
         if 'CCPA' in self.jurisdictions:
             rights_section += """
             ### CCPA Rights (California Residents)
@@ -234,13 +234,13 @@ class PrivacyPolicyGenerator:
             - **Right to Delete**: Request deletion of personal information
             - **Right to Opt-Out**: Stop the sale of personal information
             - **Right to Non-Discrimination**: Equal service regardless of privacy choices
-            
+
             To exercise these rights, visit our Privacy Center or call 1-800-PRIVACY
             Response time: 45 days maximum
             """
-            
+
         return rights_section
-    
+
     def validate_policy_compliance(self):
         """
         Validate privacy policy against regulatory requirements
@@ -268,7 +268,7 @@ class PrivacyPolicyGenerator:
                 'update_mechanism': self.check_update_mechanism()
             }
         }
-        
+
         return self.generate_compliance_report(compliance_checklist)
 ```
 
@@ -290,7 +290,7 @@ class ContractReviewSystem:
                 'privacy', 'security', 'audit rights', 'regulatory compliance'
             ]
         }
-        
+
     def review_contract(self, contract_text, contract_type):
         """
         Automated contract review with risk assessment
@@ -303,9 +303,9 @@ class ContractReviewSystem:
             'recommendations': self.generate_recommendations(contract_text),
             'approval_required': self.determine_approval_requirements(contract_text)
         }
-        
+
         return self.compile_review_report(review_results)
-    
+
     def assess_contract_risk(self, contract_text):
         """
         Assess risk level based on contract terms
@@ -315,33 +315,33 @@ class ContractReviewSystem:
             'medium_risk': 0,
             'low_risk': 0
         }
-        
+
         # Scan for risk keywords
         for risk_level, keywords in self.risk_keywords.items():
             if risk_level != 'compliance_terms':
                 for keyword in keywords:
                     risk_scores[risk_level] += contract_text.lower().count(keyword.lower())
-        
+
         # Calculate overall risk score
         total_high = risk_scores['high_risk'] * 3
         total_medium = risk_scores['medium_risk'] * 2
         total_low = risk_scores['low_risk'] * 1
-        
+
         overall_score = total_high + total_medium + total_low
-        
+
         if overall_score >= 10:
             return 'HIGH - Legal review required'
         elif overall_score >= 5:
             return 'MEDIUM - Manager approval required'
         else:
             return 'LOW - Standard approval process'
-    
+
     def analyze_compliance_terms(self, contract_text):
         """
         Analyze compliance-related terms and requirements
         """
         compliance_findings = []
-        
+
         # Check for data processing terms
         if any(term in contract_text.lower() for term in ['personal data', 'data processing', 'gdpr']):
             compliance_findings.append({
@@ -350,7 +350,7 @@ class ContractReviewSystem:
                 'risk_level': 'HIGH',
                 'action': 'Ensure DPA covers GDPR Article 28 requirements'
             })
-        
+
         # Check for security requirements
         if any(term in contract_text.lower() for term in ['security', 'encryption', 'access control']):
             compliance_findings.append({
@@ -359,7 +359,7 @@ class ContractReviewSystem:
                 'risk_level': 'MEDIUM',
                 'action': 'Verify security controls meet SOC2 standards'
             })
-        
+
         # Check for international terms
         if any(term in contract_text.lower() for term in ['international', 'cross-border', 'global']):
             compliance_findings.append({
@@ -368,15 +368,15 @@ class ContractReviewSystem:
                 'risk_level': 'HIGH',
                 'action': 'Review local law requirements and data residency'
             })
-        
+
         return compliance_findings
-    
+
     def generate_recommendations(self, contract_text):
         """
         Generate specific recommendations for contract improvement
         """
         recommendations = []
-        
+
         # Standard recommendation categories
         recommendations.extend([
             {
@@ -398,7 +398,7 @@ class ContractReviewSystem:
                 'rationale': 'Ensure compliance with data protection regulations'
             }
         ])
-        
+
         return recommendations
 ```
 
