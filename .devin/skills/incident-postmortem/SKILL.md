@@ -1,0 +1,98 @@
+---
+name: incident-postmortem
+routing_category: governance
+description: "インシデント事後分析：タイムライン作成・RCA・blame-freeカルチャー・再発防止アクション設計"
+disable-model-invocation: true
+contract:
+  preconditions:
+    - "The request matches this skill's description or routing category."
+  postconditions:
+    - "The response names the result, reasoning, and verification or handoff path."
+  invariants:
+    - "Do not treat generated mirrors or runtime caches as DCR source of truth."
+composable:
+  input_type: task
+  output_type: artifact-or-decision
+  chains_with:
+    - verification-before-completion
+runtime_targets:
+  - codex
+  - claude
+  - copilot
+  - cursor
+  - gemini-cli
+---
+
+# Incident Postmortem
+
+## 基本原則
+
+- Blame-free: 人を責めず、システムとプロセスを改善する
+- 事後分析はインシデント収束後72時間以内に開始する
+- アクションアイテムには必ずオーナーと期限を設定する
+
+## タイムライン作成手順
+
+1. 各関係者からタイムラインを個別に収集する（バイアス防止）
+2. タイムスタンプ・誰が・何をした・影響 の4列で整理
+3. 「最初の異常検知」→「対応開始」→「原因特定」→「解決」を必ずマーク
+4. 検知の遅延・対応の遅延・判断ミスのポイントを特定
+
+## RCA フレームワーク
+
+### 五つのなぜ（5 Whys）
+```
+なぜ発生したか？ → 直接原因
+なぜその状態になったか？ → 一次要因
+なぜ防げなかったか？ → プロセス要因
+なぜ検知が遅れたか？ → 監視要因
+なぜ再発防止できていないか？ → 組織要因
+```
+
+### Fishbone（特性要因図）カテゴリ
+- People（判断・スキル）
+- Process（手順・承認フロー）
+- Technology（コード・設定・インフラ）
+- Environment（負荷・外部依存）
+
+## Blame-free カルチャーの原則
+
+- 個人の名前ではなく「役割」で記述する（例：「オンコール担当が...」）
+- 「〇〇さんがミスした」→「システムが誤操作を防げなかった」に言い換える
+- 全員が「自分も同じ状況なら同じことをした可能性がある」と認識する
+
+## 再発防止アクション設計
+
+| 優先度 | 種別 | 内容例 | タイムライン |
+|--------|------|--------|------------|
+| P0 | 即時対応 | 監視アラートの追加 | 今週中 |
+| P1 | 短期改善 | デプロイ手順の更新 | 2週間以内 |
+| P2 | 中期改善 | アーキテクチャ変更 | 次四半期 |
+
+## 事後分析ドキュメントテンプレート
+
+```markdown
+## インシデント概要
+- 発生日時 / 解決日時 / 影響ユーザー数 / 重大度
+
+## タイムライン
+
+## 根本原因
+
+## 影響範囲
+
+## 対応内容
+
+## 再発防止アクション
+| アクション | オーナー | 期限 | ステータス |
+
+## 学んだこと（Lessons Learned）
+
+## 参考リンク
+```
+
+## 共有と文化醸成
+
+- 事後分析結果は全エンジニアに共有する（透明性）
+- 月次で事後分析レビュー会を開催し横断学習を促す
+- 良い事後分析を表彰し、隠蔽文化を排除する

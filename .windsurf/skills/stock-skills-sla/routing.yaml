@@ -1,0 +1,182 @@
+# Stock Skills SLA — ルーティング定義
+# B (stock_skills_2) の routing.yaml を継承し、A (シナリオ・レンズ) の mode/horizon を追加。
+
+agents:
+  screener:
+    role: 銘柄探し・スクリーニング実行
+    triggers: [探す, スクリーニング, いい株, おすすめ, 割安, 高配当, テーマ, トレンド, 成長株,
+               割安成長, バリュー, グロース, 10倍, テンバガー, 穴場, 発掘, 無名, 小型株,
+               ETF, 債券ETF, セクターETF, 品質, 優良, 堅い, ストック型]
+    required_context:
+      - key: region
+        optional: true
+        default: japan
+      - key: theme
+        optional: true
+      - key: investment_horizon
+        optional: true
+        default: mid_3_5y
+      - key: mode
+        optional: true
+        default: screening
+
+  analyst:
+    role: 銘柄分析・バリュエーション評価・5軸スコア・期間別3シナリオ
+    triggers: [分析, レポート, 割安度, バリュエーション, バリュートラップ, 還元率,
+               シナリオ, どうなる, 10倍, 将来性, ファンダ]
+    required_context:
+      - key: symbol
+        optional: false
+      - key: investment_horizon
+        optional: true
+        default: mid_3_5y
+      - key: mode
+        optional: true
+        default: holdings
+
+  health-checker:
+    role: PFの事実・数値を出す（判断・レコメンドはしない）
+    triggers: [PF, ポートフォリオ, 損益, ヘルスチェック, ストレステスト, VIX, 金利,
+               期待リターン, 構造, 偏り, 市況チェック, おはよう, 朝サマリー,
+               モーニング, TODO, 予定, 定常業務, 日次チェック, ルーティン]
+    required_context: []
+
+  researcher:
+    role: ニュース・センチメント・業界/市場動向・IR深掘り・EDINETテキスト調査
+    triggers: [ニュース, リサーチ, 深掘り, 業界, マーケット, 市況, センチメント,
+               ビジネスモデル, 動向, IR, 有報, MD&A, 適時開示]
+    required_context:
+      - key: topic_or_symbol
+        optional: true
+        default: market_overview
+
+  strategist:
+    role: 投資判断・入替提案・売却判断・What-Ifシミュレーション
+    triggers: [入替, リバランス, 改善, 調整, プラン, 戦略, どうすべき, 乗り換え,
+               スワップ, 売却, 損切り, 利確, 手放す, 撤退, 売るべき, 売り時]
+    required_context:
+      - key: target_scope
+        optional: true
+        default: portfolio
+      - key: investment_horizon
+        optional: true
+        default: mid_3_5y
+
+  risk-assessor:
+    role: 市場リスク判定（🟢通常/🟡注意/🔴荒天）+ セクター地合い
+    triggers: [リスク判定, リスクオン, リスクオフ, 押し目, 買われすぎ, 売られすぎ,
+               市況判定, 地合い, 相場環境]
+    required_context: []
+
+  reviewer:
+    role: 品質・Convergence Gate・源タグ整合性・禁止語スキャン
+    triggers: []  # 自動挿入のみ
+    required_context: []
+
+examples:
+  # ─── Pattern A: ミニマル（1-3行で済む事実照会）─────────────────────
+  - intent: "VIXは？"
+    agent: health-checker
+    pattern: A
+    header: "🎯 [health-checker] VIX確認"
+
+  - intent: "TODO見せて"
+    agent: health-checker
+    pattern: A
+    header: "🎯 [health-checker] TODOリスト"
+
+  # ─── Pattern B: 単一エージェント ────────────────────────────────────
+  - intent: "いい日本株ある？"
+    agent: screener
+    pattern: B
+    header: "🎯 [screener] 日本株スクリーニング"
+
+  - intent: "割安成長株を探して"
+    agent: screener
+    pattern: B
+    header: "🎯 [screener] 割安成長株スクリーニング"
+    context:
+      mode: value_growth
+      investment_horizon: mid_3_5y
+
+  - intent: "10年持てそうな日本株"
+    agent: screener
+    pattern: B
+    header: "🎯 [screener] 長期割安成長株スクリーニング"
+    context:
+      mode: value_growth
+      investment_horizon: long_10y_plus
+
+  - intent: "トヨタってどう？"
+    agent: analyst
+    pattern: B
+    header: "🎯 [analyst] トヨタ(7203.T) 分析"
+
+  - intent: "PF大丈夫？"
+    agent: health-checker
+    pattern: B
+    header: "🎯 [health-checker] PFヘルスチェック"
+
+  - intent: "ストレステストして"
+    agent: health-checker
+    pattern: B
+    header: "🎯 [health-checker] ストレステスト"
+
+  - intent: "最新ニュース教えて"
+    agent: researcher
+    pattern: B
+    header: "🎯 [researcher] 市況/ニュースリサーチ"
+
+  # ─── Pattern C: 連鎖（2エージェント以上）────────────────────────────
+  - intent: "グロース株を探して"
+    agents: [risk-assessor, screener]
+    pattern: C
+    header: "🎯 [risk-assessor → screener] リスク判定 → スクリーニング"
+    note: "risk-off 時はスクリーニングを見送り（買わない）"
+
+  - intent: "PFを改善したい"
+    agents: [health-checker, strategist]
+    pattern: C
+    header: "🎯 [health-checker → strategist] PF診断 → 改善提案"
+
+  - intent: "XX銘柄を売るべきか"
+    agents: [analyst, strategist]
+    pattern: C
+    header: "🎯 [analyst → strategist] 銘柄分析 → 売却判断"
+
+  - intent: "XX銘柄に乗り換えたい"
+    agents: [analyst, risk-assessor, strategist]
+    pattern: C
+    header: "🎯 [analyst → risk-assessor → strategist] 分析 → リスク → 入替判断"
+
+  # ─── value_growth 専用 ────────────────────────────────────────────
+  - intent: "割安成長株を5年目線で探して"
+    agent: screener
+    pattern: B
+    header: "🎯 [screener] 割安成長株 3〜5年レンズ"
+    context:
+      mode: value_growth
+      investment_horizon: mid_3_5y
+
+  - intent: "1〜2年で上がりそうな割安株"
+    agent: screener
+    pattern: B
+    header: "🎯 [screener] 割安株 1〜2年レンズ"
+    context:
+      mode: value_growth
+      investment_horizon: short_1_2y
+
+  # ─── 定常業務 ────────────────────────────────────────────────────
+  - intent: "定常業務"
+    mode: routine-daily
+    agents: [health-checker, researcher]
+    pattern: C
+    header: "🎯 [routine-daily] 日次チェック"
+
+context_rules:
+  # 直前の出力から銘柄を引き継ぐ
+  - if: "ユーザー入力が「その株を」「それを」「さっきの銘柄」を含む"
+    then: "直前エージェント出力から symbol を自動取得"
+  # portfolio.csv から地域を推測
+  - if: "region が不明でポートフォリオがある"
+    then: "portfolio.csv の主要保有地域を region のデフォルトとする"

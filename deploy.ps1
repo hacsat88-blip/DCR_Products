@@ -7,10 +7,11 @@
   対象エディタと同期先:
     VS Code Copilot : ~/.agents/skills/
     Cursor          : .cursor/
+    Devin           : .devin/ + .windsurf/ compatibility mirror
     Agents          : .ai/catalog/agents-source/ -> .codex/agents/ (toml) + .claude/agents/ (md)
 
 .PARAMETER Target
-    同期先を指定: all | vscode | cursor | agents | dcr
+    同期先を指定: all | vscode | cursor | devin | windsurf | agents | dcr
   デフォルト: all
 
 .PARAMETER DryRun
@@ -22,12 +23,13 @@
 .EXAMPLE
   .\deploy.ps1
   .\deploy.ps1 -Target vscode
+  .\deploy.ps1 -Target devin
   .\deploy.ps1 -Target agents
   .\deploy.ps1 -Check
 #>
 
 param(
-    [ValidateSet("all", "vscode", "cursor", "agents", "dcr")]
+    [ValidateSet("all", "vscode", "cursor", "devin", "windsurf", "agents", "dcr")]
     [string]$Target = "all",
     [switch]$DryRun,
     [switch]$Check,
@@ -43,6 +45,11 @@ $CatalogPaths = Join-Path $RepoRoot "tools\lib\catalog-paths.ps1"
 . $CatalogPaths
 $DeprecatedAliases = Join-Path $RepoRoot "tools\lib\deprecated-aliases.ps1"
 . $DeprecatedAliases
+
+if ($Target -eq "windsurf") {
+    Write-Host "[ALIAS] Target 'windsurf' is deprecated; using 'devin'." -ForegroundColor DarkYellow
+    $Target = "devin"
+}
 
 # ── Gate enforcement ──
 if ($EnforceGate) {
@@ -67,7 +74,7 @@ if ($EnforceGate) {
 
 # ── Unified Adapter Framework (new) ──
 $DeployAll = Join-Path $RepoRoot "tools\deploy-all.ps1"
-if ((Test-Path $DeployAll) -and -not $Check -and ($Target -in @("all", "vscode", "cursor", "agents"))) {
+if ((Test-Path $DeployAll) -and -not $Check -and ($Target -in @("all", "vscode", "cursor", "devin", "agents"))) {
     Write-Host ""
     Write-Host "=== Deploy Adapters (Unified Framework) ===" -ForegroundColor Cyan
     $targetArg = if ($Target -eq "all") { "all" } else { $Target }
@@ -89,6 +96,8 @@ $SourceAgents = Resolve-DcrSourcePath -RepoRoot $RepoRoot -AssetType "agents-sou
 $DestVSCodeSkills = Join-Path $UserHome ".agents\skills"
 $DestCodexAgents = Join-Path $RepoRoot ".codex\agents"
 $DestClaudeAgents = Join-Path $RepoRoot ".claude\agents"
+$DestDevin = Join-Path $RepoRoot ".devin"
+$DestWindsurf = Join-Path $RepoRoot ".windsurf"
 
 function Get-TempDirectory {
     $tempDir = Join-Path ([System.IO.Path]::GetTempPath()) ("dcr-deploy-" + [System.Guid]::NewGuid().ToString("N"))
@@ -479,6 +488,26 @@ if ($Check) {
         $claudeDiffs = Get-FlatFileDrift -Source $SourceAgents -Destination $DestClaudeAgents -Filter '*.md' -IgnoreNames @('README.md')
         Write-CheckDrift -Label "Claude agents" -Diffs $claudeDiffs
     }
+    if ($Target -eq "all" -or $Target -eq "devin") {
+        $devinAdapter = Join-Path $RepoRoot "tools\adapters\devin.ps1"
+        if (-not (Test-Path $devinAdapter)) {
+            Write-CheckDrift -Label "Devin mirror" -Diffs @("[SOURCE_MISSING] $devinAdapter")
+        }
+        else {
+            $tempDir = Get-TempDirectory
+            try {
+                $tempDevin = Join-Path $tempDir ".devin"
+                & $devinAdapter -RepoRoot $RepoRoot -OutputRoot $tempDevin -Quiet
+                Write-CheckDrift -Label "Devin canonical mirror" -Diffs (Get-DirectoryDrift -Source $tempDevin -Destination $DestDevin -IgnoreNames @("config.local.json"))
+                Write-CheckDrift -Label "Windsurf compatibility mirror" -Diffs (Get-DirectoryDrift -Source (Join-Path $tempDir ".windsurf") -Destination $DestWindsurf)
+            }
+            finally {
+                if (Test-Path $tempDir) {
+                    Remove-Item -LiteralPath $tempDir -Recurse -Force -ErrorAction SilentlyContinue
+                }
+            }
+        }
+    }
     if ($Target -eq "all" -or $Target -eq "dcr") {
         $dcrConfigPath = Join-Path $RepoRoot ".dcr\config.json"
         $dcrConfigDest = Join-Path $HOME ".config\dcr\config.json"
@@ -592,6 +621,9 @@ if ($Watch) {
                 }
                 if ($Target -eq "all" -or $Target -eq "agents") {
                     & $DeployAll -Target agents
+                }
+                if ($Target -eq "all" -or $Target -eq "devin") {
+                    & $DeployAll -Target devin
                 }
                 Write-Host "[WATCH] Deploy complete. Watching..." -ForegroundColor Green
             }
