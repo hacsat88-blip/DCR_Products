@@ -39,13 +39,6 @@ analytics output の scope、KPI interpretation、reporting handoff の判断基
 - reporting lens and audience
 - confidence / assumption notes
 - recommended follow-up analysis
-    WHERE date >= DATE_SUB(CURRENT_DATE(), INTERVAL 90 DAY)
-    GROUP BY campaign_name
-    HAVING SUM(spend) > 1000  -- Filter for significant spend
-    ORDER BY roi_percentage DESC;
-  `
-};
-```
 
 ## 🔄 Your Workflow Process
 
