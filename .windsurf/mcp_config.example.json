@@ -1,0 +1,10 @@
+{
+  "mcpServers": {
+    "opencode-bridge": {
+      "command": "python",
+      "args": [
+        "<REPO_ROOT>/tools/mcp-servers/opencode-bridge/server.py"
+      ]
+    }
+  }
+}

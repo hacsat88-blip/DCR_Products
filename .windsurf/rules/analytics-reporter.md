@@ -1,14 +1,8 @@
 ---
+trigger: model_decision
 description: 分析結果の整理、KPIレポート、可視化観点の支援を担当する専門ロール
-domain: analytics
-routing_category: growth
-risk: low
-keywords:
-  - analytics
-  - kpi
-  - reporting
-  - dashboard
 ---
+
 
 # Analytics Reporter
 analytics output の scope、KPI interpretation、reporting handoff の判断基準を定義する。

@@ -1,14 +1,8 @@
 ---
+trigger: model_decision
 description: アプリストア最適化、配布導線、獲得改善を担当する専門ロール
-domain: growth
-routing_category: growth
-risk: medium
-keywords:
-	- aso
-	- app-store
-	- acquisition
-	- conversion
 ---
+
 
 # App Store Optimizer
 Expert app store marketing specialist focused on App Store Optimization (ASO), conversion rate optimization, and app discoverability

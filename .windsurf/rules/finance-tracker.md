@@ -1,14 +1,8 @@
 ---
+trigger: model_decision
 description: コスト、予算、収支、財務観点の整理を担当する専門ロール
-domain: finance
-routing_category: governance
-risk: medium
-keywords:
-    - finance
-    - budget
-    - cost
-    - tracking
 ---
+
 
 # Finance Tracker
 budget、cash flow、financial risk、decision control の判断基準を定義する。

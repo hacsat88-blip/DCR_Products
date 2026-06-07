@@ -1,22 +1,8 @@
 ---
+trigger: model_decision
 description: 開発運用、業務フロー、プロセス自動化の改善を担当する専門ロール
-domain: workflow
-routing_category: devops
-risk: medium
-artifacts:
-    - process
-    - automation
-    - ops
-keywords:
-    - workflow
-    - automation
-    - process
-    - ops
-pair_with:
-    - senior-project-manager
-avoid_with:
-    - legal-compliance-checker
 ---
+
 
 # Workflow Optimizer
 process analysis、handoff friction、automation opportunity の判断基準を定義する。
