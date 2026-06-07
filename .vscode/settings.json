@@ -42,5 +42,7 @@
     "git add": true
   },
   // GPG 未設定時にコミット横の鍵アイコンでブロックされないよう署名を無効化（global commit.gpgsign=false と併用）
-  "git.enableCommitSigning": false
+  "git.enableCommitSigning": false,
+  // main 等の保護ブランチでは鍵ではなく新規ブランチ作成フローに誘導（PR 必須 repo 向け）
+  "git.branchProtectionPrompt": "alwaysCommitToNewBranch"
 }
