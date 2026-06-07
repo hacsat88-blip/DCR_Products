@@ -1,19 +1,10 @@
 ---
 trigger: model_decision
-description: Deprecated DCR rule aliases for Windsurf; route old names to successors
+description: Deprecated DCR aliases for Devin Desktop legacy Cascade compatibility
 ---
 
-# Deprecated Rule Aliases
+# Deprecated Aliases
 
-When a user or document references a deprecated rule name, silently use the successor rule instead.
+Deprecated alias routing is generated from .ai/catalog/_deprecated-aliases.json and resolved by the shared DCR router.
 
-- behavioral-nudge-engine -> growth-hacker
-- evidence-collector -> qa-reality-checker
-- inclusive-visuals-specialist -> ui-designer
-- instagram-curator -> content-creator
-- reddit-community-builder -> social-media-strategist
-- sprint-prioritizer -> senior-project-manager
-- test-results-analyzer -> qa-reality-checker
-- tiktok-strategist -> social-media-strategist
-- twitter-engager -> social-media-strategist
-- ux-architect -> ui-designer
+Read .ai/module/deprecation-lifecycle.md before restoring or invoking removed aliases.
