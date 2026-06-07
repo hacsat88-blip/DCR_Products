@@ -25,3 +25,6 @@ url = "https://mcp.supermemory.ai/mcp"
 
 [mcp_servers.supermemory-satoshi-dev.http_headers]
 x-sm-project = "satoshi-dev"
+
+[sandbox_workspace_write]
+network_access = true

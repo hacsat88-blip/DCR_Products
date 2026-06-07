@@ -75,14 +75,16 @@ OpenAI Skills baseline へのスリム化では、個別 QA / review / security 
 2. 変更スコープを箇条書きで定義する
 3. 実装順序を依存関係に基づいて決定する
 4. 検証方法を各変更項目に対して定義する
-5. **チェックリストを生成する**（後のQA Gateで使用）
-6. 必要に応じて `model-route` で実装時のモデル階層を決める
-7. Spec-first 補強が必要なら、以下を Plan に織り込む:
+5. CI の有無と repo-native な検証コマンドを確認する
+6. LLM アプリ、PR、外部公開、本番/CD に近い変更で最低 CI がない場合、lint / format、typecheck、test、必要時 smoke を計画に含める
+7. **チェックリストを生成する**（後のQA Gateで使用）
+8. 必要に応じて `model-route` で実装時のモデル階層を決める
+9. Spec-first 補強が必要なら、以下を Plan に織り込む:
    - clarify: 不明な要求、非目標、制約を実装前に固定
    - analyze: spec / plan / tasks / code の矛盾を検出
    - checklist: 受け入れ条件を検証可能な項目へ分解
    - doctor: 正本、生成物、検証コマンド、外部依存の健全性を確認
-8. データ / multimodal / mobile / model-debate 系の旧 skill に一致する場合は、上の Consolidated Pipeline Aliases の phase に検証項目として畳む
+10. データ / multimodal / mobile / model-debate 系の旧 skill に一致する場合は、上の Consolidated Pipeline Aliases の phase に検証項目として畳む
 
 ### 出口条件
 - ユーザーがプランを承認した
@@ -126,10 +128,15 @@ NEXT q/ でQA検証を実行することを推奨します
 3. リスク順に報告する（STOP 重大 -> FIX 中 -> GO 低）
 4. 機能チェックリスト表を作成する（PASS / FAIL）
 5. 構造品質は `eval-harness`、構成安全性は `security-scan` で補助検証する
-6. 必要に応じて spec-kit review / threatmodel 相当の観点を追加する:
+6. CI / ローカル再現コマンドの証拠を確認する:
+   - lint / format
+   - typecheck
+   - test
+   - smoke / server response（サーバー・外部公開・LLMアプリで必要な場合）
+7. 必要に応じて spec-kit review / threatmodel 相当の観点を追加する:
    - review: 実装品質、テスト、エラー処理、単純性
    - threatmodel: LLM/agent artifact、外部入力、権限、注入リスク
-7. 旧 QA / review / security / performance skill に一致する場合は、専用 skill を個別発火せず、この gate の検証項目として扱う
+8. 旧 QA / review / security / performance skill に一致する場合は、専用 skill を個別発火せず、この gate の検証項目として扱う
 
 ### 報告フォーマット
 ```markdown
@@ -177,14 +184,16 @@ NEXT sh/ でリリース判定に進めます
    - 重大バグなし
    - セキュリティ（外部入力、シークレット）
    - Git 状態（未コミット変更、ブランチ）
+   - CI 状態（lint / format、typecheck、test、必要時 smoke が PASS）
 3. DCR preflight:
    - `.ai/catalog` / `.ai/book` / `.ai/kernel` / `.ai/environments` / templates の正本変更が generated mirror へ反映済みか
    - routing index や generated entrypoint の drift が残っていないか
    - `deploy.ps1 -Check` と `validate.ps1` の最新結果を確認したか
    - 広範囲 cleanup / runtime removal / provider-reference removal では `dcr-surface-reviewer` 相当の表面レビューを済ませたか
-4. リリース判定: GO Ship可能 / STOP ブロッカーあり
-5. コミットメッセージ案の提示
-6. 必要時は `harness-audit` を実行し、運用負債を次サイクルに繰り越さない
+4. 本番/CD/外部公開では、CI 不在・CI 失敗・CI 未確認のまま GO にしない。小さな試作のみ例外理由を明示して扱う
+5. リリース判定: GO Ship可能 / STOP ブロッカーあり
+6. コミットメッセージ案の提示
+7. 必要時は `harness-audit` を実行し、運用負債を次サイクルに繰り越さない
 
 ### 出口条件
 - ユーザーがコミット/マージを承認
@@ -203,6 +212,7 @@ WARN p/ でプランを更新してからに進むことを推奨します
 
 ### 小さな変更（3ステップ未満）の場合
 Pipeline は推奨するが強制しない。ユーザーが直接 `sh/` を呼んでもよい。
+ただし本番/CD/外部公開に進む場合は、変更規模に関わらず CI または同等の再現可能な検証証拠を確認する。
 
 ## Integration with DCR Kernel
 
