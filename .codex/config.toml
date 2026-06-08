@@ -4,9 +4,7 @@ args = [
     "@modelcontextprotocol/server-github",
 ]
 command = "npx"
-
-[mcp_servers.github.env]
-GITHUB_PERSONAL_ACCESS_TOKEN = "SET_IN_LOCAL_ENV"
+env_vars = ["GITHUB_PERSONAL_ACCESS_TOKEN"]
 
 [mcp_servers.supermemory-dcr-core]
 url = "https://mcp.supermemory.ai/mcp"
