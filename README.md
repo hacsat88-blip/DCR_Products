@@ -44,6 +44,8 @@ AI エージェント設定・ルール・スキルの一元管理リポジト�
 - Azure Skills を使えない場合は、DCR の `azure-infra-engineer`, `mcp-builder`, `security-engineer`, `devops-automator` などへフォールバックする
 - Superpowers は DCR に取り込まず、外部公式パッケージとして扱う。ローカル改変は `tools/check-external-superpowers.ps1` と `validate.ps1` で検知する
 - agentmemory など runtime memory backend は任意の補助層として扱う。過去判断の recall と小さな決定保存に使い、`.ai/catalog` / `.ai/book` の正本を置換しない
+- GBrain は memory/runtime 候補として `external-tool-poc` + `concept-import` 扱いにする。runtime、MCP設定、43 skills は入れず、brain-first recall / gap analysis / skill evaluation の考え方だけ参照する
+- taste-skill は frontend / visual design skillpack の `concept-import` として扱う。installer や外部 SKILL 群は入れず、design read / anti-default / image-first reference の考え方だけを既存 UI 方針に薄く反映する
 - GSD は runtime や `.planning/` を入れず、phase/state/decision/verify/wave/namespace の考え方だけを DCR skill として薄く取り込む
 
 詳細な共通仕様は `.ai/module/unified-integration.md` を参照。
@@ -202,6 +204,8 @@ pwsh -ExecutionPolicy Bypass -File .\deploy.ps1 -Check             # ドリフ�
 - ローカル改変検知: `pwsh -ExecutionPolicy Bypass -File .\tools\check-external-superpowers.ps1`
 - `validate.ps1` は Superpowers checkout が存在する環境では同じ drift check を実行し、存在しない環境ではスキップする
 - `agentmemory` は外部 runtime memory backend 候補として扱う。MCP/REST server、hooks、DB、npm package を repo 正本へ直接取り込まず、利用可能な環境だけで memory preflight / memory save を行う
+- `garrytan/gbrain` は外部 memory/runtime 候補として扱う。GBrain の 43 skills、`RESOLVER.md`、installer、Bun runtime、MCP config、remote token、OAuth、ingestion、cron/dream cycle は入れず、repo 外または Product 単位の非破壊 PoC 後に判断する
+- `Leonxlnx/taste-skill` は frontend / visual design skillpack の参照元として扱う。`npx skills add`、外部 SKILL.md 群、`design-taste-frontend` / `gpt-taste` / `image-to-code` の active skill 化は行わず、DCR `DESIGN.md` と `ui-ux-pro-max` を優先する
 - `GSD` は外部 spec-driven workflow 参照元として扱う。GSD command runtime と `.planning/` は入れず、DCR skill の `metadata.origin` に provenance を残す
 - `mattpocock/skills` は外部 engineering-method skill 参照元として扱う。`skills.sh`、setup command、Claude 固有 slash command は入れず、grill / zoom-out / diagnose / handoff の考え方だけを DCR skill として薄く取り込む
 - `addyosmani/agent-skills` は lifecycle skill pack の比較対象として扱う。installer、plugin、slash command、agent persona は入れず、DCR / Superpowers / OpenAI Skills で未充足の checklist / workflow 観点だけを selective reference とする

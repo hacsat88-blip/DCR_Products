@@ -133,6 +133,16 @@ Skill、Agent、サブエージェント、並列 orchestration、外部 MCP/API
 
 自然言語 trigger は `unified-router.md` の Runtime Memory Preflight に集約する。
 
+### GBrain external memory/runtime candidate
+
+- 位置づけ: `garrytan/gbrain` は memory DB、MCP、knowledge graph、skillpack、cron/dream cycle を含む外部 runtime 候補
+- 採用形態: `external-tool-poc` + `concept-import`
+- DCR との関係: DCR control plane、`.ai/catalog`、`.ai/book`、`pied-piper`、既存 runtime memory policy を置換しない
+- 取り込む概念: brain-first recall、gap analysis、knowledge graph、skillpack doctor / skillopt の benchmark・held-out・dirty-tree gate の評価思想
+- PoC 条件: repo 外または Product 単位で `gbrain init --pglite`、`gbrain doctor`、Codex MCP 接続などの非破壊確認を行ってから判断する
+- 禁止: 43 skills、`RESOLVER.md`、installer、Bun runtime、MCP config、remote token、OAuth、email/calendar/voice ingestion、cron/dream cycle を DCR 正本へコピーまたは自動導入しない
+- provenance: https://github.com/garrytan/gbrain
+
 ### GSD pattern imports
 
 - 位置づけ: GSD は spec-driven / context engineering / phase-state pattern の参照元
@@ -177,6 +187,15 @@ Skill、Agent、サブエージェント、並列 orchestration、外部 MCP/API
 - DCR との関係: rule / Skill / agent / orchestration / pipeline の制御層は置換しない。UI を生成する Product / prototype で必要になった場合だけ runtime 採用を個別判断する
 - 既存導入: `structured-output` に Generative UI DSL の validation 観点、`web-artifacts-builder` に GenUI artifact の component schema / parser / fallback 観点を追加
 - provenance: https://github.com/thesysdev/openui
+
+### Taste Skill frontend design reference
+
+- 位置づけ: `Leonxlnx/taste-skill` は frontend / visual design skillpack の selective reference
+- 採用形態: `concept-import`
+- DCR との関係: DCR `DESIGN.md`、`ui-ux-pro-max`、frontend / accessibility rules を優先し、DCR control plane や active Skill catalog を置換しない
+- 取り込む概念: design read、anti-default discipline、variance / motion / density dials、redesign audit、visual quality が主目的のときの image-first reference workflow
+- 非採用: `npx skills add`、外部 SKILL.md 群のコピー、`design-taste-frontend` / `gpt-taste` / `image-to-code` の active skill 化、Tailwind v4 / Motion / icon library など外部既定の強制
+- provenance: https://github.com/Leonxlnx/taste-skill
 
 ### React Doctor quality gate import
 

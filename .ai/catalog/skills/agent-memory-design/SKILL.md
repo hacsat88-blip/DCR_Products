@@ -106,6 +106,15 @@ user request
 - 禁止: agentmemory の hook、DB、server、npm runtime をこの repo の正本として直接取り込まない
 - 導入条件: MCP/REST memory server の運用、secret 除外、保存粒度、削除手順を確認してから有効化する
 
+## GBrain 型 memory/runtime の位置づけ
+
+- 役割: brain-first recall、gap analysis、knowledge graph、skillpack quality check などを含む外部 memory/runtime 候補
+- 採用形態: `external-tool-poc` + `concept-import`
+- DCR との関係: repo artifact、`.ai/catalog`、`.ai/book`、現在の git 状態を優先し、GBrain は補助検索・補助評価層としてのみ扱う
+- PoC 条件: repo 外または Product 単位で `gbrain init --pglite`、`gbrain doctor`、Codex MCP 接続の非破壊確認を行い、保存対象・削除手順・secret/PII 除外を確認してから使う
+- 禁止: GBrain の 43 skills、`RESOLVER.md`、installer、Bun runtime、MCP config、remote token、OAuth、email/calendar/voice ingestion、cron/dream cycle を DCR 正本へ直接取り込まない
+- provenance: https://github.com/garrytan/gbrain
+
 ## 記憶の4層アーキテクチャ
 
 | 層 | 種別 | ライフタイム | 実装 |

@@ -78,6 +78,12 @@
 - Rely on color alone for status communication
 - Introduce large layout shifts on data updates
 
+## Visual Anti-Slop
+
+- Start visually important pages with a concise design read: audience, page type, visual language, and density.
+- Avoid generic AI defaults such as purple gradient mesh heroes, repeated three-card rows, decorative fake system labels, and nested cards without purpose.
+- Use image references only when visual fidelity is the main success criterion, then translate them into the existing DCR design language instead of treating them as a new source of truth.
+
 ## Responsive Rules
 
 - Collapse side panels below 1024px

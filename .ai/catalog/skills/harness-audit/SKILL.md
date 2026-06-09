@@ -53,6 +53,7 @@ runtime_targets:
 | warpdotdev/oz-skills | selective skill import | 外部 runtime は入れず、Agent Skills互換素材だけ採用 |
 | oh-my-codex | pattern library | doctor / false-green / hook merge の考え方だけ採用 |
 | rohitg00/agentmemory | external-check | runtime memory backend 候補。DCR 正本を置換せず、過去判断 recall と小さな memory_save だけに使う |
+| garrytan/gbrain | external-tool-poc + concept-import | memory/runtime 候補。runtime / MCP config / 43 skills は入れず、brain-first recall、gap analysis、knowledge graph、skill evaluation の考え方だけ参照する |
 | gsd-build/get-shit-done | adopt patterns only | phase/state/decision/verify/wave/namespace pattern のみ DCR skill 化し、GSD runtime と `.planning/` は入れない |
 | external Skill/Agent/MCP repo | use external-capability-intake | サトシ開発の共通資産正本へ取り込むか、概念だけ取り込むか、改修不可の外部正本にするかを分類する |
 | mattpocock/skills | selective pattern import | grill-with-docs / zoom-out / diagnose / handoff など engineering method だけを DCR skill 化し、skills.sh runtime と setup command は入れない |
@@ -60,6 +61,7 @@ runtime_targets:
 | colbymchenry/codegraph | external-check | skill 正本ではなく optional MCP / code intelligence tool 候補。`codegraph install --print-config codex` などの非破壊確認と PoC 後に判断する |
 | multica-ai/andrej-karpathy-skills | skip / covered-by-existing-policy | 単体 CLAUDE.md は導入せず、Think Before Coding / Simplicity / Surgical Changes / Goal-Driven 原則は既存 AGENTS / kernel / editing constraints でカバーする |
 | millionco/react-doctor | selective quality gate | React 専用 diagnostic CLI は Product 単位の advisory gate とし、agent install や root 共通 CI への即導入はしない |
+| Leonxlnx/taste-skill | concept-import | frontend / visual design skillpack。installer や外部 SKILL 群は入れず、design read、anti-default、redesign audit、image-first reference の考え方だけ UI 方針へ薄く反映する |
 | openai/skills | official baseline | curated/system skills を DCR skill 整理の基準線にし、DCR 固有要素だけ overlay / pipeline / local-only として残す |
 | context-mode | external-check | MCP出力オフロードとしてPoC候補、repo正本には混ぜない |
 | ccusage / @ccusage/codex | external-check | 使用量可視化候補、導入前にローカルJSONL範囲を確認 |

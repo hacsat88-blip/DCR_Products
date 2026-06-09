@@ -336,6 +336,16 @@ python3 skills/ui-ux-pro-max/scripts/search.py "fintech crypto" --design-system 
 
 These are frequently overlooked issues that make UI look unprofessional:
 
+### Taste-Skill Concept Overlay
+
+Use `Leonxlnx/taste-skill` as a concept reference only. Do not install its skillpack, copy its SKILL.md files, or override DCR `DESIGN.md`, accessibility rules, or the existing project stack.
+
+- Before visually important landing, portfolio, marketing, or redesign work, write a one-line design read: target audience, page type, visual language, and implementation lean.
+- Set lightweight dials for design variance, motion intensity, and visual density, then keep the implementation consistent with those choices.
+- Avoid AI-default output: generic purple gradients, centered dark mesh heroes, repeated three-card rows, fake dashboard labels, and decorative clutter.
+- For visual quality as the primary success criterion, optionally create image references first, then inspect layout, typography, spacing, color, and component rhythm before coding. This is optional, not mandatory.
+- Preserve the existing framework, component library, icon policy, Tailwind version, motion library, and accessibility constraints unless the user explicitly approves a change.
+
 ### Icons & Visual Elements
 
 | Rule | Do | Don't |
