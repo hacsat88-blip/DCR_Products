@@ -194,6 +194,26 @@ function Remove-StaleManagedFiles {
     }
 }
 
+function Remove-DevinLegacyRoots {
+    param([string]$Root)
+
+    if (-not (Test-Path $Root)) { return }
+
+    $rootFull = (Resolve-Path -LiteralPath $Root).Path.TrimEnd('\', '/')
+    foreach ($relativeRoot in @("rules", "workflows")) {
+        $legacyPath = Join-Path $Root $relativeRoot
+        if (-not (Test-Path $legacyPath)) { continue }
+
+        $resolvedLegacy = (Resolve-Path -LiteralPath $legacyPath).Path
+        if (-not $resolvedLegacy.StartsWith($rootFull + [System.IO.Path]::DirectorySeparatorChar, [System.StringComparison]::OrdinalIgnoreCase)) {
+            throw "Refusing to remove path outside Devin deploy target: $resolvedLegacy"
+        }
+
+        Remove-Item -LiteralPath $resolvedLegacy -Recurse -Force
+        Write-DevinStatus -Message "  [REMOVE] legacy $relativeRoot" -Color "DarkYellow"
+    }
+}
+
 function Get-ManagedFiles {
     param([string]$Root)
 
@@ -265,6 +285,10 @@ $previousWindsurf = @(Read-ManagedFiles -Path $windsurfManifest)
 
 New-Item -ItemType Directory -Path $devinRoot -Force | Out-Null
 New-Item -ItemType Directory -Path $windsurfRoot -Force | Out-Null
+
+# Devin Local now uses skills as the canonical surface. Legacy Cascade rules and
+# workflows are generated only in the .windsurf compatibility mirror.
+Remove-DevinLegacyRoots -Root $devinRoot
 
 Write-Utf8NoBom -Path (Join-Path $devinRoot "config.json") -Content ((New-DevinConfig).TrimEnd() + "`r`n")
 Write-DevinStatus -Message "  [OK] .devin/config.json"
