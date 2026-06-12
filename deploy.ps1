@@ -7,11 +7,11 @@
   対象エディタと同期先:
     VS Code Copilot : ~/.agents/skills/
     Cursor          : .cursor/
-    Devin           : .devin/ + .windsurf/ compatibility mirror
+    Devin           : .devin/
     Agents          : .ai/catalog/agents-source/ -> .codex/agents/ (toml) + .claude/agents/ (md)
 
 .PARAMETER Target
-    同期先を指定: all | vscode | cursor | devin | windsurf | agents | dcr
+    同期先を指定: all | vscode | cursor | devin | agents | dcr
   デフォルト: all
 
 .PARAMETER DryRun
@@ -29,7 +29,7 @@
 #>
 
 param(
-    [ValidateSet("all", "vscode", "cursor", "devin", "windsurf", "agents", "dcr")]
+    [ValidateSet("all", "vscode", "cursor", "devin", "agents", "dcr")]
     [string]$Target = "all",
     [switch]$DryRun,
     [switch]$Check,
@@ -45,11 +45,6 @@ $CatalogPaths = Join-Path $RepoRoot "tools\lib\catalog-paths.ps1"
 . $CatalogPaths
 $DeprecatedAliases = Join-Path $RepoRoot "tools\lib\deprecated-aliases.ps1"
 . $DeprecatedAliases
-
-if ($Target -eq "windsurf") {
-    Write-Host "[ALIAS] Target 'windsurf' is deprecated; using 'devin'." -ForegroundColor DarkYellow
-    $Target = "devin"
-}
 
 # ── Gate enforcement ──
 if ($EnforceGate) {
@@ -97,7 +92,6 @@ $DestVSCodeSkills = Join-Path $UserHome ".agents\skills"
 $DestCodexAgents = Join-Path $RepoRoot ".codex\agents"
 $DestClaudeAgents = Join-Path $RepoRoot ".claude\agents"
 $DestDevin = Join-Path $RepoRoot ".devin"
-$DestWindsurf = Join-Path $RepoRoot ".windsurf"
 
 function Get-TempDirectory {
     $tempDir = Join-Path ([System.IO.Path]::GetTempPath()) ("dcr-deploy-" + [System.Guid]::NewGuid().ToString("N"))
@@ -499,7 +493,6 @@ if ($Check) {
                 $tempDevin = Join-Path $tempDir ".devin"
                 & $devinAdapter -RepoRoot $RepoRoot -OutputRoot $tempDevin -Quiet
                 Write-CheckDrift -Label "Devin canonical mirror" -Diffs (Get-DirectoryDrift -Source $tempDevin -Destination $DestDevin -IgnoreNames @("config.local.json"))
-                Write-CheckDrift -Label "Windsurf compatibility mirror" -Diffs (Get-DirectoryDrift -Source (Join-Path $tempDir ".windsurf") -Destination $DestWindsurf)
             }
             finally {
                 if (Test-Path $tempDir) {

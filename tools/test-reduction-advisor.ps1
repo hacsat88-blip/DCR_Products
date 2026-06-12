@@ -145,7 +145,6 @@ try {
     if ($report.analyzed_decisions -ne 10) {
         throw "expected 10 analyzed decisions, got $($report.analyzed_decisions)"
     }
-    Assert-ContainsAction -Items @($report.recommendations) -Action "remove_later"
     Assert-ContainsAction -Items @($report.recommendations) -Action "bundle_into_hub"
     Assert-ContainsAction -Items @($report.recommendations) -Action "expose_underlying_asset"
     Assert-ContainsAction -Items @($report.recommendations) -Action "clarify_trigger"

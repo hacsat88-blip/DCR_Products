@@ -74,11 +74,11 @@ try {
             timestamp = "2026-05-18T00:02:00Z"
             input = "routing policy"
             kind = "skill"
-            name = "agent-overload-recovery"
+            name = "governance-ops"
             status = "refined"
             user_reply_type = "refine"
             user_judgement = "unclear"
-            actual_asset = "skill:agent-overload-recovery"
+            actual_asset = "skill:governance-ops"
         })
     }
     foreach ($i in 1..2) {
