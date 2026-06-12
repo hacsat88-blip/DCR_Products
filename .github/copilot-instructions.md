@@ -41,6 +41,7 @@ Entrypoint for VS Code Copilot environment.
 - [legal-compliance-checker](../../.ai/catalog/rules/legal-compliance-checker.md)
 - [mobile-app-builder](../../.ai/catalog/rules/mobile-app-builder.md)
 - [model-qa-specialist](../../.ai/catalog/rules/model-qa-specialist.md)
+- [model-tiering-steward](../../.ai/catalog/rules/model-tiering-steward.md)
 - [performance-benchmarker](../../.ai/catalog/rules/performance-benchmarker.md)
 - [project-shepherd](../../.ai/catalog/rules/project-shepherd.md)
 - [qa-reality-checker](../../.ai/catalog/rules/qa-reality-checker.md)

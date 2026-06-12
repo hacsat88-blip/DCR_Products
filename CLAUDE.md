@@ -9,7 +9,7 @@ Unified entry point for Claude Code environment.
 
 ## Scope Summary
 
-- Active rules: 53
+- Active rules: 54
 - Active skills: 70
 - Active agents: 116
 - Deprecated aliases (rules/skills/agents): 0 / 0 / 0
