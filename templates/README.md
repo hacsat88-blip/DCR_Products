@@ -13,7 +13,6 @@
 | `product/`                      | 新規 Product 用の最小構成テンプレート      | `Product/<name>/` へ手動コピー                 |
 | `vscode-copilot/`               | VS Code Copilot 用 project context 断片と周辺設定 | `<project>/.github/copilot-instructions.md`    |
 | `project-context.md`            | プレースホルダーのキー一覧サンプル         | プロジェクトごとにコピーして編集               |
-| `supermemory-project-policy.md` | project 単位の memory 運用方針テンプレート | プロジェクトごとにコピーして編集               |
 
 ### Claude Code テンプレートの生成先
 

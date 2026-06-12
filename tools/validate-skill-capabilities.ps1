@@ -5,7 +5,7 @@
 
 .DESCRIPTION
   Read-only check for higher-level skill contracts:
-    - active skills with absorbs must point at deprecated aliases
+    - active skills with absorbs must point at deprecated aliases when tombstones are active
     - OpenAI baseline overlays must declare role=overlay and local_delta
     - contract/composable/runtime_targets blocks are required for every active skill
     - exact OpenAI overlaps stay small enough to behave as overlays
@@ -146,7 +146,9 @@ foreach ($dir in Get-ChildItem -Path $skillsDir -Directory | Where-Object { -not
         $absorbsCount++
         foreach ($absorbed in $absorbs) {
             if (-not $deprecatedSkillByName.ContainsKey($absorbed)) {
-                $failures += "$($dir.Name): absorbs '$absorbed' but it is not a deprecated/tombstone skill alias"
+                # Removed alias tombstones may be expired from the active registry.
+                # Keep validating the successor only while a tombstone is present.
+                continue
             }
             elseif ($deprecatedSkillByName[$absorbed].successor -ne $dir.Name) {
                 $failures += "$($dir.Name): absorbs '$absorbed' but successor is '$($deprecatedSkillByName[$absorbed].successor)'"

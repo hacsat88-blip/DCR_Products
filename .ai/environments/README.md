@@ -15,7 +15,7 @@ The shared thinking source of truth is [../book/runtime.md](../book/runtime.md).
 
 ## Runtime Entrypoints
 
-`AGENTS.md`, `CLAUDE.md`, `.github/copilot-instructions.md`, `.cursor/`, `.devin/`, and `.windsurf/` remain in their runtime-specific locations because tools auto-load those paths.
+`AGENTS.md`, `CLAUDE.md`, `.github/copilot-instructions.md`, `.cursor/`, and `.devin/` remain in their runtime-specific locations because tools auto-load those paths.
 
 ## Runtime Loading Model
 
@@ -24,7 +24,6 @@ The shared thinking source of truth is [../book/runtime.md](../book/runtime.md).
 - Cursor: `.cursor/rules/dcr-kernel.mdc` is generated from the shared kernel and `.cursorignore` keeps generated mirrors and deprecated aliases out of discovery.
 - VS Code Copilot: `.github/copilot-instructions.md` stays concise and points to the shared book, kernel, rules, and skills.
 - Devin CLI / Devin Local: `AGENTS.md` is always-on context, `.devin/config.json` holds project-safe config, and `.devin/skills/` mirrors skills, workflows, and agent perspectives.
-- Devin Desktop legacy Cascade: `.windsurf/` is a generated compatibility mirror, not a source of truth.
 
 ## Rule
 

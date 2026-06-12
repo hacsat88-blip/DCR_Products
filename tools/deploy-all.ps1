@@ -1,5 +1,5 @@
 param(
-    [ValidateSet("all", "vscode", "claude", "codex", "cursor", "devin", "windsurf", "agents")]
+    [ValidateSet("all", "vscode", "claude", "codex", "cursor", "devin", "agents")]
     [string]$Target = "all",
     [switch]$DryRun
 )
@@ -16,9 +16,6 @@ $allAdapters = $defaultAdapters
 $requestedAdapters = @(
     if ($Target -eq "all") {
         $defaultAdapters
-    }
-    elseif ($Target -eq "windsurf") {
-        @("devin")
     }
     else {
         $allAdapters | Where-Object { $Target -eq $_ }

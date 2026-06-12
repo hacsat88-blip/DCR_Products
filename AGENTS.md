@@ -14,7 +14,7 @@ GitHub Copilot CLI specific behavior lives in [.ai/environments/copilot-cli/kern
 - Active rules: 53
 - Active skills: 70
 - Active agents: 116
-- Deprecated aliases (rules/skills/agents): 10 / 78 / 34
+- Deprecated aliases (rules/skills/agents): 0 / 0 / 0
 
 ## Source of Truth
 
