@@ -127,4 +127,8 @@ Assert-FileContains ".ai/adapters/manifest.yaml" "CLAUDE.md"
 Assert-FileContains ".ai/adapters/manifest.yaml" "AGENTS.md"
 Assert-FileContains ".ai/adapters/manifest.yaml" "copilot-instructions.md"
 
+# --- Task 9: external footprint ledger ---
+Assert-Path ".ai/adapters/external-footprint.md"
+Assert-FileContains ".ai/adapters/external-footprint.md" "~/.config/dcr/config.json"
+
 Write-Host "restructure test passed" -ForegroundColor Green
