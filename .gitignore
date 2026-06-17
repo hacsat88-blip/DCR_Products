@@ -46,7 +46,6 @@ __pycache__/
 /.cursor/
 /.codex/agents/
 /.claude/agents/
-/.windsurf/
 
 # Ignore all .dcr directories by default (runtime/session files)
 **/.dcr/

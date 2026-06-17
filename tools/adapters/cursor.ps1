@@ -70,7 +70,6 @@ $cursorIgnore = @"
 .cursor/
 .codex/agents/
 .claude/agents/
-.devin/
 "@
 
 Write-Utf8NoBom -Path $cursorIgnorePath -Content ($cursorIgnore.TrimEnd() + "`r`n")

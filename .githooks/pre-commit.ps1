@@ -1,7 +1,7 @@
 #Requires -Version 5.1
 
 $ErrorActionPreference = "Stop"
-$changed = @(git diff --cached --name-only -- .ai tools deploy.ps1 .github/workflows/validate.yml .devin .gitignore .cursorignore)
+$changed = @(git diff --cached --name-only -- .ai tools deploy.ps1 .github/workflows/validate.yml .gitignore .cursorignore)
 
 if ($changed.Count -eq 0) {
     exit 0
