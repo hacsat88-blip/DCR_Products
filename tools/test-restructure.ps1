@@ -37,4 +37,9 @@ Assert-Path ".ai/core/context-efficiency.md"
 Assert-Path ".ai/core/runtime.md"
 Assert-Path ".ai/core/tool-contract.md"
 
+# --- Task 3: permissions merge (no content loss) ---
+Assert-Path ".ai/core/permissions.md"
+$permHeadings = @("P1", "P2", "P3", "Mechanical P3", "Safety Boundaries", "Routing approval overlay", "Priority", "Notes", "References")
+foreach ($h in $permHeadings) { Assert-FileContains ".ai/core/permissions.md" $h }
+
 Write-Host "restructure test passed" -ForegroundColor Green
