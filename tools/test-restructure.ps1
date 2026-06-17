@@ -42,4 +42,13 @@ Assert-Path ".ai/core/permissions.md"
 $permHeadings = @("P1", "P2", "P3", "Mechanical P3", "Safety Boundaries", "Routing approval overlay", "Priority", "Notes", "References")
 foreach ($h in $permHeadings) { Assert-FileContains ".ai/core/permissions.md" $h }
 
+# --- Task 4: routing single-source + gates + state ---
+Assert-Path ".ai/routing/coordinator.md"
+Assert-Path ".ai/routing/integration.md"
+Assert-Path ".ai/routing/triggers.md"
+Assert-Path ".ai/routing/gates/trigger-model-route.md"
+Assert-Path ".ai/routing/state/gate-state.json"
+Assert-Path ".ai/routing/state/gate-state.schema.json"
+Assert-Path ".ai/routing/state/router-decisions.jsonl"
+
 Write-Host "restructure test passed" -ForegroundColor Green
