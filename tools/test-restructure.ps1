@@ -114,4 +114,11 @@ Assert-Path ".ai/routing/gates.md"
 Assert-Path "docs/dcr/deprecation-lifecycle.md"
 Assert-Path "docs/dcr/hub-promotion-criteria.md"
 
+# --- Task 7: adapters env diffs + templates ---
+Assert-Path ".ai/adapters/claude-code/kernel.md"
+Assert-Path ".ai/adapters/codex/kernel.md"
+Assert-Path ".ai/adapters/cursor/kernel.md"
+Assert-Path ".ai/adapters/vscode-copilot/kernel.md"
+Assert-Path ".ai/adapters/project-context.md"
+
 Write-Host "restructure test passed" -ForegroundColor Green

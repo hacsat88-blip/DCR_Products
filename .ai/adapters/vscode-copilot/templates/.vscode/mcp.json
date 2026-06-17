@@ -1,0 +1,13 @@
+{
+  "inputs": [],
+  "servers": {
+    "filesystem": {
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-filesystem", "."]
+    }
+  },
+  "notes": {
+    "usage": "Adjust this file to your VS Code MCP setup if needed.",
+    "security": "Keep server scopes minimal and avoid secret-bearing paths."
+  }
+}

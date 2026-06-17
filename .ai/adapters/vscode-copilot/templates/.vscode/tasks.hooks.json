@@ -1,0 +1,31 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "DCR Deploy Check",
+            "type": "shell",
+            "command": "powershell",
+            "args": [
+                "-ExecutionPolicy",
+                "Bypass",
+                "-File",
+                "${workspaceFolder}\\deploy.ps1",
+                "-Check"
+            ]
+        },
+        {
+            "label": "DCR Validate",
+            "type": "shell",
+            "command": "powershell",
+            "args": [
+                "-ExecutionPolicy",
+                "Bypass",
+                "-File",
+                "${workspaceFolder}\\validate.ps1"
+            ]
+        }
+    ],
+    "notes": {
+        "usage": "Merge into .vscode/tasks.json if you want hook-like validation tasks."
+    }
+}

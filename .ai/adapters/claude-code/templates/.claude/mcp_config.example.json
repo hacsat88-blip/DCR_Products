@@ -1,0 +1,8 @@
+{
+    "$schema": "https://raw.githubusercontent.com/modelcontextprotocol/spec/main/schema/mcp.schema.json",
+    "mcpServers": {},
+    "notes": {
+        "usage": "Copy and adapt for your Claude environment if MCP is enabled. The repository .mcp.json is the local working config.",
+        "security": "Do not include API keys here."
+    }
+}
