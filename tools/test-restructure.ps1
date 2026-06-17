@@ -121,4 +121,10 @@ Assert-Path ".ai/adapters/cursor/kernel.md"
 Assert-Path ".ai/adapters/vscode-copilot/kernel.md"
 Assert-Path ".ai/adapters/project-context.md"
 
+# --- Task 8: deploy manifest ---
+Assert-Path ".ai/adapters/manifest.yaml"
+Assert-FileContains ".ai/adapters/manifest.yaml" "CLAUDE.md"
+Assert-FileContains ".ai/adapters/manifest.yaml" "AGENTS.md"
+Assert-FileContains ".ai/adapters/manifest.yaml" "copilot-instructions.md"
+
 Write-Host "restructure test passed" -ForegroundColor Green
