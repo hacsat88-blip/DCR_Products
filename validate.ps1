@@ -50,8 +50,10 @@ $CatalogPaths = Join-Path $RepoRoot "tools\lib\catalog-paths.ps1"
 . $CatalogPaths
 $SourceRules = Resolve-DcrSourcePath -RepoRoot $RepoRoot -AssetType "rules"
 $SourceSkills = Resolve-DcrSourcePath -RepoRoot $RepoRoot -AssetType "skills"
-$KernelRoot = Join-Path $RepoRoot ".ai\kernel"
-$EnvironmentRoot = Join-Path $RepoRoot ".ai\environments"
+$CoreRoot = Join-Path $RepoRoot ".ai\core"
+$RoutingRoot = Join-Path $RepoRoot ".ai\routing"
+$PlaybooksRoot = Join-Path $RepoRoot ".ai\catalog\playbooks"
+$AdaptersRoot = Join-Path $RepoRoot ".ai\adapters"
 $AgentsSource = Resolve-DcrSourcePath -RepoRoot $RepoRoot -AssetType "agents-source"
 $DeployScript = Join-Path $RepoRoot "deploy.ps1"
 $RoutingIndexScript = Join-Path $RepoRoot "tools\generate-routing-index.ps1"
@@ -158,20 +160,33 @@ foreach ($dir in $skillDirs) {
 Write-Host "  skills processed: $($skillDirs.Count)" -ForegroundColor DarkGray
 
 # ─────────────────────────────────────────────
-# 4. .ai/kernel/**/*.md + .ai/environments/**/*.md — H1 検証
+# 4. .ai/core/**/*.md + .ai/routing/**/*.md + .ai/catalog/playbooks/*.md
+#    + .ai/adapters/**/kernel.md — H1 検証 (新ゾーン)
 # ─────────────────────────────────────────────
 Write-Host ""
-Write-Host "== 3. .ai/kernel + .ai/environments H1 check ==="
-$kernelFiles = @()
-if (Test-Path $KernelRoot) {
-    $kernelFiles = Get-ChildItem -Path $KernelRoot -File -Filter *.md -Recurse | Sort-Object FullName
+Write-Host "== 3. .ai/core + .ai/routing + playbooks + adapters H1 check ==="
+$coreFiles = @()
+if (Test-Path $CoreRoot) {
+    $coreFiles = Get-ChildItem -Path $CoreRoot -File -Filter *.md -Recurse | Sort-Object FullName
 }
-$environmentFiles = @()
-if (Test-Path $EnvironmentRoot) {
-    $environmentFiles = Get-ChildItem -Path $EnvironmentRoot -File -Filter *.md -Recurse | Sort-Object FullName
+$routingFiles = @()
+if (Test-Path $RoutingRoot) {
+    # Exclude non-doc files under state/ (JSON, JSONL)
+    $routingFiles = Get-ChildItem -Path $RoutingRoot -File -Filter *.md -Recurse | Sort-Object FullName
+}
+$playbookFiles = @()
+if (Test-Path $PlaybooksRoot) {
+    $playbookFiles = Get-ChildItem -Path $PlaybooksRoot -File -Filter *.md | Sort-Object FullName
+}
+$adapterKernelFiles = @()
+if (Test-Path $AdaptersRoot) {
+    # Validate adapter kernel.md files and top-level adapter docs (exclude templates subtree)
+    $adapterKernelFiles = Get-ChildItem -Path $AdaptersRoot -File -Filter *.md -Recurse |
+        Where-Object { $_.FullName -notmatch '\\templates\\' } |
+        Sort-Object FullName
 }
 
-foreach ($file in @($kernelFiles + $environmentFiles)) {
+foreach ($file in @($coreFiles + $routingFiles + $playbookFiles + $adapterKernelFiles)) {
     $content = Get-Content -Path $file.FullName -Raw -Encoding utf8
     if ($content -match '(?m)^# .+') {
         if ($Verbose) { Write-Ok "$($file.FullName.Replace($RepoRoot + '\\', '')) — H1 found" }
@@ -181,8 +196,10 @@ foreach ($file in @($kernelFiles + $environmentFiles)) {
         Write-Fail "$($file.FullName.Replace($RepoRoot + '\\', '')) — H1 missing"
     }
 }
-Write-Host "  kernel docs processed: $($kernelFiles.Count)" -ForegroundColor DarkGray
-Write-Host "  environment docs processed: $($environmentFiles.Count)" -ForegroundColor DarkGray
+Write-Host "  core docs processed: $($coreFiles.Count)" -ForegroundColor DarkGray
+Write-Host "  routing docs processed: $($routingFiles.Count)" -ForegroundColor DarkGray
+Write-Host "  playbook docs processed: $($playbookFiles.Count)" -ForegroundColor DarkGray
+Write-Host "  adapter docs processed: $($adapterKernelFiles.Count)" -ForegroundColor DarkGray
 
 # ─────────────────────────────────────────────
 # 4. deploy.ps1 -DryRun 全ターゲット
