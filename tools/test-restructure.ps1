@@ -105,4 +105,13 @@ foreach ($h in $routerHeadings) {
     if (-not ($inRouter -or $inDesign)) { throw "router merge lost heading: $h" }
 }
 
+# --- Task 6: playbooks + gates overview + governance docs ---
+Assert-Path ".ai/catalog/playbooks/architecture.md"
+Assert-Path ".ai/catalog/playbooks/debugging.md"
+Assert-Path ".ai/catalog/playbooks/review.md"
+Assert-Path ".ai/catalog/playbooks/prompting.md"
+Assert-Path ".ai/routing/gates.md"
+Assert-Path "docs/dcr/deprecation-lifecycle.md"
+Assert-Path "docs/dcr/hub-promotion-criteria.md"
+
 Write-Host "restructure test passed" -ForegroundColor Green
