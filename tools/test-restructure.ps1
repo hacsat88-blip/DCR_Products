@@ -131,4 +131,9 @@ Assert-FileContains ".ai/adapters/manifest.yaml" "copilot-instructions.md"
 Assert-Path ".ai/adapters/external-footprint.md"
 Assert-FileContains ".ai/adapters/external-footprint.md" "~/.config/dcr/config.json"
 
+# --- Task 10: bootstrap script ---
+Assert-Path ".ai/adapters/bootstrap.ps1"
+Assert-FileContains ".ai/adapters/bootstrap.ps1" "install-git-hooks"
+Assert-FileContains ".ai/adapters/bootstrap.ps1" "external-footprint"
+
 Write-Host "restructure test passed" -ForegroundColor Green
