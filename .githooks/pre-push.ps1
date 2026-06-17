@@ -5,7 +5,7 @@ $upstream = git rev-parse --abbrev-ref --symbolic-full-name '@{u}' 2>$null
 
 if ($LASTEXITCODE -eq 0 -and -not [string]::IsNullOrWhiteSpace($upstream)) {
     $base = git merge-base HEAD $upstream
-    $changed = @(git diff --name-only "$base..HEAD" -- .ai tools deploy.ps1 .github/workflows/validate.yml .devin .gitignore .cursorignore)
+    $changed = @(git diff --name-only "$base..HEAD" -- .ai tools deploy.ps1 .github/workflows/validate.yml .gitignore .cursorignore)
 }
 else {
     $changed = @("run")

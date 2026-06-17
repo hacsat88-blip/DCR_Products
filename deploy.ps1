@@ -1,17 +1,16 @@
 ﻿<#
 .SYNOPSIS
   DCR Products - Deploy script
-  サトシ開発 (Git管理) から各エディタのユーザーレベルパスへ一方向同期
+  サトシ開発 (Git管理) の source-of-truth から runtime entrypoint / generated mirror へ一方向同期
 
 .DESCRIPTION
   対象エディタと同期先:
-    VS Code Copilot : ~/.agents/skills/
+    VS Code Copilot : .github/copilot-instructions.md
     Cursor          : .cursor/
-    Devin           : .devin/
     Agents          : .ai/catalog/agents-source/ -> .codex/agents/ (toml) + .claude/agents/ (md)
 
 .PARAMETER Target
-    同期先を指定: all | vscode | cursor | devin | agents | dcr
+    同期先を指定: all | vscode | cursor | agents | dcr
   デフォルト: all
 
 .PARAMETER DryRun
@@ -23,13 +22,12 @@
 .EXAMPLE
   .\deploy.ps1
   .\deploy.ps1 -Target vscode
-  .\deploy.ps1 -Target devin
   .\deploy.ps1 -Target agents
   .\deploy.ps1 -Check
 #>
 
 param(
-    [ValidateSet("all", "vscode", "cursor", "devin", "agents", "dcr")]
+    [ValidateSet("all", "vscode", "cursor", "agents", "dcr")]
     [string]$Target = "all",
     [switch]$DryRun,
     [switch]$Check,
@@ -69,7 +67,7 @@ if ($EnforceGate) {
 
 # ── Unified Adapter Framework (new) ──
 $DeployAll = Join-Path $RepoRoot "tools\deploy-all.ps1"
-if ((Test-Path $DeployAll) -and -not $Check -and ($Target -in @("all", "vscode", "cursor", "devin", "agents"))) {
+if ((Test-Path $DeployAll) -and -not $Check -and ($Target -in @("all", "vscode", "cursor", "agents"))) {
     Write-Host ""
     Write-Host "=== Deploy Adapters (Unified Framework) ===" -ForegroundColor Cyan
     $targetArg = if ($Target -eq "all") { "all" } else { $Target }
@@ -88,10 +86,8 @@ $SourceRules = Resolve-DcrSourcePath -RepoRoot $RepoRoot -AssetType "rules"
 $SourceRuntimeKernel = Join-Path $RepoRoot ".ai\kernel\dcr-kernel.md"
 $SourceAgents = Resolve-DcrSourcePath -RepoRoot $RepoRoot -AssetType "agents-source"
 
-$DestVSCodeSkills = Join-Path $UserHome ".agents\skills"
 $DestCodexAgents = Join-Path $RepoRoot ".codex\agents"
 $DestClaudeAgents = Join-Path $RepoRoot ".claude\agents"
-$DestDevin = Join-Path $RepoRoot ".devin"
 
 function Get-TempDirectory {
     $tempDir = Join-Path ([System.IO.Path]::GetTempPath()) ("dcr-deploy-" + [System.Guid]::NewGuid().ToString("N"))
@@ -328,6 +324,15 @@ function Get-FileDrift {
     return $diffs
 }
 
+function Get-GitStatusDrift {
+    param(
+        [string[]]$Paths
+    )
+
+    $status = @(git -C $RepoRoot status --short -- $Paths 2>$null)
+    return @($status | ForEach-Object { "[DIRTY] $_" })
+}
+
 function Write-PrecheckSummary {
     param(
         [string]$Label,
@@ -472,9 +477,6 @@ if ($Check) {
         $script:checkFailed = $true
     }
 
-    if ($Target -eq "all" -or $Target -eq "vscode") {
-        Write-CheckDrift -Label "VS Code Copilot skills" -Diffs (Get-DirectoryDrift -Source $SourceSkills -Destination $DestVSCodeSkills)
-    }
     if ($Target -eq "all" -or $Target -eq "agents") {
         $codexDiffs = Get-FlatFileDrift -Source $SourceAgents -Destination $DestCodexAgents -Filter '*.toml'
         Write-CheckDrift -Label "Codex agents" -Diffs $codexDiffs
@@ -482,24 +484,13 @@ if ($Check) {
         $claudeDiffs = Get-FlatFileDrift -Source $SourceAgents -Destination $DestClaudeAgents -Filter '*.md' -IgnoreNames @('README.md')
         Write-CheckDrift -Label "Claude agents" -Diffs $claudeDiffs
     }
-    if ($Target -eq "all" -or $Target -eq "devin") {
-        $devinAdapter = Join-Path $RepoRoot "tools\adapters\devin.ps1"
-        if (-not (Test-Path $devinAdapter)) {
-            Write-CheckDrift -Label "Devin mirror" -Diffs @("[SOURCE_MISSING] $devinAdapter")
-        }
-        else {
-            $tempDir = Get-TempDirectory
-            try {
-                $tempDevin = Join-Path $tempDir ".devin"
-                & $devinAdapter -RepoRoot $RepoRoot -OutputRoot $tempDevin -Quiet
-                Write-CheckDrift -Label "Devin canonical mirror" -Diffs (Get-DirectoryDrift -Source $tempDevin -Destination $DestDevin -IgnoreNames @("config.local.json"))
-            }
-            finally {
-                if (Test-Path $tempDir) {
-                    Remove-Item -LiteralPath $tempDir -Recurse -Force -ErrorAction SilentlyContinue
-                }
-            }
-        }
+    if ($Target -eq "all" -or $Target -eq "vscode") {
+        $vscodeEntryDiffs = Get-GitStatusDrift -Paths @(".github/copilot-instructions.md")
+        Write-CheckDrift -Label "VS Code Copilot entrypoint" -Diffs $vscodeEntryDiffs
+    }
+    if ($Target -eq "all") {
+        $sharedEntrypointDiffs = Get-GitStatusDrift -Paths @("AGENTS.md", "CLAUDE.md", ".ai/catalog/rules/_ROUTING_INDEX.md")
+        Write-CheckDrift -Label "Shared tracked entrypoints" -Diffs $sharedEntrypointDiffs
     }
     if ($Target -eq "all" -or $Target -eq "dcr") {
         $dcrConfigPath = Join-Path $RepoRoot ".dcr\config.json"
@@ -516,18 +507,6 @@ if ($Check) {
     Write-Host "Drift check complete." -ForegroundColor Cyan
     if ($script:checkFailed) { exit 1 }
     return
-}
-
-if ($Target -eq "all" -or $Target -eq "vscode") {
-    if ($Backup) { Backup-DeployTarget -TargetPath $DestVSCodeSkills -Label "VS Code Copilot skills" }
-    if (-not $DryRun) {
-        Write-ManagedTargetNotice -Label "VS Code Copilot skills" -Destination $DestVSCodeSkills
-        Write-PrecheckSummary -Label "VS Code Copilot skills" -Diffs (Get-DirectoryDrift -Source $SourceSkills -Destination $DestVSCodeSkills)
-    }
-    Sync-Directory -Source $SourceSkills -Destination $DestVSCodeSkills -Label "VS Code Copilot skills"
-    if (-not $DryRun) {
-        Assert-NoDrift -Label "VS Code Copilot skills" -Diffs (Get-DirectoryDrift -Source $SourceSkills -Destination $DestVSCodeSkills)
-    }
 }
 
 if ($Target -eq "all" -or $Target -eq "agents") {
@@ -609,14 +588,8 @@ if ($Watch) {
                 Write-Host "[WATCH] Change detected at $(Get-Date -Format 'HH:mm:ss'). Re-deploying..." -ForegroundColor Yellow
 
                 # Re-run deploy logic
-                if ($Target -eq "all" -or $Target -eq "vscode") {
-                    Sync-Directory -Source $SourceSkills -Destination $DestVSCodeSkills -Label "VS Code Copilot skills"
-                }
                 if ($Target -eq "all" -or $Target -eq "agents") {
                     & $DeployAll -Target agents
-                }
-                if ($Target -eq "all" -or $Target -eq "devin") {
-                    & $DeployAll -Target devin
                 }
                 Write-Host "[WATCH] Deploy complete. Watching..." -ForegroundColor Green
             }

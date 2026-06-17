@@ -50,7 +50,7 @@ DCR の skill catalog を OpenAI 公式 skills を土台にスリム化する。
 - 初回対象: curated / system / primary-runtime 相当
 - 初回対象外: experimental
 - DCR source-of-truth: `.ai/catalog/skills`
-- Generated mirrors: `AGENTS.md`, `CLAUDE.md`, `.github/copilot-instructions.md`, `.agents/skills`
+- Generated mirrors: `AGENTS.md`, `CLAUDE.md`, `.github/copilot-instructions.md`, `.codex/agents`, `.claude/agents`
 
 ## 分類
 

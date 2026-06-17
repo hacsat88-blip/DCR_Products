@@ -17,7 +17,7 @@ core / Product / generated / historical docs の 4 層モデル、移行フェ�
 - `.ai/catalog/rules/`, `.ai/catalog/skills/`, `.ai/catalog/agents-source/` の taxonomy は文書化済み
 - repo-local generated mirror と user-level managed target の境界は定義済み
 - `validate.ps1` と `deploy.ps1 -Check` は clean に通る
-- root `.vscode/` はすでに DCR core-safe な最小構成に寄っている
+- root editor workspace 設定は DCR core 正本から外し、共通運用は `.ai/`、`README.md`、`tools/` に集約する方針へ移行済み
 
 現時点の主な曖昧さは、root workspace の壊れではなく、次の 3 点にある。
 
@@ -47,7 +47,7 @@ root に残す shared source-of-truth:
 - `templates/`
 - `docs/dcr/`
 - `deploy.ps1`, `validate.ps1`, `init-project.ps1`
-- root `.vscode/` の共通設定
+- root operations scripts と `.ai/` / docs に集約した共通運用
 
 ここには Product が 1 つも存在しなくても意味がある資産だけを置く。
 

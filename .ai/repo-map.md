@@ -62,7 +62,7 @@ Repository governance model:
 - Source layer: editable canonical assets (`.ai/kernel/`, `.ai/catalog/rules/`, `.ai/catalog/skills/`, `templates/`, `.ai/catalog/agents-source/`)
 - Runtime layer: tool entrypoints read directly by each editor (`.github/`, `AGENTS.md`, `CLAUDE.md`)
 - Generated layer: deploy outputs and mirrors (`.claude/agents/`, `.codex/agents/`; large mirrors are Git-ignored)
-- Workspace layer: editor settings, docs, and operations scripts (`.vscode/`, `docs/`, `deploy.ps1`, `validate.ps1`, `init-project.ps1`)
+- Workspace layer: docs and operations scripts (`docs/`, `deploy.ps1`, `validate.ps1`, `init-project.ps1`)
 
 Unsafe migration rule:
 
@@ -108,14 +108,10 @@ Trigger-activated gate definitions (a/, i/, r/, s/, d/, p/, q/, sh/).
 .ai/kernel/dcr-kernel.md
 Shared runtime kernel source. Runtime entrypoints are generated from this file.
 
-.vscode/
-VS Code workspace settings (useInstructionFiles: true).
-Workspace config layer。`.ai/catalog/rules/` や `templates/` の代替ではない。
-
 ## Asset Layer
 
 .ai/catalog/rules/
-Agent-specific behavior rules (62 agents). 正本。
+Behavior rules (53 active rules). 正本。
 `_` プレフィクスファイルは deploy 対象外の参照ドキュメント:
 
 - _METADATA.md: メタデータポリシー定義
@@ -124,8 +120,7 @@ Agent-specific behavior rules (62 agents). 正本。
 - _git-conventions.md: コミット & ブランチ規約 (ECC 由来)
 
 .ai/catalog/skills/
-Skill definitions (57 skills). Git-managed source of truth.
-deploy.ps1 で ~/.agents/skills/ (VS Code Copilot) へ配布。
+Skill definitions (70 active skills). Git-managed source of truth。user-level mirror へ配布しない。
 
 ECC 部分採用スキル (3):
 
@@ -151,9 +146,8 @@ Experimental projects and proof-of-concepts.
 ## Deploy
 
 deploy.ps1
-一方向同期スクリプト。サトシ開発 → 各エディタのユーザーレベルパスへ配布。
+一方向同期スクリプト。repo-local entrypoint と generated mirror を source-of-truth から再生成する。
 
-- .ai/catalog/skills/ → ~/.agents/skills/ (VS Code Copilot)
 - .ai/catalog/agents-source/*.toml → .codex/agents/ (Codex, Git 管理外)
 - .ai/catalog/agents-source/*.md → .claude/agents/ (Claude Code, Git 管理外)
 
@@ -182,7 +176,7 @@ Configuration pattern:
 Markdown-based instruction files, no code dependencies.
 
 Deployment pattern:
-deploy.ps1 syncs `.ai/catalog/skills/`, `.ai/catalog/rules/`, and `.ai/catalog/agents-source/` to editor-specific paths.
+deploy.ps1 regenerates runtime entrypoints and repo-local generated mirrors from `.ai/` source-of-truth.
 One-way only: repository → editor. Never reverse.
 
 ---
@@ -195,6 +189,6 @@ When modifying this repository:
 - prefer minimal diffs
 - preserve existing naming conventions
 - do not create files in templates/ unless archiving a new editor config or managing project init templates
-- do not modify ~/.agents/ directly
+- do not modify generated mirrors directly
 - do not treat `.claude/agents/` or `.codex/agents/` as editable source paths
 - do not perform one-shot move + overwrite + delete migrations for folder restructuring

@@ -6,7 +6,7 @@
 
 | Layer             | Responsibility                                  | Main Paths                                                                                                         |
 | ----------------- | ----------------------------------------------- | ------------------------------------------------------------------------------------------------------------------ |
-| DCR core          | Product 不在でも成立する shared source-of-truth | `.ai/kernel/`, `.ai/catalog/`, `.ai/`, `.dcr/`, `templates/`, `docs/dcr/`, root `.vscode/`                          |
+| DCR core          | Product 不在でも成立する shared source-of-truth | `.ai/kernel/`, `.ai/catalog/`, `.ai/`, `.dcr/`, `templates/`, `docs/dcr/`, root operations scripts                   |
 | Product workspace | 個別 Product の source code と local workflow   | `Product/<product>/`                                                                                               |
 | generated output  | deploy により再生成される mirror                | `AGENTS.md`, `CLAUDE.md`, `.github/copilot-instructions.md`, `.claude/agents/`, `.codex/agents/` |
 | historical docs   | active ではない履歴文書                         | `docs/dcr/specs/archive/`, `docs/dcr/plans/archive/`                                                               |
@@ -21,7 +21,7 @@ root に残すのは、どの Product を開いていなくても意味がある
 - `.ai/kernel/`: 全環境共通の kernel、権限、トリガー、runtime entrypoint source
 - `.dcr/`, `templates/`: DCR 自身の設定と template 契約
 - `docs/dcr/`: governance、workflow、reference、design record
-- root `.vscode/`: DCR core 共通の設定だけ
+- root editor workspace 設定は DCR core の正本にしない。共通運用は `.ai/`、`README.md`、`tools/` に集約する
 
 `.dcr/` と `docs/dcr/` は logical control surface を構成するが、machine-readable config と human-readable docs のため物理的には分ける。詳細は `docs/dcr/reference/control-surface.md` を参照。
 
@@ -123,7 +123,7 @@ archive は subdirectory で追加します。
 
 - generated mirror は確認対象にはなっても、最初の編集対象にはしない
 - archive は historical context 用であり、active decision の起点にしない
-- workspace 既定設定では generated mirror、archive、外部 clone を探索ノイズとして抑える
+- 探索時は generated mirror、archive、外部 clone を明示的に除外してノイズを抑える
 
 ## Safe Workflow
 
