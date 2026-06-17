@@ -51,4 +51,58 @@ Assert-Path ".ai/routing/state/gate-state.json"
 Assert-Path ".ai/routing/state/gate-state.schema.json"
 Assert-Path ".ai/routing/state/router-decisions.jsonl"
 
+# --- Task 5: router merge (3->1, no content loss) ---
+Assert-Path ".ai/routing/router.md"
+Assert-Path ".ai/routing/design.md"
+$routerHeadings = @(
+    "決定木（優先順位順）",
+    "confidence 計算",
+    "発火モード",
+    "Cognitive Load Contract",
+    "Proposal State Machine",
+    "V5 自然語フィードバックループ",
+    "V6 CLI/IDE 統合仕上げ",
+    "発火前提案テンプレート",
+    "親ハブ優先ルール",
+    "後継の自動転送（alias）",
+    "親 → 子の階層解決",
+    "同一 phase での並列ルーティング",
+    "前後工程 agent の挿入",
+    "ルーティング結果のスキーマ",
+    "ユーザー個人設定（CLAUDE.local.md / AGENTS.local.md）の優先関係",
+    "関係ファイル",
+    "決定ログ書き込み義務（Mandatory）",
+    "Migration Note",
+    "Priority",
+    "Alias Resolution",
+    "Confidence Bands",
+    "Agent Design Lens",
+    "Proposal State",
+    "Parent Hubs",
+    "Cross-Environment Consistency",
+    "Fixture Evaluation",
+    "結論",
+    "現状の事実",
+    "制約",
+    "設計方針",
+    "単一ソース原則",
+    "自動参照の安全条件",
+    "参照優先順位",
+    "ルーティング規則",
+    "高一致の判定軸",
+    "ルーティング例",
+    "エディタ別マッピング",
+    "推奨する運用",
+    "品質ガード",
+    "実装フェーズ",
+    "この設計で避けられる事故",
+    "未解決事項",
+    "推奨決定"
+)
+foreach ($h in $routerHeadings) {
+    $inRouter = (Get-Content (Join-Path $RepoRoot ".ai/routing/router.md") -Raw) -match [regex]::Escape($h)
+    $inDesign = (Get-Content (Join-Path $RepoRoot ".ai/routing/design.md") -Raw) -match [regex]::Escape($h)
+    if (-not ($inRouter -or $inDesign)) { throw "router merge lost heading: $h" }
+}
+
 Write-Host "restructure test passed" -ForegroundColor Green
