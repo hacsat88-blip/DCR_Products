@@ -136,4 +136,13 @@ Assert-Path ".ai/adapters/bootstrap.ps1"
 Assert-FileContains ".ai/adapters/bootstrap.ps1" "install-git-hooks"
 Assert-FileContains ".ai/adapters/bootstrap.ps1" "external-footprint"
 
+# --- Task 11: INDEX rulebook (4 blocks) ---
+Assert-Path ".ai/INDEX.md"
+Assert-FileContains ".ai/INDEX.md" "## 0. 行動規範"
+Assert-FileContains ".ai/INDEX.md" "## 2. 概念"
+Assert-FileContains ".ai/INDEX.md" "core/safety.md"
+Assert-FileContains ".ai/INDEX.md" "routing/router.md"
+Assert-FileContains ".ai/INDEX.md" "adapters/manifest.yaml"
+Assert-FileContains ".ai/INDEX.md" "CLAUDE.md"
+
 Write-Host "restructure test passed" -ForegroundColor Green
