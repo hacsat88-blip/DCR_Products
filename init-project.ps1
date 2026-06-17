@@ -176,7 +176,7 @@ function New-ProjectInstructionOutput {
         [hashtable]$Context
     )
 
-    $kernelPath = Join-Path $RepoRoot ".ai\kernel\dcr-kernel.md"
+    $kernelPath = if (Test-Path (Join-Path $RepoRoot ".ai\core\kernel.md")) { Join-Path $RepoRoot ".ai\core\kernel.md" } else { Join-Path $RepoRoot ".ai\kernel\dcr-kernel.md" }
     if (-not (Test-Path $kernelPath)) {
         throw "DCR kernel が見つかりません: $kernelPath"
     }
@@ -440,8 +440,12 @@ if (-not $SkipShared) {
 
     $sharedItems = @()
 
-    # .ai/kernel/* files
-    $kernelDir = Join-Path $RepoRoot ".ai\kernel"
+    # .ai/kernel/* files (prefer new .ai/core zone if present)
+    if (Test-Path (Join-Path $RepoRoot ".ai\core")) {
+        $kernelDir = Join-Path $RepoRoot ".ai\core"
+    } else {
+        $kernelDir = Join-Path $RepoRoot ".ai\kernel"   # fallback during migration
+    }
     if (Test-Path $kernelDir) {
         Get-ChildItem -Path $kernelDir -Recurse -File | ForEach-Object {
             $relative = $_.FullName.Substring($kernelDir.Length).TrimStart('\', '/')
@@ -453,8 +457,12 @@ if (-not $SkipShared) {
         }
     }
 
-    # .ai/module/* files
-    $moduleDir = Join-Path $RepoRoot ".ai\module"
+    # .ai/module/* files (prefer new .ai/routing zone if present)
+    if (Test-Path (Join-Path $RepoRoot ".ai\routing")) {
+        $moduleDir = Join-Path $RepoRoot ".ai\routing"
+    } else {
+        $moduleDir = Join-Path $RepoRoot ".ai\module"   # fallback during migration
+    }
     if (Test-Path $moduleDir) {
         Get-ChildItem -Path $moduleDir -File | ForEach-Object {
             $sharedItems += @{

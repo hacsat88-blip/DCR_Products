@@ -919,6 +919,19 @@ else {
 }
 
 # ─────────────────────────────────────────────
+# 29. external footprint ledger check
+# ─────────────────────────────────────────────
+Write-Host ""
+Write-Host "== 29. external footprint ledger check ========="
+# external footprint ledger present and covers ~/.config/dcr
+$footprint = Join-Path $RepoRoot ".ai/adapters/external-footprint.md"
+if (Test-Path $footprint) {
+    $ledger = Get-Content $footprint -Raw
+    if ($ledger -match "config/dcr") { Write-Ok "external-footprint ledger covers ~/.config/dcr" }
+    else { Write-Fail "external-footprint ledger missing ~/.config/dcr entry" }
+} else { Write-Fail "external-footprint.md not found" }
+
+# ─────────────────────────────────────────────
 # 結果サマリー
 # ─────────────────────────────────────────────
 Write-Host ""
