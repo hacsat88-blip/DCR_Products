@@ -145,4 +145,8 @@ Assert-FileContains ".ai/INDEX.md" "routing/router.md"
 Assert-FileContains ".ai/INDEX.md" "adapters/manifest.yaml"
 Assert-FileContains ".ai/INDEX.md" "CLAUDE.md"
 
+# --- Task 12: generated zone marker ---
+Assert-Path ".ai/_generated/README.md"
+Assert-FileContains ".ai/_generated/README.md" "DO NOT EDIT"
+
 Write-Host "restructure test passed" -ForegroundColor Green
