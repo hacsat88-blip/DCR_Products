@@ -28,4 +28,13 @@ $zones = @(".ai/core", ".ai/routing", ".ai/routing/gates", ".ai/routing/state",
            ".ai/catalog/playbooks", ".ai/adapters", ".ai/_generated")
 foreach ($z in $zones) { Assert-Path $z }
 
+# --- Task 2: core single-source files ---
+Assert-Path ".ai/core/kernel.md"
+Assert-Path ".ai/core/identity.md"
+Assert-Path ".ai/core/safety.md"
+Assert-Path ".ai/core/quality-floor.md"
+Assert-Path ".ai/core/context-efficiency.md"
+Assert-Path ".ai/core/runtime.md"
+Assert-Path ".ai/core/tool-contract.md"
+
 Write-Host "restructure test passed" -ForegroundColor Green
