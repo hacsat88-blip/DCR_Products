@@ -116,7 +116,7 @@ Step 7（運用観測）の記録テンプレートは `docs/dcr/operation-metri
 - Product 固有の変更なら `Product/README.md` から `Product/<product>/` へ入る
 - `.dcr/` と `docs/dcr/` は 1 つの control surface として読むが、machine-readable config と human-readable docs なので物理的には分ける
 - `AGENTS.md`, `CLAUDE.md`, `.github/copilot-instructions.md`, `.claude/agents/`, `.codex/agents/` は generated mirror なので最初の編集対象にしない
-- workspace 既定設定では generated mirror、archive、外部 clone を探索ノイズとして抑える
+- 探索時は generated mirror、archive、外部 clone を明示的に除外してノイズを抑える
 
 ## 構造
 
@@ -141,10 +141,9 @@ Runtime / generated layer
   CLAUDE.md         Claude Code 実行エントリポイント
 
 Workspace / operations layer
-  .vscode/          ワークスペース設定
   docs/             設計・仕様・計画書
   docs/snapshots/   任意の個人メモ・時点スナップショット（正本層外）
-  deploy.ps1        エディタへの一方向同期
+  deploy.ps1        runtime entrypoint / generated mirror の一方向同期
   validate.ps1      source assets の構造検証
   init-project.ps1  新規プロジェクト初期化
 ```
@@ -176,6 +175,7 @@ pwsh -ExecutionPolicy Bypass -File .\deploy.ps1 -Check             # ドリフ�
 - `.ai/catalog/rules/` は invariant、routing、handoff policy を置く
 - `.ai/catalog/skills/` は再利用可能な workflow、generator、analysis method を置く
 - `.ai/catalog/agents-source/` は runtime persona と execution specialist の定義を置く
+- root editor workspace 設定は正本にしない。共通運用は `README.md` / `tools/README.md` / `.ai/` に残し、必要なコマンドは PowerShell で直接実行する
 
 ### 生成物層（Generated）- 直接編集しない WARN
 
@@ -189,10 +189,9 @@ pwsh -ExecutionPolicy Bypass -File .\deploy.ps1 -Check             # ドリフ�
 
 ### ユーザーレベル managed target - `deploy.ps1` が上書きする
 
-- `%USERPROFILE%/.agents/skills`
 - `%HOME%/.config/dcr/config.json`
 
-これらは runtime cache ではなく deploy target です。正本はこの repo にあり、user-level 側の手編集は次回 deploy で上書きされます。
+これは runtime cache ではなく deploy target です。正本はこの repo にあり、user-level 側の手編集は次回 deploy で上書きされます。
 
 ### 外部 capability pack - DCR に取り込まない
 

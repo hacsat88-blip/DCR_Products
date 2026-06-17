@@ -21,4 +21,4 @@ Copy-Item -Recurse -Force templates\cursor-hooks-bundle\.cursor .\
 ## 注意
 
 - ルート `.gitignore` の `/.cursor/` により既定ではコミットされません。共有時は `git add -f` か ignore 調整。
-- ワークスペース設定の **`chat.tools.terminal.autoApprove`** はリポジトリの `.vscode/settings.json` で **`git add` のみ**に寄せています（commit/push は IDE で確認）。
+- `chat.tools.terminal.autoApprove` を使う場合は、個人のエディタ設定で **`git add` のみ**に寄せてください（commit/push は IDE で確認）。

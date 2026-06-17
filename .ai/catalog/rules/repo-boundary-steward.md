@@ -40,7 +40,7 @@ keywords:
 - docs、templates、script、entrypoint を削除する前に参照確認を行う
 - destination が未定義の move は `defer` を既定とする
 - legacy entrypoint が参照されている間は hard delete より `shim` を優先する
-- root `.vscode` には DCR core-safe な設定だけを残す
+- root editor workspace 設定は DCR core の正本にしない。共通運用は `.ai/`、`README.md`、`tools/` に集約する
 
 ## Non-Goals
 
