@@ -2,7 +2,7 @@ param([string]$RepoRoot = ".")
 
 $outRoot = Join-Path $RepoRoot ".cursor"
 $outRulesDir = Join-Path $outRoot "rules"
-$runtimeKernel = Join-Path $RepoRoot ".ai\kernel\dcr-kernel.md"
+$runtimeKernel = Join-Path $RepoRoot ".ai\core\kernel.md"
 $cursorIgnorePath = Join-Path $RepoRoot ".cursorignore"
 
 Write-Host "[cursor] Generating .cursor mirror..." -ForegroundColor Cyan
@@ -41,12 +41,12 @@ Do not edit files here directly. Edit `.ai/` and regenerate.
 
 ## Source of Truth
 
-- Shared Book: `../.ai/book/`
-- Kernel: `../.ai/kernel/`
+- Core: `../.ai/core/`
+- Routing: `../.ai/routing/`
 - Rules: `../.ai/catalog/rules/`
 - Skills: `../.ai/catalog/skills/`
 - Agents: `../.ai/catalog/agents-source/`
-- Cursor environment diff: `../.ai/environments/cursor/kernel.md`
+- Cursor environment diff: `../.ai/adapters/cursor/kernel.md`
 
 ## Regenerate
 
@@ -89,7 +89,7 @@ if (Test-Path $runtimeKernel) {
         ""
         "# DCR Kernel Baseline"
         ""
-        'Primary source: ../.ai/book/ and ../.ai/kernel/dcr-kernel.md'
+        'Primary source: ../.ai/core/ and ../.ai/core/kernel.md'
         ""
         $kernelBody.TrimEnd()
         ""
@@ -99,7 +99,7 @@ if (Test-Path $runtimeKernel) {
     Write-Host "  [OK] .cursor/rules/dcr-kernel.mdc" -ForegroundColor Green
 }
 else {
-    Write-Warning ".ai/kernel/dcr-kernel.md not found; skipped .cursor/rules/dcr-kernel.mdc"
+    Write-Warning ".ai/core/kernel.md not found; skipped .cursor/rules/dcr-kernel.mdc"
 }
 
 Write-Host ""

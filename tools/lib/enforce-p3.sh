@@ -37,7 +37,7 @@ done
 
 $is_p3 || exit 0
 
-GATE_STATE=".ai/kernel/gate-state.json"
+GATE_STATE=".ai/routing/state/gate-state.json"
 
 # Bootstrap mode: no gate-state.json means no enforcement yet
 [[ ! -f "$GATE_STATE" ]] && exit 0

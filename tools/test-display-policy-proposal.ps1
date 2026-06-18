@@ -24,11 +24,11 @@ if (-not (Test-Path $ProposalScript)) {
 }
 
 $TempRoot = Join-Path ([System.IO.Path]::GetTempPath()) ("display-policy-proposal-test-" + [System.Guid]::NewGuid().ToString("N"))
-New-Item -ItemType Directory -Path (Join-Path $TempRoot ".ai\kernel") -Force | Out-Null
-$LogPath = Join-Path $TempRoot ".ai\kernel\router-decisions.jsonl"
+New-Item -ItemType Directory -Path (Join-Path $TempRoot ".ai\routing\state") -Force | Out-Null
+$LogPath = Join-Path $TempRoot ".ai\routing\state\router-decisions.jsonl"
 $PreviewJson = Join-Path $TempRoot "display-policy-proposal-preview.json"
 $CommitJson = Join-Path $TempRoot "display-policy-proposal-commit.json"
-$GateStatePath = Join-Path $TempRoot ".ai\kernel\gate-state.json"
+$GateStatePath = Join-Path $TempRoot ".ai\routing\state\gate-state.json"
 $CustomGateStatePath = Join-Path $TempRoot "custom\display-gate-state.json"
 
 function Write-JsonLine {

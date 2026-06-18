@@ -11,7 +11,7 @@
   pied-piper, or making a lighter path the default.
 
 .PARAMETER LogPath
-  Router decision JSONL path. Defaults to .ai/kernel/router-decisions.jsonl.
+  Router decision JSONL path. Defaults to .ai/routing/state/router-decisions.jsonl.
 
 .PARAMETER OutputJson
   Optional path to write the full report as JSON.
@@ -44,7 +44,7 @@ param(
 $ErrorActionPreference = "Stop"
 $RepoRoot = (Resolve-Path (Join-Path $PSScriptRoot "..")).Path
 if ([string]::IsNullOrWhiteSpace($LogPath)) {
-    $LogPath = Join-Path $RepoRoot ".ai/kernel/router-decisions.jsonl"
+    $LogPath = Join-Path $RepoRoot ".ai/routing/state/router-decisions.jsonl"
 }
 if ($TopN -lt 1) { $TopN = 1 }
 if ($MinShadowTrials -lt 1) { $MinShadowTrials = 1 }

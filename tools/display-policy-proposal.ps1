@@ -6,14 +6,14 @@
 .DESCRIPTION
   Runs display-policy-advisor.ps1, turns the top display actions into the
   Cognitive Load Contract proposal format, and optionally writes the proposal
-  to .ai/kernel/gate-state.json. This script does not apply display policy,
+  to .ai/routing/state/gate-state.json. This script does not apply display policy,
   delete assets, mark assets deprecated, or change routing behavior.
 
 .PARAMETER LogPath
-  Router decision JSONL path. Defaults to .ai/kernel/router-decisions.jsonl.
+  Router decision JSONL path. Defaults to .ai/routing/state/router-decisions.jsonl.
 
 .PARAMETER GateStatePath
-  Optional gate-state path. Defaults to .ai/kernel/gate-state.json under
+  Optional gate-state path. Defaults to .ai/routing/state/gate-state.json under
   RepoRoot. Used only when -CommitState is specified.
 
 .PARAMETER OutputJson
@@ -43,10 +43,10 @@ if ([string]::IsNullOrWhiteSpace($RepoRoot)) {
     $RepoRoot = $ScriptRepoRoot
 }
 if ([string]::IsNullOrWhiteSpace($LogPath)) {
-    $LogPath = Join-Path $RepoRoot ".ai/kernel/router-decisions.jsonl"
+    $LogPath = Join-Path $RepoRoot ".ai/routing/state/router-decisions.jsonl"
 }
 if ([string]::IsNullOrWhiteSpace($GateStatePath)) {
-    $GateStatePath = Join-Path $RepoRoot ".ai/kernel/gate-state.json"
+    $GateStatePath = Join-Path $RepoRoot ".ai/routing/state/gate-state.json"
 }
 if ([string]::IsNullOrWhiteSpace($ProposalId)) {
     $ProposalId = "display-policy-" + (Get-Date).ToUniversalTime().ToString("yyyyMMddHHmmss")

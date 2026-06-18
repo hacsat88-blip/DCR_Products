@@ -60,7 +60,7 @@ $inPlan = ($planContent -match [regex]::Escape($fileName)) -or
 if ($inPlan) { exit 0 }
 
 # スコープ外: drift カウンターを更新
-$driftLogPath = Join-Path $RepoRoot ".ai\kernel\scope-drift-count.json"
+$driftLogPath = Join-Path $RepoRoot ".ai\routing\state\scope-drift-count.json"
 $driftCount = 0
 if (Test-Path $driftLogPath) {
     try {

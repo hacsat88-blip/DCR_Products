@@ -1,13 +1,13 @@
 #Requires -Version 5.1
 <#
 .SYNOPSIS
-  Gate State helper — read/write/validate .ai/kernel/gate-state.json
+  Gate State helper — read/write/validate .ai/routing/state/gate-state.json
 
 .DESCRIPTION
   Provides functions for the Unified Coordinator (pied-piper) and deploy.ps1
   to read/update/check the p/ → q/ → sh/ gate chain state per session.
 
-  Schema: .ai/kernel/gate-state.schema.json
+  Schema: .ai/routing/state/gate-state.schema.json
 
 .EXAMPLE
   . .\tools\lib\gate-state.ps1
@@ -26,7 +26,7 @@ function Get-GateStatePath {
     if (-not [string]::IsNullOrWhiteSpace($GateStatePath)) {
         return $GateStatePath
     }
-    return Join-Path $RepoRoot ".ai/kernel/gate-state.json"
+    return Join-Path $RepoRoot ".ai/routing/state/gate-state.json"
 }
 
 function New-DefaultProposalState {
@@ -425,13 +425,13 @@ function Assert-GateReady {
 # ── Router Decisions Log ──
 function Get-RouterDecisionsPath {
     param([Parameter(Mandatory)][string]$RepoRoot)
-    return Join-Path $RepoRoot ".ai/kernel/router-decisions.jsonl"
+    return Join-Path $RepoRoot ".ai/routing/state/router-decisions.jsonl"
 }
 
 function Write-RouterDecision {
     <#
     .DESCRIPTION
-      Append a single routing decision to .ai/kernel/router-decisions.jsonl
+      Append a single routing decision to .ai/routing/state/router-decisions.jsonl
       (gitignored). One JSON object per line. Used by pied-piper / unified-router
       to log every selection for offline accuracy measurement.
 

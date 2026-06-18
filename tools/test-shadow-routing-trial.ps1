@@ -59,7 +59,7 @@ try {
         throw "shadow-routing-trial.ps1 exited with $LASTEXITCODE. Output: $recordOutput"
     }
 
-    $LogPath = Join-Path $TempRoot ".ai\kernel\router-decisions.jsonl"
+    $LogPath = Join-Path $TempRoot ".ai\routing\state\router-decisions.jsonl"
     if (-not (Test-Path $LogPath)) {
         throw "router decision log was not written: $LogPath"
     }

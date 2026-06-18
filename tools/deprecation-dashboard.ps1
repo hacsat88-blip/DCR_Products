@@ -40,7 +40,7 @@ $RepoRoot = (Resolve-Path (Join-Path $PSScriptRoot "..")).Path
 $rulesDir = Join-Path $RepoRoot ".ai/catalog/rules"
 $skillsDir = Join-Path $RepoRoot ".ai/catalog/skills"
 $agentsDir = Join-Path $RepoRoot ".ai/catalog/agents-source"
-$decisionsPath = Join-Path $RepoRoot ".ai/kernel/router-decisions.jsonl"
+$decisionsPath = Join-Path $RepoRoot ".ai/routing/state/router-decisions.jsonl"
 $DeprecatedAliases = Join-Path $RepoRoot "tools\lib\deprecated-aliases.ps1"
 . $DeprecatedAliases
 

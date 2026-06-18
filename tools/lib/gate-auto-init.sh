@@ -18,7 +18,7 @@ if ! echo "$prompt" | grep -qP '^\s*p/'; then
   exit 0
 fi
 
-GATE_STATE=".ai/kernel/gate-state.json"
+GATE_STATE=".ai/routing/state/gate-state.json"
 
 # If gate-state.json already exists with plan_passed=true, leave it alone
 if [[ -f "$GATE_STATE" ]]; then
@@ -29,7 +29,7 @@ if [[ -f "$GATE_STATE" ]]; then
 fi
 
 SESSION_ID="session-$(date -u +%Y%m%d-%H%M%S)"
-mkdir -p ".ai/kernel"
+mkdir -p ".ai/routing/state"
 
 python3 - <<PYEOF
 import json, os
