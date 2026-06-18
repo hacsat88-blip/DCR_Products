@@ -2,14 +2,13 @@
 
 ## Kernel source of truth
 
-- 共通思考の製本: `.ai/book/`
-- 共通仕様の正本: `.ai/kernel/_base.md`
-- 権限モデルの正本: `.ai/kernel/_permissions.md`
-- 安全境界の正本: `.ai/kernel/_safety-boundaries.md`
-- trigger 詳細の正本: `.ai/kernel/_module-behaviors.md`, `.ai/kernel/gates/`
-- 環境固有差分: `.ai/environments/`
+- 共通仕様の正本: `.ai/core/` (このファイル含む)
+- 権限モデルの正本: `.ai/core/permissions.md`
+- 安全境界の正本: `.ai/core/safety.md`
+- ルーティング・trigger 詳細の正本: `.ai/routing/`
+- 環境固有差分: `.ai/adapters/`
 
-> Runtime 安定性のため、このファイルは引き続き inline instructions を保持する。保守時は `.ai/kernel/` と同期する。
+> Runtime 安定性のため、このファイルは引き続き inline instructions を保持する。保守時は `.ai/core/` と同期する。
 
 ## Shared runtime contract
 

@@ -149,4 +149,14 @@ Assert-FileContains ".ai/INDEX.md" "CLAUDE.md"
 Assert-Path ".ai/_generated/README.md"
 Assert-FileContains ".ai/_generated/README.md" "DO NOT EDIT"
 
+# --- Task 15: old paths removed ---
+function Assert-Absent {
+    param([string]$Rel)
+    if (Test-Path (Join-Path $RepoRoot $Rel)) { throw "OLD path still present: $Rel" }
+}
+foreach ($old in @(".ai/kernel", ".ai/module", ".ai/book", ".ai/environments",
+                   "templates", ".ai/ARCHITECTURE.md", ".ai/repo-map.md", ".ai/rule-routing-design.md")) {
+    Assert-Absent $old
+}
+
 Write-Host "restructure test passed" -ForegroundColor Green

@@ -6,23 +6,23 @@
 
 ## Shared Book
 
-- Runtime: [../../book/runtime.md](../../book/runtime.md)
-- Routing: [../../book/routing.md](../../book/routing.md)
-- Gates: [../../book/gates.md](../../book/gates.md)
-- Permissions: [../../book/permissions.md](../../book/permissions.md)
-- Tool contract: [../../book/tool-contract.md](../../book/tool-contract.md)
+- Runtime: [../../core/runtime.md](../../core/runtime.md)
+- Routing: [../../routing/router.md](../../routing/router.md)
+- Gates: [../../routing/gates.md](../../routing/gates.md)
+- Permissions: [../../core/permissions.md](../../core/permissions.md)
+- Tool contract: [../../core/tool-contract.md](../../core/tool-contract.md)
 
 ## Capability Declaration
 
-- Uses generated Cursor rules from `.ai/kernel/dcr-kernel.md`.
+- Uses generated Cursor rules from `.ai/core/kernel.md`.
 - `.cursorignore` hides generated mirrors and deprecated aliases from Cursor discovery.
 - Can use editor-side context and repository files available to Cursor.
 
 ## Constraints And Fallbacks
 
 - Cursor rule loading is path- and glob-dependent.
-- Keep shared runtime behavior in `.ai/book/` and `.ai/kernel/dcr-kernel.md`; do not redefine it here.
-- If a tool is unavailable, follow [../../book/tool-contract.md](../../book/tool-contract.md) fallback rules.
+- Keep shared runtime behavior in `.ai/core/` and `.ai/core/kernel.md`; do not redefine it here.
+- If a tool is unavailable, follow [../../core/tool-contract.md](../../core/tool-contract.md) fallback rules.
 
 ## Tone
 

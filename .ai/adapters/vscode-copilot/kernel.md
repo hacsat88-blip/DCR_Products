@@ -6,11 +6,11 @@
 
 ## Shared Book
 
-- Runtime: [../../book/runtime.md](../../book/runtime.md)
-- Routing: [../../book/routing.md](../../book/routing.md)
-- Gates: [../../book/gates.md](../../book/gates.md)
-- Permissions: [../../book/permissions.md](../../book/permissions.md)
-- Tool contract: [../../book/tool-contract.md](../../book/tool-contract.md)
+- Runtime: [../../core/runtime.md](../../core/runtime.md)
+- Routing: [../../routing/router.md](../../routing/router.md)
+- Gates: [../../routing/gates.md](../../routing/gates.md)
+- Permissions: [../../core/permissions.md](../../core/permissions.md)
+- Tool contract: [../../core/tool-contract.md](../../core/tool-contract.md)
 
 ## Capability Declaration
 
@@ -21,9 +21,9 @@
 
 ## Constraints And Fallbacks
 
-- Instruction loading and context size may limit how much of the book is active at once.
-- Keep generated entrypoints concise and link to the shared book.
-- If a tool is unavailable, follow [../../book/tool-contract.md](../../book/tool-contract.md) fallback rules.
+- Instruction loading and context size may limit how much of the core is active at once.
+- Keep generated entrypoints concise and link to the shared core.
+- If a tool is unavailable, follow [../../core/tool-contract.md](../../core/tool-contract.md) fallback rules.
 
 ## Tone
 

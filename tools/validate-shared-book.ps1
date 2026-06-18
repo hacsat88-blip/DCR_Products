@@ -1,11 +1,12 @@
-﻿#Requires -Version 5.1
+#Requires -Version 5.1
 <#
 .SYNOPSIS
   Validate the DCR shared book and thin environment capability declarations.
 
 .DESCRIPTION
-  Ensures .ai/book contains the shared runtime chapters and that
-  .ai/environments/*/kernel.md files do not redefine shared behavior.
+  Ensures .ai/core and .ai/routing contain the shared runtime chapters and that
+  .ai/adapters/*/kernel.md files do not redefine shared behavior.
+  (Previously checked .ai/book/ and .ai/environments/; updated for concept-zone restructure.)
 #>
 
 param(
@@ -15,10 +16,10 @@ param(
 
 $ErrorActionPreference = "Stop"
 $resolvedRoot = (Resolve-Path $RepoRoot).Path
-$BookRoot = Join-Path $resolvedRoot ".ai\book"
-$EnvironmentRoot = Join-Path $resolvedRoot ".ai\environments"
-$KernelBase = Join-Path $resolvedRoot ".ai\kernel\_base.md"
-$RuntimeKernel = Join-Path $resolvedRoot ".ai\kernel\dcr-kernel.md"
+$CoreRoot     = Join-Path $resolvedRoot ".ai\core"
+$RoutingRoot  = Join-Path $resolvedRoot ".ai\routing"
+$AdapterRoot  = Join-Path $resolvedRoot ".ai\adapters"
+$KernelFile   = Join-Path $resolvedRoot ".ai\core\kernel.md"
 
 $passed = 0
 $failed = 0
@@ -40,42 +41,50 @@ function Write-Fail {
 Write-Host "== Validate: shared book contract ==" -ForegroundColor Cyan
 Write-Host ""
 
-$requiredBookFiles = @(
-    "README.md",
-    "runtime.md",
-    "routing.md",
-    "gates.md",
-    "permissions.md",
-    "tool-contract.md"
+# --- Check core chapter files (previously .ai/book/) ---
+$requiredCoreFiles = @(
+    @{ Rel = "core\README.md";         Fallback = "core\kernel.md" },
+    @{ Rel = "core\runtime.md";        Fallback = $null },
+    @{ Rel = "routing\router.md";      Fallback = $null },
+    @{ Rel = "routing\gates.md";       Fallback = $null },
+    @{ Rel = "core\permissions.md";    Fallback = $null },
+    @{ Rel = "core\tool-contract.md";  Fallback = $null }
 )
 
-foreach ($name in $requiredBookFiles) {
-    $path = Join-Path $BookRoot $name
+foreach ($entry in $requiredCoreFiles) {
+    $rel  = $entry.Rel
+    $path = Join-Path $resolvedRoot (".ai\" + $rel)
+    # Use fallback if primary is a README that doesn't exist
+    if (-not (Test-Path $path) -and $entry.Fallback) {
+        $rel  = $entry.Fallback
+        $path = Join-Path $resolvedRoot (".ai\" + $rel)
+    }
     if (-not (Test-Path $path)) {
-        Write-Fail ".ai/book/$name — missing"
+        Write-Fail ".ai/$($rel.Replace('\','/')) — missing"
         continue
     }
 
     $content = Get-Content -Path $path -Raw -Encoding utf8
     if ($content -notmatch '(?m)^# .+') {
-        Write-Fail ".ai/book/$name — H1 missing"
+        Write-Fail ".ai/$($rel.Replace('\','/')) — H1 missing"
     }
     else {
-        Write-Ok ".ai/book/$name — H1 found"
+        Write-Ok ".ai/$($rel.Replace('\','/')) — H1 found"
     }
 }
 
-$runtimePath = Join-Path $BookRoot "runtime.md"
-$toolContractPath = Join-Path $BookRoot "tool-contract.md"
+# --- runtime.md section check (now in .ai/core/runtime.md) ---
+$runtimePath     = Join-Path $CoreRoot "runtime.md"
+$toolContractPath = Join-Path $CoreRoot "tool-contract.md"
 
 if (Test-Path $runtimePath) {
     $runtime = Get-Content -Path $runtimePath -Raw -Encoding utf8
     foreach ($required in @("Freshness And External Confirmation", "Reasoning Escalation", "Trigger Parsing", "Execution Modes", "Tool Routing")) {
         if ($runtime -notmatch [regex]::Escape($required)) {
-            Write-Fail ".ai/book/runtime.md — required section missing: $required"
+            Write-Fail ".ai/core/runtime.md — required section missing: $required"
         }
         else {
-            Write-Ok ".ai/book/runtime.md — required section present: $required"
+            Write-Ok ".ai/core/runtime.md — required section present: $required"
         }
     }
 }
@@ -84,16 +93,17 @@ if (Test-Path $toolContractPath) {
     $toolContract = Get-Content -Path $toolContractPath -Raw -Encoding utf8
     foreach ($operation in @("Read", "Search", "Edit", "Run", "Test", "Fetch", "Browse", "Delegate", "Commit", "Deploy")) {
         if ($toolContract -notmatch "\|\s*``?$operation``?\s*\|") {
-            Write-Fail ".ai/book/tool-contract.md — operation missing: $operation"
+            Write-Fail ".ai/core/tool-contract.md — operation missing: $operation"
         }
         else {
-            Write-Ok ".ai/book/tool-contract.md — operation present: $operation"
+            Write-Ok ".ai/core/tool-contract.md — operation present: $operation"
         }
     }
 }
 
-if (Test-Path $EnvironmentRoot) {
-    $envKernelFiles = Get-ChildItem -Path $EnvironmentRoot -File -Filter "kernel.md" -Recurse | Sort-Object FullName
+# --- adapter kernel thin-environment check (previously .ai/environments/) ---
+if (Test-Path $AdapterRoot) {
+    $adapterKernelFiles = Get-ChildItem -Path $AdapterRoot -File -Filter "kernel.md" -Recurse | Sort-Object FullName
     $bannedPatterns = @(
         '(?im)^##\s+Signal protocol\b',
         '(?im)^##\s+Response behavior\b',
@@ -107,18 +117,18 @@ if (Test-Path $EnvironmentRoot) {
         '(?im)^##\s+Permission model\b',
         '(?im)^##\s+Safety boundaries\b',
         # ASCII-only pattern for PS 5.1 without BOM (matches 判断の優先順位)
-        '(?m)^\u5224\u65AD\u306E\u512A\u5148\u9806\u4F4D'
+        '(?m)^判断の優先順位'
     )
 
-    foreach ($file in $envKernelFiles) {
+    foreach ($file in $adapterKernelFiles) {
         $relative = $file.FullName.Replace($resolvedRoot + [System.IO.Path]::DirectorySeparatorChar, "")
         $content = Get-Content -Path $file.FullName -Raw -Encoding utf8
 
-        if ($content -notmatch '\.\./\.\./book/runtime\.md') {
-            Write-Fail "$relative — missing shared book runtime reference"
+        if ($content -notmatch '\.\./\.\./core/runtime\.md') {
+            Write-Fail "$relative — missing shared core runtime reference"
         }
         else {
-            Write-Ok "$relative — shared book runtime reference found"
+            Write-Ok "$relative — shared core runtime reference found"
         }
 
         if ($content -notmatch 'tool-contract\.md') {
@@ -139,18 +149,19 @@ if (Test-Path $EnvironmentRoot) {
     }
 }
 
-foreach ($compatFile in @($KernelBase, $RuntimeKernel)) {
+# --- kernel.md compat check (previously .ai/kernel/_base.md + dcr-kernel.md) ---
+foreach ($compatFile in @($KernelFile)) {
     if (-not (Test-Path $compatFile)) {
         Write-Fail "$($compatFile.Replace($resolvedRoot + [System.IO.Path]::DirectorySeparatorChar, '')) — missing"
         continue
     }
 
     $content = Get-Content -Path $compatFile -Raw -Encoding utf8
-    if ($content -notmatch '\.ai/book|book/') {
-        Write-Fail "$($compatFile.Replace($resolvedRoot + [System.IO.Path]::DirectorySeparatorChar, '')) — missing .ai/book reference"
+    if ($content -notmatch '\.ai/core|core/') {
+        Write-Fail "$($compatFile.Replace($resolvedRoot + [System.IO.Path]::DirectorySeparatorChar, '')) — missing .ai/core reference"
     }
     else {
-        Write-Ok "$($compatFile.Replace($resolvedRoot + [System.IO.Path]::DirectorySeparatorChar, '')) — .ai/book reference found"
+        Write-Ok "$($compatFile.Replace($resolvedRoot + [System.IO.Path]::DirectorySeparatorChar, '')) — .ai/core reference found"
     }
 }
 
@@ -167,4 +178,3 @@ if ($errors.Count -gt 0) {
 Write-Host "=========================================="
 
 if ($failed -gt 0) { exit 1 } else { exit 0 }
-
