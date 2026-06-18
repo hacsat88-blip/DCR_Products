@@ -45,7 +45,7 @@ Compact 前に以下を実行し、重要情報を永続化する:
 
 ```
 ① plan ファイル保存: docs/dcr/plans/YYYY-MM-DD-<feature>.md
-② gate-state 記録:   .ai/kernel/gate-state.json (Update-GateState 呼び出し)
+② gate-state 記録:   .ai/routing/state/gate-state.json (Update-GateState 呼び出し)
 ③ メモリ記録:        mem_cli.py quick-save で重要な発見・決定を保存
 ④ タスクリスト確認:  未完了タスクの状態を確認してからコンテキスト解放
 ```

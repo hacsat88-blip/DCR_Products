@@ -12,7 +12,7 @@
 
 ## Shared Book Rule
 
-`.ai/kernel/_base.md` を共通正本とし、環境別 kernel は次だけを書く。
+`.ai/core/identity.md` を共通正本とし、環境別 kernel は次だけを書く。
 
 - entrypoint と自動ロード仕様
 - 使えるツール・使えないツール
@@ -268,7 +268,7 @@ Skill、Agent、サブエージェント、並列 orchestration、外部 MCP/API
 
 ## Notes
 
-- Copilot CLI は `AGENTS.md` を入口とし、CLI 固有差分は `.ai/environments/copilot-cli/kernel.md` を参照する
+- Copilot CLI は `AGENTS.md` を入口とし、CLI 固有差分は `.ai/adapters/copilot-cli/kernel.md` を参照する
 - VS Code Copilot は `.github/copilot-instructions.md` を優先
 - Codex は `AGENTS.md` を優先
 - Cursor は `.cursor/rules/`（`deploy.ps1` 生成）を優先

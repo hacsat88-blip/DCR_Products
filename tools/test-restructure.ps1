@@ -159,4 +159,11 @@ foreach ($old in @(".ai/kernel", ".ai/module", ".ai/book", ".ai/environments",
     Assert-Absent $old
 }
 
+# --- Task 17b: no dangling old-path references in live canonical zones ---
+Push-Location $RepoRoot
+try {
+    $hits = git grep -nE '\.ai/(kernel|module|book|environments)/' -- '.ai/core/*' '.ai/routing/*' '.ai/catalog/*' ':!.ai/adapters' 2>$null
+} finally { Pop-Location }
+if ($hits) { throw "dangling old-path reference(s) in live zones:`n$($hits -join "`n")" }
+
 Write-Host "restructure test passed" -ForegroundColor Green

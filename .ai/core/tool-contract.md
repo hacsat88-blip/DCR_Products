@@ -31,7 +31,7 @@ The shared runtime should reason in abstract operations. Each environment adapte
 
 ## Environment Capability Declarations
 
-Each `.ai/environments/*/kernel.md` file should declare:
+Each `.ai/adapters/*/kernel.md` file should declare:
 
 - entrypoint
 - available capabilities

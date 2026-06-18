@@ -143,7 +143,7 @@ confidence は候補順位を決める指標であり、単独では実行許可
 
 直前に `gate-state.json` の `proposal_state.status = proposed|refined` がある場合、次の短い発話は新規依頼として扱う前に proposal reply として解釈する。
 
-`proposal_state` は gitignored の `.ai/kernel/gate-state.json` に保存し、永続的な判断履歴は `router-decisions.jsonl` に残す。
+`proposal_state` は gitignored の `.ai/routing/state/gate-state.json` に保存し、永続的な判断履歴は `router-decisions.jsonl` に残す。
 
 保存内容:
 
@@ -319,8 +319,8 @@ research-analyst.absorbs = [docs-researcher, market-researcher, competitive-anal
 - 実体 agent: [pied-piper](../catalog/agents-source/pied-piper.md)
 - 統合層: [unified-coordinator.md](unified-coordinator.md)
 - インデックス: `.ai/catalog/rules/_ROUTING_INDEX.md` (auto-generated)
-- ゲート状態: `.ai/kernel/gate-state.json` (Phase B-4)
-- 決定ログ: `.ai/kernel/router-decisions.jsonl` (中期-C, gitignored)
+- ゲート状態: `.ai/routing/state/gate-state.json` (Phase B-4)
+- 決定ログ: `.ai/routing/state/router-decisions.jsonl` (中期-C, gitignored)
 - ハブ判定: [hub-promotion-criteria.md](hub-promotion-criteria.md)
 - 削除サイクル: [deprecation-lifecycle.md](deprecation-lifecycle.md)
 
@@ -358,9 +358,9 @@ V4.1 では `pied-piper` の集中を削除候補やハブ化候補にせず、`
 V7 では `router-decisions-report.ps1` と `reduction-advisor.ps1` が smoke/test/fixture 由来の synthetic telemetry を削減判断から除外する。実運用の non-synthetic decision が少ない場合は `collect_real_usage` を返し、削除・deprecated・表示抑制に進まない。
 V7.1 では `tools/shadow-routing-trial.ps1` を使い、実作業に近い依頼文、候補、承認/却下/再提案、ユーザー評価 (`just_right|too_many|off_target|lighter|too_heavy|unclear`) を `shadow_trial: true` として記録する。これは削減そのものではなく、V8 以降の表示抑制や束ね直しの判断材料にする。
 V8 では `tools/display-policy-advisor.ps1` が shadow trial から表示だけの改善候補を出す。対象は `suppress_secondary_options|show_underlying_asset|make_lightweight_default|demote_candidate|clarify_display_copy|keep_as_default` までで、削除、deprecated、routing の自動変更は行わない。実装変更に進む場合は、この advisor 出力を発火前提案としてユーザー承認に戻す。
-V9 では `tools/display-policy-proposal.ps1` が V8 advisor 出力を最大3件の `proposal_state.options` に変換する。既定は preview のみで、`-CommitState` を付けた場合だけ `.ai/kernel/gate-state.json` に `approve_required` の承認待ち proposal として保存する。表示ポリシーの実変更は、この proposal が承認された後の別ステップにする。
+V9 では `tools/display-policy-proposal.ps1` が V8 advisor 出力を最大3件の `proposal_state.options` に変換する。既定は preview のみで、`-CommitState` を付けた場合だけ `.ai/routing/state/gate-state.json` に `approve_required` の承認待ち proposal として保存する。表示ポリシーの実変更は、この proposal が承認された後の別ステップにする。
 V10 では `tools/bundle-advisor.ps1` が routing decision と catalog frontmatter から親候補への束ね案を出す。対象は `bundle_into_hub|expose_underlying_asset|clarify_parent_label|keep_separate|observe_more` までで、物理統合、削除、deprecated 追加は行わない。束ね案を実装に進める場合は V10.1 以降で承認 proposal に戻す。
-V10.1 では `tools/bundle-proposal.ps1` が V10 advisor 出力を最大3件の `proposal_state.options` に変換する。既定は preview のみで、`-CommitState` のときだけ `.ai/kernel/gate-state.json` に `approve_required` の承認待ち proposal として保存する。束ね表示の実変更は、この proposal が承認された後の別ステップにする。
+V10.1 では `tools/bundle-proposal.ps1` が V10 advisor 出力を最大3件の `proposal_state.options` に変換する。既定は preview のみで、`-CommitState` のときだけ `.ai/routing/state/gate-state.json` に `approve_required` の承認待ち proposal として保存する。束ね表示の実変更は、この proposal が承認された後の別ステップにする。
 
 ## Migration Note
 
@@ -414,7 +414,7 @@ When approval is required, present the recommended candidate first and wait for 
 
 ## Proposal State
 
-When `.ai/kernel/gate-state.json` contains `proposal_state.status = proposed|refined`, short follow-up replies are interpreted as responses to the active proposal before normal routing.
+When `.ai/routing/state/gate-state.json` contains `proposal_state.status = proposed|refined`, short follow-up replies are interpreted as responses to the active proposal before normal routing.
 
 - approve updates the active proposal to `approved` only when one option is clearly selected.
 - reject updates it to `rejected` and does not fire anything.

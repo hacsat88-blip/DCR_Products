@@ -25,7 +25,7 @@
 
 ## Gate state enforcement
 
-- sh/ 起動時、`Test-GateReady -RequireGate 'qa_passed'` で `.ai/kernel/gate-state.json` を確認する（唯一の正本）
+- sh/ 起動時、`Test-GateReady -RequireGate 'qa_passed'` で `.ai/routing/state/gate-state.json` を確認する（唯一の正本）
 - `qa_passed = true` でない場合: **ブロック**。実装を進めず以下を返す:
   ```
   STOP - q/ QA Gate を通過していません。

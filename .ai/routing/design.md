@@ -28,8 +28,8 @@
 
 ### 1. 単一ソース原則
 
-- 共通カーネルの正本: `.ai/kernel/`
-- runtime kernel の正本: `.ai/kernel/dcr-kernel.md`
+- 共通カーネルの正本: `.ai/core/`
+- runtime kernel の正本: `.ai/core/kernel.md`
 - ロールの正本: `.ai/catalog/rules/*.md`
 - エディタ固有ファイルは生成物または薄い入口に寄せる
 
@@ -140,7 +140,7 @@
 
 ### Phase 2: ずれ防止
 
-- 共通 runtime kernel は `.ai/kernel/dcr-kernel.md` から出力する
+- 共通 runtime kernel は `.ai/core/kernel.md` から出力する
 
 ### Phase 3: 精度向上
 

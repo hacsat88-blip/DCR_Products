@@ -1,4 +1,4 @@
-<!-- Merged from .ai/kernel/_permissions.md + .ai/book/permissions.md (single home: core/permissions.md) -->
+<!-- Single home: core/permissions.md (consolidated from former kernel + book permission docs) -->
 # DCR Kernel Permissions
 
 このファイルは実行権限モデルの正本です。応答シグナルとは別に、操作権限を P1 / P2 / P3 で管理します。

@@ -26,7 +26,7 @@
 
 ## Gate state persistence
 
-- p/ 承認後、`Update-GateState` を呼び出して `.ai/kernel/gate-state.json` に記録する（唯一の正本）
+- p/ 承認後、`Update-GateState` を呼び出して `.ai/routing/state/gate-state.json` に記録する（唯一の正本）
 - 3ステップ以上の計画は `docs/dcr/plans/YYYY-MM-DD-<feature>.md` にも保存する
 - スコープ変更検知時は `plan_approved: false` にリセットし `scope_resets` をインクリメントする
 - `scope_resets >= 3` で `WARN s/ で目的と前提を再整理することを推奨します` を提示する
@@ -34,7 +34,7 @@
 ## Mandatory: structured gate-state write
 
 p/ 承認後、`tools/lib/gate-state.ps1` の `Update-GateState` 関数を呼び出して
-`.ai/kernel/gate-state.json` に以下を **必ず** 書き込む（ヒューマン読みやすい
+`.ai/routing/state/gate-state.json` に以下を **必ず** 書き込む（ヒューマン読みやすい
 md と並行して、機械可読な JSON を deploy.ps1 -EnforceGate が参照する）：
 
 ```powershell

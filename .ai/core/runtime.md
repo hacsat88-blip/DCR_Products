@@ -128,7 +128,7 @@ humanlayer/12-factor-agents is adopted only as a design lens:
 - prefer small focused agents and parent hubs over monolithic agents
 - keep trigger behavior consistent across CLI/IDE entrypoints
 
-Do not copy external prose into the runtime contract. Summarize with provenance in `.ai/module/unified-integration.md` when a principle becomes durable DCR guidance.
+Do not copy external prose into the runtime contract. Summarize with provenance in `.ai/routing/integration.md` when a principle becomes durable DCR guidance.
 
 ## References
 
@@ -136,5 +136,5 @@ Do not copy external prose into the runtime contract. Summarize with provenance 
 - Detailed gates: [gates.md](gates.md)
 - Detailed routing: [routing.md](routing.md)
 - Abstract tool operations: [tool-contract.md](tool-contract.md)
-- Runtime compatibility mirror: [../kernel/_base.md](../kernel/_base.md)
+- Runtime compatibility mirror: [./identity.md](./identity.md)
 

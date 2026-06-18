@@ -29,7 +29,7 @@
 
 - q/ 実行時、`gate-state.json` の `plan_passed: true` を確認する（`Read-GateState` で取得）
 - `plan_passed` が `false` の場合: `WARN p/ で計画を先に策定してください` を提示（ブロックではなく警告）
-- q/ 全通過（STOP = 0）時、`Update-GateState` で `.ai/kernel/gate-state.json` に記録する（唯一の正本）
+- q/ 全通過（STOP = 0）時、`Update-GateState` で `.ai/routing/state/gate-state.json` に記録する（唯一の正本）
 - STOP が残存する場合は `qa_passed = $false` で書き込む
 
 ## Evidence format
@@ -42,7 +42,7 @@
 ## Mandatory: structured gate-state write
 
 q/ 実行完了時、`tools/lib/gate-state.ps1` の `Update-GateState` を呼び、
-`.ai/kernel/gate-state.json` に findings 内訳と qa_passed を **必ず** 記録する：
+`.ai/routing/state/gate-state.json` に findings 内訳と qa_passed を **必ず** 記録する：
 
 ```powershell
 . .\tools\lib\gate-state.ps1

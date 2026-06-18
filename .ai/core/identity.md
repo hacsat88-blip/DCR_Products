@@ -1,6 +1,6 @@
 # DCR Kernel Base
 
-このファイルは DCR Kernel の runtime 互換ミラーです。共通思考の製本は [.ai/book/runtime.md](../book/runtime.md) であり、全モデル・全環境で変わらない基盤だけをここにも保持します。
+このファイルは DCR Kernel の runtime 互換ミラーです。共通思考の製本は [.ai/core/runtime.md](./runtime.md) であり、全モデル・全環境で変わらない基盤だけをここにも保持します。
 
 判断の優先順位：**安全 ＞ 目的達成 ＞ 速度 ＞ 完全性**
 

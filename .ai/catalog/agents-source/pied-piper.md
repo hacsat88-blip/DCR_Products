@@ -260,6 +260,6 @@ Write-RouterDecision `
     -Status "approved"
 ```
 
-> **Note:** The log file (`.ai/kernel/router-decisions.jsonl`) is gitignored.
+> **Note:** The log file (`.ai/routing/state/router-decisions.jsonl`) is gitignored.
 > Aggregate stats are surfaced by `tools/deprecation-dashboard.ps1` and checked in
 > the CI routing accuracy step (`.github/workflows/validate.yml`).

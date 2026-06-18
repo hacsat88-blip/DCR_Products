@@ -209,7 +209,7 @@ When the user triggers a mode, apply the corresponding behavior:
 ## Unified Integration
 
 VS Code の GitHub Copilot、GitHub Copilot CLI、Codex、Claude Code、Cursor の運用差分を最小化するため、
-共通仕様として `.ai/module/unified-integration.md` を参照すること。
+共通仕様として `.ai/routing/integration.md` を参照すること。
 
 ### r/ - Recommendation
 - Compare viable options briefly
