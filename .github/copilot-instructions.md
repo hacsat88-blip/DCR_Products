@@ -1,5 +1,5 @@
 <!-- AUTO-GENERATED FILE - DO NOT EDIT DIRECTLY
-Generated from: .ai/book + .ai/kernel + .ai/catalog/rules/ + .ai/catalog/skills/
+Generated from: .ai/core + .ai/routing + .ai/catalog/rules/ + .ai/catalog/skills/
 To regenerate: Run pwsh -ExecutionPolicy Bypass -File .\deploy.ps1 or .\tools\deploy-all.ps1
 Any manual edits will be overwritten on next deploy. -->
 
@@ -141,7 +141,7 @@ Entrypoint for VS Code Copilot environment.
 
 ## Unified Coordinator
 
-全タスクの単一入口は **pied-piper** agent。Rule/Skill/Agent 選定は [.ai/module/unified-router.md](../../.ai/module/unified-router.md) の決定木に従い、候補を増やさず必要十分な候補へ圧縮し、発火前に候補・理由・期待効果を報告する。
+全タスクの単一入口は **pied-piper** agent。Rule/Skill/Agent 選定は [.ai/routing/router.md](../../.ai/routing/router.md) の決定木に従い、候補を増やさず必要十分な候補へ圧縮し、発火前に候補・理由・期待効果を報告する。
 
 Skill、Agent、サブエージェント、並列 orchestration、外部 MCP/API、P2/P3 操作が関わる場合は、原則として **候補提示 → ユーザー承認 → 発火** の順に進める。P1 read-only の単独低リスク探索のみ、短い事前報告後に自動実行できる。
 
@@ -149,7 +149,7 @@ Skill、Agent、サブエージェント、並列 orchestration、外部 MCP/API
 
 `いい感じに` / `任せる` / `おまかせ` / `よさそう` / `よさげ` / `たぶん` / `多分` は承認にせず、候補提示または再確認に戻す。`キャンセル` / `中止` は却下、`別案` / `別の案` / `軽く` は再提案として扱う。
 
-`.ai/kernel/gate-state.json` に `proposal_state.status = proposed|refined` がある場合、短い次発話は通常ルーティングより先に直前提案への返答として解釈する。承認・却下・修正・曖昧の分類は `tools/lib/gate-state.ps1` の proposal state machine に従う。
+`.ai/routing/state/gate-state.json` に `proposal_state.status = proposed|refined` がある場合、短い次発話は通常ルーティングより先に直前提案への返答として解釈する。承認・却下・修正・曖昧の分類は `tools/lib/gate-state.ps1` の proposal state machine に従う。
 
 ---
 
@@ -163,10 +163,10 @@ Skill、Agent、サブエージェント、並列 orchestration、外部 MCP/API
 
 「これどう？」「サトシ開発目線で」「前と同じ観点で」「入れる価値ある？」「導入して」「置き換える必要ある？」「また同じエラー」「過去判断も踏まえて」など、過去判断が品質に影響する相談では、利用可能な runtime memory を着手前に確認する。
 
-agentmemory 互換 backend が使える場合は、同種タスク、関連ファイルの過去判断、採用/非採用ポリシー、検証済みコマンドを短く検索する。使えない場合は通常の repo 探索へフォールバックする。memory recall は正本ではなく、.ai/catalog / .ai/book / repo artifact / 現在の git 状態を優先する。
+agentmemory 互換 backend が使える場合は、同種タスク、関連ファイルの過去判断、採用/非採用ポリシー、検証済みコマンドを短く検索する。使えない場合は通常の repo 探索へフォールバックする。memory recall は正本ではなく、.ai/catalog / .ai/core / repo artifact / 現在の git 状態を優先する。
 
 ---
 
-Load priority: .ai/book/ > .ai/kernel/ > .ai/catalog/rules/ > .ai/catalog/skills/
+Load priority: .ai/core/ > .ai/routing/ > .ai/catalog/rules/ > .ai/catalog/skills/
 
 For architecture details, see [docs/dcr/architecture/unified-adapter-system.md](../../docs/dcr/architecture/unified-adapter-system.md)

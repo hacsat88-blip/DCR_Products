@@ -72,10 +72,13 @@ prototypes/blue-planet-globe/
 .claude/settings.local.json
 
 # Per-session gate state (managed at runtime, not committed)
-.ai/kernel/gate-state.json
+.ai/routing/state/gate-state.json
 
 # Router decision log (per-session telemetry, not committed)
-.ai/kernel/router-decisions.jsonl
+.ai/routing/state/router-decisions.jsonl
+
+# P3 force-override log (per-session telemetry, not committed)
+.ai/routing/state/p3-force-log.jsonl
 
 # Deprecation dashboard snapshot (regenerated, not committed)
 docs/deprecation-status.json

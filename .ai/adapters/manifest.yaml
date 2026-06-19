@@ -1,0 +1,28 @@
+# 配布地図: source(正本) -> entrypoint(生成物) / mirror(生成物)
+# deploy.ps1 と validate.ps1 はこの manifest を正として読み、INDEX.md §3 と突き合わせる。
+version: 1
+sources:
+  core: .ai/core
+  routing: .ai/routing
+  catalog: .ai/catalog
+  adapters: .ai/adapters
+entrypoints:
+  - tool: claude-code
+    out: CLAUDE.md
+    adapter: .ai/adapters/claude-code/kernel.md
+    reads: [core, routing, catalog]
+  - tool: codex
+    out: AGENTS.md
+    adapter: .ai/adapters/codex/kernel.md
+    reads: [core, routing, catalog]
+  - tool: vscode-copilot
+    out: .github/copilot-instructions.md
+    adapter: .ai/adapters/vscode-copilot/kernel.md
+    reads: [core, routing, catalog]
+mirrors:
+  - source: .ai/catalog/agents-source   # *.md
+    out: .claude/agents
+    generated: true
+  - source: .ai/catalog/agents-source   # *.toml
+    out: .codex/agents
+    generated: true

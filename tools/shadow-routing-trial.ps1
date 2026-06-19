@@ -5,7 +5,7 @@
 
 .DESCRIPTION
   Appends a non-synthetic, observation-first routing decision to
-  .ai/kernel/router-decisions.jsonl. Use this to collect real-ish routing
+  .ai/routing/state/router-decisions.jsonl. Use this to collect real-ish routing
   feedback before hiding, bundling, deprecating, or deleting any asset.
 #>
 

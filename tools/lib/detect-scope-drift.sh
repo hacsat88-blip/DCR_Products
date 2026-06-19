@@ -10,7 +10,7 @@ input="${CLAUDE_TOOL_INPUT:-}"
 file_path=$(python3 -c "import sys,json; d=json.load(sys.stdin); print(d.get('file_path',''))" <<< "$input" 2>/dev/null || echo "")
 [[ -z "$file_path" ]] && exit 0
 
-GATE_STATE=".ai/kernel/gate-state.json"
+GATE_STATE=".ai/routing/state/gate-state.json"
 [[ ! -f "$GATE_STATE" ]] && exit 0
 
 # Only enforce when a plan has been approved
@@ -36,7 +36,7 @@ from datetime import datetime, timezone
 
 drift_count = int(sys.argv[1])
 file_path = sys.argv[2]
-path = ".ai/kernel/gate-state.json"
+path = ".ai/routing/state/gate-state.json"
 
 with open(path, "r", encoding="utf-8") as f:
     state = json.load(f)

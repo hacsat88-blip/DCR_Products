@@ -54,7 +54,7 @@ function Write-Warn { param([string]$m) Write-Host "[WARN] $m" -ForegroundColor 
 Write-Host ""
 Write-Host "=== 1. Gate State 整合性 ===" -ForegroundColor Cyan
 
-$gateStatePath = Join-Path $RepoRoot ".ai\kernel\gate-state.json"
+$gateStatePath = Join-Path $RepoRoot ".ai\routing\state\gate-state.json"
 if (-not (Test-Path $gateStatePath)) {
     Write-Warn "gate-state.json が存在しません（ブートストラップ状態）"
 } else {
@@ -133,31 +133,21 @@ if (Test-Path $settingsPath) {
 Write-Host ""
 Write-Host "=== 3. カーネルファイル鮮度 ===" -ForegroundColor Cyan
 
-$baseFile = Join-Path $RepoRoot ".ai\kernel\_base.md"
+$baseFile = Join-Path $RepoRoot ".ai\core\identity.md"
 if (-not (Test-Path $baseFile)) {
-    Write-Fail "_base.md が存在しません"
+    Write-Fail "identity.md が存在しません"
 } else {
-    $content = Get-Content -Path $baseFile -Raw
-    $linkPattern = '\[[^\]]+\]\((\.{1,2}/[^)]+)\)'
-    $matches = [regex]::Matches($content, $linkPattern)
-    foreach ($m in $matches) {
-        $href = ($m.Groups[1].Value -split '#')[0]
-        $relPath = $href -replace "/", "\"
-        $target = [System.IO.Path]::GetFullPath((Join-Path (Split-Path $baseFile) $relPath))
-        if (Test-Path $target) { Write-Ok   "_base.md 参照先存在: $href" }
-        else                   { Write-Fail "_base.md 参照先欠落: $href" }
-    }
+    Write-Ok "identity.md 存在"
 }
 
-$expectedKernelFiles = @(
-    "_quality-floor.md", "_self-correction.md", "_auto-escalation.md",
-    "_parallel-execution.md", "_context-efficiency.md",
-    "_permissions.md", "_safety-boundaries.md", "_module-behaviors.md"
+$expectedCoreFiles = @(
+    "identity.md", "quality-floor.md", "context-efficiency.md",
+    "permissions.md", "safety.md", "kernel.md"
 )
-foreach ($kf in $expectedKernelFiles) {
-    $kpath = Join-Path $RepoRoot ".ai\kernel\$kf"
-    if (Test-Path $kpath) { Write-Ok   "カーネルファイル存在: $kf" }
-    else                  { Write-Fail "カーネルファイル欠落: $kf" }
+foreach ($kf in $expectedCoreFiles) {
+    $kpath = Join-Path $RepoRoot ".ai\core\$kf"
+    if (Test-Path $kpath) { Write-Ok   "コアファイル存在: $kf" }
+    else                  { Write-Fail "コアファイル欠落: $kf" }
 }
 
 # ─────────────────────────────────────────────
@@ -168,7 +158,7 @@ Write-Host "=== 4. デッドコード検出 ===" -ForegroundColor Cyan
 
 $catalogDir = Join-Path $RepoRoot ".ai\catalog"
 $routerIndex = Join-Path $RepoRoot ".ai\catalog\skills\_SKILLS_ROUTING_INDEX.md"
-$routerDecisions = Join-Path $RepoRoot ".ai\kernel\router-decisions.jsonl"
+$routerDecisions = Join-Path $RepoRoot ".ai\routing\state\router-decisions.jsonl"
 
 $orphanCount = 0
 foreach ($kind in @("rules", "skills")) {

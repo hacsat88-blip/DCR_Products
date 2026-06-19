@@ -38,7 +38,7 @@ runtime_targets:
 
 > **このスキルは参照エントリーポイントです。**
 > 実際のルーティング実行は **[pied-piper](./../agents-source/pied-piper.md)** agent が担います。
-> ロジック定義は **[.ai/module/unified-router.md](../../../module/unified-router.md)** を参照してください。
+> ロジック定義は **[.ai/routing/router.md](../../../routing/router.md)** を参照してください。
 
 ## 役割
 
@@ -107,7 +107,7 @@ runtime_targets:
 - `refine`: `別案` / `別の案` / `軽めに` / `軽く` / `詳しく` / `もう少し` / `絞って` で `refined`
 - `ambiguous`: active proposal がない、または候補が一意でない場合は発火せず再確認
 
-状態は `.ai/kernel/gate-state.json`、監査履歴は `.ai/kernel/router-decisions.jsonl` に残します。分類の実装は `tools/lib/gate-state.ps1` の proposal state machine に従います。
+状態は `.ai/routing/state/gate-state.json`、監査履歴は `.ai/routing/state/router-decisions.jsonl` に残します。分類の実装は `tools/lib/gate-state.ps1` の proposal state machine に従います。
 V5 では `tools/test-proposal-reply-vocabulary.ps1` で、自然語返答の実行時挙動を検証します。
 V6 では `tools/test-routing-entrypoint-contract.ps1` で、Codex / Claude Code / VS Code Copilot の生成入口が同じ自然語返答契約を読めることを検証します。
 V7 では `tools/router-decisions-report.ps1` と `tools/reduction-advisor.ps1` が smoke/test/fixture 由来の synthetic telemetry を削減判断から除外し、実運用ログ不足時は `collect_real_usage` に留めます。
@@ -119,6 +119,6 @@ V10.1 では `tools/bundle-proposal.ps1` で、V10 の束ね提案を `proposal_
 
 ## 詳細
 
-- 決定木・ローカルオーバーライド優先順位: [unified-router.md](../../../module/unified-router.md)
+- 決定木・ローカルオーバーライド優先順位: [router.md](../../../routing/router.md)
 - 統一Coordinator 実装: [pied-piper.md](./../agents-source/pied-piper.md)
-- ゲート連鎖: [trigger-p/q/sh](../../../kernel/gates/)
+- ゲート連鎖: [trigger-p/q/sh](../../../routing/gates/)

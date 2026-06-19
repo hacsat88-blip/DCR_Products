@@ -63,7 +63,7 @@ metadata:
 1. 現在の repo artifact を確認する。
    - `git status --short --branch`
    - `rg -uu -n "<repo名|作者|主要語>" README.md .ai docs tools Product`
-   - 関連する `.ai/catalog/skills/*/SKILL.md`、`.ai/module/unified-integration.md`、`README.md`
+   - 関連する `.ai/catalog/skills/*/SKILL.md`、`.ai/routing/integration.md`、`README.md`
 2. runtime memory が該当する場合は、過去判断を補助情報として見る。
 3. 外部 repo は公式 README / docs / release / license を確認する。最新性が必要なら web で確認する。
 4. 既存 DCR の正本・generated mirror・user-level managed target と衝突しないか見る。
@@ -90,7 +90,7 @@ metadata:
 
 導入先:
 
-- `.ai/module/unified-integration.md`
+- `.ai/routing/integration.md`
 - `README.md`
 - 既存 `.ai/catalog/skills/<skill>/SKILL.md`
 - 必要なら `harness-audit` の External Capability Audit 表
@@ -166,7 +166,7 @@ EXTERNAL CAPABILITY INTAKE
 
 ## 実装する場合の最小手順
 
-1. `README.md` と `.ai/module/unified-integration.md` に境界を明記する。
+1. `README.md` と `.ai/routing/integration.md` に境界を明記する。
 2. 既存 skill に自然な home があればそこへ薄く追加する。なければ新しい DCR skill を作る。
 3. `harness-audit` の External Capability Audit 表へ候補を追加する。
 4. skill を追加した場合は `tools/generate-routing-index.ps1 -SkillsOutputPath .ai/catalog/skills/_SKILLS_ROUTING_INDEX.md` を実行する。

@@ -11,7 +11,7 @@
     - Alias age (days since deprecation commit, via git log)
     - Recent call count (default last 30 days, from router-decisions.jsonl)
     - External-reference count (grep for old name in repo)
-    - Removal-eligibility verdict (per .ai/module/deprecation-lifecycle.md)
+    - Removal-eligibility verdict (per docs/dcr/deprecation-lifecycle.md)
 
   Output: console table + optional JSON to docs/deprecation-status.json
 
@@ -40,7 +40,7 @@ $RepoRoot = (Resolve-Path (Join-Path $PSScriptRoot "..")).Path
 $rulesDir = Join-Path $RepoRoot ".ai/catalog/rules"
 $skillsDir = Join-Path $RepoRoot ".ai/catalog/skills"
 $agentsDir = Join-Path $RepoRoot ".ai/catalog/agents-source"
-$decisionsPath = Join-Path $RepoRoot ".ai/kernel/router-decisions.jsonl"
+$decisionsPath = Join-Path $RepoRoot ".ai/routing/state/router-decisions.jsonl"
 $DeprecatedAliases = Join-Path $RepoRoot "tools\lib\deprecated-aliases.ps1"
 . $DeprecatedAliases
 
@@ -148,7 +148,7 @@ foreach ($alias in Get-DcrDeprecatedAliases -RepoRoot $RepoRoot) {
     })
 }
 
-# ── Verdict per .ai/module/deprecation-lifecycle.md ──
+# ── Verdict per docs/dcr/deprecation-lifecycle.md ──
 foreach ($r in $report) {
     $verdict = "WAIT"
     if ($r.days_deprecated -lt 0) {
@@ -241,7 +241,7 @@ if ($OutputMarkdown) {
         "",
         "## Next Step",
         "",
-        "- Review this list with .ai/module/deprecation-lifecycle.md and update docs/deprecation-removed.md when removal is executed.",
+        "- Review this list with docs/dcr/deprecation-lifecycle.md and update docs/deprecation-removed.md when removal is executed.",
         ""
     )
 

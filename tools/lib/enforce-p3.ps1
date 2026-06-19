@@ -41,7 +41,7 @@ $Label = $OperationLabels[$Operation]
 
 # --force の場合はログして続行
 if ($Force) {
-    $logPath = Join-Path $RepoRoot ".ai\kernel\p3-force-log.jsonl"
+    $logPath = Join-Path $RepoRoot ".ai\routing\state\p3-force-log.jsonl"
     $logEntry = @{
         timestamp = (Get-Date).ToUniversalTime().ToString("yyyy-MM-ddTHH:mm:ssZ")
         operation = $Operation

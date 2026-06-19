@@ -39,7 +39,7 @@ runtime_targets:
 
 ## 実行手順
 
-1. `skills/`, `rules/`, `.ai/kernel/gates/` を棚卸し
+1. `skills/`, `rules/`, `.ai/routing/gates/` を棚卸し
 2. 監査結果を PASS/FAIL で記録
 3. Top 3 改善アクションを提示
 4. 外部候補は `external-capability-intake` に渡し、`skip / concept-import / selective-source-import / immutable-upstream / external-tool-poc` に分類する

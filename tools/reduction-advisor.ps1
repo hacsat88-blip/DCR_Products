@@ -12,10 +12,10 @@
   default so validation telemetry does not drive catalog pruning.
 
 .PARAMETER LogPath
-  Router decision JSONL path. Defaults to .ai/kernel/router-decisions.jsonl.
+  Router decision JSONL path. Defaults to .ai/routing/state/router-decisions.jsonl.
 
 .PARAMETER GateStatePath
-  Gate state JSON path. Defaults to .ai/kernel/gate-state.json.
+  Gate state JSON path. Defaults to .ai/routing/state/gate-state.json.
 
 .PARAMETER OutputJson
   Optional path to write the full recommendation report as JSON.
@@ -51,10 +51,10 @@ if (Test-Path $deprecatedAliasLib) {
     . $deprecatedAliasLib
 }
 if ([string]::IsNullOrWhiteSpace($LogPath)) {
-    $LogPath = Join-Path $RepoRoot ".ai/kernel/router-decisions.jsonl"
+    $LogPath = Join-Path $RepoRoot ".ai/routing/state/router-decisions.jsonl"
 }
 if ([string]::IsNullOrWhiteSpace($GateStatePath)) {
-    $GateStatePath = Join-Path $RepoRoot ".ai/kernel/gate-state.json"
+    $GateStatePath = Join-Path $RepoRoot ".ai/routing/state/gate-state.json"
 }
 if ($TopN -lt 1) { $TopN = 1 }
 if ($MinEvidence -lt 1) { $MinEvidence = 1 }

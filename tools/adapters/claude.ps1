@@ -106,7 +106,7 @@ $MarkdownTick = [char]96
 
 $content = @"
 <!-- AUTO-GENERATED FILE - DO NOT EDIT DIRECTLY
-Generated from: .ai/book + .ai/kernel + .ai/catalog/rules/ + .ai/catalog/skills/ + .ai/catalog/agents-source/
+Generated from: .ai/core + .ai/routing + .ai/catalog/rules/ + .ai/catalog/skills/ + .ai/catalog/agents-source/
 To regenerate: Run pwsh -ExecutionPolicy Bypass -File .\deploy.ps1 or .\tools\deploy-all.ps1
 Any manual edits will be overwritten on next deploy. -->
 
@@ -126,15 +126,15 @@ Unified entry point for Claude Code environment.
 - Rules: [.ai/catalog/rules/](.ai/catalog/rules/)
 - Skills: [.ai/catalog/skills/](.ai/catalog/skills/)
 - Agents: [.ai/catalog/agents-source/](.ai/catalog/agents-source/)
-- Shared Book: [.ai/book/](.ai/book/)
-- Kernel: [.ai/kernel/](.ai/kernel/)
-- Environment diff (Claude Code): [.ai/environments/claude-code/kernel.md](.ai/environments/claude-code/kernel.md)
+- Core: [.ai/core/](.ai/core/)
+- Routing: [.ai/routing/](.ai/routing/)
+- Environment diff (Claude Code): [.ai/adapters/claude-code/kernel.md](.ai/adapters/claude-code/kernel.md)
 ---
 
 ## Unified Coordinator
 
 全タスクの単一入口は **pied-piper** agent。
-Rule/Skill/Agent の選定は [.ai/module/unified-router.md](.ai/module/unified-router.md) の決定木に従い、
+Rule/Skill/Agent の選定は [.ai/routing/router.md](.ai/routing/router.md) の決定木と **unified-router** skill に従い、
 候補を増やさず必要十分な候補へ圧縮し、発火前に候補・理由・期待効果を報告する。
 
 Skill、Agent、サブエージェント、並列 orchestration、外部 MCP/API、P2/P3 操作が関わる場合は、原則として **候補提示 → ユーザー承認 → 発火** の順に進める。P1 read-only の単独低リスク探索のみ、短い事前報告後に自動実行できる。
@@ -143,7 +143,7 @@ Skill、Agent、サブエージェント、並列 orchestration、外部 MCP/API
 
 ${MarkdownTick}いい感じに${MarkdownTick} / ${MarkdownTick}任せる${MarkdownTick} / ${MarkdownTick}おまかせ${MarkdownTick} / ${MarkdownTick}よさそう${MarkdownTick} / ${MarkdownTick}よさげ${MarkdownTick} / ${MarkdownTick}たぶん${MarkdownTick} / ${MarkdownTick}多分${MarkdownTick} は承認にせず、候補提示または再確認に戻す。${MarkdownTick}キャンセル${MarkdownTick} / ${MarkdownTick}中止${MarkdownTick} は却下、${MarkdownTick}別案${MarkdownTick} / ${MarkdownTick}別の案${MarkdownTick} / ${MarkdownTick}軽く${MarkdownTick} は再提案として扱う。
 
-${MarkdownTick}.ai/kernel/gate-state.json${MarkdownTick} に ${MarkdownTick}proposal_state.status = proposed|refined${MarkdownTick} がある場合、短い次発話は通常ルーティングより先に直前提案への返答として解釈する。承認・却下・修正・曖昧の分類は ${MarkdownTick}tools/lib/gate-state.ps1${MarkdownTick} の proposal state machine に従う。
+${MarkdownTick}.ai/routing/state/gate-state.json${MarkdownTick} に ${MarkdownTick}proposal_state.status = proposed|refined${MarkdownTick} がある場合、短い次発話は通常ルーティングより先に直前提案への返答として解釈する。承認・却下・修正・曖昧の分類は ${MarkdownTick}tools/lib/gate-state.ps1${MarkdownTick} の proposal state machine に従う。
 
 ## Completion Review Proposal
 
@@ -153,12 +153,12 @@ ${MarkdownTick}.ai/kernel/gate-state.json${MarkdownTick} に ${MarkdownTick}prop
 
 「これどう？」「サトシ開発目線で」「前と同じ観点で」「入れる価値ある？」「導入して」「置き換える必要ある？」「また同じエラー」「過去判断も踏まえて」など、過去判断が品質に影響する相談では、利用可能な runtime memory を着手前に確認する。
 
-agentmemory 互換 backend が使える場合は、同種タスク、関連ファイルの過去判断、採用/非採用ポリシー、検証済みコマンドを短く検索する。使えない場合は通常の repo 探索へフォールバックする。memory recall は正本ではなく、${MarkdownTick}.ai/catalog${MarkdownTick} / ${MarkdownTick}.ai/book${MarkdownTick} / repo artifact / 現在の git 状態を優先する。
+agentmemory 互換 backend が使える場合は、同種タスク、関連ファイルの過去判断、採用/非採用ポリシー、検証済みコマンドを短く検索する。使えない場合は通常の repo 探索へフォールバックする。memory recall は正本ではなく、${MarkdownTick}.ai/catalog${MarkdownTick} / ${MarkdownTick}.ai/core${MarkdownTick} / repo artifact / 現在の git 状態を優先する。
 
 詳細：
-- [.ai/module/unified-coordinator.md](.ai/module/unified-coordinator.md)
-- [.ai/module/unified-router.md](.ai/module/unified-router.md)
-- [.ai/module/unified-integration.md](.ai/module/unified-integration.md)
+- [.ai/routing/coordinator.md](.ai/routing/coordinator.md)
+- [.ai/routing/router.md](.ai/routing/router.md)
+- [.ai/routing/integration.md](.ai/routing/integration.md)
 "@
 
 $utf8 = New-Object System.Text.UTF8Encoding $false

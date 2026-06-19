@@ -10,7 +10,7 @@ VS Code Copilot, Copilot CLI, Claude Code, Codex, Cursor の5環境に対応し�
 | Layer     | Path                                                                      | 説明                                              |
 | --------- | ------------------------------------------------------------------------- | ------------------------------------------------- |
 | Source    | `.ai/catalog/rules/`, `.ai/catalog/skills/`, `.ai/catalog/agents-source/` | 編集対象の正本                                    |
-| Kernel    | `.ai/kernel/`                                                             | 共通仕様の正本（_base.md, gates/, environments/） |
+| Core      | `.ai/core/`                                                               | 共通仕様の正本（identity.md, safety.md, permissions.md 等。gates は `.ai/routing/gates/`、環境差分は `.ai/adapters/`） |
 | Runtime   | `.github/`, `AGENTS.md`, `CLAUDE.md`                                      | エディタが読む入口                                |
 | Generated | `.cursor/rules/*.mdc`, `.claude/agents/`, `.codex/agents/`                | deploy.ps1 の出力（手編集禁止）                   |
 

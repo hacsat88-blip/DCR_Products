@@ -13,7 +13,7 @@ command=$(python3 -c "import sys,json; d=json.load(sys.stdin); print(d.get('comm
 exit_code="${CLAUDE_TOOL_EXIT_CODE:-0}"
 [[ "$exit_code" != "0" ]] && exit 0
 
-GATE_STATE=".ai/kernel/gate-state.json"
+GATE_STATE=".ai/routing/state/gate-state.json"
 [[ ! -f "$GATE_STATE" ]] && exit 0
 
 # Get the latest commit SHA
@@ -25,7 +25,7 @@ import sys, json
 from datetime import datetime, timezone
 
 sha = sys.argv[1]
-path = ".ai/kernel/gate-state.json"
+path = ".ai/routing/state/gate-state.json"
 
 with open(path, "r", encoding="utf-8") as f:
     state = json.load(f)

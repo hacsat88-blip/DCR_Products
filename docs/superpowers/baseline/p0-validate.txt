@@ -1,0 +1,78 @@
+
+DCR Products Validate
+Source: C:\Users\hacsa\Desktop\サトシ開発
+
+== 1. catalog rules/*.md H1 check ==============
+  rules processed: 53
+
+== 2. catalog skills/*/SKILL.md check ==========
+  skills processed: 70
+
+== 3. .ai/kernel + .ai/environments H1 check ===
+  kernel docs processed: 26
+  environment docs processed: 12
+
+== 4. deploy.ps1 -DryRun check ==================
+
+== 5. routing index freshness check ============
+
+== 6. catalog rules/*.md trait check ==========
+  trait references checked: 45
+
+== 7. catalog skills/*/SKILL.md contract ======
+  skills with contract: 70
+
+== 8. catalog skills/*/SKILL.md compose ======
+  skills with composable: 70
+
+== 9. catalog rules/*.md challenge check ======
+  rules with challenge: 16
+
+== 10. catalog skills/*/SKILL.md package =====
+  skills with package: 7
+
+== 11. catalog skills/*/SKILL.md names ======
+  skill names checked: 70
+
+== 12. rule/skill basename collision check ====
+  basename collisions checked: 0
+
+== 13. catalog rules/*.md routing check =====
+  rule routing categories checked: 53
+
+== 14. agents-source/*.toml version check =======
+  agent toml files checked: 116
+
+== 15. catalog rules/*.md descriptions =====
+  rule descriptions checked: 53
+
+== 16. external Superpowers drift check ========
+
+== 17. shared book contract check ==============
+
+== 18. routing fixture consistency check =======
+
+== 19. proposal reply vocabulary check ========
+
+== 20. routing entrypoint contract check ======
+
+== 21. router decision report check ===========
+
+== 22. reduction advisor check ================
+
+== 23. shadow routing trial check =============
+
+== 24. display policy advisor check ==========
+
+== 25. display policy proposal check =========
+
+== 26. bundle advisor check ==================
+
+== 27. bundle proposal check =================
+
+== 28. PowerShell script glyph check ==========
+
+==================================================
+RESULT: 792 passed, 0 failed
+==================================================
+

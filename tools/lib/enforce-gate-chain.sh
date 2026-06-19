@@ -9,7 +9,7 @@ input="${CLAUDE_TOOL_INPUT:-}"
 command=$(python3 -c "import sys,json; d=json.load(sys.stdin); print(d.get('command',''))" <<< "$input" 2>/dev/null || echo "")
 [[ "$command" != *"git push"* ]] && exit 0
 
-GATE_STATE=".ai/kernel/gate-state.json"
+GATE_STATE=".ai/routing/state/gate-state.json"
 
 # Bootstrap mode: no gate-state.json means no enforcement yet
 [[ ! -f "$GATE_STATE" ]] && exit 0

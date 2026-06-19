@@ -5,7 +5,7 @@
 
 ## First Inspection Order
 
-0. `.ai/kernel/`
+0. `.ai/core/` and `.ai/routing/`
    - 全環境共通の応答方針、権限、トリガー、runtime kernel を調べるとき
 1. `rules/`
    - invariant、routing metadata、handoff policy、禁止事項を調べるとき
