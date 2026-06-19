@@ -154,8 +154,11 @@ function Assert-Absent {
     param([string]$Rel)
     if (Test-Path (Join-Path $RepoRoot $Rel)) { throw "OLD path still present: $Rel" }
 }
+# editor テンプレは adapters/<env>/templates へ移行済み。templates/product（ワークスペース層の
+# Product 雛形）は意図的に保持するため、bare "templates" ではなく移行済み editor サブディレクトリ個別で不在検証する。
 foreach ($old in @(".ai/kernel", ".ai/module", ".ai/book", ".ai/environments",
-                   "templates", ".ai/ARCHITECTURE.md", ".ai/repo-map.md", ".ai/rule-routing-design.md")) {
+                   "templates/claude-code", "templates/codex", "templates/vscode-copilot", "templates/cursor-hooks-bundle",
+                   ".ai/ARCHITECTURE.md", ".ai/repo-map.md", ".ai/rule-routing-design.md")) {
     Assert-Absent $old
 }
 
