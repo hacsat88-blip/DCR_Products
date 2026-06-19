@@ -37,6 +37,16 @@ param(
 )
 
 $ErrorActionPreference = "Stop"
+
+# UTF-8 enforcement: 非UTF-8(CP932)な PowerShell セッション（新PCの初回 bootstrap 等）で
+# 日本語 entrypoint が文字化けするのを防ぐ。書込は各 adapter が UTF8Encoding($false) で
+# 明示しているため、ここでは読み取りとコンソール/出力エンコーディングのみ UTF-8 に固定する。
+$utf8NoBom = New-Object System.Text.UTF8Encoding $false
+$OutputEncoding = $utf8NoBom
+try { [Console]::OutputEncoding = $utf8NoBom } catch {}
+try { [Console]::InputEncoding = $utf8NoBom } catch {}
+$PSDefaultParameterValues['Get-Content:Encoding'] = 'utf8'
+
 $RepoRoot = $PSScriptRoot
 $UserHome = $env:USERPROFILE
 $CatalogPaths = Join-Path $RepoRoot "tools\lib\catalog-paths.ps1"
