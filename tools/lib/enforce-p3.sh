@@ -9,7 +9,7 @@ input="${CLAUDE_TOOL_INPUT:-}"
 file_path=$(python3 -c "import sys,json; d=json.load(sys.stdin); print(d.get('file_path',''))" <<< "$input" 2>/dev/null || echo "")
 [[ -z "$file_path" ]] && exit 0
 
-# P3 patterns from .ai/kernel/_permissions.md
+# P3 patterns from .ai/core/permissions.md
 p3_patterns=(
   "*.config.*"
   "tsconfig*"

@@ -6,7 +6,7 @@
 .DESCRIPTION
   Ensures .ai/core and .ai/routing contain the shared runtime chapters and that
   .ai/adapters/*/kernel.md files do not redefine shared behavior.
-  (Previously checked .ai/book/ and .ai/environments/; updated for concept-zone restructure.)
+  (Updated for the concept-zone restructure: now checks core/routing chapters and adapter kernels.)
 #>
 
 param(
@@ -41,7 +41,7 @@ function Write-Fail {
 Write-Host "== Validate: shared book contract ==" -ForegroundColor Cyan
 Write-Host ""
 
-# --- Check core chapter files (previously .ai/book/) ---
+# --- Check core chapter files (.ai/core) ---
 $requiredCoreFiles = @(
     @{ Rel = "core\README.md";         Fallback = "core\kernel.md" },
     @{ Rel = "core\runtime.md";        Fallback = $null },
@@ -101,7 +101,7 @@ if (Test-Path $toolContractPath) {
     }
 }
 
-# --- adapter kernel thin-environment check (previously .ai/environments/) ---
+# --- adapter kernel thin-environment check (.ai/adapters) ---
 if (Test-Path $AdapterRoot) {
     $adapterKernelFiles = Get-ChildItem -Path $AdapterRoot -File -Filter "kernel.md" -Recurse | Sort-Object FullName
     $bannedPatterns = @(
@@ -149,7 +149,7 @@ if (Test-Path $AdapterRoot) {
     }
 }
 
-# --- kernel.md compat check (previously .ai/kernel/_base.md + dcr-kernel.md) ---
+# --- kernel.md compat check (.ai/core) ---
 foreach ($compatFile in @($KernelFile)) {
     if (-not (Test-Path $compatFile)) {
         Write-Fail "$($compatFile.Replace($resolvedRoot + [System.IO.Path]::DirectorySeparatorChar, '')) — missing"
