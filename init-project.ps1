@@ -176,7 +176,7 @@ function New-ProjectInstructionOutput {
         [hashtable]$Context
     )
 
-    $kernelPath = if (Test-Path (Join-Path $RepoRoot ".ai\core\kernel.md")) { Join-Path $RepoRoot ".ai\core\kernel.md" } else { Join-Path $RepoRoot ".ai\kernel\dcr-kernel.md" }
+    $kernelPath = Join-Path $RepoRoot ".ai\core\kernel.md"
     if (-not (Test-Path $kernelPath)) {
         throw "DCR kernel が見つかりません: $kernelPath"
     }
@@ -449,35 +449,29 @@ if (-not $SkipShared) {
 
     $sharedItems = @()
 
-    # .ai/kernel/* files (prefer new .ai/core zone if present)
-    if (Test-Path (Join-Path $RepoRoot ".ai\core")) {
-        $kernelDir = Join-Path $RepoRoot ".ai\core"
-    } else {
-        $kernelDir = Join-Path $RepoRoot ".ai\kernel"   # fallback during migration
-    }
-    if (Test-Path $kernelDir) {
-        Get-ChildItem -Path $kernelDir -Recurse -File | ForEach-Object {
-            $relative = $_.FullName.Substring($kernelDir.Length).TrimStart('\', '/')
+    # .ai/core/* files (consolidated DCR kernel zone)
+    $coreDir = Join-Path $RepoRoot ".ai\core"
+    if (Test-Path $coreDir) {
+        Get-ChildItem -Path $coreDir -Recurse -File | ForEach-Object {
+            $relative = $_.FullName.Substring($coreDir.Length).TrimStart('\', '/')
             $sharedItems += @{
                 Source = $_.FullName
-                Dest   = Join-Path $ProjectPath ".ai\kernel\$relative"
-                Label  = ".ai/kernel/$($relative -replace '\\', '/')"
+                Dest   = Join-Path $ProjectPath ".ai\core\$relative"
+                Label  = ".ai/core/$($relative -replace '\\', '/')"
             }
         }
     }
 
-    # .ai/module/* files (prefer new .ai/routing zone if present)
-    if (Test-Path (Join-Path $RepoRoot ".ai\routing")) {
-        $moduleDir = Join-Path $RepoRoot ".ai\routing"
-    } else {
-        $moduleDir = Join-Path $RepoRoot ".ai\module"   # fallback during migration
-    }
-    if (Test-Path $moduleDir) {
-        Get-ChildItem -Path $moduleDir -File | ForEach-Object {
+    # .ai/routing/* files (routing/decision zone; runtime state/ is excluded)
+    $routingDir = Join-Path $RepoRoot ".ai\routing"
+    if (Test-Path $routingDir) {
+        Get-ChildItem -Path $routingDir -Recurse -File |
+            Where-Object { $_.FullName -notmatch '[\\/]state[\\/]' } | ForEach-Object {
+            $relative = $_.FullName.Substring($routingDir.Length).TrimStart('\', '/')
             $sharedItems += @{
                 Source = $_.FullName
-                Dest   = Join-Path $ProjectPath ".ai\module\$($_.Name)"
-                Label  = ".ai/module/$($_.Name)"
+                Dest   = Join-Path $ProjectPath ".ai\routing\$relative"
+                Label  = ".ai/routing/$($relative -replace '\\', '/')"
             }
         }
     }

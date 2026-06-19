@@ -54,13 +54,6 @@ $CatalogPaths = Join-Path $RepoRoot "tools\lib\catalog-paths.ps1"
 $DeprecatedAliases = Join-Path $RepoRoot "tools\lib\deprecated-aliases.ps1"
 . $DeprecatedAliases
 
-function Resolve-Source {
-    param([string]$NewRel, [string]$OldRel)
-    $new = Join-Path $RepoRoot $NewRel
-    if (Test-Path $new) { return $new }
-    return (Join-Path $RepoRoot $OldRel)   # fallback during migration
-}
-
 # ── Gate enforcement ──
 if ($EnforceGate) {
     $GateStateLib = Join-Path $RepoRoot "tools\lib\gate-state.ps1"
@@ -100,7 +93,7 @@ if ((Test-Path $DeployAll) -and -not $Check -and ($Target -in @("all", "vscode",
 # ── Paths ──
 $SourceSkills = Resolve-DcrSourcePath -RepoRoot $RepoRoot -AssetType "skills"
 $SourceRules = Resolve-DcrSourcePath -RepoRoot $RepoRoot -AssetType "rules"
-$SourceRuntimeKernel = Resolve-Source -NewRel ".ai\core\kernel.md" -OldRel ".ai\kernel\dcr-kernel.md"
+$SourceRuntimeKernel = Join-Path $RepoRoot ".ai\core\kernel.md"
 $SourceAgents = Resolve-DcrSourcePath -RepoRoot $RepoRoot -AssetType "agents-source"
 
 $DestCodexAgents = Join-Path $RepoRoot ".codex\agents"

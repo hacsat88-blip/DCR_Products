@@ -77,6 +77,9 @@ prototypes/blue-planet-globe/
 # Router decision log (per-session telemetry, not committed)
 .ai/routing/state/router-decisions.jsonl
 
+# P3 force-override log (per-session telemetry, not committed)
+.ai/routing/state/p3-force-log.jsonl
+
 # Deprecation dashboard snapshot (regenerated, not committed)
 docs/deprecation-status.json
 
