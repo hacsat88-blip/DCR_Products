@@ -12,7 +12,7 @@
 
 ## 1. Skills（~/.claude/skills、計 50）
 
-- **正本:** `~/.agents/.skill-lock.json`（v3。各 skill の sourceUrl / skillPath / hash / installedAt を保持）
+- **正本:** `~/.agents/.skill-lock.json`（v3。各 skill の source / sourceUrl / skillPath / hash / installedAt を保持。drift check は `source` で照合）
 - **状態の注意:** `~/.claude/skills/*` は `~/.agents/skills/`(不在) を指す **broken symlink**。実体の出所は上記 lock。drift check が壊れを警告する。
 - **分類:** 全 50 件 `immutable-upstream`（外部 git 由来）。うちサトシ catalog と名前重複する 7 件（find-skills, mcp-builder, remotion-best-practices, skill-creator, theme-factory, ui-ux-pro-max, web-artifacts-builder）は catalog 側を正本とし `skip`。
 
@@ -65,7 +65,7 @@
 
 ## 4. サトシ catalog との関係
 
-- catalog（正本）: rules 54 / skills 70 / agents 117。`~/.claude` 側 135 件との**名前重複は 8 件（skills 7 + agent 1）= 約6%**。両者はほぼ独立。
+- catalog（正本）: rules 54 / skills 70 / agents 116。`~/.claude` 側 135 件との**名前重複は 8 件（skills 7 + agent 1）= 約6%**。両者はほぼ独立。
 - 重複分は catalog を正本とし `~/.claude` 側を `skip` 扱い（二重管理しない）。
 
 ## 5. selective-source-import で DCR 取込したもの

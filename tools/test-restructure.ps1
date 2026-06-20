@@ -172,3 +172,4 @@ try {
 if ($hits) { throw "dangling old-path reference(s) in live zones / tools / root scripts:`n$($hits -join "`n")" }
 
 Write-Host "restructure test passed" -ForegroundColor Green
+exit 0
