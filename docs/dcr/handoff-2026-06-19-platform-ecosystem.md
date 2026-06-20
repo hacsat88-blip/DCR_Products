@@ -1,8 +1,11 @@
 # 引き継ぎ: プラットフォーム側エコシステムの集約方針タスク
 
 **作成日:** 2026-06-19
-**ステータス:** 未着手（後日実施）
+**ステータス:** ✅ 完了（2026-06-19）
+**成果:** 台帳 [docs/dcr/external-ecosystem-registry.md](external-ecosystem-registry.md) + drift検出 `tools/check-external-ecosystem.ps1`。intake 精査の結果、~/.claude 側はほぼ全件 `immutable-upstream`（追跡）が正と確定し、**selective-import は「取込なし」**。可視化（track-only）で「全体像が分かる」ゴール達成。`feat/external-ecosystem-registry` ブランチ。
 **前提作業:** `.ai/` 概念ベース再編は完了・マージ済み（後述）
+
+> 以下は実施時の計画ブリーフ（記録）。実際の結論は上記「成果」を参照。
 
 ---
 
