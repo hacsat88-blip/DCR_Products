@@ -27,6 +27,7 @@
 | 専門プレイブック         | catalog/playbooks/              |
 | 各モデルへの配布          | adapters/manifest.yaml          |
 | リポ外依存・復元手順      | adapters/external-footprint.md  |
+| マシン上の外部AI資産(~/.claude) | docs/dcr/external-ecosystem-registry.md |
 
 ## 3. エントリポイント対応表
 | ツール          | 入口(生成物)                     | 由来(正本) |

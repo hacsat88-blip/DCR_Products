@@ -21,6 +21,10 @@
 
 判断基準、trigger 解釈、権限、gate、外部確認条件、検証姿勢は環境別に再定義しない。差分が必要な場合も、共通正本への追加可否を先に検討する。
 
+## External Ecosystem Boundary
+
+`~/.claude/`（個人 skills 50・loose agents 85・plugins）と各 marketplace は **DCR の正本ではなく外部 vendor/marketplace 由来**であり、`.ai/catalog` にコピーして正本化しない（`external-capability-intake` の `immutable-upstream` 扱い）。これらは更新が upstream 側で進むため、DCR 側は「出所・件数・管理方針」を [docs/dcr/external-ecosystem-registry.md](../../docs/dcr/external-ecosystem-registry.md) に台帳化し、`tools/check-external-ecosystem.ps1` で drift を監視するだけにする。価値が高く完全管理したい少数のみ `selective-source-import` で provenance 付き取込する。
+
 ## Common Flow
 
 1. `p/` Plan Gate

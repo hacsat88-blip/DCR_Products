@@ -48,7 +48,7 @@ AI エージェント設定・ルール・スキルの一元管理リポジト�
 - taste-skill は frontend / visual design skillpack の `concept-import` として扱う。installer や外部 SKILL 群は入れず、design read / anti-default / image-first reference の考え方だけを既存 UI 方針に薄く反映する
 - GSD は runtime や `.planning/` を入れず、phase/state/decision/verify/wave/namespace の考え方だけを DCR skill として薄く取り込む
 
-詳細な共通仕様は `.ai/module/unified-integration.md` を参照。
+詳細な共通仕様は `.ai/routing/integration.md` を参照。
 
 ## 初回セットアップ
 
@@ -202,6 +202,7 @@ pwsh -ExecutionPolicy Bypass -File .\deploy.ps1 -Check             # ドリフ�
 - 更新は upstream への fast-forward のみを許可し、DCR の `.ai/catalog/` へコピーして正本化しない
 - ローカル改変検知: `pwsh -ExecutionPolicy Bypass -File .\tools\check-external-superpowers.ps1`
 - `validate.ps1` は Superpowers checkout が存在する環境では同じ drift check を実行し、存在しない環境ではスキップする
+- `~/.claude` のマシン全体の外部 AI 資産（skills 50 / loose agents 85 / plugins・marketplaces）は `immutable-upstream` として `docs/dcr/external-ecosystem-registry.md` に台帳化し、`pwsh -ExecutionPolicy Bypass -File .\tools\check-external-ecosystem.ps1` で drift（追加 / 削除 / 出所変更 / 壊れ）を監視する。価値が高く完全管理したい少数のみ `selective-source-import` で provenance 付き取込する
 - `agentmemory` は外部 runtime memory backend 候補として扱う。MCP/REST server、hooks、DB、npm package を repo 正本へ直接取り込まず、利用可能な環境だけで memory preflight / memory save を行う
 - `garrytan/gbrain` は外部 memory/runtime 候補として扱う。GBrain の 43 skills、`RESOLVER.md`、installer、Bun runtime、MCP config、remote token、OAuth、ingestion、cron/dream cycle は入れず、repo 外または Product 単位の非破壊 PoC 後に判断する
 - `Leonxlnx/taste-skill` は frontend / visual design skillpack の参照元として扱う。`npx skills add`、外部 SKILL.md 群、`design-taste-frontend` / `gpt-taste` / `image-to-code` の active skill 化は行わず、DCR `DESIGN.md` と `ui-ux-pro-max` を優先する
