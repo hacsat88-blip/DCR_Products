@@ -4,20 +4,20 @@
 
 ## Asset Taxonomy
 
-- `.ai/catalog/rules/`: invariant、routing metadata、handoff policy を置く
-- `.ai/catalog/skills/`: 再利用可能な workflow、generator、analysis method を置く
-- `.ai/catalog/agents-source/`: runtime persona と execution specialist を置く
+- `.ai/assets/rules/`: invariant、routing metadata、handoff policy を置く
+- `.ai/assets/skills/`: 再利用可能な workflow、generator、analysis method を置く
+- `.ai/assets/agents/`: runtime persona と execution specialist を置く
 - `Product/**`: 再作中・成果物として保持する Product workspace だけを置く。shared にしたい asset だけ root 正本へ昇格する
 - `templates/product/`: bootstrap 用の最小構成例を置く。実在 Product discovery の対象にはしない
 
 ## 正本
 
-- `.ai/catalog/rules/`
-- `.ai/catalog/skills/`
+- `.ai/assets/rules/`
+- `.ai/assets/skills/`
 - `templates/`
-- `.ai/catalog/agents-source/`
+- `.ai/assets/agents/`
 - `.ai/kernel/`
-- `.ai/module/`
+- `.ai/core/modules/`
 - `.dcr/config.json`
 - `.dcr/templates/`
 
@@ -33,7 +33,7 @@
 - `.claude/agents/` (Git 管理外)
 - `.codex/agents/` (Git 管理外)
 
-大量生成される mirror は `.gitignore` で除外し、`.ai/catalog/` と `.ai/kernel/` を正本として扱います。
+大量生成される mirror は `.gitignore` で除外し、`.ai/assets/`, `.ai/kernel/` を正本として扱います。
 
 ## User-Level Managed Target
 

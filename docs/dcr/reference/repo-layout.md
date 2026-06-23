@@ -15,9 +15,9 @@
 
 root に残すのは、どの Product を開いていなくても意味がある shared asset です。
 
-- `.ai/catalog/rules/`: invariant、routing metadata、handoff policy
-- `.ai/catalog/skills/`: reusable workflow、generator、analysis method
-- `.ai/catalog/agents-source/`: runtime persona と execution specialist の source-of-truth
+- `.ai/assets/rules/`: invariant、routing metadata、handoff policy
+- `.ai/assets/skills/`: reusable workflow、generator、analysis method
+- `.ai/assets/agents/`: runtime persona と execution specialist の source-of-truth
 - `.ai/kernel/`: 全環境共通の kernel、権限、トリガー、runtime entrypoint source
 - `.dcr/`, `templates/`: DCR 自身の設定と template 契約
 - `docs/dcr/`: governance、workflow、reference、design record
@@ -53,7 +53,7 @@ Product/
 
 - product-local `.ai/` は overlay 用の source-of-truth だけを置く
 - generated mirror や editor-specific output は Product 側の `.ai/` に置かない
-- shared 化が必要な asset だけ root の `.ai/catalog/rules/`, `.ai/catalog/skills/`, `.ai/catalog/agents-source/` へ昇格する
+- shared 化が必要な asset だけ root の `.ai/assets/rules/`, `.ai/assets/skills/`, `.ai/assets/agents/` へ昇格する
 
 `templates/product/` は新しい Product を始めるときの bootstrap 例であり、実在 Product と同じ discovery 対象にはしません。
 

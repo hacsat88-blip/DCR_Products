@@ -6,11 +6,11 @@
 
 ## Shared Book
 
-- Runtime: [../../book/runtime.md](../../book/runtime.md)
-- Routing: [../../book/routing.md](../../book/routing.md)
-- Gates: [../../book/gates.md](../../book/gates.md)
-- Permissions: [../../book/permissions.md](../../book/permissions.md)
-- Tool contract: [../../book/tool-contract.md](../../book/tool-contract.md)
+- Runtime: [../../assets/books/runtime.md](../../assets/books/runtime.md)
+- Routing: [../../assets/books/routing.md](../../assets/books/routing.md)
+- Gates: [../../assets/books/gates.md](../../assets/books/gates.md)
+- Permissions: [../../assets/books/permissions.md](../../assets/books/permissions.md)
+- Tool contract: [../../assets/books/tool-contract.md](../../assets/books/tool-contract.md)
 
 ## Capability Declaration
 
@@ -23,7 +23,7 @@
 
 - CLI-specific troubleshooting, shell behavior, and task tracking stay here.
 - Do not copy shared trigger, gate, routing, or permission logic into this file.
-- If a tool is unavailable, follow [../../book/tool-contract.md](../../book/tool-contract.md) fallback rules.
+- If a tool is unavailable, follow [../../assets/books/tool-contract.md](../../assets/books/tool-contract.md) fallback rules.
 
 ## Tone
 

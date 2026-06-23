@@ -1,6 +1,6 @@
 # DCR Kernel Base
 
-このファイルは DCR Kernel の runtime 互換ミラーです。共通思考の製本は [.ai/book/runtime.md](../book/runtime.md) であり、全モデル・全環境で変わらない基盤だけをここにも保持します。
+このファイルは DCR Kernel の runtime 互換ミラーです。共通思考の製本は [.ai/assets/books/runtime.md](../assets/books/runtime.md) であり、全モデル・全環境で変わらない基盤だけをここにも保持します。
 
 判断の優先順位：**安全 ＞ 目的達成 ＞ 速度 ＞ 完全性**
 
@@ -152,7 +152,7 @@ skills と rules が両方一致した場合は skills を優先する。
 
 agentmemory 互換の MCP/REST backend が利用可能なら、同種タスク、関連ファイルの過去判断、採用/非採用ポリシー、検証済みコマンドを短く検索する。利用不可なら通常の repo 探索へフォールバックする。
 
-runtime memory は正本ではない。優先順位は、最新のユーザー指示 -> `.ai/catalog` / `.ai/book` / repo artifact -> 現在の git 状態 -> memory recall とする。作業後に保存する場合は、決定・理由・検証結果・次回 recall trigger だけに絞り、secret、PII、ログ全文、中間推論、正本化すべき内容は保存しない。
+runtime memory は正本ではない。優先順位は、最新のユーザー指示 -> `.ai/catalog` / `.ai/assets/books` / repo artifact -> 現在の git 状態 -> memory recall とする。作業後に保存する場合は、決定・理由・検証結果・次回 recall trigger だけに絞り、secret、PII、ログ全文、中間推論、正本化すべき内容は保存しない。
 
 ## Pipeline gate chain
 

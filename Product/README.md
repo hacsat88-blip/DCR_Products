@@ -29,14 +29,14 @@ standalone clone や外部 repo は、このフォルダへ同居させない方
 
 複数 Product や複数 editor で再利用する asset だけを root の shared source-of-truth へ昇格します。
 
-- shared rule: `.ai/catalog/rules/`
-- shared skill: `.ai/catalog/skills/`
-- shared agent source: `.ai/catalog/agents-source/`
+- shared rule: `.ai/assets/rules/`
+- shared skill: `.ai/assets/skills/`
+- shared agent source: `.ai/assets/agents/`
 
 Product 専用の generated mirror はここに置きません。
 
 ## Related References
 
-- shared source-of-truth の入口: `.ai/catalog/README.md`
+- shared source-of-truth の入口: `.ai/00_START_HERE.md`
 - repo 全体の配置ルール: `docs/dcr/reference/repo-layout.md`
 - Product 雛形の意図: `templates/product/`

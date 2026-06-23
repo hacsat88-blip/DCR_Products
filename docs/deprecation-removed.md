@@ -1,6 +1,6 @@
 # Deprecation Removed Ledger
 
-物理削除した rule / skill / agent の累積ログ。`.ai/module/deprecation-lifecycle.md` の
+物理削除した rule / skill / agent の累積ログ。`.ai/core/modules/deprecation-lifecycle.md` の
 Stage 4（REMOVED）に進めた時に追記する。
 
 git 履歴と異なり、本ファイルは **「いつ・なぜ・誰が」削除したか** のヒューマン読み
@@ -144,7 +144,7 @@ git 履歴と異なり、本ファイルは **「いつ・なぜ・誰が」削�
 
 ## 関連
 
-- ライフサイクル仕様: [.ai/module/deprecation-lifecycle.md](../.ai/module/deprecation-lifecycle.md)
+- ライフサイクル仕様: [.ai/core/modules/deprecation-lifecycle.md](../.ai/core/modules/deprecation-lifecycle.md)
 - 監視ダッシュボード: `pwsh tools/deprecation-dashboard.ps1`
 - 候補抽出: `pwsh tools/deprecation-dashboard.ps1 -OutputJson`
 - Stage 4候補Markdown: `pwsh tools/deprecation-dashboard.ps1 -OutputMarkdown`

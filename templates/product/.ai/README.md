@@ -20,6 +20,6 @@
 - editor-specific output
 - root DCR core を恒久的に置き換えるための複製
 
-shared 化が必要な asset だけ root の `.ai/catalog/rules/`, `.ai/catalog/skills/`, `.ai/catalog/agents-source/` へ昇格します。
+shared 化が必要な asset だけ root の `.ai/assets/rules/`, `.ai/assets/skills/`, `.ai/assets/agents/` へ昇格します。
 
 active な asset が無い段階では、このディレクトリ自体を作らないか、README だけを境界マーカーとして置けば十分です。

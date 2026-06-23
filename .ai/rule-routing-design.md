@@ -2,7 +2,7 @@
 
 ## 結論
 
-このリポジトリでは、`.ai/catalog/rules/` を単一のロール定義ソースとして維持しつつ、
+このリポジトリでは、`.ai/assets/rules/` を単一のロール定義ソースとして維持しつつ、
 各エディタでは「共通カーネル + 軽量ルータ + エディタ別アダプタ」で
 動的参照をそろえる設計が最も安全です。
 
@@ -12,7 +12,7 @@
 ## 現状の事実
 
 - ルートに `AGENTS.md` と `CLAUDE.md` がある
-- `.ai/catalog/rules/` にロール別のMarkdownがある
+- `.ai/assets/rules/` にロール別のMarkdownがある
 - `.github/copilot-instructions.md` がある
 - `deploy.ps1` が同期の中心になっている
 
@@ -29,7 +29,7 @@
 
 - 共通カーネルの正本: `.ai/kernel/`
 - runtime kernel の正本: `.ai/kernel/dcr-kernel.md`
-- ロールの正本: `.ai/catalog/rules/*.md`
+- ロールの正本: `.ai/assets/rules/*.md`
 - エディタ固有ファイルは生成物または薄い入口に寄せる
 
 `AGENTS.md`、`CLAUDE.md`、`.github/copilot-instructions.md` は
@@ -52,8 +52,8 @@
 ### 3. 参照優先順位
 
 1. 常時ルール: カーネル
-2. 明示ロール: ユーザー指定の `.ai/catalog/rules/<role>.md`
-3. 高一致ロール: 自動選択した `.ai/catalog/rules/<role>.md`
+2. 明示ロール: ユーザー指定の `.ai/assets/rules/<role>.md`
+3. 高一致ロール: 自動選択した `.ai/assets/rules/<role>.md`
 4. 補助ロール: 最大1件まで追加
 
 原則として、同時に読むロールは最大2件までに制限する。
@@ -70,19 +70,19 @@
 ### ルーティング例
 
 - React/Next.js のUI実装
-  - 主ロール: `.ai/catalog/rules/frontend-developer.md`
-  - 補助候補: `.ai/catalog/rules/ux-architect.md`
+  - 主ロール: `.ai/assets/rules/frontend-developer.md`
+  - 補助候補: `.ai/assets/rules/ux-architect.md`
 - 脆弱性レビュー
-  - 主ロール: `.ai/catalog/rules/security-engineer.md`
-  - 補助候補: `.ai/catalog/rules/api-tester.md`
+  - 主ロール: `.ai/assets/rules/security-engineer.md`
+  - 補助候補: `.ai/assets/rules/api-tester.md`
 - SEO改善案
-  - 主ロール: `.ai/catalog/rules/seo-specialist.md`
+  - 主ロール: `.ai/assets/rules/seo-specialist.md`
 - APIテスト設計
-  - 主ロール: `.ai/catalog/rules/api-tester.md`
-  - 補助候補: `.ai/catalog/rules/backend-architect.md`
+  - 主ロール: `.ai/assets/rules/api-tester.md`
+  - 補助候補: `.ai/assets/rules/backend-architect.md`
 - 要件整理と進行設計
-  - 主ロール: `.ai/catalog/rules/senior-project-manager.md`
-  - 補助候補: `.ai/catalog/rules/workflow-optimizer.md`
+  - 主ロール: `.ai/assets/rules/senior-project-manager.md`
+  - 補助候補: `.ai/assets/rules/workflow-optimizer.md`
 
 ## エディタ別マッピング
 
@@ -90,21 +90,21 @@
 
 - 入口: `AGENTS.md`
 - 方式: `AGENTS.md` に共通カーネルとルーティング方針を書く
-- ロール適用: 高一致時に `.ai/catalog/rules/*.md` を参照する
+- ロール適用: 高一致時に `.ai/assets/rules/*.md` を参照する
 - 方針: ロール本文を `AGENTS.md` に全展開しない
 
 ### Claude Code
 
 - 入口: `CLAUDE.md`
 - 方式: `CLAUDE.md` に共通カーネル、権限モデル、ルーティング方針を書く
-- ロール適用: 高一致時に `.ai/catalog/rules/*.md` を参照する
+- ロール適用: 高一致時に `.ai/assets/rules/*.md` を参照する
 - 方針: `Codex` と同じ判断基準を使い、差分は権限周りだけに限定する
 
 ### VS Code / Copilot
 
 - 入口: `.github/copilot-instructions.md`
 - 方式: 既存の `.ai/` モジュール参照方式を維持する
-- ロール適用: まず共通カーネルを読み、必要時のみ `.ai/catalog/rules/*.md` を追加参照する
+- ロール適用: まず共通カーネルを読み、必要時のみ `.ai/assets/rules/*.md` を追加参照する
 - 方針: Copilot 固有の `.instructions.md` を増やしすぎない
 
 ### Antigravity / Gemini
@@ -133,7 +133,7 @@
 
 ### Phase 1: 無事故で始める
 
-- `.ai/catalog/rules/` を正本とする方針を文書化する
+- `.ai/assets/rules/` を正本とする方針を文書化する
 - `AGENTS.md` と `CLAUDE.md` に動的参照ポリシーを追記する
 - Codex / Claude / Copilot / Cursor の入口だけを現行対応範囲にする
 
@@ -150,21 +150,21 @@
 ## この設計で避けられる事故
 
 - Editorごとに別判断基準が育ってずれる
-- 生成ミラーと `.ai/catalog/rules/*.md` が乖離する
+- 生成ミラーと `.ai/assets/rules/*.md` が乖離する
 - 曖昧な依頼で専門ロールを誤適用する
 - 高リスク作業でロールを重ねすぎて判断が不安定になる
 
 ## 未解決事項
 
 - Antigravity / Gemini adapter を追加するかどうか
-- VS Code 側で `.ai/catalog/rules/*.md` の追加参照をどこまで安定運用できるか
+- VS Code 側で `.ai/assets/rules/*.md` の追加参照をどこまで安定運用できるか
 - 各ロールにどの粒度のメタデータを持たせるか
 
 ## 推奨決定
 
 現時点では、次を正式方針にするのが安全。
 
-1. `.ai/catalog/rules/` をロール定義の正本にする
+1. `.ai/assets/rules/` をロール定義の正本にする
 2. 自動参照は「高一致時のみ」に制限する
-3. `Claude Code` と `Codex` は `.ai/catalog/rules/*.md` の動的参照を採用する
+3. `Claude Code` と `Codex` は `.ai/assets/rules/*.md` の動的参照を採用する
 4. 未対応クライアントは adapter 実装まで対応表に載せない

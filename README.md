@@ -8,7 +8,7 @@ AI エージェント設定・ルール・スキルの一元管理リポジト�
 
 | やりたいこと | 最初に見る場所 | 編集してよい場所 |
 | ------------ | -------------- | ---------------- |
-| 共通ルール・スキル・エージェントを変える | `.ai/catalog/README.md` | `.ai/catalog/rules/`, `.ai/catalog/skills/`, `.ai/catalog/agents-source/` |
+| 共通ルール・スキル・エージェントを変える | `.ai/20_SOURCE/README.md` | `.ai/assets/rules/`, `.ai/assets/skills/`, `.ai/assets/agents/` |
 | 全環境共通の応答・権限・トリガーを変える | `.ai/kernel/README.md` | `.ai/kernel/` |
 | エディタ / CLI 固有の差分を変える | `.ai/environments/README.md` | `.ai/environments/<tool>/kernel.md` |
 | Product 固有の作業をする | `Product/README.md` | `Product/<product>/` |
@@ -28,9 +28,9 @@ AI エージェント設定・ルール・スキルの一元管理リポジト�
 
 ## モデル差分の置き場所
 
-ルール本文はモデル別に分けません。共通ルール・スキル・エージェントの正本は `.ai/catalog/` に置き、モデル差分は実行メタデータだけに閉じ込めます。
+ルール本文はモデル別に分けません。共通ルール・スキル・エージェントの正本は `.ai/assets/rules/`, `.ai/assets/skills/`, `.ai/assets/agents/` に置き、モデル差分は実行メタデータだけに閉じ込めます。
 
-- Codex agent のモデル指定: `.ai/catalog/agents-source/*.toml` と生成先 `.codex/agents/*.toml`
+- Codex agent のモデル指定: `.ai/assets/agents/*.toml` と生成先 `.codex/agents/*.toml`
 - 例: `model`, `model_reasoning_effort`, `sandbox_mode`
 - Claude / Copilot / Cursor はエディタ側で選択中のモデルが入口ファイルを読むため、ルール本文をモデル別に複製しない
 
@@ -43,12 +43,12 @@ AI エージェント設定・ルール・スキルの一元管理リポジト�
 - Azure architecture / deploy / diagnostics / compliance / cost / RBAC / Kusto / Foundry は、まず Azure Skills plugin の利用可否を確認する
 - Azure Skills を使えない場合は、DCR の `azure-infra-engineer`, `mcp-builder`, `security-engineer`, `devops-automator` などへフォールバックする
 - Superpowers は DCR に取り込まず、外部公式パッケージとして扱う。ローカル改変は `tools/check-external-superpowers.ps1` と `validate.ps1` で検知する
-- agentmemory など runtime memory backend は任意の補助層として扱う。過去判断の recall と小さな決定保存に使い、`.ai/catalog` / `.ai/book` の正本を置換しない
+- agentmemory など runtime memory backend は任意の補助層として扱う。過去判断の recall と小さな決定保存に使い、`.ai/catalog` / `.ai/assets/books` の正本を置換しない
 - GBrain は memory/runtime 候補として `external-tool-poc` + `concept-import` 扱いにする。runtime、MCP設定、43 skills は入れず、brain-first recall / gap analysis / skill evaluation の考え方だけ参照する
 - taste-skill は frontend / visual design skillpack の `concept-import` として扱う。installer や外部 SKILL 群は入れず、design read / anti-default / image-first reference の考え方だけを既存 UI 方針に薄く反映する
 - GSD は runtime や `.planning/` を入れず、phase/state/decision/verify/wave/namespace の考え方だけを DCR skill として薄く取り込む
 
-詳細な共通仕様は `.ai/module/unified-integration.md` を参照。
+詳細な共通仕様は `.ai/core/modules/unified-integration.md` を参照。
 
 ## 初回セットアップ
 
@@ -62,7 +62,7 @@ pwsh -ExecutionPolicy Bypass -File .\validate.ps1
 
 PowerShell 実行系は PowerShell 7 (`pwsh`) を標準とする。Windows PowerShell 5.1 (`powershell.exe`) は非推奨で、UTF-8 日本語を含むスクリプトを誤解釈する可能性がある。`.ps1` / `.psm1` / `.psd1` の実行ログには `[OK]`, `[WARN]`, `[STOP]` などの ASCII マーカーを使い、絵文字・装飾記号は入れない。
 
-`.codex/agents/`, `.claude/agents/` が無い場合も異常ではありません。`deploy.ps1` が `.ai/kernel/` と `.ai/catalog/` から再生成します。
+`.codex/agents/`, `.claude/agents/` が無い場合も異常ではありません。`deploy.ps1` が `.ai/kernel/` と source assets から再生成します。
 
 ## 開発ワークフロー標準
 
@@ -104,7 +104,7 @@ Step 7（運用観測）の記録テンプレートは `docs/dcr/operation-metri
 
 複数の AI エディタが同じ構造判断に到達したいときは、次の順で見る。
 
-1. shared source-of-truth の入口: `.ai/catalog/README.md`
+1. shared source-of-truth の入口: `.ai/00_START_HERE.md`
 2. Product 固有作業の入口: `Product/README.md`
 3. `.dcr/` と `docs/dcr/` の運用面: `docs/dcr/reference/control-surface.md`
 4. 配置ルールの安定参照: `docs/dcr/reference/repo-layout.md`
@@ -112,7 +112,7 @@ Step 7（運用観測）の記録テンプレートは `docs/dcr/operation-metri
 
 判断原則:
 
-- shared rule / skill / agent source を触るなら `.ai/catalog/` から始める
+- shared rule / skill / agent source を触るなら `.ai/20_SOURCE/README.md` から始める
 - Product 固有の変更なら `Product/README.md` から `Product/<product>/` へ入る
 - `.dcr/` と `docs/dcr/` は 1 つの control surface として読むが、machine-readable config と human-readable docs なので物理的には分ける
 - `AGENTS.md`, `CLAUDE.md`, `.github/copilot-instructions.md`, `.claude/agents/`, `.codex/agents/` は generated mirror なので最初の編集対象にしない
@@ -128,9 +128,9 @@ Source layer
   .ai/catalog/      共有 source-of-truth の親フォルダ
   .ai/kernel/gates/ トリガーゲート (a/ i/ r/ s/ d/ p/ q/ sh/)
   DESIGN.md         UI/UX の見た目とトーンの正本
-  .ai/catalog/rules/        エージェントルールの正本
-  .ai/catalog/skills/       スキル定義の正本
-  .ai/catalog/agents-source/ エージェント定義の正本
+  .ai/assets/rules/         エージェントルールの正本
+  .ai/assets/skills/        スキル定義の正本
+  .ai/assets/agents/        エージェント定義の正本
   templates/        init-project.ps1 用テンプレート入力
 
 Runtime / generated layer
@@ -164,18 +164,18 @@ pwsh -ExecutionPolicy Bypass -File .\deploy.ps1 -Check             # ドリフ�
 
 ### 正本層（Source of Truth）- これを編集する
 
-- `.ai/catalog/rules/` - エージェントルール定義
-- `.ai/catalog/skills/` - スキル定義
-- `.ai/catalog/agents-source/` - エージェント定義
+- `.ai/assets/rules/` - エージェントルール定義
+- `.ai/assets/skills/` - スキル定義
+- `.ai/assets/agents/` - エージェント定義
 - `.ai/kernel/` - 全環境共通カーネル、権限、トリガー、環境差分
 - `.ai/environments/` - VS Code Copilot / Claude Code / Copilot CLI / Codex の環境固有差分
 - `templates/` - `init-project.ps1` 用の入力テンプレート
 
 役割の境界:
 
-- `.ai/catalog/rules/` は invariant、routing、handoff policy を置く
-- `.ai/catalog/skills/` は再利用可能な workflow、generator、analysis method を置く
-- `.ai/catalog/agents-source/` は runtime persona と execution specialist の定義を置く
+- `.ai/assets/rules/` は invariant、routing、handoff policy を置く
+- `.ai/assets/skills/` は再利用可能な workflow、generator、analysis method を置く
+- `.ai/assets/agents/` は runtime persona と execution specialist の定義を置く
 
 ### 生成物層（Generated）- 直接編集しない WARN
 
@@ -224,12 +224,12 @@ pwsh -ExecutionPolicy Bypass -File .\deploy.ps1 -Check             # ドリフ�
 - repo 全体の置き場所に迷ったら `docs/dcr/reference/repo-layout.md` を先に参照する
 - 新規 active spec / plan は `docs/dcr/specs/` と `docs/dcr/plans/` の直下へ保存し、完了済み・低頻度文書だけ `archive/` へ移す
 - 外部/検証系リポジトリは DCR 本体と分離する
-- `Product/` 配下の standalone clone は DCR の正本に含めない。併置する場合も external path として ignore し、shared 化が必要な asset だけ `.ai/catalog/rules/` / `.ai/catalog/skills/` / `.ai/catalog/agents-source/` へ昇格する
+- `Product/` 配下の standalone clone は DCR の正本に含めない。併置する場合も external path として ignore し、shared 化が必要な asset だけ `.ai/assets/rules/` / `.ai/assets/skills/` / `.ai/assets/agents/` へ昇格する
 
 unsafe migration と見なすもの:
 
-- `.ai/catalog/rules/` を runtime/generated 配下へ移す
-- `.ai/catalog/skills/` を runtime/generated 配下へ移す
+- `.ai/assets/rules/` を runtime/generated 配下へ移す
+- `.ai/assets/skills/` を runtime/generated 配下へ移す
 - `templates/` を削除する
 - `templates/vscode-copilot/.github/copilot-instructions.md` で `.github/copilot-instructions.md` を上書きする
 
@@ -248,7 +248,7 @@ unsafe migration と見なすもの:
 - `~/.config/dcr/worktrees/` などのセッション生成物は Git 管理対象にしない
 - リポジトリ内の `.dcr/` は実行時生成物ではなく、DCR 設定とテンプレートの正本として扱う
 
-将来 `.github/instructions/` を追加することは可能だが、これは VS Code Copilot 専用の補助レイヤーであり、このリポジトリでは `.ai/catalog/rules/` や `.ai/catalog/skills/` の正本を置き換えない。
+将来 `.github/instructions/` を追加することは可能だが、これは VS Code Copilot 専用の補助レイヤーであり、このリポジトリでは `.ai/assets/rules/` や `.ai/assets/skills/` の正本を置き換えない。
 
 構成移行が必要になった場合の安全な順序:
 

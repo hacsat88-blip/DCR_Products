@@ -9,7 +9,7 @@ VS Code Copilot, Copilot CLI, Claude Code, Codex, Cursor の5環境に対応し�
 
 | Layer     | Path                                                                      | 説明                                              |
 | --------- | ------------------------------------------------------------------------- | ------------------------------------------------- |
-| Source    | `.ai/catalog/rules/`, `.ai/catalog/skills/`, `.ai/catalog/agents-source/` | 編集対象の正本                                    |
+| Source    | `.ai/assets/rules/`, `.ai/assets/skills/`, `.ai/assets/agents/`           | 編集対象の正本                                    |
 | Kernel    | `.ai/kernel/`                                                             | 共通仕様の正本（_base.md, gates/, environments/） |
 | Runtime   | `.github/`, `AGENTS.md`, `CLAUDE.md`                                      | エディタが読む入口                                |
 | Generated | `.cursor/rules/*.mdc`, `.claude/agents/`, `.codex/agents/`                | deploy.ps1 の出力（手編集禁止）                   |
@@ -29,7 +29,7 @@ generated mirror や archive は既定の探索起点にしません。
 
 ### 新しいルールを追加する
 
-1. `.ai/catalog/rules/<name>.md` を作成する
+1. `.ai/assets/rules/<name>.md` を作成する
 2. YAML frontmatter を記述する（必須: `description`, `domain`, `routing_category`, `risk`, `keywords`）
 3. `inherits:` で継承する trait を指定する（コード生成ルールは `coding-standards` を推奨）
 4. `pwsh -ExecutionPolicy Bypass -File .\validate.ps1 -Verbose` を実行して構造チェックを通過させる（検証項目はスクリプト改修により増減し得ます）
@@ -60,14 +60,14 @@ inherits:
 
 ### 新しいスキルを追加する
 
-1. `.ai/catalog/skills/<name>/SKILL.md` を作成する
+1. `.ai/assets/skills/<name>/SKILL.md` を作成する
 2. YAML frontmatter に `name`, `description` を記述する（任意: `contract`, `composable`, `package`）
-3. ルーティングや依存関係を変える場合は [.ai/module/unified-router.md](.ai/module/unified-router.md) の決定木に沿い、pied-piper 経由の 3 行報告（採用名・理由・期待効果）を前提にする（旧 skill-router は deprecated）
+3. ルーティングや依存関係を変える場合は [.ai/core/modules/unified-router.md](.ai/core/modules/unified-router.md) の決定木に沿い、pied-piper 経由の 3 行報告（採用名・理由・期待効果）を前提にする（旧 skill-router は deprecated）
 4. `pwsh -ExecutionPolicy Bypass -File .\validate.ps1 -Verbose` で検証する
 
 ## エージェントの追加
 
-1. `.ai/catalog/agents-source/<name>.toml` と `.ai/catalog/agents-source/<name>.md` を作成する
+1. `.ai/assets/agents/<name>.toml` と `.ai/assets/agents/<name>.md` を作成する
 2. `.toml` には必須フィールド: `name`, `description`, `version`
 3. `pwsh -ExecutionPolicy Bypass -File .\validate.ps1` で検証する
 

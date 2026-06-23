@@ -14,7 +14,7 @@ core / Product / generated / historical docs の 4 層モデル、移行フェ�
 
 2026-04-21 時点の前提:
 
-- `.ai/catalog/rules/`, `.ai/catalog/skills/`, `.ai/catalog/agents-source/` の taxonomy は文書化済み
+- `.ai/assets/rules/`, `.ai/assets/skills/`, `.ai/assets/agents/` の taxonomy は文書化済み
 - repo-local generated mirror と user-level managed target の境界は定義済み
 - `validate.ps1` と `deploy.ps1 -Check` は clean に通る
 - root `.vscode/` はすでに DCR core-safe な最小構成に寄っている
@@ -42,7 +42,7 @@ root に残す shared source-of-truth:
 
 - `.ai/catalog/`
 - `.ai/kernel/`
-- `.ai/module/`
+- `.ai/core/modules/`
 - `.dcr/`
 - `templates/`
 - `docs/dcr/`

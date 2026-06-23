@@ -29,7 +29,7 @@ Utility scripts for build, deployment, and maintenance operations.
 
 ### `manifest-compiler.ps1`
 
-**Purpose:** Compile frontmatter from `.ai/catalog/rules/*.md`, `.ai/catalog/skills/*/SKILL.md`, and `.ai/catalog/agents-source/` into a unified JSON manifest
+**Purpose:** Compile frontmatter from resolved rules, skills, and agents source paths into a unified JSON manifest
 
 **Input:** YAML frontmatter with `targets: [vscode, claude, codex]` field
 
@@ -58,8 +58,8 @@ Generates `CLAUDE.md` for Claude Code environment
 Generates `AGENTS.md` for Codex (GitHub CLI) environment
 
 #### `adapters/agents.ps1`
-Generates `.codex/agents/*.toml` and `.claude/agents/*.md` from `.ai/catalog/agents-source/`.
-The generated agent mirrors are ignored by Git; edit `.ai/catalog/agents-source/` instead.
+Generates `.codex/agents/*.toml` and `.claude/agents/*.md` from `.ai/assets/agents/`.
+The generated agent mirrors are ignored by Git; edit `.ai/assets/agents/` instead.
 
 ---
 
@@ -67,11 +67,11 @@ The generated agent mirrors are ignored by Git; edit `.ai/catalog/agents-source/
 
 ### `generate-routing-index.ps1`
 
-**Purpose:** Auto-generate `.ai/catalog/rules/_ROUTING_INDEX.md` from rule frontmatter
+**Purpose:** Auto-generate `.ai/assets/rules/_ROUTING_INDEX.md` from rule frontmatter
 
-**Input:** `.ai/catalog/rules/*.md` metadata
+**Input:** `.ai/assets/rules/*.md` metadata
 
-**Output:** `.ai/catalog/rules/_ROUTING_INDEX.md` (searchable index)
+**Output:** `.ai/assets/rules/_ROUTING_INDEX.md` (searchable index)
 
 **Called by:** `validate.ps1`
 
@@ -84,9 +84,9 @@ The generated agent mirrors are ignored by Git; edit `.ai/catalog/agents-source/
 
 ### `audit-openai-skills.ps1`
 
-**Purpose:** Compare DCR `.ai/catalog/skills/` against the local OpenAI official skills baseline and classify slimming candidates.
+**Purpose:** Compare DCR `.ai/assets/skills/` against the local OpenAI official skills baseline and classify slimming candidates.
 
-**Input:** `.ai/catalog/skills/`, OpenAI curated plugin cache, OpenAI primary runtime skills, and local system skills.
+**Input:** `.ai/assets/skills/`, OpenAI curated plugin cache, OpenAI primary runtime skills, and local system skills.
 
 **Output:** Read-only console report by default; JSON when `-AsJson` is provided. The report
 includes reviewed exact-overlap decisions, deprecated pipeline aliases, and deprecated growth /
@@ -106,7 +106,7 @@ not treated as automatic replacement/deletion candidates.
 
 **Purpose:** Package skills for distribution and versioning
 
-**Input:** `.ai/catalog/skills/` directory
+**Input:** `.ai/assets/skills/` directory
 
 **Output:** Versioned package archive (`.zip` or `.tar.gz`)
 

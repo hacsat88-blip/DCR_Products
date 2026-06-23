@@ -20,9 +20,9 @@ DCR (Dynamic Context Router) は、現行の AI 開発環境に統一的なル�
               ┌───────────────┼───────────────┐
               │               │               │
         ┌─────┴─────┐  ┌─────┴─────┐  ┌─────┴─────┐
-        │ .ai/catalog│  │ .ai/catalog│  │ .ai/catalog│
-        │ /rules/    │  │ /skills/   │  │ /agents-   │
-        │ *.md       │  │ */SKILL.md │  │ source/*   │
+        │ .ai/assets│  │ .ai/catalog│  │ .ai/assets│
+        │ /rules/   │  │ /skills/   │  │ /agents/  │
+        │ *.md      │  │ */SKILL.md │  │ *.md/toml │
         └─────┬──────┘  └─────┬──────┘  └─────┬─────┘
               │               │               │
               └───────┬───────┘               │
@@ -39,7 +39,7 @@ DCR (Dynamic Context Router) は、現行の AI 開発環境に統一的なル�
     └─────────┘  └─────────┘  └────────┘  └─────────────┘
 ```
 
-`(*)` `.ai/catalog/agents-source/` を Git 管理外の `.codex/agents/` / `.claude/agents/` へ配布する経路。`sync-agents.ps1` はこの処理を呼び出す legacy shim として残します。
+`(*)` `.ai/assets/agents/` を Git 管理外の `.codex/agents/` / `.claude/agents/` へ配布する経路。`sync-agents.ps1` はこの処理を呼び出す legacy shim として残します。
 
 ## レイヤー構造
 
@@ -60,9 +60,9 @@ DCR (Dynamic Context Router) は、現行の AI 開発環境に統一的なル�
 
 編集対象のカノニカルアセット。
 
-- **.ai/catalog/rules/** - 専門ロール定義 (YAML frontmatter + Markdown body)
-- **.ai/catalog/skills/** - 実行可能なワークフロー定義 (SKILL.md)
-- **.ai/catalog/agents-source/** - エージェント定義 (TOML + MD)
+- **.ai/assets/rules/** - 専門ロール定義 (YAML frontmatter + Markdown body)
+- **.ai/assets/skills/** - 実行可能なワークフロー定義 (SKILL.md)
+- **.ai/assets/agents/** - エージェント定義 (TOML + MD)
 
 ### 3. Runtime Layer
 
@@ -105,8 +105,8 @@ DCR (Dynamic Context Router) は、現行の AI 開発環境に統一的なル�
 
 ```text
 1. ユーザー指定の role/skill (最優先)
-2. .ai/catalog/skills/* の一致
-3. .ai/catalog/rules/*.md の強一致 (最大2件)
+2. .ai/assets/skills/* の一致
+3. .ai/assets/rules/*.md の強一致 (最大2件)
 4. 直接処理 (デフォルト)
 ```
 

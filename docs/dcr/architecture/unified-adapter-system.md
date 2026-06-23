@@ -4,9 +4,9 @@
 
 ## Source Of Truth
 
-- `.ai/catalog/rules/`
-- `.ai/catalog/skills/`
-- `.ai/catalog/agents-source/`
+- `.ai/assets/rules/`
+- `.ai/assets/skills/`
+- `.ai/assets/agents/`
 - `templates/`
 
 ## Generated Outputs

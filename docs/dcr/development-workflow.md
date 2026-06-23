@@ -12,11 +12,11 @@ DCR Products の最小運用フローです。迷ったときはこのファイ�
 
 ## 正本層
 
-- `.ai/catalog/rules/`
-- `.ai/catalog/skills/`
-- `.ai/catalog/agents-source/`
+- `.ai/assets/rules/`
+- `.ai/assets/skills/`
+- `.ai/assets/agents/`
 - `templates/`
-- `.ai/kernel/`, `.ai/module/`
+- `.ai/kernel/`, `.ai/core/modules/`
 - `.dcr/` の設定ファイルとテンプレート
 
 ## 生成物層

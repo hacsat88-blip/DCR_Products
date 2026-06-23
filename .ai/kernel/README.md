@@ -1,11 +1,11 @@
 # DCR Kernel - 統一・最適化アーキテクチャ
 
-このディレクトリは、複数の AI モデル・環境間で DCR Kernel（Decision-Making Coherence & Reliability）の仕様を統一・最適化する runtime 互換レイヤーです。共通思考の製本は [../book/](../book/) です。
+このディレクトリは、複数の AI モデル・環境間で DCR Kernel（Decision-Making Coherence & Reliability）の仕様を統一・最適化する runtime 互換レイヤーです。共通思考の製本は [../assets/books/](../assets/books/) です。
 
 **設計哲学**: 
 - **Core は統一** -> Signal protocol / Triggers / Permission model など変わらない要素
 - **差分のみカスタマイズ** -> 環境固有機能（CLI Session init など）のみ分離
-- **単一ソース・オブ・トゥルース** -> `.ai/book/` を修正し、必要な runtime mirror を同期すれば全環境に自動反映
+- **単一ソース・オブ・トゥルース** -> `.ai/assets/books/` を修正し、必要な runtime mirror を同期すれば全環境に自動反映
 
 ---
 
@@ -313,7 +313,7 @@ PASS generated entrypoints -> `.ai/kernel/dcr-kernel.md` から同期
 
 ## Note: 参考資料
 
-- **統合元仕様**: `.ai/module/unified-integration.md`
+- **統合元仕様**: `.ai/core/modules/unified-integration.md`
 - **検証スクリプト**: `validate.ps1` / `deploy.ps1`
 - **モデルファイル**: `AGENTS.md` / `CLAUDE.md` / `.github/copilot-instructions.md`
 

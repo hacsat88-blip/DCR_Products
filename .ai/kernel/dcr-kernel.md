@@ -2,7 +2,7 @@
 
 ## Kernel source of truth
 
-- 共通思考の製本: `.ai/book/`
+- 共通思考の製本: `.ai/assets/books/`
 - 共通仕様の正本: `.ai/kernel/_base.md`
 - 権限モデルの正本: `.ai/kernel/_permissions.md`
 - 安全境界の正本: `.ai/kernel/_safety-boundaries.md`
@@ -188,7 +188,7 @@ When the user triggers a mode, apply the corresponding behavior:
 - 自然言語 trigger: `これどう？`, `サトシ開発目線で`, `前と同じ観点で`, `入れる価値ある？`, `導入して`, `置き換える必要ある？`, `また同じエラー`, `過去判断も踏まえて`
 - agentmemory 互換の MCP/REST backend が利用可能なら、同種タスク、関連ファイルの過去判断、採用/非採用ポリシー、検証済みコマンドを短く検索する
 - 利用不可なら通常の repo 探索へフォールバックする
-- runtime memory は正本ではない。最新のユーザー指示 -> `.ai/catalog` / `.ai/book` / repo artifact -> 現在の git 状態 -> memory recall の順で優先する
+- runtime memory は正本ではない。最新のユーザー指示 -> `.ai/catalog` / `.ai/assets/books` / repo artifact -> 現在の git 状態 -> memory recall の順で優先する
 - 作業後に保存する場合は、決定・理由・検証結果・次回 recall trigger だけに絞り、secret、PII、ログ全文、中間推論、正本化すべき内容は保存しない
 
 ## External capability packs
@@ -210,7 +210,7 @@ When the user triggers a mode, apply the corresponding behavior:
 ## Unified Integration
 
 VS Code の GitHub Copilot、GitHub Copilot CLI、Codex、Claude Code、Cursor の運用差分を最小化するため、
-共通仕様として `.ai/module/unified-integration.md` を参照すること。
+共通仕様として `.ai/core/modules/unified-integration.md` を参照すること。
 
 ### r/ - Recommendation
 - Compare viable options briefly
