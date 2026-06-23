@@ -1,39 +1,41 @@
 <#
 .SYNOPSIS
   DCR Products — Validate script
-    .ai/catalog/rules/*.md と .ai/catalog/skills/*/SKILL.md の構造品質を検証し、
+    resolved rules/*.md と skills/*/SKILL.md の構造品質を検証し、
   deploy.ps1 の全ターゲット DryRun を確認する
 
 .DESCRIPTION
   検証内容:
-    1. .ai/catalog/rules/*.md (アンダースコアプレフィクス除外) — H1 見出しが存在するか
-    2. .ai/catalog/skills/*/SKILL.md — YAML frontmatter に name: と description: が存在するか
-    3. .ai/catalog/skills/*/SKILL.md — frontmatter 以外の本文が存在するか
+    1. resolved rules/*.md (アンダースコアプレフィクス除外) — H1 見出しが存在するか
+    2. resolved skills/*/SKILL.md — YAML frontmatter に name: と description: が存在するか
+    3. resolved skills/*/SKILL.md — frontmatter 以外の本文が存在するか
     4. deploy.ps1 -DryRun が exit 0 で完了するか
     5. catalog rules の _ROUTING_INDEX.md が生成結果と一致するか
-    6. .ai/catalog/rules/*.md の inherits: が実在する _*.md trait を参照しているか
-    7. .ai/catalog/skills/*/SKILL.md の contract: 構造が有効か
-    8. .ai/catalog/skills/*/SKILL.md の composable: chains_with が実在するスキルを参照しているか
-    9. .ai/catalog/rules/*.md の challenge: targets が実在するルールを参照しているか
-   10. .ai/catalog/skills/*/SKILL.md の package: dependencies が実在するスキルを参照しているか
-   11. .ai/catalog/skills/*/SKILL.md — name: の重複がないか
-   12. .ai/catalog/rules/*.md と .ai/catalog/skills/*/SKILL.md の basename collision がないか
-   13. .ai/catalog/rules/*.md の routing_category が許可集合に含まれるか
-   14. catalog agents-source/*.toml — version フィールドが存在するか
-   15. .ai/catalog/rules/*.md — description: が空でないか・最低限の品質があるか
+    6. resolved rules/*.md の inherits: が実在する _*.md trait を参照しているか
+    7. resolved skills/*/SKILL.md の contract: 構造が有効か
+    8. resolved skills/*/SKILL.md の composable: chains_with が実在するスキルを参照しているか
+    9. resolved rules/*.md の challenge: targets が実在するルールを参照しているか
+   10. resolved skills/*/SKILL.md の package: dependencies が実在するスキルを参照しているか
+   11. resolved skills/*/SKILL.md — name: の重複がないか
+   12. resolved rules/*.md と skills/*/SKILL.md の basename collision がないか
+   13. resolved rules/*.md の routing_category が許可集合に含まれるか
+   14. agents-source/*.toml — version フィールドが存在するか
+    15. resolved rules/*.md — description: が空でないか・最低限の品質があるか
    16. external Superpowers checkout の drift がないか
    17. shared book contract が有効か
    18. routing fixture が一貫しているか
    19. proposal reply vocabulary の V5 自然語返答が一貫しているか
    20. routing entrypoint contract の V6 CLI/IDE 生成物が一貫しているか
-   21. router decision report の V3 見える化が一貫しているか
-   22. reduction advisor の V7 実ログ削減判断が一貫しているか
-   23. shadow routing trial の V7.1 実ログ収集が一貫しているか
-   24. display policy advisor の V8 表示抑制判断が一貫しているか
-   25. display policy proposal の V9 承認待ち変換が一貫しているか
-   26. bundle advisor の V10 親候補提案が一貫しているか
-   27. bundle proposal の V10.1 承認待ち変換が一貫しているか
-   28. PowerShell 実行ファイルに絵文字・装飾記号が含まれていないか
+   21. core module documents の local markdown links が解決できるか
+   22. router decision report の V3 見える化が一貫しているか
+   23. reduction advisor の V7 実ログ削減判断が一貫しているか
+   24. shadow routing trial の V7.1 実ログ収集が一貫しているか
+   25. display policy advisor の V8 表示抑制判断が一貫しているか
+   26. display policy proposal の V9 承認待ち変換が一貫しているか
+   27. bundle advisor の V10 親候補提案が一貫しているか
+   28. bundle proposal の V10.1 承認待ち変換が一貫しているか
+   29. PowerShell 実行ファイルに絵文字・装飾記号が含まれていないか
+   30. retired target guard が policy declared targets の退役状態を維持しているか
 
 .EXAMPLE
   pwsh -ExecutionPolicy Bypass -File .\validate.ps1
@@ -50,16 +52,21 @@ $CatalogPaths = Join-Path $RepoRoot "tools\lib\catalog-paths.ps1"
 . $CatalogPaths
 $SourceRules = Resolve-DcrSourcePath -RepoRoot $RepoRoot -AssetType "rules"
 $SourceSkills = Resolve-DcrSourcePath -RepoRoot $RepoRoot -AssetType "skills"
+$SourceRulesRelative = Get-DcrResolvedSourceRelativePath -RepoRoot $RepoRoot -AssetType "rules"
+$SourceSkillsRelative = Get-DcrResolvedSourceRelativePath -RepoRoot $RepoRoot -AssetType "skills"
 $KernelRoot = Join-Path $RepoRoot ".ai\kernel"
 $EnvironmentRoot = Join-Path $RepoRoot ".ai\environments"
 $AgentsSource = Resolve-DcrSourcePath -RepoRoot $RepoRoot -AssetType "agents-source"
 $DeployScript = Join-Path $RepoRoot "deploy.ps1"
+$ControlPlaneRegistryScript = Join-Path $RepoRoot "tools\update-ai-control-plane-registries.ps1"
 $RoutingIndexScript = Join-Path $RepoRoot "tools\generate-routing-index.ps1"
 $ExternalSuperpowersCheckScript = Join-Path $RepoRoot "tools\check-external-superpowers.ps1"
 $SharedBookCheckScript = Join-Path $RepoRoot "tools\validate-shared-book.ps1"
 $RoutingAccuracyScript = Join-Path $RepoRoot "tools\eval-routing-accuracy.ps1"
 $ProposalReplyVocabularyTestScript = Join-Path $RepoRoot "tools\test-proposal-reply-vocabulary.ps1"
 $RoutingEntrypointContractTestScript = Join-Path $RepoRoot "tools\test-routing-entrypoint-contract.ps1"
+$ModuleLinkContractTestScript = Join-Path $RepoRoot "tools\test-module-link-contract.ps1"
+$RetiredTargetsTestScript = Join-Path $RepoRoot "tools\test-retired-targets.ps1"
 $RouterDecisionReportTestScript = Join-Path $RepoRoot "tools\test-router-decisions-report.ps1"
 $ReductionAdvisorTestScript = Join-Path $RepoRoot "tools\test-reduction-advisor.ps1"
 $ShadowRoutingTrialTestScript = Join-Path $RepoRoot "tools\test-shadow-routing-trial.ps1"
@@ -69,12 +76,37 @@ $BundleAdvisorTestScript = Join-Path $RepoRoot "tools\test-bundle-advisor.ps1"
 $BundleProposalTestScript = Join-Path $RepoRoot "tools\test-bundle-proposal.ps1"
 $RoutingIndexFile = Join-Path $SourceRules "_ROUTING_INDEX.md"
 function Resolve-DcrPowerShellExe {
-    $pwshCommand = Get-Command pwsh -ErrorAction SilentlyContinue
-    if ($pwshCommand -and $pwshCommand.Source) {
-        return $pwshCommand.Source
+    $candidates = @()
+
+    if ($env:DCR_POWERSHELL_EXE) {
+        $candidates += $env:DCR_POWERSHELL_EXE
     }
 
-    return (Get-Process -Id $PID).Path
+    $currentProcess = (Get-Process -Id $PID -ErrorAction SilentlyContinue).Path
+    if ($currentProcess) {
+        $candidates += $currentProcess
+    }
+
+    foreach ($commandName in @("pwsh", "powershell")) {
+        $command = Get-Command $commandName -ErrorAction SilentlyContinue
+        if ($command -and $command.Source) {
+            $candidates += $command.Source
+        }
+    }
+
+    foreach ($candidate in ($candidates | Where-Object { $_ } | Select-Object -Unique)) {
+        try {
+            $probe = & $candidate -NoProfile -ExecutionPolicy Bypass -Command "exit 0" 2>$null
+            if ($LASTEXITCODE -eq 0) {
+                return $candidate
+            }
+        }
+        catch {
+            continue
+        }
+    }
+
+    throw "No usable PowerShell executable found. Set DCR_POWERSHELL_EXE to a working powershell.exe or pwsh.exe path."
 }
 
 $PowerShellExe = Resolve-DcrPowerShellExe
@@ -96,9 +128,9 @@ Write-Host ""
 # ─────────────────────────────────────────────
 # 1. catalog rules/*.md — H1 見出し検証
 # ─────────────────────────────────────────────
-Write-Host "== 1. catalog rules/*.md H1 check =============="
+Write-Host "== 1. rules/*.md H1 check ======================"
 $ruleFiles = Get-ChildItem -Path $SourceRules -File -Filter *.md |
-Where-Object { $_.BaseName -notlike "_*" } |
+Where-Object { $_.BaseName -ne "README" -and $_.BaseName -notlike "_*" } |
 Sort-Object Name
 
 foreach ($file in $ruleFiles) {
@@ -114,10 +146,10 @@ foreach ($file in $ruleFiles) {
 Write-Host "  rules processed: $($ruleFiles.Count)" -ForegroundColor DarkGray
 
 # ─────────────────────────────────────────────
-# 2 & 3. catalog skills/*/SKILL.md — frontmatter + body 検証
+# 2 & 3. resolved skills/*/SKILL.md — frontmatter + body 検証
 # ─────────────────────────────────────────────
 Write-Host ""
-Write-Host "== 2. catalog skills/*/SKILL.md check =========="
+Write-Host "== 2. resolved skills/*/SKILL.md check ========="
 $skillDirs = Get-ChildItem -Path $SourceSkills -Directory |
 Where-Object { $_.Name -notlike "_*" } |
 Sort-Object Name
@@ -189,8 +221,10 @@ Write-Host "  environment docs processed: $($environmentFiles.Count)" -Foregroun
 # ─────────────────────────────────────────────
 Write-Host ""
 Write-Host "== 4. deploy.ps1 -DryRun check =================="
-$isWindowsPlatform = ($env:OS -eq "Windows_NT")
-$deployDryRunTargets = @("vscode", "cursor", "devin", "windsurf", "agents", "dcr")
+$isWindowsPlatform = [System.Runtime.InteropServices.RuntimeInformation]::IsOSPlatform(
+    [System.Runtime.InteropServices.OSPlatform]::Windows
+)
+$deployDryRunTargets = @("vscode", "cursor", "agents", "dcr")
 if (-not $isWindowsPlatform) {
     Write-Host "  [SKIP] deploy DryRun: Windows-only script (non-Windows CI skipped)" -ForegroundColor DarkGray
     $script:passed += $deployDryRunTargets.Count
@@ -218,7 +252,7 @@ if (-not (Test-Path $RoutingIndexScript)) {
     Write-Fail "tools/generate-routing-index.ps1 — file not found"
 }
 elseif (-not (Test-Path $RoutingIndexFile)) {
-    Write-Fail ".ai/catalog/rules/_ROUTING_INDEX.md — file not found"
+    Write-Fail "$SourceRulesRelative/_ROUTING_INDEX.md — file not found"
 }
 else {
     $tempIndex = Join-Path ([System.IO.Path]::GetTempPath()) ("routing-index-" + [System.Guid]::NewGuid().ToString("N") + ".md")
@@ -232,11 +266,11 @@ else {
             $existing = (Get-Content -Path $RoutingIndexFile -Raw -Encoding utf8) -replace "`r`n", "`n"
             $generated = (Get-Content -Path $tempIndex -Raw -Encoding utf8) -replace "`r`n", "`n"
             if ($existing -ceq $generated) {
-                if ($Verbose) { Write-Ok ".ai/catalog/rules/_ROUTING_INDEX.md — up to date" }
+                if ($Verbose) { Write-Ok "$SourceRulesRelative/_ROUTING_INDEX.md — up to date" }
                 else { $script:passed++ }
             }
             else {
-                Write-Fail ".ai/catalog/rules/_ROUTING_INDEX.md — out of date (run tools/generate-routing-index.ps1)"
+                Write-Fail "$SourceRulesRelative/_ROUTING_INDEX.md — out of date (run tools/generate-routing-index.ps1)"
             }
         }
     }
@@ -251,7 +285,24 @@ else {
 # 6. catalog rules/*.md — inherits: trait 参照整合チェック
 # ─────────────────────────────────────────────
 Write-Host ""
-Write-Host "== 6. catalog rules/*.md trait check =========="
+Write-Host "== 5b. control-plane registry check ============"
+if (-not (Test-Path $ControlPlaneRegistryScript)) {
+    Write-Fail "tools/update-ai-control-plane-registries.ps1 - file not found"
+}
+else {
+    $result = & $PowerShellExe -ExecutionPolicy Bypass -File $ControlPlaneRegistryScript -RepoRoot $RepoRoot -Check 2>&1
+    if ($LASTEXITCODE -eq 0) {
+        if ($Verbose) { Write-Ok ".ai/control-plane/source-registry.json - up to date" }
+        else { $script:passed++ }
+    }
+    else {
+        Write-Fail ".ai/control-plane/source-registry.json - out of date (run tools/update-ai-control-plane-registries.ps1)"
+        $result | ForEach-Object { Write-Host "    $_" -ForegroundColor DarkYellow }
+    }
+}
+
+Write-Host ""
+Write-Host "== 6. rules/*.md trait check =================="
 $traitFiles = Get-ChildItem -Path $SourceRules -File -Filter "_*.md" |
 Where-Object { $_.BaseName -ne "_METADATA" -and $_.BaseName -ne "_ROUTING_INDEX" } |
 ForEach-Object { $_.BaseName.TrimStart("_") }
@@ -284,17 +335,17 @@ foreach ($file in $ruleFiles) {
             else { $script:passed++ }
         }
         else {
-            Write-Fail "$($file.Name) — inherits '$trait' not found (no _$trait.md in .ai/catalog/rules/)"
+            Write-Fail "$($file.Name) — inherits '$trait' not found (no _$trait.md in $SourceRulesRelative/)"
         }
     }
 }
 Write-Host "  trait references checked: $traitCheckCount" -ForegroundColor DarkGray
 
 # ─────────────────────────────────────────────
-# 7. catalog skills/*/SKILL.md — contract: 構造チェック
+# 7. resolved skills/*/SKILL.md — contract: 構造チェック
 # ─────────────────────────────────────────────
 Write-Host ""
-Write-Host "== 7. catalog skills/*/SKILL.md contract ======"
+Write-Host "== 7. resolved skills/*/SKILL.md contract ====="
 $contractCheckCount = 0
 $allowedContractKeys = @("preconditions", "postconditions", "invariants")
 
@@ -352,10 +403,10 @@ foreach ($dir in $skillDirs) {
 Write-Host "  skills with contract: $contractCheckCount" -ForegroundColor DarkGray
 
 # ─────────────────────────────────────────────
-# 8. catalog skills/*/SKILL.md — composable: chains_with 参照チェック
+# 8. resolved skills/*/SKILL.md — composable: chains_with 参照チェック
 # ─────────────────────────────────────────────
 Write-Host ""
-Write-Host "== 8. catalog skills/*/SKILL.md compose ======"
+Write-Host "== 8. resolved skills/*/SKILL.md compose ======"
 $composableCheckCount = 0
 $allSkillNames = $skillDirs | ForEach-Object { $_.Name }
 
@@ -399,7 +450,7 @@ foreach ($dir in $skillDirs) {
             else { $script:passed++ }
         }
         else {
-            Write-Fail "$($dir.Name)/SKILL.md — chains_with '$chain' not found in .ai/catalog/skills/"
+            Write-Fail "$($dir.Name)/SKILL.md — chains_with '$chain' not found in $SourceSkillsRelative/"
         }
     }
 }
@@ -409,7 +460,7 @@ Write-Host "  skills with composable: $composableCheckCount" -ForegroundColor Da
 # 9. catalog rules/*.md — challenge: targets 参照チェック
 # ─────────────────────────────────────────────
 Write-Host ""
-Write-Host "== 9. catalog rules/*.md challenge check ======"
+Write-Host "== 9. rules/*.md challenge check =============="
 $challengeCheckCount = 0
 $allRuleNames = $ruleFiles | ForEach-Object { $_.BaseName }
 
@@ -445,17 +496,17 @@ foreach ($file in $ruleFiles) {
             else { $script:passed++ }
         }
         else {
-            Write-Fail "$($file.Name) — challenge target '$target' not found in .ai/catalog/rules/"
+            Write-Fail "$($file.Name) — challenge target '$target' not found in $SourceRulesRelative/"
         }
     }
 }
 Write-Host "  rules with challenge: $challengeCheckCount" -ForegroundColor DarkGray
 
 # ─────────────────────────────────────────────
-# 10. catalog skills/*/SKILL.md — package: dependencies 参照チェック
+# 10. resolved skills/*/SKILL.md — package: dependencies 参照チェック
 # ─────────────────────────────────────────────
 Write-Host ""
-Write-Host "== 10. catalog skills/*/SKILL.md package ====="
+Write-Host "== 10. resolved skills/*/SKILL.md package ===="
 $packageCheckCount = 0
 
 foreach ($dir in $skillDirs) {
@@ -504,7 +555,7 @@ foreach ($dir in $skillDirs) {
                 else { $script:passed++ }
             }
             else {
-                Write-Fail "$($dir.Name)/SKILL.md — package dep '$dep' not found in .ai/catalog/skills/"
+                Write-Fail "$($dir.Name)/SKILL.md — package dep '$dep' not found in $SourceSkillsRelative/"
             }
         }
     }
@@ -512,10 +563,10 @@ foreach ($dir in $skillDirs) {
 Write-Host "  skills with package: $packageCheckCount" -ForegroundColor DarkGray
 
 # ─────────────────────────────────────────────
-# 11. catalog skills/*/SKILL.md — name: 重複チェック
+# 11. resolved skills/*/SKILL.md — name: 重複チェック
 # ─────────────────────────────────────────────
 Write-Host ""
-Write-Host "== 11. catalog skills/*/SKILL.md names ======"
+Write-Host "== 11. resolved skills/*/SKILL.md names ======"
 $skillNames = @{}
 $dupCheckCount = 0
 
@@ -550,7 +601,7 @@ $skillBasenames = $skillDirs | ForEach-Object { $_.Name }
 $collisions = $ruleBasenames | Where-Object { $_ -in $skillBasenames } | Sort-Object -Unique
 
 if ($collisions.Count -eq 0) {
-    if ($Verbose) { Write-Ok ".ai/catalog/rules/ and .ai/catalog/skills/ — no basename collisions" }
+    if ($Verbose) { Write-Ok "$SourceRulesRelative/ and $SourceSkillsRelative/ — no basename collisions" }
     else { $script:passed++ }
 }
 else {
@@ -561,7 +612,7 @@ else {
             else { $script:passed++ }
         }
         else {
-            Write-Fail "basename '$name' exists in both .ai/catalog/rules/ and .ai/catalog/skills/"
+            Write-Fail "basename '$name' exists in both $SourceRulesRelative/ and $SourceSkillsRelative/"
         }
     }
 }
@@ -571,7 +622,7 @@ Write-Host "  basename collisions checked: $($basenameCollisionCheckCount)" -For
 # 13. catalog rules/*.md — routing_category 許可値チェック
 # ─────────────────────────────────────────────
 Write-Host ""
-Write-Host "== 13. catalog rules/*.md routing check ====="
+Write-Host "== 13. rules/*.md routing check ============="
 $routingCategoryCheckCount = 0
 
 foreach ($file in $ruleFiles) {
@@ -591,7 +642,7 @@ foreach ($file in $ruleFiles) {
 Write-Host "  rule routing categories checked: $routingCategoryCheckCount" -ForegroundColor DarkGray
 
 # ─────────────────────────────────────────────
-# 14. .ai/catalog/agents-source/*.toml — version フィールドチェック
+# 14. agents-source/*.toml — version フィールドチェック
 # ─────────────────────────────────────────────
 Write-Host ""
 Write-Host "== 14. agents-source/*.toml version check ======="
@@ -617,7 +668,7 @@ Write-Host "  agent toml files checked: $agentVersionCheckCount" -ForegroundColo
 # 15. catalog rules/*.md — description: 品質チェック
 # ─────────────────────────────────────────────
 Write-Host ""
-Write-Host "== 15. catalog rules/*.md descriptions ====="
+Write-Host "== 15. rules/*.md descriptions ============="
 $descCheckCount = 0
 
 foreach ($file in $ruleFiles) {
@@ -741,10 +792,30 @@ else {
 }
 
 # ─────────────────────────────────────────────
-# 21. router decisions report V3 smoke check
+# 21. module link contract smoke check
 # ─────────────────────────────────────────────
 Write-Host ""
-Write-Host "== 21. router decision report check ==========="
+Write-Host "== 21. module link contract check ============"
+if (-not (Test-Path $ModuleLinkContractTestScript)) {
+    Write-Fail "tools/test-module-link-contract.ps1 — file not found"
+}
+else {
+    $result = & $PowerShellExe -ExecutionPolicy Bypass -File $ModuleLinkContractTestScript -RepoRoot $RepoRoot 2>&1
+    if ($LASTEXITCODE -eq 0) {
+        if ($Verbose -and $result) { Write-Host "  $result" -ForegroundColor DarkGray }
+        $script:passed++
+    }
+    else {
+        Write-Fail "module link contract smoke — failed"
+        if ($result) { Write-Host "  $result" -ForegroundColor DarkGray }
+    }
+}
+
+# ─────────────────────────────────────────────
+# 22. router decisions report V3 smoke check
+# ─────────────────────────────────────────────
+Write-Host ""
+Write-Host "== 22. router decision report check ==========="
 if (-not (Test-Path $RouterDecisionReportTestScript)) {
     Write-Fail "tools/test-router-decisions-report.ps1 — file not found"
 }
@@ -761,10 +832,10 @@ else {
 }
 
 # ─────────────────────────────────────────────
-# 22. reduction advisor V7 smoke check
+# 23. reduction advisor V7 smoke check
 # ─────────────────────────────────────────────
 Write-Host ""
-Write-Host "== 22. reduction advisor check ================"
+Write-Host "== 23. reduction advisor check ================"
 if (-not (Test-Path $ReductionAdvisorTestScript)) {
     Write-Fail "tools/test-reduction-advisor.ps1 — file not found"
 }
@@ -781,10 +852,10 @@ else {
 }
 
 # ─────────────────────────────────────────────
-# 23. shadow routing trial V7.1 smoke check
+# 24. shadow routing trial V7.1 smoke check
 # ─────────────────────────────────────────────
 Write-Host ""
-Write-Host "== 23. shadow routing trial check ============="
+Write-Host "== 24. shadow routing trial check ============="
 if (-not (Test-Path $ShadowRoutingTrialTestScript)) {
     Write-Fail "tools/test-shadow-routing-trial.ps1 — file not found"
 }
@@ -801,10 +872,10 @@ else {
 }
 
 # ─────────────────────────────────────────────
-# 24. display policy advisor V8 smoke check
+# 25. display policy advisor V8 smoke check
 # ─────────────────────────────────────────────
 Write-Host ""
-Write-Host "== 24. display policy advisor check =========="
+Write-Host "== 25. display policy advisor check =========="
 if (-not (Test-Path $DisplayPolicyAdvisorTestScript)) {
     Write-Fail "tools/test-display-policy-advisor.ps1 — file not found"
 }
@@ -821,10 +892,10 @@ else {
 }
 
 # ─────────────────────────────────────────────
-# 25. display policy proposal V9 smoke check
+# 26. display policy proposal V9 smoke check
 # ─────────────────────────────────────────────
 Write-Host ""
-Write-Host "== 25. display policy proposal check ========="
+Write-Host "== 26. display policy proposal check ========="
 if (-not (Test-Path $DisplayPolicyProposalTestScript)) {
     Write-Fail "tools/test-display-policy-proposal.ps1 — file not found"
 }
@@ -841,10 +912,10 @@ else {
 }
 
 # ─────────────────────────────────────────────
-# 26. bundle advisor V10 smoke check
+# 27. bundle advisor V10 smoke check
 # ─────────────────────────────────────────────
 Write-Host ""
-Write-Host "== 26. bundle advisor check =================="
+Write-Host "== 27. bundle advisor check =================="
 if (-not (Test-Path $BundleAdvisorTestScript)) {
     Write-Fail "tools/test-bundle-advisor.ps1 — file not found"
 }
@@ -861,10 +932,10 @@ else {
 }
 
 # ─────────────────────────────────────────────
-# 27. bundle proposal V10.1 smoke check
+# 28. bundle proposal V10.1 smoke check
 # ─────────────────────────────────────────────
 Write-Host ""
-Write-Host "== 27. bundle proposal check ================="
+Write-Host "== 28. bundle proposal check ================="
 if (-not (Test-Path $BundleProposalTestScript)) {
     Write-Fail "tools/test-bundle-proposal.ps1 — file not found"
 }
@@ -881,10 +952,10 @@ else {
 }
 
 # ─────────────────────────────────────────────
-# 28. PowerShell script status glyph check
+# 29. PowerShell script status glyph check
 # ─────────────────────────────────────────────
 Write-Host ""
-Write-Host "== 28. PowerShell script glyph check =========="
+Write-Host "== 29. PowerShell script glyph check =========="
 $PowerShellStatusGlyphPattern = '[\uD800-\uDBFF][\uDC00-\uDFFF]|[\u2600-\u26FF\u2700-\u27BF]'
 $PowerShellScriptFiles = Get-ChildItem -Path $RepoRoot -Recurse -File -Include *.ps1,*.psm1,*.psd1 -ErrorAction SilentlyContinue |
 Where-Object {
@@ -911,6 +982,26 @@ if ($glyphHits.Count -eq 0) {
 }
 else {
     Write-Fail "PowerShell scripts - emoji/status glyphs found: $($glyphHits -join ', ')"
+}
+
+# -----------------------------------------------------------------------------
+# 30. retired target guard check
+# -----------------------------------------------------------------------------
+Write-Host ""
+Write-Host "== 30. retired target guard check ============="
+if (-not (Test-Path $RetiredTargetsTestScript)) {
+    Write-Fail "tools/test-retired-targets.ps1 - file not found"
+}
+else {
+    $result = & $PowerShellExe -ExecutionPolicy Bypass -File $RetiredTargetsTestScript -RepoRoot $RepoRoot 2>&1
+    if ($LASTEXITCODE -eq 0) {
+        if ($Verbose -and $result) { Write-Host "  $result" -ForegroundColor DarkGray }
+        $script:passed++
+    }
+    else {
+        Write-Fail "retired target guard smoke - failed"
+        if ($result) { Write-Host "  $result" -ForegroundColor DarkGray }
+    }
 }
 
 # ─────────────────────────────────────────────

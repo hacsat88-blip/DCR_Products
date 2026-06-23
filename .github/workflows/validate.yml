@@ -37,7 +37,7 @@ jobs:
       - name: Check generated entrypoint drift
         shell: pwsh
         run: |
-          $diff = @(git status --short AGENTS.md CLAUDE.md .github/copilot-instructions.md .ai/catalog/rules/_ROUTING_INDEX.md .devin .windsurf)
+          $diff = @(git status --short AGENTS.md CLAUDE.md .github/copilot-instructions.md .ai/catalog/rules/_ROUTING_INDEX.md)
           if ($diff.Count -gt 0) {
             $diff | ForEach-Object { Write-Host $_ }
             throw "Generated tracked entrypoints are stale."

@@ -70,7 +70,6 @@ prototypes/blue-planet-globe/
 # Personal local overrides (not shared)
 .claude/local/
 .claude/settings.local.json
-.devin/config.local.json
 
 # Per-session gate state (managed at runtime, not committed)
 .ai/kernel/gate-state.json

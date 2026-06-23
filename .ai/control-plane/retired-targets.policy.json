@@ -1,0 +1,41 @@
+{
+  "schemaVersion": 1,
+  "purpose": "Declare retired AI runtime targets that must not be restored as active distribution surfaces.",
+  "allowedHistoryRoots": [
+    "docs/audits"
+  ],
+  "retiredTargets": [
+    {
+      "id": "devin",
+      "retiredAt": "2026-06-22",
+      "reason": "User removed the Devin app and related runtime files; DCR no longer distributes a Devin mirror.",
+      "forbiddenPaths": [
+        ".devin",
+        ".ai/environments/devin"
+      ],
+      "forbiddenFiles": [
+        "tools/adapters/devin.ps1",
+        ".ai/distribution/manifests/devin.json"
+      ],
+      "forbiddenText": [
+        "devin",
+        ".devin"
+      ]
+    },
+    {
+      "id": "windsurf",
+      "retiredAt": "2026-06-22",
+      "reason": "User removed Windsurf; DCR no longer maintains a Windsurf compatibility mirror.",
+      "forbiddenPaths": [
+        ".windsurf"
+      ],
+      "forbiddenFiles": [
+        ".ai/distribution/manifests/windsurf-compat.json"
+      ],
+      "forbiddenText": [
+        "windsurf",
+        ".windsurf"
+      ]
+    }
+  ]
+}
