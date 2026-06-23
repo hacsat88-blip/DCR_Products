@@ -1,0 +1,11 @@
+{
+  "schemaVersion": 1,
+  "id": "dcr-home",
+  "entrypoints": ["%USERPROFILE%/.config/dcr/config.json"],
+  "generatedTargets": ["%USERPROFILE%/.config/dcr/config.json"],
+  "sourceRoots": [".dcr/config.json"],
+  "adapter": "deploy.ps1 -Target dcr",
+  "forbiddenDirectEdits": ["%USERPROFILE%/.config/dcr/config.json"],
+  "secretPolicy": "metadata-only",
+  "verify": [".\\deploy.ps1 -Check -Target dcr"]
+}

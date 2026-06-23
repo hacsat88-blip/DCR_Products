@@ -1,0 +1,10 @@
+{
+  "schemaVersion": 1,
+  "id": "cursor",
+  "entrypoints": [".cursor/README.md"],
+  "generatedTargets": [".cursor/rules"],
+  "sourceRoots": [".ai/assets/books", ".ai/kernel", ".ai/assets/rules", ".ai/assets/skills", ".ai/environments/cursor"],
+  "adapter": "tools/adapters/cursor.ps1",
+  "forbiddenDirectEdits": [".cursor/rules"],
+  "verify": [".\\deploy.ps1 -Check -Target cursor"]
+}

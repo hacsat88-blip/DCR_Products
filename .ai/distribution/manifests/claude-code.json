@@ -1,0 +1,10 @@
+{
+  "schemaVersion": 1,
+  "id": "claude-code",
+  "entrypoints": ["CLAUDE.md"],
+  "generatedTargets": [".claude/agents"],
+  "sourceRoots": [".ai/assets/books", ".ai/kernel", ".ai/assets/rules", ".ai/assets/skills", ".ai/assets/agents", ".ai/environments/claude-code"],
+  "adapter": "tools/adapters/claude.ps1",
+  "forbiddenDirectEdits": ["CLAUDE.md", ".claude/agents"],
+  "verify": [".\\deploy.ps1 -Check", ".\\tools\\test-routing-entrypoint-contract.ps1"]
+}

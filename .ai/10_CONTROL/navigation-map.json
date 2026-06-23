@@ -1,0 +1,114 @@
+{
+  "schemaVersion": 1,
+  "stage": "phase-1-navigation-overlay",
+  "rule": "Numbered directories are navigation only. They do not replace current primary source paths.",
+  "entrypoint": ".ai/00_START_HERE.md",
+  "layers": [
+    {
+      "id": "10_CONTROL",
+      "label": "Control plane",
+      "purpose": "Canonical registries, target policy, home inventory, lifecycle rules, and navigation.",
+      "numberedPath": ".ai/10_CONTROL",
+      "canonicalPaths": [
+        ".ai/control-plane",
+        ".ai/compatibility/legacy-path-map.json"
+      ],
+      "editPolicy": "edit-control-metadata"
+    },
+    {
+      "id": "20_SOURCE",
+      "label": "Canonical source assets",
+      "purpose": "Rules, skills, agents, books, kernel, modules, and environment source files.",
+      "numberedPath": ".ai/20_SOURCE",
+      "canonicalPaths": [
+        ".ai/20_SOURCE/source-layout.json",
+        ".ai/assets/rules",
+        ".ai/assets/skills",
+        ".ai/assets/agents",
+        ".ai/assets/books",
+        ".ai/kernel",
+        ".ai/core/modules",
+        ".ai/environments"
+      ],
+      "legacyPaths": [
+        ".ai/catalog/rules",
+        ".ai/catalog/skills",
+        ".ai/catalog/agents-source",
+        ".ai/book",
+        ".ai/module"
+      ],
+      "futurePaths": [
+        ".ai/core"
+      ],
+      "editPolicy": "edit-current-primary-source"
+    },
+    {
+      "id": "30_ROUTING",
+      "label": "Routing and gate state",
+      "purpose": "Router contracts, gate behavior, routing schemas, fixtures, and local generated state.",
+      "numberedPath": ".ai/30_ROUTING",
+      "canonicalPaths": [
+        ".ai/routing",
+        ".ai/kernel/gates",
+        ".ai/core/modules/unified-router.md",
+        ".ai/core/modules/unified-coordinator.md",
+        ".ai/core/modules/unified-integration.md"
+      ],
+      "localGeneratedPaths": [
+        ".ai/routing/state"
+      ],
+      "editPolicy": "edit-routing-source-never-local-state"
+    },
+    {
+      "id": "40_DISTRIBUTION",
+      "label": "Distribution and generated targets",
+      "purpose": "Model manifests, deploy adapters, templates, generated entrypoints, and runtime mirrors.",
+      "numberedPath": ".ai/40_DISTRIBUTION",
+      "canonicalPaths": [
+        ".ai/distribution",
+        "tools/adapters",
+        "templates",
+        "deploy.ps1",
+        "tools/deploy-all.ps1"
+      ],
+      "generatedTargets": [
+        "AGENTS.md",
+        "CLAUDE.md",
+        ".github/copilot-instructions.md",
+        ".codex/agents",
+        ".claude/agents",
+        ".cursor/rules"
+      ],
+      "editPolicy": "edit-adapters-or-source-never-generated-targets"
+    },
+    {
+      "id": "50_EXTERNAL",
+      "label": "External capabilities and home inventory",
+      "purpose": "External imports, capability records, vendor cache policy, and home-side classification.",
+      "numberedPath": ".ai/50_EXTERNAL",
+      "canonicalPaths": [
+        ".ai/integrations",
+        ".ai/control-plane/home-inventory.policy.json"
+      ],
+      "editPolicy": "classify-before-importing-or-moving"
+    },
+    {
+      "id": "90_COMPAT",
+      "label": "Compatibility and migration",
+      "purpose": "Legacy path maps, generated notices, and staged migration compatibility.",
+      "numberedPath": ".ai/90_COMPAT",
+      "canonicalPaths": [
+        ".ai/compatibility"
+      ],
+      "editPolicy": "preserve-dual-read-until-validated"
+    }
+  ],
+  "validation": {
+    "auditScript": "tools/audit-ai-control-plane.ps1",
+    "commands": [
+      ".\\tools\\audit-ai-control-plane.ps1 -HomeRoot $env:USERPROFILE -NoSecrets",
+      ".\\deploy.ps1 -Check",
+      ".\\validate.ps1"
+    ]
+  }
+}

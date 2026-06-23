@@ -1,0 +1,19 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://dcr.local/schemas/routing-state.schema.json",
+  "title": "DCR Routing State",
+  "type": "object",
+  "additionalProperties": true,
+  "properties": {
+    "proposal_state": {
+      "type": "object",
+      "additionalProperties": true,
+      "properties": {
+        "status": {
+          "type": "string",
+          "enum": ["none", "proposed", "refined", "approved", "rejected"]
+        }
+      }
+    }
+  }
+}

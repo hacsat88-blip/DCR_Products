@@ -1,0 +1,61 @@
+{
+  "schemaVersion": 1,
+  "stage": "assets-primary-core-compat",
+  "rule": "Use currentPrimary as authoritative. futurePrimary is only authoritative after an explicit source-layout and legacy-path-map switch.",
+  "groups": [
+    {
+      "id": "rules",
+      "type": "asset",
+      "currentPrimary": ".ai/assets/rules",
+      "legacyPath": ".ai/catalog/rules",
+      "futurePrimary": ".ai/assets/rules",
+      "readiness": "primary switched after active rule markdown files were moved"
+    },
+    {
+      "id": "skills",
+      "type": "asset",
+      "currentPrimary": ".ai/assets/skills",
+      "legacyPath": ".ai/catalog/skills",
+      "futurePrimary": ".ai/assets/skills",
+      "readiness": "primary switched after active skill directories and routing index were moved"
+    },
+    {
+      "id": "agents-source",
+      "type": "asset",
+      "currentPrimary": ".ai/assets/agents",
+      "legacyPath": ".ai/catalog/agents-source",
+      "futurePrimary": ".ai/assets/agents",
+      "readiness": "primary switched after active agent markdown and toml files were moved"
+    },
+    {
+      "id": "books",
+      "type": "asset",
+      "currentPrimary": ".ai/assets/books",
+      "legacyPath": ".ai/book",
+      "futurePrimary": ".ai/assets/books",
+      "readiness": "primary switched after shared book chapters were moved"
+    },
+    {
+      "id": "kernel",
+      "type": "core",
+      "currentPrimary": ".ai/kernel",
+      "futurePrimary": ".ai/core/kernel",
+      "readiness": "mapped only; switch requires explicit migration"
+    },
+    {
+      "id": "modules",
+      "type": "core",
+      "currentPrimary": ".ai/core/modules",
+      "legacyPath": ".ai/module",
+      "futurePrimary": ".ai/core/modules",
+      "readiness": "primary switched after module documents were moved"
+    },
+    {
+      "id": "environments",
+      "type": "core",
+      "currentPrimary": ".ai/environments",
+      "futurePrimary": ".ai/core/environments",
+      "readiness": "mapped only; switch requires explicit migration"
+    }
+  ]
+}

@@ -1,0 +1,55 @@
+{
+  "schemaVersion": 1,
+  "stage": "mapped-dual-read",
+  "paths": [
+    {
+      "legacy": ".ai/catalog/rules",
+      "future": ".ai/assets/rules",
+      "assetType": "rules",
+      "currentPrimary": ".ai/assets/rules",
+      "rule": "Rules have moved. Keep the legacy directory as a compatibility marker only."
+    },
+    {
+      "legacy": ".ai/catalog/skills",
+      "future": ".ai/assets/skills",
+      "assetType": "skills",
+      "currentPrimary": ".ai/assets/skills",
+      "rule": "Skills have moved. Keep the legacy directory as a compatibility marker only."
+    },
+    {
+      "legacy": ".ai/catalog/agents-source",
+      "future": ".ai/assets/agents",
+      "assetType": "agents-source",
+      "currentPrimary": ".ai/assets/agents",
+      "rule": "Agents have moved. Keep the legacy directory as a compatibility marker only."
+    },
+    {
+      "legacy": ".ai/book",
+      "future": ".ai/assets/books",
+      "assetType": "book",
+      "currentPrimary": ".ai/assets/books",
+      "rule": "Shared book chapters have moved. Keep the legacy directory as a compatibility marker only."
+    },
+    {
+      "legacy": ".ai/kernel",
+      "future": ".ai/core/kernel",
+      "assetType": "kernel",
+      "currentPrimary": ".ai/kernel",
+      "rule": "Mapped only; no automatic resolution switch yet."
+    },
+    {
+      "legacy": ".ai/module",
+      "future": ".ai/core/modules",
+      "assetType": "module",
+      "currentPrimary": ".ai/core/modules",
+      "rule": "Module documents have moved. Keep the legacy directory as a compatibility marker only."
+    },
+    {
+      "legacy": ".ai/environments",
+      "future": ".ai/core/environments",
+      "assetType": "environments",
+      "currentPrimary": ".ai/environments",
+      "rule": "Mapped only; no automatic resolution switch yet."
+    }
+  ]
+}

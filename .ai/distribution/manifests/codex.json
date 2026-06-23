@@ -1,0 +1,10 @@
+{
+  "schemaVersion": 1,
+  "id": "codex",
+  "entrypoints": ["AGENTS.md"],
+  "generatedTargets": [".codex/agents"],
+  "sourceRoots": [".ai/assets/books", ".ai/kernel", ".ai/assets/rules", ".ai/assets/skills", ".ai/assets/agents", ".ai/environments/codex"],
+  "adapter": "tools/adapters/codex.ps1",
+  "forbiddenDirectEdits": ["AGENTS.md", ".codex/agents"],
+  "verify": [".\\deploy.ps1 -Check", ".\\tools\\test-routing-entrypoint-contract.ps1"]
+}

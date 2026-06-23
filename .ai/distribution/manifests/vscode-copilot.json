@@ -1,0 +1,10 @@
+{
+  "schemaVersion": 1,
+  "id": "vscode-copilot",
+  "entrypoints": [".github/copilot-instructions.md"],
+  "generatedTargets": ["%USERPROFILE%/.agents/skills"],
+  "sourceRoots": [".ai/assets/books", ".ai/kernel", ".ai/assets/rules", ".ai/assets/skills", ".ai/environments/vscode-copilot"],
+  "adapter": "tools/adapters/vscode.ps1",
+  "forbiddenDirectEdits": [".github/copilot-instructions.md", "%USERPROFILE%/.agents/skills"],
+  "verify": [".\\deploy.ps1 -Check -Target vscode"]
+}

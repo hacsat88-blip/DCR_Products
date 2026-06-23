@@ -1,0 +1,94 @@
+{
+  "schemaVersion": 1,
+  "purpose": "Generated and runtime targets controlled or classified by the DCR AI Control Plane.",
+  "targets": [
+    {
+      "id": "entrypoint.codex-agents-md",
+      "path": "AGENTS.md",
+      "targetType": "generated-entrypoint",
+      "source": [".ai/assets/books", ".ai/kernel", ".ai/assets/rules", ".ai/assets/skills", ".ai/assets/agents", ".ai/environments/codex", ".ai/environments/copilot-cli"],
+      "adapter": "tools/adapters/codex.ps1",
+      "editPolicy": "do-not-edit-directly",
+      "prunePolicy": "overwrite-file",
+      "secretPolicy": "no-secrets",
+      "verify": [".\\deploy.ps1 -Check", ".\\validate.ps1"]
+    },
+    {
+      "id": "entrypoint.claude-md",
+      "path": "CLAUDE.md",
+      "targetType": "generated-entrypoint",
+      "source": [".ai/assets/books", ".ai/kernel", ".ai/assets/rules", ".ai/assets/skills", ".ai/assets/agents", ".ai/environments/claude-code"],
+      "adapter": "tools/adapters/claude.ps1",
+      "editPolicy": "do-not-edit-directly",
+      "prunePolicy": "overwrite-file",
+      "secretPolicy": "no-secrets",
+      "verify": [".\\deploy.ps1 -Check", ".\\validate.ps1"]
+    },
+    {
+      "id": "entrypoint.vscode-copilot",
+      "path": ".github/copilot-instructions.md",
+      "targetType": "generated-entrypoint",
+      "source": [".ai/assets/books", ".ai/kernel", ".ai/assets/rules", ".ai/assets/skills", ".ai/environments/vscode-copilot"],
+      "adapter": "tools/adapters/vscode.ps1",
+      "editPolicy": "do-not-edit-directly",
+      "prunePolicy": "overwrite-file",
+      "secretPolicy": "no-secrets",
+      "verify": [".\\deploy.ps1 -Check", ".\\validate.ps1"]
+    },
+    {
+      "id": "mirror.codex-agents",
+      "path": ".codex/agents",
+      "targetType": "generated-mirror",
+      "source": [".ai/assets/agents"],
+      "adapter": "tools/adapters/agents.ps1",
+      "editPolicy": "do-not-edit-directly",
+      "prunePolicy": "managed-files-only",
+      "secretPolicy": "no-secrets",
+      "verify": [".\\deploy.ps1 -Check -Target agents"]
+    },
+    {
+      "id": "mirror.claude-agents",
+      "path": ".claude/agents",
+      "targetType": "generated-mirror",
+      "source": [".ai/assets/agents"],
+      "adapter": "tools/adapters/agents.ps1",
+      "editPolicy": "do-not-edit-directly",
+      "prunePolicy": "managed-files-only",
+      "secretPolicy": "no-secrets",
+      "verify": [".\\deploy.ps1 -Check -Target agents"]
+    },
+    {
+      "id": "mirror.cursor-rules",
+      "path": ".cursor/rules",
+      "targetType": "generated-mirror",
+      "source": [".ai/assets/books", ".ai/kernel", ".ai/assets/rules", ".ai/assets/skills", ".ai/environments/cursor"],
+      "adapter": "tools/adapters/cursor.ps1",
+      "editPolicy": "do-not-edit-directly",
+      "prunePolicy": "managed-files-only",
+      "secretPolicy": "no-secrets",
+      "verify": [".\\deploy.ps1 -Check -Target cursor"]
+    },
+    {
+      "id": "home.vscode-skills",
+      "path": "%USERPROFILE%/.agents/skills",
+      "targetType": "home-generated-mirror",
+      "source": [".ai/assets/skills"],
+      "adapter": "deploy.ps1 -Target vscode",
+      "editPolicy": "do-not-edit-directly",
+      "prunePolicy": "managed-files-only",
+      "secretPolicy": "metadata-only",
+      "verify": [".\\deploy.ps1 -Check -Target vscode"]
+    },
+    {
+      "id": "home.dcr-config",
+      "path": "%USERPROFILE%/.config/dcr/config.json",
+      "targetType": "home-runtime-config",
+      "source": [".dcr/config.json"],
+      "adapter": "deploy.ps1 -Target dcr",
+      "editPolicy": "requires-explicit-approval",
+      "prunePolicy": "single-file",
+      "secretPolicy": "metadata-only",
+      "verify": [".\\deploy.ps1 -Check -Target dcr"]
+    }
+  ]
+}

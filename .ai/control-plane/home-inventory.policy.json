@@ -1,0 +1,148 @@
+{
+  "schemaVersion": 1,
+  "purpose": "Classify AI-related assets under the user home without reading secrets.",
+  "noSecretsDefault": true,
+  "classificationSet": [
+    "managed-by-dcr",
+    "external-runtime",
+    "vendor-cache",
+    "candidate-import",
+    "ignore",
+    "forbidden-secret"
+  ],
+  "classifiedPaths": [
+    {
+      "id": "home.agents-root",
+      "path": "%USERPROFILE%/.agents",
+      "classification": "external-runtime",
+      "handling": "metadata-only",
+      "notes": "May contain VS Code Copilot skill lock and generated skills."
+    },
+    {
+      "id": "home.agents-skills",
+      "path": "%USERPROFILE%/.agents/skills",
+      "classification": "managed-by-dcr",
+      "handling": "metadata-only",
+      "managedBy": "deploy.ps1 -Target vscode"
+    },
+    {
+      "id": "home.codex-root",
+      "path": "%USERPROFILE%/.codex",
+      "classification": "external-runtime",
+      "handling": "metadata-only",
+      "notes": "Codex app runtime, auth, sessions, plugin cache, and local skills live here."
+    },
+    {
+      "id": "home.codex-auth",
+      "path": "%USERPROFILE%/.codex/auth.json",
+      "classification": "forbidden-secret",
+      "handling": "never-read-content"
+    },
+    {
+      "id": "home.codex-agent-skills",
+      "path": "%USERPROFILE%/.codex/agent-skills",
+      "classification": "candidate-import",
+      "handling": "metadata-only"
+    },
+    {
+      "id": "home.codex-anthropic-skills",
+      "path": "%USERPROFILE%/.codex/anthropic-skills",
+      "classification": "vendor-cache",
+      "handling": "metadata-only"
+    },
+    {
+      "id": "home.codex-ecc",
+      "path": "%USERPROFILE%/.codex/ecc",
+      "classification": "candidate-import",
+      "handling": "metadata-only"
+    },
+    {
+      "id": "home.codex-agents",
+      "path": "%USERPROFILE%/.codex/agents",
+      "classification": "external-runtime",
+      "handling": "metadata-only"
+    },
+    {
+      "id": "home.codex-skills",
+      "path": "%USERPROFILE%/.codex/skills",
+      "classification": "external-runtime",
+      "handling": "metadata-only"
+    },
+    {
+      "id": "home.claude-root",
+      "path": "%USERPROFILE%/.claude",
+      "classification": "external-runtime",
+      "handling": "metadata-only"
+    },
+    {
+      "id": "home.claude-credentials",
+      "path": "%USERPROFILE%/.claude/.credentials.json",
+      "classification": "forbidden-secret",
+      "handling": "never-read-content"
+    },
+    {
+      "id": "home.claude-agents",
+      "path": "%USERPROFILE%/.claude/agents",
+      "classification": "candidate-import",
+      "handling": "metadata-only"
+    },
+    {
+      "id": "home.claude-skills",
+      "path": "%USERPROFILE%/.claude/skills",
+      "classification": "candidate-import",
+      "handling": "metadata-only"
+    },
+    {
+      "id": "home.cursor-root",
+      "path": "%USERPROFILE%/.cursor",
+      "classification": "external-runtime",
+      "handling": "metadata-only"
+    },
+    {
+      "id": "home.cursor-rules",
+      "path": "%USERPROFILE%/.cursor/rules",
+      "classification": "external-runtime",
+      "handling": "metadata-only"
+    },
+    {
+      "id": "home.cursor-skills",
+      "path": "%USERPROFILE%/.cursor/skills-cursor",
+      "classification": "external-runtime",
+      "handling": "metadata-only"
+    },
+    {
+      "id": "home.config-dcr",
+      "path": "%USERPROFILE%/.config/dcr",
+      "classification": "managed-by-dcr",
+      "handling": "metadata-only",
+      "managedBy": "deploy.ps1 -Target dcr"
+    },
+    {
+      "id": "home.config-git-ignore",
+      "path": "%USERPROFILE%/.config/git/ignore",
+      "classification": "external-runtime",
+      "handling": "metadata-only"
+    },
+    {
+      "id": "home.opencode-root",
+      "path": "%USERPROFILE%/.opencode",
+      "classification": "external-runtime",
+      "handling": "metadata-only"
+    },
+    {
+      "id": "home.codeium-root",
+      "path": "%USERPROFILE%/.codeium",
+      "classification": "external-runtime",
+      "handling": "metadata-only"
+    }
+  ],
+  "auditHints": [
+    "%USERPROFILE%/.agents",
+    "%USERPROFILE%/.codex",
+    "%USERPROFILE%/.claude",
+    "%USERPROFILE%/.cursor",
+    "%USERPROFILE%/.opencode",
+    "%USERPROFILE%/.codeium",
+    "%USERPROFILE%/.config/dcr"
+  ]
+}
