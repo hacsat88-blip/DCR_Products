@@ -11,7 +11,7 @@
     - Alias age (days since deprecation commit, via git log)
     - Recent call count (default last 30 days, from router-decisions.jsonl)
     - External-reference count (grep for old name in repo)
-    - Removal-eligibility verdict (per .ai/module/deprecation-lifecycle.md)
+    - Removal-eligibility verdict (per .ai/core/modules/deprecation-lifecycle.md)
 
   Output: console table + optional JSON to docs/deprecation-status.json
 
@@ -37,9 +37,13 @@ param(
 
 $ErrorActionPreference = 'Stop'
 $RepoRoot = (Resolve-Path (Join-Path $PSScriptRoot "..")).Path
-$rulesDir = Join-Path $RepoRoot ".ai/catalog/rules"
-$skillsDir = Join-Path $RepoRoot ".ai/catalog/skills"
-$agentsDir = Join-Path $RepoRoot ".ai/catalog/agents-source"
+$CatalogPaths = Join-Path $RepoRoot "tools\lib\catalog-paths.ps1"
+. $CatalogPaths
+$rulesDir = Resolve-DcrSourcePath -RepoRoot $RepoRoot -AssetType "rules"
+$skillsDir = Resolve-DcrSourcePath -RepoRoot $RepoRoot -AssetType "skills"
+$agentsDir = Resolve-DcrSourcePath -RepoRoot $RepoRoot -AssetType "agents-source"
+$rulesRelativePath = Get-DcrResolvedSourceRelativePath -RepoRoot $RepoRoot -AssetType "rules"
+$agentsRelativePath = Get-DcrResolvedSourceRelativePath -RepoRoot $RepoRoot -AssetType "agents-source"
 $decisionsPath = Join-Path $RepoRoot ".ai/kernel/router-decisions.jsonl"
 $DeprecatedAliases = Join-Path $RepoRoot "tools\lib\deprecated-aliases.ps1"
 . $DeprecatedAliases
@@ -113,9 +117,9 @@ function Get-ExternalRefs {
                 $skip = $false
                 foreach ($ex in $exclude) { if ($f -like "$ex/*") { $skip = $true } }
                 if ($SourcePath -and $f -eq $SourcePath) { $skip = $true }
-                if ($Kind -eq 'agent' -and $f -eq ".ai/catalog/agents-source/$Name.toml") { $skip = $true }
+                if ($Kind -eq 'agent' -and $f -eq "$agentsRelativePath/$Name.toml") { $skip = $true }
                 # Skip generated docs and lifecycle ledgers that intentionally list aliases.
-                if ($f -in @('CLAUDE.md', 'AGENTS.md', '.ai/catalog/rules/_ROUTING_INDEX.md', '.ai/catalog/_deprecated-aliases.json', 'docs/deprecation-removed.md', 'docs/deprecation-candidates.md')) { $skip = $true }
+                if ($f -in @('CLAUDE.md', 'AGENTS.md', "$rulesRelativePath/_ROUTING_INDEX.md", '.ai/catalog/_deprecated-aliases.json', 'docs/deprecation-removed.md', 'docs/deprecation-candidates.md')) { $skip = $true }
                 -not $skip
             }
         return @($refs)
@@ -148,7 +152,7 @@ foreach ($alias in Get-DcrDeprecatedAliases -RepoRoot $RepoRoot) {
     })
 }
 
-# ── Verdict per .ai/module/deprecation-lifecycle.md ──
+# ── Verdict per .ai/core/modules/deprecation-lifecycle.md ──
 foreach ($r in $report) {
     $verdict = "WAIT"
     if ($r.days_deprecated -lt 0) {
@@ -241,7 +245,7 @@ if ($OutputMarkdown) {
         "",
         "## Next Step",
         "",
-        "- Review this list with .ai/module/deprecation-lifecycle.md and update docs/deprecation-removed.md when removal is executed.",
+        "- Review this list with .ai/core/modules/deprecation-lifecycle.md and update docs/deprecation-removed.md when removal is executed.",
         ""
     )
 

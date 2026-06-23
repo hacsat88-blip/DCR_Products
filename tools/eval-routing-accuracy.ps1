@@ -41,9 +41,11 @@ if (-not (Test-Path $FixturePath)) {
     exit 1
 }
 
-$rulesDir = Join-Path $RepoRoot ".ai/catalog/rules"
-$skillsDir = Join-Path $RepoRoot ".ai/catalog/skills"
-$agentsDir = Join-Path $RepoRoot ".ai/catalog/agents-source"
+$CatalogPaths = Join-Path $RepoRoot "tools\lib\catalog-paths.ps1"
+. $CatalogPaths
+$rulesDir = Resolve-DcrSourcePath -RepoRoot $RepoRoot -AssetType "rules"
+$skillsDir = Resolve-DcrSourcePath -RepoRoot $RepoRoot -AssetType "skills"
+$agentsDir = Resolve-DcrSourcePath -RepoRoot $RepoRoot -AssetType "agents-source"
 $DeprecatedAliases = Join-Path $RepoRoot "tools\lib\deprecated-aliases.ps1"
 . $DeprecatedAliases
 $deprecatedAliasRows = @(Get-DcrDeprecatedAliases -RepoRoot $RepoRoot)

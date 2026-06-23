@@ -3,8 +3,7 @@
   Frontmatter to JSON manifest compiler
 
 .DESCRIPTION
-  Scans .ai/catalog/rules/*.md, .ai/catalog/skills/*/SKILL.md, and
-  .ai/catalog/agents-source/* to extract frontmatter targets and compile
+  Scans resolved rules, skills, and agents source paths to extract frontmatter targets and compile
   them into a unified JSON manifest for adapter distribution.
 
 .PARAMETER RepoRoot
@@ -76,10 +75,13 @@ $manifest = @{
 $ruleDir = Resolve-DcrSourcePath -RepoRoot $resolvedRoot -AssetType "rules"
 $skillDir = Resolve-DcrSourcePath -RepoRoot $resolvedRoot -AssetType "skills"
 $agentDir = Resolve-DcrSourcePath -RepoRoot $resolvedRoot -AssetType "agents-source"
+$ruleRelativePath = Get-DcrResolvedSourceRelativePath -RepoRoot $resolvedRoot -AssetType "rules"
+$skillRelativePath = Get-DcrResolvedSourceRelativePath -RepoRoot $resolvedRoot -AssetType "skills"
+$agentRelativePath = Get-DcrResolvedSourceRelativePath -RepoRoot $resolvedRoot -AssetType "agents-source"
 
-Write-Host "[1/3] Scanning $(Get-DcrCanonicalRelativePath -AssetType 'rules')/*.md..." -ForegroundColor Yellow
+Write-Host "[1/3] Scanning $ruleRelativePath/*.md..." -ForegroundColor Yellow
 $ruleFiles = @(Get-ChildItem -Path $ruleDir -Filter "*.md" -ErrorAction SilentlyContinue |
-    Where-Object { -not $_.BaseName.StartsWith("_") })
+    Where-Object { $_.BaseName -ne "README" -and -not $_.BaseName.StartsWith("_") })
 foreach ($file in $ruleFiles) {
     $targets = @(Get-FrontmatterTargets -FilePath $file.FullName)
     if ($targets.Count -eq 0) {
@@ -88,14 +90,14 @@ foreach ($file in $ruleFiles) {
 
     $manifest.rules += @{
         name = $file.BaseName
-        path = "$(Get-DcrCanonicalRelativePath -AssetType 'rules')/$($file.Name)"
+        path = "$ruleRelativePath/$($file.Name)"
         targets = $targets
         description = (Get-FrontmatterField -FilePath $file.FullName -Field "description")
     }
 }
 Write-Host "  [OK] Found $($manifest.rules.Count) rules" -ForegroundColor Green
 
-Write-Host "[2/3] Scanning $(Get-DcrCanonicalRelativePath -AssetType 'skills')/*/SKILL.md..." -ForegroundColor Yellow
+Write-Host "[2/3] Scanning $skillRelativePath/*/SKILL.md..." -ForegroundColor Yellow
 $skillDirs = @(Get-ChildItem -Path $skillDir -Directory -ErrorAction SilentlyContinue |
     Where-Object { -not $_.Name.StartsWith("_") })
 foreach ($dir in $skillDirs) {
@@ -111,14 +113,14 @@ foreach ($dir in $skillDirs) {
 
     $manifest.skills += @{
         name = $dir.Name
-        path = "$(Get-DcrCanonicalRelativePath -AssetType 'skills')/$($dir.Name)/SKILL.md"
+        path = "$skillRelativePath/$($dir.Name)/SKILL.md"
         targets = $targets
         description = (Get-FrontmatterField -FilePath $skillFile -Field "description")
     }
 }
 Write-Host "  [OK] Found $($manifest.skills.Count) skills" -ForegroundColor Green
 
-Write-Host "[3/3] Scanning $(Get-DcrCanonicalRelativePath -AssetType 'agents-source')/*.md..." -ForegroundColor Yellow
+Write-Host "[3/3] Scanning $agentRelativePath/*.md..." -ForegroundColor Yellow
 $agentFiles = @(Get-ChildItem -Path $agentDir -Filter "*.md" -ErrorAction SilentlyContinue |
     Where-Object { $_.Name -ne "README.md" })
 foreach ($file in $agentFiles) {
@@ -129,7 +131,7 @@ foreach ($file in $agentFiles) {
 
     $manifest.agents += @{
         name = $file.BaseName
-        path = "$(Get-DcrCanonicalRelativePath -AssetType 'agents-source')/$($file.Name)"
+        path = "$agentRelativePath/$($file.Name)"
         targets = $targets
         description = (Get-FrontmatterField -FilePath $file.FullName -Field "description")
     }

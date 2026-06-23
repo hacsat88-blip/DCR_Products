@@ -35,6 +35,22 @@ function Write-CheckFail {
     Write-Host "[FAIL] $Message" -ForegroundColor Red
 }
 
+function Invoke-SuperpowersGit {
+    param(
+        [Parameter(Mandatory)]
+        [string[]]$Arguments,
+        [switch]$IgnoreError
+    )
+
+    $safePath = (Resolve-Path -LiteralPath $Path).Path
+    $output = & git -c "safe.directory=$safePath" -c "core.excludesfile=" -C $Path @Arguments 2>&1
+    if (-not $IgnoreError -and $LASTEXITCODE -ne 0) {
+        throw ($output -join [Environment]::NewLine)
+    }
+
+    return $output
+}
+
 if (-not (Test-Path -LiteralPath $Path)) {
     $message = "Superpowers checkout not found: $Path"
     if ($RequireInstalled) {
@@ -54,8 +70,7 @@ if (-not (Test-Path -LiteralPath (Join-Path $Path ".git"))) {
 $failures = @()
 
 try {
-    $origin = (& git -C $Path remote get-url origin 2>&1).Trim()
-    if ($LASTEXITCODE -ne 0) { throw $origin }
+    $origin = (Invoke-SuperpowersGit -Arguments @("remote", "get-url", "origin")).Trim()
 }
 catch {
     Write-CheckFail "Unable to read Superpowers origin: $_"
@@ -66,7 +81,7 @@ if ($origin -ne $ExpectedOrigin) {
     $failures += "origin is '$origin' (expected '$ExpectedOrigin')"
 }
 
-$status = & git -C $Path status --porcelain 2>&1
+$status = Invoke-SuperpowersGit -Arguments @("status", "--porcelain") -IgnoreError
 if ($LASTEXITCODE -ne 0) {
     $failures += "git status failed: $status"
 }
@@ -74,12 +89,12 @@ elseif ($status) {
     $failures += "working tree has local changes: $($status -join '; ')"
 }
 
-$upstream = (& git -C $Path rev-parse --abbrev-ref --symbolic-full-name "@{u}" 2>$null).Trim()
+$upstream = (Invoke-SuperpowersGit -Arguments @("rev-parse", "--abbrev-ref", "--symbolic-full-name", "@{u}") -IgnoreError).Trim()
 if ($LASTEXITCODE -ne 0 -or [string]::IsNullOrWhiteSpace($upstream)) {
     $failures += "tracking branch is not configured"
 }
 else {
-    $counts = (& git -C $Path rev-list --left-right --count "HEAD...@{u}" 2>&1).Trim()
+    $counts = (Invoke-SuperpowersGit -Arguments @("rev-list", "--left-right", "--count", "HEAD...@{u}") -IgnoreError).Trim()
     if ($LASTEXITCODE -ne 0) {
         $failures += "unable to compare with upstream '$upstream': $counts"
     }
@@ -115,6 +130,6 @@ if ($failures.Count -gt 0) {
     exit 1
 }
 
-$head = (& git -C $Path log -1 --oneline 2>$null).Trim()
+$head = (Invoke-SuperpowersGit -Arguments @("log", "-1", "--oneline") -IgnoreError).Trim()
 Write-CheckOk "Superpowers external checkout is clean and aligned ($head)"
 exit 0

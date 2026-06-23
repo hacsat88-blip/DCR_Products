@@ -1,9 +1,18 @@
-param([string]$RepoRoot = ".")
+param(
+    [string]$RepoRoot = ".",
+    [string]$OutRoot = "",
+    [string]$CursorIgnorePath = ""
+)
 
-$outRoot = Join-Path $RepoRoot ".cursor"
+$CatalogPaths = Join-Path (Split-Path $PSScriptRoot -Parent) "lib\catalog-paths.ps1"
+. $CatalogPaths
+$rulesRelativePath = Get-DcrResolvedSourceRelativePath -RepoRoot $RepoRoot -AssetType "rules"
+$skillsRelativePath = Get-DcrResolvedSourceRelativePath -RepoRoot $RepoRoot -AssetType "skills"
+$agentsRelativePath = Get-DcrResolvedSourceRelativePath -RepoRoot $RepoRoot -AssetType "agents-source"
+$outRoot = if ([string]::IsNullOrWhiteSpace($OutRoot)) { Join-Path $RepoRoot ".cursor" } else { $OutRoot }
 $outRulesDir = Join-Path $outRoot "rules"
 $runtimeKernel = Join-Path $RepoRoot ".ai\kernel\dcr-kernel.md"
-$cursorIgnorePath = Join-Path $RepoRoot ".cursorignore"
+$cursorIgnorePath = if ([string]::IsNullOrWhiteSpace($CursorIgnorePath)) { Join-Path $RepoRoot ".cursorignore" } else { $CursorIgnorePath }
 
 Write-Host "[cursor] Generating .cursor mirror..." -ForegroundColor Cyan
 
@@ -41,11 +50,11 @@ Do not edit files here directly. Edit `.ai/` and regenerate.
 
 ## Source of Truth
 
-- Shared Book: `../.ai/book/`
+- Shared Book: `../.ai/assets/books/`
 - Kernel: `../.ai/kernel/`
-- Rules: `../.ai/catalog/rules/`
-- Skills: `../.ai/catalog/skills/`
-- Agents: `../.ai/catalog/agents-source/`
+- Rules: `../$rulesRelativePath/`
+- Skills: `../$skillsRelativePath/`
+- Agents: `../$agentsRelativePath/`
 - Cursor environment diff: `../.ai/environments/cursor/kernel.md`
 
 ## Regenerate
@@ -72,57 +81,57 @@ $cursorIgnore = @"
 .claude/agents/
 
 # Deprecated rule aliases (hide from Cursor discovery)
-.ai/catalog/rules/behavioral-nudge-engine.md
-.ai/catalog/rules/evidence-collector.md
-.ai/catalog/rules/inclusive-visuals-specialist.md
-.ai/catalog/rules/instagram-curator.md
-.ai/catalog/rules/reddit-community-builder.md
-.ai/catalog/rules/sprint-prioritizer.md
-.ai/catalog/rules/test-results-analyzer.md
-.ai/catalog/rules/tiktok-strategist.md
-.ai/catalog/rules/twitter-engager.md
-.ai/catalog/rules/ux-architect.md
+$rulesRelativePath/behavioral-nudge-engine.md
+$rulesRelativePath/evidence-collector.md
+$rulesRelativePath/inclusive-visuals-specialist.md
+$rulesRelativePath/instagram-curator.md
+$rulesRelativePath/reddit-community-builder.md
+$rulesRelativePath/sprint-prioritizer.md
+$rulesRelativePath/test-results-analyzer.md
+$rulesRelativePath/tiktok-strategist.md
+$rulesRelativePath/twitter-engager.md
+$rulesRelativePath/ux-architect.md
 
 # Deprecated skill aliases
-.ai/catalog/skills/continuous-learning/
-.ai/catalog/skills/schema-markup/
-.ai/catalog/skills/skill-router/
+$skillsRelativePath/continuous-learning/
+$skillsRelativePath/schema-markup/
+$skillsRelativePath/skill-router/
 
 # Deprecated agent aliases
-.ai/catalog/agents-source/ad-security-reviewer.md
-.ai/catalog/agents-source/agent-organizer.md
-.ai/catalog/agents-source/ai-prompt-manager-orchestrator.md
-.ai/catalog/agents-source/api-designer.md
-.ai/catalog/agents-source/api-documenter.md
-.ai/catalog/agents-source/architecture-diagram-orchestrator.md
-.ai/catalog/agents-source/browser-debugger.md
-.ai/catalog/agents-source/competitive-analyst.md
-.ai/catalog/agents-source/data-researcher.md
-.ai/catalog/agents-source/database-optimizer.md
-.ai/catalog/agents-source/deployment-engineer.md
-.ai/catalog/agents-source/devops-incident-responder.md
-.ai/catalog/agents-source/docs-researcher.md
-.ai/catalog/agents-source/error-detective.md
-.ai/catalog/agents-source/graphql-architect.md
-.ai/catalog/agents-source/knowledge-synthesizer.md
-.ai/catalog/agents-source/llm-architect.md
-.ai/catalog/agents-source/machine-learning-engineer.md
-.ai/catalog/agents-source/market-researcher.md
-.ai/catalog/agents-source/microservices-architect.md
-.ai/catalog/agents-source/mobile-app-developer.md
-.ai/catalog/agents-source/multi-agent-coordinator.md
-.ai/catalog/agents-source/nlp-engineer.md
-.ai/catalog/agents-source/payment-integration.md
-.ai/catalog/agents-source/performance-monitor.md
-.ai/catalog/agents-source/platform-engineer.md
-.ai/catalog/agents-source/reviewer.md
-.ai/catalog/agents-source/risk-manager.md
-.ai/catalog/agents-source/search-specialist.md
-.ai/catalog/agents-source/task-distributor.md
-.ai/catalog/agents-source/tooling-engineer.md
-.ai/catalog/agents-source/trend-analyst.md
-.ai/catalog/agents-source/ui-fixer.md
-.ai/catalog/agents-source/workflow-orchestrator.md
+$agentsRelativePath/ad-security-reviewer.md
+$agentsRelativePath/agent-organizer.md
+$agentsRelativePath/ai-prompt-manager-orchestrator.md
+$agentsRelativePath/api-designer.md
+$agentsRelativePath/api-documenter.md
+$agentsRelativePath/architecture-diagram-orchestrator.md
+$agentsRelativePath/browser-debugger.md
+$agentsRelativePath/competitive-analyst.md
+$agentsRelativePath/data-researcher.md
+$agentsRelativePath/database-optimizer.md
+$agentsRelativePath/deployment-engineer.md
+$agentsRelativePath/devops-incident-responder.md
+$agentsRelativePath/docs-researcher.md
+$agentsRelativePath/error-detective.md
+$agentsRelativePath/graphql-architect.md
+$agentsRelativePath/knowledge-synthesizer.md
+$agentsRelativePath/llm-architect.md
+$agentsRelativePath/machine-learning-engineer.md
+$agentsRelativePath/market-researcher.md
+$agentsRelativePath/microservices-architect.md
+$agentsRelativePath/mobile-app-developer.md
+$agentsRelativePath/multi-agent-coordinator.md
+$agentsRelativePath/nlp-engineer.md
+$agentsRelativePath/payment-integration.md
+$agentsRelativePath/performance-monitor.md
+$agentsRelativePath/platform-engineer.md
+$agentsRelativePath/reviewer.md
+$agentsRelativePath/risk-manager.md
+$agentsRelativePath/search-specialist.md
+$agentsRelativePath/task-distributor.md
+$agentsRelativePath/tooling-engineer.md
+$agentsRelativePath/trend-analyst.md
+$agentsRelativePath/ui-fixer.md
+$agentsRelativePath/workflow-orchestrator.md
 "@
 
 Write-Utf8NoBom -Path $cursorIgnorePath -Content ($cursorIgnore.TrimEnd() + "`r`n")
@@ -142,7 +151,7 @@ if (Test-Path $runtimeKernel) {
         ""
         "# DCR Kernel Baseline"
         ""
-        'Primary source: ../.ai/book/ and ../.ai/kernel/dcr-kernel.md'
+        'Primary source: ../.ai/assets/books/ and ../.ai/kernel/dcr-kernel.md'
         ""
         $kernelBody.TrimEnd()
         ""

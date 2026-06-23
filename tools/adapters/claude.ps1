@@ -1,4 +1,7 @@
-param([string]$RepoRoot = ".")
+﻿param(
+    [string]$RepoRoot = ".",
+    [string]$OutputPath = ""
+)
 
 $CatalogPaths = Join-Path (Split-Path $PSScriptRoot -Parent) "lib\catalog-paths.ps1"
 . $CatalogPaths
@@ -8,11 +11,14 @@ $DeprecatedAliases = Join-Path (Split-Path $PSScriptRoot -Parent) "lib\deprecate
 $rulesDir = Resolve-DcrSourcePath -RepoRoot $RepoRoot -AssetType "rules"
 $skillsDir = Resolve-DcrSourcePath -RepoRoot $RepoRoot -AssetType "skills"
 $agentsDir = Resolve-DcrSourcePath -RepoRoot $RepoRoot -AssetType "agents-source"
+$rulesRelativePath = Get-DcrResolvedSourceRelativePath -RepoRoot $RepoRoot -AssetType "rules"
+$skillsRelativePath = Get-DcrResolvedSourceRelativePath -RepoRoot $RepoRoot -AssetType "skills"
+$agentsRelativePath = Get-DcrResolvedSourceRelativePath -RepoRoot $RepoRoot -AssetType "agents-source"
 
 Write-Host "[claude] Generating CLAUDE.md..." -ForegroundColor Cyan
 
 function Get-Targets($file) {
-    $text = Get-Content $file.FullName -Raw
+    $text = Get-Content $file.FullName -Raw -Encoding utf8
     if ($text -match '(?s)^---.*?^targets:\s*\n((?:.*?\n)*?)(?:^---|^$)') {
         return [regex]::Matches($Matches[1], '^\s*-\s*(.+)$', 'Multiline') | % { $_.Groups[1].Value }
     }
@@ -20,7 +26,7 @@ function Get-Targets($file) {
 }
 
 function Get-RoutingCategory($file) {
-    $text = Get-Content $file.FullName -Raw
+    $text = Get-Content $file.FullName -Raw -Encoding utf8
     if ($text -match '(?ms)^---(.*?)^---') {
         $fm = $Matches[1]
         if ($fm -match '(?m)^\s*routing_category\s*:\s*(\S+)') { return $Matches[1].Trim() }
@@ -49,7 +55,7 @@ function Get-DeprecationInfo($kind, $name) {
 }
 
 # Collect claude-targeted items (separate active vs deprecated)
-foreach ($f in Get-ChildItem $rulesDir -Filter "*.md" | Where-Object { -not $_.BaseName.StartsWith("_") }) {
+foreach ($f in Get-ChildItem $rulesDir -Filter "*.md" | Where-Object { $_.BaseName -ne "README" -and -not $_.BaseName.StartsWith("_") }) {
     $targets = Get-Targets $f
     if (-not $targets) { $targets = @("vscode", "claude", "codex") }
     if ($targets -contains "claude") {
@@ -106,7 +112,7 @@ $MarkdownTick = [char]96
 
 $content = @"
 <!-- AUTO-GENERATED FILE - DO NOT EDIT DIRECTLY
-Generated from: .ai/book + .ai/kernel + .ai/catalog/rules/ + .ai/catalog/skills/ + .ai/catalog/agents-source/
+Generated from: .ai/assets/books + .ai/kernel + $rulesRelativePath/ + $skillsRelativePath/ + $agentsRelativePath/
 To regenerate: Run pwsh -ExecutionPolicy Bypass -File .\deploy.ps1 or .\tools\deploy-all.ps1
 Any manual edits will be overwritten on next deploy. -->
 
@@ -123,10 +129,10 @@ Unified entry point for Claude Code environment.
 
 ## Source of Truth
 
-- Rules: [.ai/catalog/rules/](.ai/catalog/rules/)
-- Skills: [.ai/catalog/skills/](.ai/catalog/skills/)
-- Agents: [.ai/catalog/agents-source/](.ai/catalog/agents-source/)
-- Shared Book: [.ai/book/](.ai/book/)
+- Rules: [$rulesRelativePath/]($rulesRelativePath/)
+- Skills: [$skillsRelativePath/]($skillsRelativePath/)
+- Agents: [$agentsRelativePath/]($agentsRelativePath/)
+- Shared Book: [.ai/assets/books/](.ai/assets/books/)
 - Kernel: [.ai/kernel/](.ai/kernel/)
 - Environment diff (Claude Code): [.ai/environments/claude-code/kernel.md](.ai/environments/claude-code/kernel.md)
 ---
@@ -134,7 +140,7 @@ Unified entry point for Claude Code environment.
 ## Unified Coordinator
 
 全タスクの単一入口は **pied-piper** agent。
-Rule/Skill/Agent の選定は [.ai/module/unified-router.md](.ai/module/unified-router.md) の決定木に従い、
+Rule/Skill/Agent の選定は [.ai/core/modules/unified-router.md](.ai/core/modules/unified-router.md) の決定木に従い、
 候補を増やさず必要十分な候補へ圧縮し、発火前に候補・理由・期待効果を報告する。
 
 Skill、Agent、サブエージェント、並列 orchestration、外部 MCP/API、P2/P3 操作が関わる場合は、原則として **候補提示 → ユーザー承認 → 発火** の順に進める。P1 read-only の単独低リスク探索のみ、短い事前報告後に自動実行できる。
@@ -153,16 +159,19 @@ ${MarkdownTick}.ai/kernel/gate-state.json${MarkdownTick} に ${MarkdownTick}prop
 
 「これどう？」「サトシ開発目線で」「前と同じ観点で」「入れる価値ある？」「導入して」「置き換える必要ある？」「また同じエラー」「過去判断も踏まえて」など、過去判断が品質に影響する相談では、利用可能な runtime memory を着手前に確認する。
 
-agentmemory 互換 backend が使える場合は、同種タスク、関連ファイルの過去判断、採用/非採用ポリシー、検証済みコマンドを短く検索する。使えない場合は通常の repo 探索へフォールバックする。memory recall は正本ではなく、${MarkdownTick}.ai/catalog${MarkdownTick} / ${MarkdownTick}.ai/book${MarkdownTick} / repo artifact / 現在の git 状態を優先する。
+agentmemory 互換 backend が使える場合は、同種タスク、関連ファイルの過去判断、採用/非採用ポリシー、検証済みコマンドを短く検索する。使えない場合は通常の repo 探索へフォールバックする。memory recall は正本ではなく、${MarkdownTick}.ai/assets${MarkdownTick} / ${MarkdownTick}.ai/control-plane${MarkdownTick} / repo artifact / 現在の git 状態を優先する。
 
 詳細：
-- [.ai/module/unified-coordinator.md](.ai/module/unified-coordinator.md)
-- [.ai/module/unified-router.md](.ai/module/unified-router.md)
-- [.ai/module/unified-integration.md](.ai/module/unified-integration.md)
+- [.ai/core/modules/unified-coordinator.md](.ai/core/modules/unified-coordinator.md)
+- [.ai/core/modules/unified-router.md](.ai/core/modules/unified-router.md)
+- [.ai/core/modules/unified-integration.md](.ai/core/modules/unified-integration.md)
 "@
 
 $utf8 = New-Object System.Text.UTF8Encoding $false
-[System.IO.File]::WriteAllText("$RepoRoot/CLAUDE.md", ($content.TrimEnd() + [Environment]::NewLine), $utf8)
+$outPath = if ([string]::IsNullOrWhiteSpace($OutputPath)) { Join-Path $RepoRoot "CLAUDE.md" } else { $OutputPath }
+$outDir = Split-Path $outPath -Parent
+if ($outDir) { New-Item -ItemType Directory -Path $outDir -Force | Out-Null }
+[System.IO.File]::WriteAllText($outPath, ($content.TrimEnd() + [Environment]::NewLine), $utf8)
 
 Write-Host "  [OK] CLAUDE.md" -ForegroundColor Green
 Write-Host ""

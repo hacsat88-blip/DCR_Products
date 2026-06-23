@@ -5,11 +5,11 @@ Do not edit files here directly. Edit .ai/ and regenerate.
 
 ## Source of Truth
 
-- Shared Book: ../.ai/book/
+- Shared Book: ../.ai/assets/books/
 - Kernel: ../.ai/kernel/
-- Rules: ../.ai/catalog/rules/
-- Skills: ../.ai/catalog/skills/
-- Agents: ../.ai/catalog/agents-source/
+- Rules: ../.ai/assets/rules/
+- Skills: ../.ai/assets/skills/
+- Agents: ../.ai/assets/agents/
 - Cursor environment diff: ../.ai/environments/cursor/kernel.md
 
 ## Regenerate

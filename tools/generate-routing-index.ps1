@@ -81,7 +81,7 @@ function Get-FrontmatterMap {
 
 $rows = @()
 $files = Get-ChildItem -Path $rulesDir -File -Filter *.md |
-    Where-Object { $_.BaseName -notlike "_*" } |
+    Where-Object { $_.BaseName -ne "README" -and $_.BaseName -notlike "_*" } |
     Sort-Object Name
 
 foreach ($file in $files) {

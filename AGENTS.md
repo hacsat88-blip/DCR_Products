@@ -1,5 +1,5 @@
 <!-- AUTO-GENERATED FILE - DO NOT EDIT DIRECTLY
-Generated from: .ai/book + .ai/kernel + .ai/catalog/rules/ + .ai/catalog/skills/ + .ai/catalog/agents-source/
+Generated from: .ai/assets/books + .ai/kernel + .ai/assets/rules/ + .ai/assets/skills/ + .ai/assets/agents/
 To regenerate: Run pwsh -ExecutionPolicy Bypass -File .\deploy.ps1 or .\tools\deploy-all.ps1
 Any manual edits will be overwritten on next deploy. -->
 
@@ -18,10 +18,10 @@ GitHub Copilot CLI specific behavior lives in [.ai/environments/copilot-cli/kern
 
 ## Source of Truth
 
-- Rules: [.ai/catalog/rules/](.ai/catalog/rules/)
-- Skills: [.ai/catalog/skills/](.ai/catalog/skills/)
-- Agents: [.ai/catalog/agents-source/](.ai/catalog/agents-source/)
-- Shared Book: [.ai/book/](.ai/book/)
+- Rules: [.ai/assets/rules/](.ai/assets/rules/)
+- Skills: [.ai/assets/skills/](.ai/assets/skills/)
+- Agents: [.ai/assets/agents/](.ai/assets/agents/)
+- Shared Book: [.ai/assets/books/](.ai/assets/books/)
 - Kernel: [.ai/kernel/](.ai/kernel/)
 - Environment diff (Codex): [.ai/environments/codex/kernel.md](.ai/environments/codex/kernel.md)
 
@@ -47,12 +47,12 @@ Skill、Agent、サブエージェント、並列 orchestration、外部 MCP/API
 
 「これどう？」「サトシ開発目線で」「前と同じ観点で」「入れる価値ある？」「導入して」「置き換える必要ある？」「また同じエラー」「過去判断も踏まえて」など、過去判断が品質に影響する相談では、利用可能な runtime memory を着手前に確認する。
 
-agentmemory 互換 backend が使える場合は、同種タスク、関連ファイルの過去判断、採用/非採用ポリシー、検証済みコマンドを短く検索する。使えない場合は通常の repo 探索へフォールバックする。memory recall は正本ではなく、`.ai/catalog` / `.ai/book` / repo artifact / 現在の git 状態を優先する。
+agentmemory 互換 backend が使える場合は、同種タスク、関連ファイルの過去判断、採用/非採用ポリシー、検証済みコマンドを短く検索する。使えない場合は通常の repo 探索へフォールバックする。memory recall は正本ではなく、`.ai/assets` / `.ai/control-plane` / repo artifact / 現在の git 状態を優先する。
 
 詳細：
-- [.ai/module/unified-coordinator.md](.ai/module/unified-coordinator.md)
-- [.ai/module/unified-router.md](.ai/module/unified-router.md)
-- [.ai/module/unified-integration.md](.ai/module/unified-integration.md)
+- [.ai/core/modules/unified-coordinator.md](.ai/core/modules/unified-coordinator.md)
+- [.ai/core/modules/unified-router.md](.ai/core/modules/unified-router.md)
+- [.ai/core/modules/unified-integration.md](.ai/core/modules/unified-integration.md)
 
 ---
 

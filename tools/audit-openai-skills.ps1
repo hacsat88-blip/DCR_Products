@@ -3,7 +3,8 @@
   Audit DCR skills against the OpenAI official skills baseline.
 
 .DESCRIPTION
-  Read-only by default. Compares .ai/catalog/skills with local OpenAI curated,
+  Read-only by default. Compares the resolved DCR skills source (.ai/assets/skills)
+  with local OpenAI curated,
   primary-runtime, and local system skill caches. Classifies DCR skills into:
   keep, replace-with-openai, merge-into-overlay, fold-into-pipeline, deprecate.
 

@@ -46,6 +46,8 @@ param(
 
 $ErrorActionPreference = "Stop"
 $RepoRoot = (Resolve-Path (Join-Path $PSScriptRoot "..")).Path
+$CatalogPaths = Join-Path $RepoRoot "tools/lib/catalog-paths.ps1"
+. $CatalogPaths
 $deprecatedAliasLib = Join-Path $RepoRoot "tools/lib/deprecated-aliases.ps1"
 if (Test-Path $deprecatedAliasLib) {
     . $deprecatedAliasLib
@@ -123,12 +125,12 @@ function Add-CatalogAsset {
 function Get-CatalogIndex {
     param([Parameter(Mandatory)][string]$Root)
     $catalog = New-Object System.Collections.ArrayList
-    $rulesDir = Join-Path $Root ".ai/catalog/rules"
-    $skillsDir = Join-Path $Root ".ai/catalog/skills"
-    $agentsDir = Join-Path $Root ".ai/catalog/agents-source"
+    $rulesDir = Resolve-DcrSourcePath -RepoRoot $Root -AssetType "rules"
+    $skillsDir = Resolve-DcrSourcePath -RepoRoot $Root -AssetType "skills"
+    $agentsDir = Resolve-DcrSourcePath -RepoRoot $Root -AssetType "agents-source"
 
     if (Test-Path $rulesDir) {
-        foreach ($file in Get-ChildItem -Path $rulesDir -File -Filter "*.md" | Where-Object { -not $_.BaseName.StartsWith("_") }) {
+        foreach ($file in Get-ChildItem -Path $rulesDir -File -Filter "*.md" | Where-Object { $_.BaseName -ne "README" -and -not $_.BaseName.StartsWith("_") }) {
             Add-CatalogAsset -Catalog $catalog -Kind "rule" -Name $file.BaseName -Path $file.FullName -Frontmatter (Get-Frontmatter -Path $file.FullName)
         }
     }

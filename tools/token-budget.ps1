@@ -34,6 +34,8 @@ param(
 
 $ErrorActionPreference = 'Stop'
 $RepoRoot = (Resolve-Path (Join-Path $PSScriptRoot "..")).Path
+$CatalogPaths = Join-Path $RepoRoot "tools\lib\catalog-paths.ps1"
+. $CatalogPaths
 
 # ── Token estimator ──
 # Heuristic: ~3.5 chars/token for mixed Japanese + English text.
@@ -52,14 +54,15 @@ function Get-ActiveAssets {
     param([string]$Kind)
     switch ($Kind) {
         'rule' {
-            $dir = Join-Path $RepoRoot ".ai/catalog/rules"
+            $dir = Resolve-DcrSourcePath -RepoRoot $RepoRoot -AssetType "rules"
             return Get-ChildItem -Path $dir -Filter '*.md' | Where-Object {
                 -not $_.BaseName.StartsWith('_') -and
+                $_.BaseName -ne 'README' -and
                 -not (Test-Deprecated $_.FullName)
             }
         }
         'skill' {
-            $dir = Join-Path $RepoRoot ".ai/catalog/skills"
+            $dir = Resolve-DcrSourcePath -RepoRoot $RepoRoot -AssetType "skills"
             return Get-ChildItem -Path $dir -Directory | Where-Object {
                 -not $_.Name.StartsWith('_') -and
                 (Test-Path (Join-Path $_.FullName "SKILL.md")) -and
@@ -67,7 +70,7 @@ function Get-ActiveAssets {
             } | ForEach-Object { Get-Item (Join-Path $_.FullName "SKILL.md") }
         }
         'agent' {
-            $dir = Join-Path $RepoRoot ".ai/catalog/agents-source"
+            $dir = Resolve-DcrSourcePath -RepoRoot $RepoRoot -AssetType "agents-source"
             return Get-ChildItem -Path $dir -Filter '*.md' | Where-Object {
                 $_.Name -ne 'README.md' -and
                 -not (Test-Deprecated $_.FullName)
@@ -134,8 +137,8 @@ foreach ($kind in @('rule', 'skill', 'agent')) {
     $count = 0
     switch ($kind) {
         'rule' {
-            $dir = Join-Path $RepoRoot ".ai/catalog/rules"
-            foreach ($f in (Get-ChildItem -Path $dir -Filter '*.md' | Where-Object { -not $_.BaseName.StartsWith('_') })) {
+            $dir = Resolve-DcrSourcePath -RepoRoot $RepoRoot -AssetType "rules"
+            foreach ($f in (Get-ChildItem -Path $dir -Filter '*.md' | Where-Object { $_.BaseName -ne 'README' -and -not $_.BaseName.StartsWith('_') })) {
                 if (Test-Deprecated $f.FullName) {
                     $tokens += Estimate-Tokens -Path $f.FullName
                     $count++
@@ -143,7 +146,7 @@ foreach ($kind in @('rule', 'skill', 'agent')) {
             }
         }
         'skill' {
-            $dir = Join-Path $RepoRoot ".ai/catalog/skills"
+            $dir = Resolve-DcrSourcePath -RepoRoot $RepoRoot -AssetType "skills"
             foreach ($d in (Get-ChildItem -Path $dir -Directory | Where-Object { -not $_.Name.StartsWith('_') })) {
                 $sf = Join-Path $d.FullName "SKILL.md"
                 if ((Test-Path $sf) -and (Test-Deprecated $sf)) {
@@ -153,7 +156,7 @@ foreach ($kind in @('rule', 'skill', 'agent')) {
             }
         }
         'agent' {
-            $dir = Join-Path $RepoRoot ".ai/catalog/agents-source"
+            $dir = Resolve-DcrSourcePath -RepoRoot $RepoRoot -AssetType "agents-source"
             foreach ($f in (Get-ChildItem -Path $dir -Filter '*.md' | Where-Object { $_.Name -ne 'README.md' })) {
                 if (Test-Deprecated $f.FullName) {
                     $tokens += Estimate-Tokens -Path $f.FullName

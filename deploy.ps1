@@ -7,11 +7,10 @@
   対象エディタと同期先:
     VS Code Copilot : ~/.agents/skills/
     Cursor          : .cursor/
-    Devin           : .devin/ + .windsurf/ compatibility mirror
-    Agents          : .ai/catalog/agents-source/ -> .codex/agents/ (toml) + .claude/agents/ (md)
+    Agents          : resolved agents source -> .codex/agents/ (toml) + .claude/agents/ (md)
 
 .PARAMETER Target
-    同期先を指定: all | vscode | cursor | devin | windsurf | agents | dcr
+    同期先を指定: all | vscode | cursor | agents | dcr
   デフォルト: all
 
 .PARAMETER DryRun
@@ -23,13 +22,12 @@
 .EXAMPLE
   .\deploy.ps1
   .\deploy.ps1 -Target vscode
-  .\deploy.ps1 -Target devin
   .\deploy.ps1 -Target agents
   .\deploy.ps1 -Check
 #>
 
 param(
-    [ValidateSet("all", "vscode", "cursor", "devin", "windsurf", "agents", "dcr")]
+    [ValidateSet("all", "vscode", "cursor", "agents", "dcr")]
     [string]$Target = "all",
     [switch]$DryRun,
     [switch]$Check,
@@ -45,11 +43,6 @@ $CatalogPaths = Join-Path $RepoRoot "tools\lib\catalog-paths.ps1"
 . $CatalogPaths
 $DeprecatedAliases = Join-Path $RepoRoot "tools\lib\deprecated-aliases.ps1"
 . $DeprecatedAliases
-
-if ($Target -eq "windsurf") {
-    Write-Host "[ALIAS] Target 'windsurf' is deprecated; using 'devin'." -ForegroundColor DarkYellow
-    $Target = "devin"
-}
 
 # ── Gate enforcement ──
 if ($EnforceGate) {
@@ -74,7 +67,7 @@ if ($EnforceGate) {
 
 # ── Unified Adapter Framework (new) ──
 $DeployAll = Join-Path $RepoRoot "tools\deploy-all.ps1"
-if ((Test-Path $DeployAll) -and -not $Check -and ($Target -in @("all", "vscode", "cursor", "devin", "agents"))) {
+if ((Test-Path $DeployAll) -and -not $Check -and ($Target -in @("all", "vscode", "cursor", "agents"))) {
     Write-Host ""
     Write-Host "=== Deploy Adapters (Unified Framework) ===" -ForegroundColor Cyan
     $targetArg = if ($Target -eq "all") { "all" } else { $Target }
@@ -96,8 +89,6 @@ $SourceAgents = Resolve-DcrSourcePath -RepoRoot $RepoRoot -AssetType "agents-sou
 $DestVSCodeSkills = Join-Path $UserHome ".agents\skills"
 $DestCodexAgents = Join-Path $RepoRoot ".codex\agents"
 $DestClaudeAgents = Join-Path $RepoRoot ".claude\agents"
-$DestDevin = Join-Path $RepoRoot ".devin"
-$DestWindsurf = Join-Path $RepoRoot ".windsurf"
 
 function Get-TempDirectory {
     $tempDir = Join-Path ([System.IO.Path]::GetTempPath()) ("dcr-deploy-" + [System.Guid]::NewGuid().ToString("N"))
@@ -317,21 +308,123 @@ function Get-FileDrift {
 
     $diffs = @()
 
-    if (-not (Test-Path $SourcePath)) {
+    try {
+        $sourceExists = Test-Path -LiteralPath $SourcePath
+    }
+    catch {
+        $diffs += "[SOURCE_INACCESSIBLE] $Label ($($_.Exception.Message))"
+        return $diffs
+    }
+
+    if (-not $sourceExists) {
         $diffs += "[SOURCE_MISSING] $Label"
         return $diffs
     }
 
-    if (-not (Test-Path $DestinationPath)) {
+    try {
+        $destinationExists = Test-Path -LiteralPath $DestinationPath
+    }
+    catch {
+        $diffs += "[DESTINATION_INACCESSIBLE] $Label ($($_.Exception.Message))"
+        return $diffs
+    }
+
+    if (-not $destinationExists) {
         $diffs += "[MISSING] $Label"
         return $diffs
     }
 
-    if ((Get-FileHash $SourcePath -Algorithm MD5).Hash -ne (Get-FileHash $DestinationPath -Algorithm MD5).Hash) {
+    try {
+        $sourceHash = (Get-FileHash -LiteralPath $SourcePath -Algorithm MD5).Hash
+        $destinationHash = (Get-FileHash -LiteralPath $DestinationPath -Algorithm MD5).Hash
+    }
+    catch {
+        $diffs += "[HASH_INACCESSIBLE] $Label ($($_.Exception.Message))"
+        return $diffs
+    }
+
+    if ($sourceHash -ne $destinationHash) {
         $diffs += "[MODIFIED] $Label"
     }
 
     return $diffs
+}
+
+function Read-NormalizedTextFile {
+    param([string]$Path)
+
+    return ([System.IO.File]::ReadAllText($Path, [System.Text.Encoding]::UTF8) -replace "`r`n", "`n")
+}
+
+function Get-GeneratedFileDrift {
+    param(
+        [string]$AdapterScript,
+        [string]$DestinationPath,
+        [string]$Label
+    )
+
+    $diffs = @()
+    if (-not (Test-Path -LiteralPath $AdapterScript)) {
+        return @("[ADAPTER_MISSING] $Label ($AdapterScript)")
+    }
+
+    $tempFile = Join-Path ([System.IO.Path]::GetTempPath()) ("dcr-generated-" + [System.Guid]::NewGuid().ToString("N") + ".md")
+    try {
+        $result = & $AdapterScript -RepoRoot $RepoRoot -OutputPath $tempFile 2>&1
+        if (-not $?) {
+            $diffs += "[GENERATION_FAILED] $Label ($($result -join '; '))"
+            return $diffs
+        }
+
+        if (-not (Test-Path -LiteralPath $DestinationPath)) {
+            $diffs += "[MISSING] $Label"
+            return $diffs
+        }
+
+        $expected = Read-NormalizedTextFile -Path $tempFile
+        $actual = Read-NormalizedTextFile -Path $DestinationPath
+        if ($expected -ne $actual) {
+            $diffs += "[MODIFIED] $Label"
+        }
+
+        return $diffs
+    }
+    finally {
+        if (Test-Path -LiteralPath $tempFile) {
+            Remove-Item -LiteralPath $tempFile -Force
+        }
+    }
+}
+
+function Get-CursorMirrorDrift {
+    $diffs = @()
+    $adapterScript = Join-Path $RepoRoot "tools\adapters\cursor.ps1"
+    if (-not (Test-Path -LiteralPath $adapterScript)) {
+        return @("[ADAPTER_MISSING] .cursor mirror ($adapterScript)")
+    }
+
+    $tempRoot = Join-Path ([System.IO.Path]::GetTempPath()) ("dcr-cursor-" + [System.Guid]::NewGuid().ToString("N"))
+    $tempCursor = Join-Path $tempRoot ".cursor"
+    $tempCursorIgnore = Join-Path $tempRoot ".cursorignore"
+    try {
+        New-Item -ItemType Directory -Path $tempRoot -Force | Out-Null
+        $result = & $adapterScript -RepoRoot $RepoRoot -OutRoot $tempCursor -CursorIgnorePath $tempCursorIgnore 2>&1
+        if (-not $?) {
+            $diffs += "[GENERATION_FAILED] .cursor mirror ($($result -join '; '))"
+            return $diffs
+        }
+
+        $diffs += Get-FileDrift -SourcePath (Join-Path $tempCursor "README.md") -DestinationPath (Join-Path $RepoRoot ".cursor\README.md") -Label ".cursor/README.md"
+        $diffs += Get-FileDrift -SourcePath (Join-Path $tempCursor "mcp.json") -DestinationPath (Join-Path $RepoRoot ".cursor\mcp.json") -Label ".cursor/mcp.json"
+        $diffs += Get-DirectoryDrift -Source (Join-Path $tempCursor "rules") -Destination (Join-Path $RepoRoot ".cursor\rules")
+        $diffs += Get-FileDrift -SourcePath $tempCursorIgnore -DestinationPath (Join-Path $RepoRoot ".cursorignore") -Label ".cursorignore"
+        return $diffs
+    }
+    finally {
+        if (Test-Path -LiteralPath $tempRoot) {
+            Remove-Item -LiteralPath $tempRoot -Recurse -Force
+        }
+    }
 }
 
 function Write-PrecheckSummary {
@@ -478,8 +571,19 @@ if ($Check) {
         $script:checkFailed = $true
     }
 
+    if ($Target -eq "all") {
+        Write-CheckDrift -Label "AGENTS.md" -Diffs (Get-GeneratedFileDrift -AdapterScript (Join-Path $RepoRoot "tools\adapters\codex.ps1") -DestinationPath (Join-Path $RepoRoot "AGENTS.md") -Label "AGENTS.md")
+        Write-CheckDrift -Label "CLAUDE.md" -Diffs (Get-GeneratedFileDrift -AdapterScript (Join-Path $RepoRoot "tools\adapters\claude.ps1") -DestinationPath (Join-Path $RepoRoot "CLAUDE.md") -Label "CLAUDE.md")
+    }
     if ($Target -eq "all" -or $Target -eq "vscode") {
-        Write-CheckDrift -Label "VS Code Copilot skills" -Diffs (Get-DirectoryDrift -Source $SourceSkills -Destination $DestVSCodeSkills)
+        Write-CheckDrift -Label "GitHub Copilot instructions" -Diffs (Get-GeneratedFileDrift -AdapterScript (Join-Path $RepoRoot "tools\adapters\vscode.ps1") -DestinationPath (Join-Path $RepoRoot ".github\copilot-instructions.md") -Label ".github/copilot-instructions.md")
+    }
+    if ($Target -eq "all" -or $Target -eq "cursor") {
+        Write-CheckDrift -Label "Cursor mirror" -Diffs (Get-CursorMirrorDrift)
+    }
+
+    if ($Target -eq "all" -or $Target -eq "vscode") {
+        Write-CheckDrift -Label "VS Code Copilot skills" -Diffs (Get-DirectoryDrift -Source $SourceSkills -Destination $DestVSCodeSkills -IgnoreNames @('README.md'))
     }
     if ($Target -eq "all" -or $Target -eq "agents") {
         $codexDiffs = Get-FlatFileDrift -Source $SourceAgents -Destination $DestCodexAgents -Filter '*.toml'
@@ -487,26 +591,6 @@ if ($Check) {
 
         $claudeDiffs = Get-FlatFileDrift -Source $SourceAgents -Destination $DestClaudeAgents -Filter '*.md' -IgnoreNames @('README.md')
         Write-CheckDrift -Label "Claude agents" -Diffs $claudeDiffs
-    }
-    if ($Target -eq "all" -or $Target -eq "devin") {
-        $devinAdapter = Join-Path $RepoRoot "tools\adapters\devin.ps1"
-        if (-not (Test-Path $devinAdapter)) {
-            Write-CheckDrift -Label "Devin mirror" -Diffs @("[SOURCE_MISSING] $devinAdapter")
-        }
-        else {
-            $tempDir = Get-TempDirectory
-            try {
-                $tempDevin = Join-Path $tempDir ".devin"
-                & $devinAdapter -RepoRoot $RepoRoot -OutputRoot $tempDevin -Quiet
-                Write-CheckDrift -Label "Devin canonical mirror" -Diffs (Get-DirectoryDrift -Source $tempDevin -Destination $DestDevin -IgnoreNames @("config.local.json"))
-                Write-CheckDrift -Label "Windsurf compatibility mirror" -Diffs (Get-DirectoryDrift -Source (Join-Path $tempDir ".windsurf") -Destination $DestWindsurf)
-            }
-            finally {
-                if (Test-Path $tempDir) {
-                    Remove-Item -LiteralPath $tempDir -Recurse -Force -ErrorAction SilentlyContinue
-                }
-            }
-        }
     }
     if ($Target -eq "all" -or $Target -eq "dcr") {
         $dcrConfigPath = Join-Path $RepoRoot ".dcr\config.json"
@@ -529,11 +613,11 @@ if ($Target -eq "all" -or $Target -eq "vscode") {
     if ($Backup) { Backup-DeployTarget -TargetPath $DestVSCodeSkills -Label "VS Code Copilot skills" }
     if (-not $DryRun) {
         Write-ManagedTargetNotice -Label "VS Code Copilot skills" -Destination $DestVSCodeSkills
-        Write-PrecheckSummary -Label "VS Code Copilot skills" -Diffs (Get-DirectoryDrift -Source $SourceSkills -Destination $DestVSCodeSkills)
+        Write-PrecheckSummary -Label "VS Code Copilot skills" -Diffs (Get-DirectoryDrift -Source $SourceSkills -Destination $DestVSCodeSkills -IgnoreNames @('README.md'))
     }
     Sync-Directory -Source $SourceSkills -Destination $DestVSCodeSkills -Label "VS Code Copilot skills"
     if (-not $DryRun) {
-        Assert-NoDrift -Label "VS Code Copilot skills" -Diffs (Get-DirectoryDrift -Source $SourceSkills -Destination $DestVSCodeSkills)
+        Assert-NoDrift -Label "VS Code Copilot skills" -Diffs (Get-DirectoryDrift -Source $SourceSkills -Destination $DestVSCodeSkills -IgnoreNames @('README.md'))
     }
 }
 
@@ -621,9 +705,6 @@ if ($Watch) {
                 }
                 if ($Target -eq "all" -or $Target -eq "agents") {
                     & $DeployAll -Target agents
-                }
-                if ($Target -eq "all" -or $Target -eq "devin") {
-                    & $DeployAll -Target devin
                 }
                 Write-Host "[WATCH] Deploy complete. Watching..." -ForegroundColor Green
             }

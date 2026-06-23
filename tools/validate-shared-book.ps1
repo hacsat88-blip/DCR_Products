@@ -4,7 +4,7 @@
   Validate the DCR shared book and thin environment capability declarations.
 
 .DESCRIPTION
-  Ensures .ai/book contains the shared runtime chapters and that
+  Ensures the resolved shared book source contains the shared runtime chapters and that
   .ai/environments/*/kernel.md files do not redefine shared behavior.
 #>
 
@@ -15,7 +15,10 @@ param(
 
 $ErrorActionPreference = "Stop"
 $resolvedRoot = (Resolve-Path $RepoRoot).Path
-$BookRoot = Join-Path $resolvedRoot ".ai\book"
+$CatalogPaths = Join-Path $resolvedRoot "tools\lib\catalog-paths.ps1"
+. $CatalogPaths
+$BookRoot = Resolve-DcrSourcePath -RepoRoot $resolvedRoot -AssetType "books"
+$BookRelativePath = Get-DcrResolvedSourceRelativePath -RepoRoot $resolvedRoot -AssetType "books"
 $EnvironmentRoot = Join-Path $resolvedRoot ".ai\environments"
 $KernelBase = Join-Path $resolvedRoot ".ai\kernel\_base.md"
 $RuntimeKernel = Join-Path $resolvedRoot ".ai\kernel\dcr-kernel.md"
@@ -52,16 +55,16 @@ $requiredBookFiles = @(
 foreach ($name in $requiredBookFiles) {
     $path = Join-Path $BookRoot $name
     if (-not (Test-Path $path)) {
-        Write-Fail ".ai/book/$name — missing"
+        Write-Fail "$BookRelativePath/$name — missing"
         continue
     }
 
     $content = Get-Content -Path $path -Raw -Encoding utf8
     if ($content -notmatch '(?m)^# .+') {
-        Write-Fail ".ai/book/$name — H1 missing"
+        Write-Fail "$BookRelativePath/$name — H1 missing"
     }
     else {
-        Write-Ok ".ai/book/$name — H1 found"
+        Write-Ok "$BookRelativePath/$name — H1 found"
     }
 }
 
@@ -72,10 +75,10 @@ if (Test-Path $runtimePath) {
     $runtime = Get-Content -Path $runtimePath -Raw -Encoding utf8
     foreach ($required in @("Freshness And External Confirmation", "Reasoning Escalation", "Trigger Parsing", "Execution Modes", "Tool Routing")) {
         if ($runtime -notmatch [regex]::Escape($required)) {
-            Write-Fail ".ai/book/runtime.md — required section missing: $required"
+            Write-Fail "$BookRelativePath/runtime.md — required section missing: $required"
         }
         else {
-            Write-Ok ".ai/book/runtime.md — required section present: $required"
+            Write-Ok "$BookRelativePath/runtime.md — required section present: $required"
         }
     }
 }
@@ -84,10 +87,10 @@ if (Test-Path $toolContractPath) {
     $toolContract = Get-Content -Path $toolContractPath -Raw -Encoding utf8
     foreach ($operation in @("Read", "Search", "Edit", "Run", "Test", "Fetch", "Browse", "Delegate", "Commit", "Deploy")) {
         if ($toolContract -notmatch "\|\s*``?$operation``?\s*\|") {
-            Write-Fail ".ai/book/tool-contract.md — operation missing: $operation"
+            Write-Fail "$BookRelativePath/tool-contract.md — operation missing: $operation"
         }
         else {
-            Write-Ok ".ai/book/tool-contract.md — operation present: $operation"
+            Write-Ok "$BookRelativePath/tool-contract.md — operation present: $operation"
         }
     }
 }
@@ -114,7 +117,7 @@ if (Test-Path $EnvironmentRoot) {
         $relative = $file.FullName.Replace($resolvedRoot + [System.IO.Path]::DirectorySeparatorChar, "")
         $content = Get-Content -Path $file.FullName -Raw -Encoding utf8
 
-        if ($content -notmatch '\.\./\.\./book/runtime\.md') {
+        if ($content -notmatch '\.\./\.\./(book|assets/books)/runtime\.md') {
             Write-Fail "$relative — missing shared book runtime reference"
         }
         else {
@@ -146,11 +149,11 @@ foreach ($compatFile in @($KernelBase, $RuntimeKernel)) {
     }
 
     $content = Get-Content -Path $compatFile -Raw -Encoding utf8
-    if ($content -notmatch '\.ai/book|book/') {
-        Write-Fail "$($compatFile.Replace($resolvedRoot + [System.IO.Path]::DirectorySeparatorChar, '')) — missing .ai/book reference"
+    if ($content -notmatch '\.ai/(book|assets/books)|(book|assets/books)/') {
+        Write-Fail "$($compatFile.Replace($resolvedRoot + [System.IO.Path]::DirectorySeparatorChar, '')) — missing shared book reference"
     }
     else {
-        Write-Ok "$($compatFile.Replace($resolvedRoot + [System.IO.Path]::DirectorySeparatorChar, '')) — .ai/book reference found"
+        Write-Ok "$($compatFile.Replace($resolvedRoot + [System.IO.Path]::DirectorySeparatorChar, '')) — shared book reference found"
     }
 }
 
