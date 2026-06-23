@@ -114,7 +114,7 @@ If an agentmemory-compatible MCP/REST backend is available, search for:
 - adoption or rejection policy for external packs
 - verified commands, failure causes, and residual risk
 
-Runtime memory is never the source of truth. Prefer the latest user instruction, `.ai/catalog`, `.ai/book`, repo artifacts, and current git state over memory recall. If saving after work, save only the decision, reason, verification result, and future recall trigger. Do not save secrets, PII, full logs, hidden reasoning, or content that belongs in DCR source files.
+Runtime memory is never the source of truth. Prefer the latest user instruction, `.ai/assets`, `.ai/control-plane`, repo artifacts, and current git state over memory recall. If saving after work, save only the decision, reason, verification result, and future recall trigger. Do not save secrets, PII, full logs, hidden reasoning, or content that belongs in DCR source files.
 
 ## External Design Principles
 
@@ -128,7 +128,7 @@ humanlayer/12-factor-agents is adopted only as a design lens:
 - prefer small focused agents and parent hubs over monolithic agents
 - keep trigger behavior consistent across CLI/IDE entrypoints
 
-Do not copy external prose into the runtime contract. Summarize with provenance in `.ai/module/unified-integration.md` when a principle becomes durable DCR guidance.
+Do not copy external prose into the runtime contract. Summarize with provenance in `.ai/core/modules/unified-integration.md` when a principle becomes durable DCR guidance.
 
 ## References
 

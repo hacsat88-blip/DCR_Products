@@ -31,7 +31,7 @@ agentmemory などの runtime memory backend が利用可能な場合のみ検�
 優先順位:
 
 1. ユーザーの最新指示
-2. `.ai/catalog` / `.ai/book` / repo 内 artifact
+2. `.ai/catalog` / `.ai/assets/books` / repo 内 artifact
 3. 現在の git 状態
 4. runtime memory の recall
 
@@ -204,8 +204,8 @@ Codex / Claude Code / VS Code Copilot の生成 entrypoint は、同じ自然語
 
 | 親ハブ | 内部 variant |
 |---|---|
-| [conversion-optimization-hub](../catalog/skills/conversion-optimization-hub/SKILL.md) | page / popup / form / signup-flow / onboarding / paywall-upgrade |
-| [strategic-messaging](../catalog/skills/strategic-messaging/SKILL.md) | content-strategy / marketing-psychology |
+| [growth-ops](../../assets/skills/growth-ops/SKILL.md) | legacy `conversion-optimization-hub` lane: page / popup / form / signup-flow / onboarding / paywall-upgrade |
+| [growth-ops](../../assets/skills/growth-ops/SKILL.md) | legacy `strategic-messaging` lane: content-strategy / marketing-psychology |
 
 親が選定されたあと、親 SKILL.md 内の variant 判定表で内部分岐する（router の関心外）。
 
@@ -314,9 +314,9 @@ research-analyst.absorbs = [docs-researcher, market-researcher, competitive-anal
 
 ## 関係ファイル
 
-- 実体 agent: [pied-piper](../catalog/agents-source/pied-piper.md)
+- 実体 agent: [pied-piper](../../assets/agents/pied-piper.md)
 - 統合層: [unified-coordinator.md](unified-coordinator.md)
-- インデックス: `.ai/catalog/rules/_ROUTING_INDEX.md` (auto-generated)
+- インデックス: `.ai/assets/rules/_ROUTING_INDEX.md` (auto-generated)
 - ゲート状態: `.ai/kernel/gate-state.json` (Phase B-4)
 - 決定ログ: `.ai/kernel/router-decisions.jsonl` (中期-C, gitignored)
 - ハブ判定: [hub-promotion-criteria.md](hub-promotion-criteria.md)

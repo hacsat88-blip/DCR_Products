@@ -12,10 +12,10 @@ DCR の調整層ハブ。実行仕様は pied-piper agent に、決定木は uni
 
 | 役割 | ファイル |
 |---|---|
-| agent 実行仕様 | [pied-piper.md](../catalog/agents-source/pied-piper.md) |
+| agent 実行仕様 | [pied-piper.md](../../assets/agents/pied-piper.md) |
 | ルーティング決定木 | [unified-router.md](unified-router.md) |
 | 統合フロー | [unified-integration.md](unified-integration.md) |
-| ゲート | [trigger-p.md](../kernel/gates/trigger-p.md) / [trigger-q.md](../kernel/gates/trigger-q.md) / [trigger-sh.md](../kernel/gates/trigger-sh.md) |
+| ゲート | [trigger-p.md](../../kernel/gates/trigger-p.md) / [trigger-q.md](../../kernel/gates/trigger-q.md) / [trigger-sh.md](../../kernel/gates/trigger-sh.md) |
 
 ## 旧オーケストレーターからの移行
 

@@ -1,13 +1,13 @@
-# Agent Source Compatibility Marker
+# Skills Compatibility Marker
 
-Agent source files moved to `.ai/assets/agents`.
+Skill source directories moved to `.ai/assets/skills`.
 
 This directory is kept only as a legacy path marker during the AI Control Plane
-migration. Do not add new `.md` or `.toml` agent definitions here.
+migration. Do not add new skill directories here.
 
 Current primary:
 
-- `.ai/assets/agents`
+- `.ai/assets/skills`
 
 Related maps:
 

@@ -3,7 +3,7 @@
 This chapter defines model-independent Rule / Skill / Agent selection.
 The routing experience should reduce cognitive load: shrink candidates, show the recommended path first, and keep detailed scoring in telemetry instead of the normal user response.
 
-The detailed implementation remains in [../module/unified-router.md](../module/unified-router.md). This file is the shared book chapter that every environment should read before applying local capability constraints.
+The detailed implementation remains in [../../core/modules/unified-router.md](../../core/modules/unified-router.md). This file is the shared book chapter that every environment should read before applying local capability constraints.
 
 ## Priority
 
@@ -73,5 +73,5 @@ Routing must not depend on the model vendor. Environment files may only remove a
 
 ## Fixture Evaluation
 
-Canonical routing examples live in [../../tools/eval-routing-fixtures.json](../../tools/eval-routing-fixtures.json). [../../tools/eval-routing-accuracy.ps1](../../tools/eval-routing-accuracy.ps1) validates that expected assets exist, aliases resolve, and frontmatter supports the route.
+Canonical routing examples live in [../../../tools/eval-routing-fixtures.json](../../../tools/eval-routing-fixtures.json). [../../../tools/eval-routing-accuracy.ps1](../../../tools/eval-routing-accuracy.ps1) validates that expected assets exist, aliases resolve, and frontmatter supports the route.
 

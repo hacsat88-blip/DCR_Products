@@ -7,7 +7,7 @@
 
 - 環境差分で運用品質がぶれないようにする
 - gstack 的な「計画 → 実装 → レビュー → QA → 出荷」の流れを共通化する
-- 既存の `.ai/catalog/rules/` と `.ai/catalog/skills/` を活かし、全面置換ではなく統合で進める
+- 既存の `.ai/assets/rules/` と `.ai/assets/skills/` を活かし、全面置換ではなく統合で進める
 - 全モデルで同じ思考と実行判断を再現し、個性・口調・利用可能ツールだけを環境差分として残す
 
 ## Shared Book Rule
@@ -24,7 +24,7 @@
 ## Common Flow
 
 1. `p/` Plan Gate
-   - `.ai/catalog/skills/writing-plans` を優先
+   - `.ai/assets/skills/writing-plans` を優先
    - 3ステップ以上は計画を明示してから実装
 2. 実装
    - 既存の skill と rules の優先順位に従う
@@ -34,11 +34,11 @@
 4. `a/` Review Gate
    - ユーザー承認後に既存 review/debug ルールを適用
 5. `q/` QA Gate
-   - `.ai/catalog/skills/webapp-testing` を優先
+   - `.ai/assets/skills/webapp-testing` を優先
    - 画面検証は証跡を残す
 6. `sh/` Ship Gate
-    - `.ai/catalog/skills/verification-before-completion` と
-       `.ai/catalog/skills/finishing-a-development-branch` を優先
+    - `.ai/assets/skills/verification-before-completion` と
+       `.ai/assets/skills/finishing-a-development-branch` を優先
 
 ## Execution Modes (共通定義)
 
@@ -101,7 +101,7 @@ pied-piper
 
 ## Unified Coordinator（統一調整層）
 
-**全タスクの入口**は [pied-piper](../catalog/agents-source/pied-piper.md) agent で受ける。
+**全タスクの入口**は [pied-piper](../../assets/agents/pied-piper.md) agent で受ける。
 詳細は [unified-coordinator.md](unified-coordinator.md) と [unified-router.md](unified-router.md) を参照。
 
 発火前に以下3行の提案を必ず先に出す：
@@ -127,7 +127,7 @@ Skill、Agent、サブエージェント、並列 orchestration、外部 MCP/API
 
 - 位置づけ: agentmemory などの MCP/REST memory backend は任意の外部補助層
 - 役割: 過去判断、関連ファイル履歴、採用/非採用ポリシー、検証済みコマンドを着手前に recall する
-- DCR との関係: `.ai/catalog`、`.ai/book`、docs、git 状態を正本とし、memory recall は補助情報として扱う
+- DCR との関係: `.ai/catalog`、`.ai/assets/books`、docs、git 状態を正本とし、memory recall は補助情報として扱う
 - 保存方針: 作業完了後に保存する場合は、決定・理由・検証結果・次回 recall trigger だけに絞る
 - 禁止: secret、PII、ログ全文、中間推論、正本化すべき内容を runtime memory に保存しない
 
@@ -137,7 +137,7 @@ Skill、Agent、サブエージェント、並列 orchestration、外部 MCP/API
 
 - 位置づけ: `garrytan/gbrain` は memory DB、MCP、knowledge graph、skillpack、cron/dream cycle を含む外部 runtime 候補
 - 採用形態: `external-tool-poc` + `concept-import`
-- DCR との関係: DCR control plane、`.ai/catalog`、`.ai/book`、`pied-piper`、既存 runtime memory policy を置換しない
+- DCR との関係: DCR control plane、`.ai/catalog`、`.ai/assets/books`、`pied-piper`、既存 runtime memory policy を置換しない
 - 取り込む概念: brain-first recall、gap analysis、knowledge graph、skillpack doctor / skillopt の benchmark・held-out・dirty-tree gate の評価思想
 - PoC 条件: repo 外または Product 単位で `gbrain init --pglite`、`gbrain doctor`、Codex MCP 接続などの非破壊確認を行ってから判断する
 - 禁止: 43 skills、`RESOLVER.md`、installer、Bun runtime、MCP config、remote token、OAuth、email/calendar/voice ingestion、cron/dream cycle を DCR 正本へコピーまたは自動導入しない
@@ -147,7 +147,7 @@ Skill、Agent、サブエージェント、並列 orchestration、外部 MCP/API
 
 - 位置づけ: GSD は spec-driven / context engineering / phase-state pattern の参照元
 - 採用形態: runtime command、`.planning/`、installer は導入せず、DCR skill として薄く移植する
-- DCR との関係: `pied-piper`、`unified-router`、`.ai/book` を置換しない
+- DCR との関係: `pied-piper`、`unified-router`、`.ai/assets/books` を置換しない
 - 既存導入: `decision-complete-planning`、`phase-state-artifacts`、`parallel-wave-execution`、`uat-verification-gate`、`namespace-skill-routing`
 
 ### Matt Pocock skills pattern imports
@@ -209,7 +209,7 @@ Skill、Agent、サブエージェント、並列 orchestration、外部 MCP/API
 
 - 位置づけ: openai/skills は DCR skill catalog の置換用コピー元ではなく、公式 baseline として扱う
 - 採用形態: curated / system / primary-runtime 相当を比較対象にし、DCR skill は `keep`、`replace-with-openai`、`merge-into-overlay`、`fold-into-pipeline`、`deprecate` に分類する
-- DCR との関係: `.ai/catalog/skills` を正本に保ち、OpenAI official skill は plugin/cache または upstream として参照する。user-level installer や generated mirror を正本化しない
+- DCR との関係: `.ai/assets/skills` を正本に保ち、OpenAI official skill は plugin/cache または upstream として参照する。user-level installer や generated mirror を正本化しない
 - Exact overlap: 同名 skill は自動置換しない。比較済み decision を優先し、DCR の `docs/dcr/*`、proposal/approval gate、source-of-truth/mirror governance が残る場合は `merge-into-overlay` とする
 - Pipeline consolidation: QA / ship / review / drift / security / performance 系の個別 skill は、物理削除前に `successor: dcr-pipeline` の deprecated alias として畳む
 - Growth umbrella: marketing / CRO / SEO / copy / email / analytics / pricing 系は `growth-ops` を active umbrella にし、旧 skill は `successor: growth-ops` の deprecated alias として残す。金融データ連携など DCR 固有のものは keep する
@@ -223,7 +223,7 @@ Skill、Agent、サブエージェント、並列 orchestration、外部 MCP/API
 
 - 位置づけ: humanlayer/12-factor-agents は agent framework ではなく、production-grade agentic software の設計原則として参照する
 - 採用形態: dependency、installer、runtime wrapper、外部 command は導入せず、DCR の判断基準として薄く要約する
-- DCR との関係: `.ai/catalog` / `.ai/book` / `.ai/kernel` を正本にし、外部原則は source-of-truth を置換しない
+- DCR との関係: `.ai/catalog` / `.ai/assets/books` / `.ai/kernel` を正本にし、外部原則は source-of-truth を置換しない
 - provenance: https://github.com/humanlayer/12-factor-agents
 
 採用する設計チェック:

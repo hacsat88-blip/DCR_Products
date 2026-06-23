@@ -118,9 +118,12 @@ function Get-DcrDeprecatedAliases {
     $rulesDir = Resolve-DcrSourcePath -RepoRoot $resolvedRoot -AssetType "rules"
     $skillsDir = Resolve-DcrSourcePath -RepoRoot $resolvedRoot -AssetType "skills"
     $agentsDir = Resolve-DcrSourcePath -RepoRoot $resolvedRoot -AssetType "agents-source"
+    $rulesRelativePath = Get-DcrResolvedSourceRelativePath -RepoRoot $resolvedRoot -AssetType "rules"
+    $skillsRelativePath = Get-DcrResolvedSourceRelativePath -RepoRoot $resolvedRoot -AssetType "skills"
+    $agentsRelativePath = Get-DcrResolvedSourceRelativePath -RepoRoot $resolvedRoot -AssetType "agents-source"
 
     if ($Kind -in @("all", "rule")) {
-        foreach ($file in Get-ChildItem -Path $rulesDir -Filter "*.md" -File | Where-Object { -not $_.BaseName.StartsWith("_") }) {
+        foreach ($file in Get-ChildItem -Path $rulesDir -Filter "*.md" -File | Where-Object { $_.BaseName -ne "README" -and -not $_.BaseName.StartsWith("_") }) {
             $fm = Get-DcrAliasFrontmatterMap -Path $file.FullName
             if ($fm -and $fm["deprecated"] -eq "true") {
                 Add-DcrDeprecatedAliasRow -RowsByKey $rowsByKey -Row (New-DcrDeprecatedAliasRow `
@@ -128,7 +131,7 @@ function Get-DcrDeprecatedAliases {
                     -Name $file.BaseName `
                     -Successor $fm["successor"] `
                     -State "live" `
-                    -SourcePath ".ai/catalog/rules/$($file.Name)" `
+                    -SourcePath "$rulesRelativePath/$($file.Name)" `
                     -Reason $fm["deprecation_reason"] `
                     -Source "frontmatter")
             }
@@ -148,7 +151,7 @@ function Get-DcrDeprecatedAliases {
                     -Name $dir.Name `
                     -Successor $fm["successor"] `
                     -State "live" `
-                    -SourcePath ".ai/catalog/skills/$($dir.Name)/SKILL.md" `
+                    -SourcePath "$skillsRelativePath/$($dir.Name)/SKILL.md" `
                     -Reason $fm["deprecation_reason"] `
                     -Source "frontmatter")
             }
@@ -164,7 +167,7 @@ function Get-DcrDeprecatedAliases {
                     -Name $file.BaseName `
                     -Successor $fm["successor"] `
                     -State "live" `
-                    -SourcePath ".ai/catalog/agents-source/$($file.Name)" `
+                    -SourcePath "$agentsRelativePath/$($file.Name)" `
                     -Reason $fm["deprecation_reason"] `
                     -Source "frontmatter")
             }

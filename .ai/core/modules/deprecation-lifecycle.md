@@ -56,10 +56,10 @@ Get-ChildItem -Recurse -Include *.md,*.ps1,*.json,*.toml -Exclude '.git' |
   Select-String -Pattern $oldName -List
 
 # 3. ファイル削除（rules / skills / agents）
-Remove-Item ".ai/catalog/rules/$oldName.md" -Force
-# skills の場合: Remove-Item ".ai/catalog/skills/$oldName" -Recurse -Force
-# agents の場合: Remove-Item ".ai/catalog/agents-source/$oldName.md" -Force
-#                Remove-Item ".ai/catalog/agents-source/$oldName.toml" -Force
+Remove-Item ".ai/assets/rules/$oldName.md" -Force
+# skills の場合: Remove-Item ".ai/assets/skills/$oldName" -Recurse -Force
+# agents の場合: Remove-Item ".ai/assets/agents/$oldName.md" -Force
+#                Remove-Item ".ai/assets/agents/$oldName.toml" -Force
 
 # 4. 再生成
 . .\tools\generate-routing-index.ps1
@@ -89,8 +89,8 @@ Remove-Item ".ai/catalog/rules/$oldName.md" -Force
 万一削除後に「やっぱり必要だった」となった場合：
 
 ```bash
-git log --all -- .ai/catalog/rules/instagram-curator.md
-git checkout <last-commit-hash>^ -- .ai/catalog/rules/instagram-curator.md
+git log --all -- .ai/assets/rules/instagram-curator.md
+git checkout <last-commit-hash>^ -- .ai/assets/rules/instagram-curator.md
 ```
 
 履歴は永続的に git に残るため、ファイル復活は常に可能。
@@ -98,7 +98,7 @@ git checkout <last-commit-hash>^ -- .ai/catalog/rules/instagram-curator.md
 
 ## 関連
 
-- 命名・改名規則: `.ai/catalog/rules/_NAMING_CONVENTION.md`
+- 命名・改名規則: `.ai/assets/rules/_NAMING_CONVENTION.md`
 - ゲート連鎖: `.ai/kernel/gates/trigger-{p,q,sh}.md`
 - 決定ログ: `.ai/kernel/router-decisions.jsonl`
 - ダッシュボード: `tools/deprecation-dashboard.ps1`（次フェーズ）

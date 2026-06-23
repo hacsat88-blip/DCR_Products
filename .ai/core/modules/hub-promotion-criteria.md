@@ -76,7 +76,7 @@
 
 ## ハブ作成手順
 
-1. `mkdir .ai/catalog/skills/<hub-name>/` （新ディレクトリ）
+1. `mkdir .ai/assets/skills/<hub-name>/` （新ディレクトリ）
 2. `<hub-name>/SKILL.md` を作成し以下を含める：
    - `name`, `description`（トリガー語を網羅）
    - `parent: <upper-hub or 基盤層>` （任意）
@@ -101,6 +101,6 @@
 
 ## 関連
 
-- 命名規則: `.ai/catalog/rules/_NAMING_CONVENTION.md`
-- 削除サイクル: `.ai/module/deprecation-lifecycle.md`
-- 統一ルーター: `.ai/module/unified-router.md`
+- 命名規則: `.ai/assets/rules/_NAMING_CONVENTION.md`
+- 削除サイクル: `.ai/core/modules/deprecation-lifecycle.md`
+- 統一ルーター: `.ai/core/modules/unified-router.md`
