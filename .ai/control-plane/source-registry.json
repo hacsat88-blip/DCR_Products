@@ -5799,11 +5799,11 @@
                                                   ".github/copilot-instructions.md"
                                               ],
                         "upstream":  "local",
-                        "hash":  "ec25421c53d01471c5b3f60735278848c3d29d0750387800b874f211e69708dd",
+                        "hash":  "9d78f8a54b918b3398e8d15f67addde3a0df3699a96f1a1f62e95a65c8f22fc5",
                         "files":  [
                                       {
                                           "path":  ".ai/assets/books/README.md",
-                                          "sha256":  "3f4b5916d9f95f6459ab5b878cfa039468e780072223ca33b05f736f0d7260dc"
+                                          "sha256":  "efad9a6727e251bb4e1173a2effdc31be299823ad90b3b75e9f5e4667c698318"
                                       }
                                   ]
                     },
