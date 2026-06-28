@@ -71,6 +71,9 @@ $RoutingIndexFile = Join-Path $SourceRules "_ROUTING_INDEX.md"
 function Resolve-DcrPowerShellExe {
     $pwshCommand = Get-Command pwsh -ErrorAction SilentlyContinue
     if ($pwshCommand -and $pwshCommand.Source) {
+        if ($pwshCommand.Source -match '\\WindowsApps\\pwsh\.exe$') {
+            return (Get-Process -Id $PID).Path
+        }
         return $pwshCommand.Source
     }
 

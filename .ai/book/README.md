@@ -36,6 +36,7 @@ All AI environments should read this book first. Environment files may describe 
 - [gates.md](gates.md): trigger and gate chain behavior
 - [permissions.md](permissions.md): P1 / P2 / P3 permissions and safety boundaries
 - [tool-contract.md](tool-contract.md): abstract tool operations and fallbacks across environments
+- [mac-migration.md](mac-migration.md): Windows to macOS migration, Product boundary, UTF-8/LF policy
 
 ## Compatibility Layer
 

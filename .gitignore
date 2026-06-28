@@ -15,10 +15,14 @@ desktop.ini
 # Removed from Git (local delete when unlocked); prevents accidental re-add
 /Product/cyber-stock-dashboard/
 
+# Product workspaces are local or separately backed up; shared Git tracks DCR core.
+/Product/
+
 # Node
 node_modules/
 npm-debug.log*
 **/.next/
+*.tsbuildinfo
 
 # 一時ファイル
 *.tmp
@@ -74,6 +78,7 @@ prototypes/blue-planet-globe/
 
 # Per-session gate state (managed at runtime, not committed)
 .ai/kernel/gate-state.json
+.ai/routing/state/
 
 # Router decision log (per-session telemetry, not committed)
 .ai/kernel/router-decisions.jsonl

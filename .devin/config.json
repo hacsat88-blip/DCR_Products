@@ -1,15 +1,21 @@
 {
-  "mcpServers": {},
-  "read_config_from": {
-    "cursor": true,
-    "windsurf": true,
-    "claude": true
-  },
-  "permissions": {
-    "allow": [],
-    "ask": [
-      "mcp__*"
-    ],
-    "deny": []
-  }
+    "mcpServers":  {
+
+                   },
+    "read_config_from":  {
+                             "cursor":  true,
+                             "windsurf":  true,
+                             "claude":  true
+                         },
+    "permissions":  {
+                        "allow":  [
+
+                                  ],
+                        "ask":  [
+                                    "mcp__*"
+                                ],
+                        "deny":  [
+
+                                 ]
+                    }
 }
