@@ -19,9 +19,7 @@ composable:
 runtime_targets:
   - codex
   - claude
-  - copilot
   - cursor
-  - gemini-cli
 ---
 
 # MCP Server Development Guide

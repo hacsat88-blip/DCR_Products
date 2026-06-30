@@ -1,4 +1,8 @@
-﻿param([string]$RepoRoot = ".")
+param(
+    [string]$RepoRoot = ".",
+    [string]$OutputPath = "",
+    [switch]$Quiet
+)
 
 $CatalogPaths = Join-Path (Split-Path $PSScriptRoot -Parent) "lib\catalog-paths.ps1"
 . $CatalogPaths
@@ -9,23 +13,24 @@ $rulesDir = Resolve-DcrSourcePath -RepoRoot $RepoRoot -AssetType "rules"
 $skillsDir = Resolve-DcrSourcePath -RepoRoot $RepoRoot -AssetType "skills"
 $agentsDir = Resolve-DcrSourcePath -RepoRoot $RepoRoot -AssetType "agents-source"
 
-Write-Host "[claude] Generating CLAUDE.md..." -ForegroundColor Cyan
+function Write-ClaudeStatus {
+    param([string]$Message, [string]$Color = "Green")
+    if (-not $Quiet) { Write-Host $Message -ForegroundColor $Color }
+}
+
+function New-Text {
+    param([int[]]$Codepoints)
+    return -join ($Codepoints | ForEach-Object { [char]$_ })
+}
+
+Write-ClaudeStatus -Message "[claude] Generating CLAUDE.md..." -Color "Cyan"
 
 function Get-Targets($file) {
     $text = Get-Content $file.FullName -Raw
     if ($text -match '(?s)^---.*?^targets:\s*\n((?:.*?\n)*?)(?:^---|^$)') {
-        return [regex]::Matches($Matches[1], '^\s*-\s*(.+)$', 'Multiline') | % { $_.Groups[1].Value }
+        return [regex]::Matches($Matches[1], '^\s*-\s*(.+)$', 'Multiline') | ForEach-Object { $_.Groups[1].Value }
     }
     return @()
-}
-
-function Get-RoutingCategory($file) {
-    $text = Get-Content $file.FullName -Raw
-    if ($text -match '(?ms)^---(.*?)^---') {
-        $fm = $Matches[1]
-        if ($fm -match '(?m)^\s*routing_category\s*:\s*(\S+)') { return $Matches[1].Trim() }
-    }
-    return $null
 }
 
 $activeRules = @()
@@ -48,17 +53,12 @@ function Get-DeprecationInfo($kind, $name) {
     return @{ Deprecated = $false; Successor = $null; State = $null }
 }
 
-# Collect claude-targeted items (separate active vs deprecated)
 foreach ($f in Get-ChildItem $rulesDir -Filter "*.md" | Where-Object { -not $_.BaseName.StartsWith("_") }) {
     $targets = Get-Targets $f
-    if (-not $targets) { $targets = @("vscode", "claude", "codex") }
+    if (-not $targets) { $targets = @("claude", "codex", "cursor") }
     if ($targets -contains "claude") {
         $dep = Get-DeprecationInfo "rule" $f.BaseName
-        if ($dep.Deprecated) {
-            $deprecatedRules += [pscustomobject]@{ Name = $f.BaseName; Successor = $dep.Successor }
-        } else {
-            $activeRules += $f.BaseName
-        }
+        if ($dep.Deprecated) { $deprecatedRules += [pscustomobject]@{ Name = $f.BaseName; Successor = $dep.Successor } } else { $activeRules += $f.BaseName }
     }
 }
 
@@ -67,14 +67,10 @@ foreach ($dir in Get-ChildItem $skillsDir -Directory | Where-Object { -not $_.Na
     if (Test-Path $sf) {
         $sfItem = Get-Item $sf
         $targets = Get-Targets $sfItem
-        if (-not $targets) { $targets = @("vscode", "claude", "codex") }
+        if (-not $targets) { $targets = @("claude", "codex", "cursor") }
         if ($targets -contains "claude") {
             $dep = Get-DeprecationInfo "skill" $dir.Name
-            if ($dep.Deprecated) {
-                $deprecatedSkills += [pscustomobject]@{ Name = $dir.Name; Successor = $dep.Successor }
-            } else {
-                $activeSkills += $dir.Name
-            }
+            if ($dep.Deprecated) { $deprecatedSkills += [pscustomobject]@{ Name = $dir.Name; Successor = $dep.Successor } } else { $activeSkills += $dir.Name }
         }
     }
 }
@@ -84,18 +80,16 @@ foreach ($f in Get-ChildItem $agentsDir -Filter "*.md" | Where-Object { $_.Name 
     if (-not $targets) { $targets = @("codex", "claude") }
     if ($targets -contains "claude") {
         $dep = Get-DeprecationInfo "agent" $f.BaseName
-        if ($dep.Deprecated) {
-            $deprecatedAgents += [pscustomobject]@{ Name = $f.BaseName; Successor = $dep.Successor }
-        } else {
-            $activeAgents += $f.BaseName
-        }
+        if ($dep.Deprecated) { $deprecatedAgents += [pscustomobject]@{ Name = $f.BaseName; Successor = $dep.Successor } } else { $activeAgents += $f.BaseName }
     }
 }
+
 foreach ($alias in $deprecatedAliasRows | Where-Object { $_.state -eq "removed" }) {
     if ($alias.kind -eq "rule") { $deprecatedRules += [pscustomobject]@{ Name = $alias.name; Successor = $alias.successor } }
     if ($alias.kind -eq "skill") { $deprecatedSkills += [pscustomobject]@{ Name = $alias.name; Successor = $alias.successor } }
     if ($alias.kind -eq "agent") { $deprecatedAgents += [pscustomobject]@{ Name = $alias.name; Successor = $alias.successor } }
 }
+
 $activeRuleCount = $activeRules.Count
 $activeSkillCount = $activeSkills.Count
 $activeAgentCount = $activeAgents.Count
@@ -103,6 +97,12 @@ $deprecatedRuleCount = $deprecatedRules.Count
 $deprecatedSkillCount = $deprecatedSkills.Count
 $deprecatedAgentCount = $deprecatedAgents.Count
 $MarkdownTick = [char]96
+$TermOsusume = New-Text @(0x304a,0x3059,0x3059,0x3081,0x3067)
+$TermSuisho = New-Text @(0x63a8,0x5968,0x3067)
+$TermOmakase = New-Text @(0x304a,0x307e,0x304b,0x305b)
+$TermCancel = New-Text @(0x30ad,0x30e3,0x30f3,0x30bb,0x30eb)
+$TermBetsuan = New-Text @(0x5225,0x6848)
+$TermKaruku = New-Text @(0x8efd,0x304f)
 
 $content = @"
 <!-- AUTO-GENERATED FILE - DO NOT EDIT DIRECTLY
@@ -129,40 +129,38 @@ Unified entry point for Claude Code environment.
 - Shared Book: [.ai/book/](.ai/book/)
 - Kernel: [.ai/kernel/](.ai/kernel/)
 - Environment diff (Claude Code): [.ai/environments/claude-code/kernel.md](.ai/environments/claude-code/kernel.md)
+
 ---
 
 ## Unified Coordinator
 
-全タスクの単一入口は **pied-piper** agent。
-Rule/Skill/Agent の選定は [.ai/module/unified-router.md](.ai/module/unified-router.md) の決定木に従い、
-候補を増やさず必要十分な候補へ圧縮し、発火前に候補・理由・期待効果を報告する。
+Primary coordinator: **pied-piper** agent. Route Rule/Skill/Agent selection through **unified-router**, reduce candidates to the necessary set, and report the candidate, reason, and expected effect before firing.
 
-Skill、Agent、サブエージェント、並列 orchestration、外部 MCP/API、P2/P3 操作が関わる場合は、原則として **候補提示 → ユーザー承認 → 発火** の順に進める。P1 read-only の単独低リスク探索のみ、短い事前報告後に自動実行できる。
+When Skill, Agent, subagent, parallel orchestration, external MCP/API, or P2/P3 operation is involved, use candidate proposal -> user approval -> execution. P1 read-only low-risk exploration may proceed after a short notice.
 
-自然言語の承認は柔らかく拾うが、一意でない場合は再確認する。${MarkdownTick}おすすめで${MarkdownTick} / ${MarkdownTick}推奨で${MarkdownTick} / ${MarkdownTick}Aで${MarkdownTick} / ${MarkdownTick}1で${MarkdownTick} は対象が一意の直前候補に結びつく場合のみ承認扱い。${MarkdownTick}それで${MarkdownTick} / ${MarkdownTick}進めて${MarkdownTick} / ${MarkdownTick}承認${MarkdownTick} / ${MarkdownTick}OK${MarkdownTick} は単独候補の場合のみ承認扱い。
+Approval vocabulary is strict. ${MarkdownTick}$TermOsusume${MarkdownTick} / ${MarkdownTick}$TermSuisho${MarkdownTick} / ${MarkdownTick}A${MarkdownTick} / ${MarkdownTick}1${MarkdownTick} approve only when they bind to one immediately previous candidate. ${MarkdownTick}OK${MarkdownTick} approves only when there is a single candidate.
 
-${MarkdownTick}いい感じに${MarkdownTick} / ${MarkdownTick}任せる${MarkdownTick} / ${MarkdownTick}おまかせ${MarkdownTick} / ${MarkdownTick}よさそう${MarkdownTick} / ${MarkdownTick}よさげ${MarkdownTick} / ${MarkdownTick}たぶん${MarkdownTick} / ${MarkdownTick}多分${MarkdownTick} は承認にせず、候補提示または再確認に戻す。${MarkdownTick}キャンセル${MarkdownTick} / ${MarkdownTick}中止${MarkdownTick} は却下、${MarkdownTick}別案${MarkdownTick} / ${MarkdownTick}別の案${MarkdownTick} / ${MarkdownTick}軽く${MarkdownTick} は再提案として扱う。
+Ambiguous terms such as ${MarkdownTick}$TermOmakase${MarkdownTick} require a proposal or reconfirmation, not execution. ${MarkdownTick}$TermCancel${MarkdownTick} rejects. ${MarkdownTick}$TermBetsuan${MarkdownTick} / ${MarkdownTick}$TermKaruku${MarkdownTick} request a refined proposal.
 
-${MarkdownTick}.ai/kernel/gate-state.json${MarkdownTick} に ${MarkdownTick}proposal_state.status = proposed|refined${MarkdownTick} がある場合、短い次発話は通常ルーティングより先に直前提案への返答として解釈する。承認・却下・修正・曖昧の分類は ${MarkdownTick}tools/lib/gate-state.ps1${MarkdownTick} の proposal state machine に従う。
+If ${MarkdownTick}.ai/kernel/gate-state.json${MarkdownTick} has ${MarkdownTick}proposal_state.status = proposed|refined${MarkdownTick}, interpret short next messages as responses to the active proposal before normal routing. Classification follows ${MarkdownTick}tools/lib/gate-state.ps1${MarkdownTick}.
 
 ## Completion Review Proposal
 
-実装・修正・生成物・設定変更・MCP/API 変更・source-of-truth 変更などの完成物がある場合、完了報告前に ${MarkdownTick}a/${MarkdownTick} Review Gate + ${MarkdownTick}code-reviewer${MarkdownTick} 相当のレビュー実行を提案する。レビューは自動実行せず、採用候補・理由・期待効果・承認が必要な理由を示し、ユーザー承認後に発火する。trivial docs/typo、read-only 調査、またはユーザーがレビュー不要を明示した場合は省略できる。
+For implementation, generated output, configuration, MCP/API, or source-of-truth changes, propose ${MarkdownTick}a/${MarkdownTick} Review Gate + ${MarkdownTick}code-reviewer${MarkdownTick} before final completion unless the work is trivial docs/typo, read-only investigation, or the user explicitly says no review.
 
 ## Runtime Memory Preflight
 
-「これどう？」「サトシ開発目線で」「前と同じ観点で」「入れる価値ある？」「導入して」「置き換える必要ある？」「また同じエラー」「過去判断も踏まえて」など、過去判断が品質に影響する相談では、利用可能な runtime memory を着手前に確認する。
+For questions that depend on previous DCR decisions, recall runtime memory before acting. Memory is only supporting context; current repo artifacts, ${MarkdownTick}.ai/catalog${MarkdownTick}, ${MarkdownTick}.ai/book${MarkdownTick}, and git state remain authoritative.
 
-agentmemory 互換 backend が使える場合は、同種タスク、関連ファイルの過去判断、採用/非採用ポリシー、検証済みコマンドを短く検索する。使えない場合は通常の repo 探索へフォールバックする。memory recall は正本ではなく、${MarkdownTick}.ai/catalog${MarkdownTick} / ${MarkdownTick}.ai/book${MarkdownTick} / repo artifact / 現在の git 状態を優先する。
-
-詳細：
+Details:
 - [.ai/module/unified-coordinator.md](.ai/module/unified-coordinator.md)
 - [.ai/module/unified-router.md](.ai/module/unified-router.md)
 - [.ai/module/unified-integration.md](.ai/module/unified-integration.md)
 "@
 
 $utf8 = New-Object System.Text.UTF8Encoding $false
-[System.IO.File]::WriteAllText("$RepoRoot/CLAUDE.md", ($content.TrimEnd() + [Environment]::NewLine), $utf8)
+$destination = if ([string]::IsNullOrWhiteSpace($OutputPath)) { "$RepoRoot/CLAUDE.md" } else { $OutputPath }
+[System.IO.File]::WriteAllText($destination, ($content.TrimEnd() + [Environment]::NewLine), $utf8)
 
-Write-Host "  [OK] CLAUDE.md" -ForegroundColor Green
-Write-Host ""
+Write-ClaudeStatus -Message "  [OK] CLAUDE.md"
+Write-ClaudeStatus -Message ""

@@ -1,6 +1,6 @@
 # Unified Integration Module
 
-このモジュールは、VS Code の GitHub Copilot、GitHub Copilot CLI、Codex、Cursor、Claude Code の
+このモジュールは、Codex、Cursor、Claude Code の
 現行環境で同じ運用を再現するための共通仕様です。
 
 ## 目的
@@ -46,7 +46,7 @@
 
 | Keyword           | Mode                 | 適用環境                                    |
 | ----------------- | -------------------- | ------------------------------------------- |
-| `autopilot:`      | 自律実行             | VS Code / Copilot CLI / Claude Code / Codex |
+| `autopilot:`      | 自律実行             | Claude Code / Codex / Cursor |
 | `ralph:`          | 完了保証ループ       | 同上（`ulw` 内包）                          |
 | `ulw`             | 超並列バッチ処理     | 同上                                        |
 | `ralplan:`        | 反復プラン精度向上   | 同上                                        |
@@ -156,7 +156,7 @@ Skill、Agent、サブエージェント、並列 orchestration、外部 MCP/API
 - 採用形態: `skills.sh`、setup command、Claude 固有 slash command は導入せず、DCR skill として薄く移植する
 - DCR との関係: `pied-piper` と `unified-router` を置換せず、pre-plan / pre-impl / debug / handoff の補助 skill として使う
 - 既存導入: `domain-decision-grilling`、`architecture-zoom-out`、`systematic-debugging` 補強、`phase-state-artifacts` handoff 補強、`improve-codebase-architecture` provenance 補強
-- 互換性: Codex / Claude / Copilot / Cursor / Gemini CLI で読めるよう、特定IDEの slash command ではなく自然言語 trigger と DCR metadata に落とす
+- 互換性: Codex / Claude Code / Cursor で読めるよう、特定IDEの slash command ではなく自然言語 trigger と DCR metadata に落とす
 
 ### Addy Osmani agent-skills selective reference
 
@@ -268,8 +268,8 @@ Skill、Agent、サブエージェント、並列 orchestration、外部 MCP/API
 
 ## Notes
 
-- Copilot CLI は `AGENTS.md` を入口とし、CLI 固有差分は `.ai/environments/copilot-cli/kernel.md` を参照する
-- VS Code Copilot は `.github/copilot-instructions.md` を優先
+- Codex は `AGENTS.md` を入口とし、Codex 固有差分は `.ai/environments/codex/kernel.md` を参照する
+- Cursor は `.cursor/` を入口とし、Cursor 固有差分は `.ai/environments/cursor/kernel.md` を参照する
 - Codex は `AGENTS.md` を優先
 - Cursor は `.cursor/rules/`（`deploy.ps1` 生成）を優先
 - Claude Code は `CLAUDE.md` を優先

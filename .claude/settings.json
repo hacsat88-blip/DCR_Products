@@ -3,126 +3,24 @@
   "language": "japanese",
   "permissions": {
     "allow": [
-      "Bash(npm run:*)",
-      "Bash(npx next:*)",
-      "Bash(npm install:*)",
-      "Bash(npx tsc:*)",
-      "Bash(npx vitest:*)",
-      "Bash(gh pr:*)",
-      "Bash(gh run *)",
-      "WebSearch",
-      "Bash(git fetch *)",
-      "Bash(git checkout *)",
-      "Bash(git merge *)",
-      "Bash(git worktree *)",
-      "Bash(git add *)",
-      "Bash(git commit -m ' *)"
+      "Bash(git status:*)",
+      "Bash(git branch:*)",
+      "Bash(git diff:*)",
+      "Bash(git log:*)",
+      "Bash(pwsh -ExecutionPolicy Bypass -File ./deploy.ps1 -Check)",
+      "Bash(pwsh -ExecutionPolicy Bypass -File ./validate.ps1)"
     ],
     "ask": [
-      "Bash(git push *)"
+      "Bash(git add:*)",
+      "Bash(git commit:*)",
+      "Bash(git push:*)",
+      "Bash(pwsh -ExecutionPolicy Bypass -File ./deploy.ps1)"
     ],
     "deny": [
       "Read(./.env)",
       "Read(./.env.*)",
       "Read(./**/*.pem)",
       "Read(./**/*.key)"
-    ]
-  },
-  "hooks": {
-    "PreToolUse": [
-      {
-        "matcher": "Bash(git commit *)",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "powershell -ExecutionPolicy Bypass -File tools/lib/validate-commit-msg.ps1",
-            "statusMessage": "コミットメッセージ規約チェック"
-          },
-          {
-            "type": "command",
-            "command": "powershell -ExecutionPolicy Bypass -File validate.ps1; if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }; powershell -ExecutionPolicy Bypass -File deploy.ps1 -Check; exit $LASTEXITCODE",
-            "statusMessage": "カタログ検証 + デプロイチェック"
-          }
-        ]
-      },
-      {
-        "matcher": "Bash(git push *)",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "powershell -ExecutionPolicy Bypass -File tools/lib/enforce-gate-chain.ps1 -RequiredPhase ship",
-            "statusMessage": "ゲートチェーン: ship gate 確認"
-          },
-          {
-            "type": "command",
-            "command": "powershell -ExecutionPolicy Bypass -File validate.ps1; if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }; powershell -ExecutionPolicy Bypass -File deploy.ps1 -Check; exit $LASTEXITCODE",
-            "statusMessage": "カタログ検証 + デプロイチェック"
-          }
-        ]
-      },
-      {
-        "matcher": "Bash(rm *)|Bash(del *)|Bash(Remove-Item *)",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "powershell -ExecutionPolicy Bypass -File tools/lib/enforce-p3.ps1 -Operation delete",
-            "statusMessage": "P3ゲート: 破壊的操作チェック"
-          }
-        ]
-      }
-    ],
-    "PostToolUse": [
-      {
-        "matcher": "Bash(git commit *)",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "powershell -ExecutionPolicy Bypass -File tools/lib/gate-advance-post-commit.ps1",
-            "statusMessage": "ゲート状態: コミット後自動進行",
-            "async": true
-          }
-        ]
-      },
-      {
-        "matcher": "Bash(git push *)",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "powershell -ExecutionPolicy Bypass -File tools/lib/session-capture.ps1",
-            "statusMessage": "セッション学習キャプチャ",
-            "async": true
-          }
-        ]
-      },
-      {
-        "matcher": "Write|Edit",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "powershell -ExecutionPolicy Bypass -File tools/lib/detect-scope-drift.ps1",
-            "statusMessage": "スコープドリフト検知",
-            "async": true
-          }
-        ]
-      }
-    ],
-    "UserPromptSubmit": [
-      {
-        "matcher": "",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "python -X utf8 \"C:/Users/hacsa/.claude/projects/C--Users-hacsa-Desktop------/memory/mem_cli.py\" search-hook",
-            "statusMessage": "メモリ検索"
-          },
-          {
-            "type": "command",
-            "command": "powershell -ExecutionPolicy Bypass -File tools/lib/gate-auto-init.ps1",
-            "statusMessage": "ゲート状態チェック",
-            "async": true
-          }
-        ]
-      }
     ]
   }
 }

@@ -25,9 +25,7 @@ composable:
 runtime_targets:
   - codex
   - claude
-  - copilot
   - cursor
-  - gemini-cli
 ---
 
 # Finishing a Development Branch
@@ -46,7 +44,7 @@ baseline. This DCR overlay only adds local release and mirror checks.
 
 - Confirm `git status --short` and separate intended changes from ambient drift.
 - If `.ai/catalog`, `.ai/book`, `.ai/kernel`, adapters, templates, or generated entrypoints changed, require `deploy.ps1 -Check`.
-- If active/deprecated counts changed, confirm `AGENTS.md`, `CLAUDE.md`, and Copilot instructions agree.
+- If active/deprecated counts changed, confirm `AGENTS.md`, `CLAUDE.md`, and `.cursor/` agree.
 - Keep generated mirrors out of commits unless they are tracked entrypoints.
 
 ## Handoff

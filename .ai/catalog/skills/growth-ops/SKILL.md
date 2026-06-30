@@ -25,9 +25,8 @@ metadata:
   runtime_targets:
     - codex
     - claude
-    - copilot
     - cursor
-    - gemini-cli
+---
 absorbs:
   - ad-creative
   - ai-seo

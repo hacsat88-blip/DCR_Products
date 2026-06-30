@@ -1343,6 +1343,28 @@
       "removed_at": "2026-06-03",
       "removal_policy": "human_override_vendor_cleanup",
       "removed_by": "codex"
+    },
+    {
+      "kind": "skill",
+      "name": "ai-prompt-manager",
+      "successor": "prompt-master",
+      "state": "removed",
+      "source_path": ".ai/catalog/skills/ai-prompt-manager/SKILL.md",
+      "reason": "Product-specific Chrome extension development skill is outside the Mac triad source-of-truth; keep shared prompt guidance in prompt-master.",
+      "removed_at": "2026-06-30",
+      "removal_policy": "human_override_mac_triad_core",
+      "removed_by": "codex"
+    },
+    {
+      "kind": "skill",
+      "name": "stock-skills-sla",
+      "successor": "j-quants",
+      "state": "removed",
+      "source_path": ".ai/catalog/skills/stock-skills-sla/SKILL.md",
+      "reason": "Product-specific investment assistant pack and sample portfolio data are outside the Mac triad source-of-truth; keep only reusable J-Quants access guidance.",
+      "removed_at": "2026-06-30",
+      "removal_policy": "human_override_mac_triad_core",
+      "removed_by": "codex"
     }
   ]
 }

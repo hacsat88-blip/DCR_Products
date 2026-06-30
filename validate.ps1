@@ -55,6 +55,7 @@ $EnvironmentRoot = Join-Path $RepoRoot ".ai\environments"
 $AgentsSource = Resolve-DcrSourcePath -RepoRoot $RepoRoot -AssetType "agents-source"
 $DeployScript = Join-Path $RepoRoot "deploy.ps1"
 $RoutingIndexScript = Join-Path $RepoRoot "tools\generate-routing-index.ps1"
+$SkillCapabilityValidationScript = Join-Path $RepoRoot "tools\validate-skill-capabilities.ps1"
 $ExternalSuperpowersCheckScript = Join-Path $RepoRoot "tools\check-external-superpowers.ps1"
 $SharedBookCheckScript = Join-Path $RepoRoot "tools\validate-shared-book.ps1"
 $RoutingAccuracyScript = Join-Path $RepoRoot "tools\eval-routing-accuracy.ps1"
@@ -68,6 +69,7 @@ $DisplayPolicyProposalTestScript = Join-Path $RepoRoot "tools\test-display-polic
 $BundleAdvisorTestScript = Join-Path $RepoRoot "tools\test-bundle-advisor.ps1"
 $BundleProposalTestScript = Join-Path $RepoRoot "tools\test-bundle-proposal.ps1"
 $RoutingIndexFile = Join-Path $SourceRules "_ROUTING_INDEX.md"
+$SkillRoutingIndexFile = Join-Path $SourceSkills "_SKILLS_ROUTING_INDEX.md"
 function Resolve-DcrPowerShellExe {
     $pwshCommand = Get-Command pwsh -ErrorAction SilentlyContinue
     if ($pwshCommand -and $pwshCommand.Source) {
@@ -192,65 +194,72 @@ Write-Host "  environment docs processed: $($environmentFiles.Count)" -Foregroun
 # ─────────────────────────────────────────────
 Write-Host ""
 Write-Host "== 4. deploy.ps1 -DryRun check =================="
-$isWindowsPlatform = ($env:OS -eq "Windows_NT")
-$deployDryRunTargets = @("vscode", "cursor", "devin", "windsurf", "agents", "dcr")
-if (-not $isWindowsPlatform) {
-    Write-Host "  [SKIP] deploy DryRun: Windows-only script (non-Windows CI skipped)" -ForegroundColor DarkGray
-    $script:passed += $deployDryRunTargets.Count
-}
-else {
-    foreach ($target in $deployDryRunTargets) {
-        $result = & $PowerShellExe -ExecutionPolicy Bypass -File $DeployScript -DryRun -Target $target 2>&1
-        if ($LASTEXITCODE -eq 0) {
-            if ($Verbose) { Write-Ok "deploy -Target $target — exit 0" }
-            else { $script:passed++ }
-        }
-        else {
-            Write-Fail "deploy -Target $target — exit $LASTEXITCODE"
-            if ($Verbose -and $result) { Write-Host "  $result" -ForegroundColor DarkGray }
-        }
+$deployDryRunTargets = @("codex", "claude", "cursor", "agents")
+foreach ($target in $deployDryRunTargets) {
+    $result = & $PowerShellExe -ExecutionPolicy Bypass -File $DeployScript -DryRun -Target $target 2>&1
+    if ($LASTEXITCODE -eq 0) {
+        if ($Verbose) { Write-Ok "deploy -Target $target - exit 0" }
+        else { $script:passed++ }
+    }
+    else {
+        Write-Fail "deploy -Target $target - exit $LASTEXITCODE"
+        if ($Verbose -and $result) { Write-Host "  $result" -ForegroundColor DarkGray }
     }
 }
 
 # ─────────────────────────────────────────────
 # 5. routing index 生成整合チェック
-# ─────────────────────────────────────────────
+# -------------------------------------------------
+# 5. routing index freshness check
+# -------------------------------------------------
 Write-Host ""
 Write-Host "== 5. routing index freshness check ============"
 if (-not (Test-Path $RoutingIndexScript)) {
-    Write-Fail "tools/generate-routing-index.ps1 — file not found"
+    Write-Fail "tools/generate-routing-index.ps1 - file not found"
 }
 elseif (-not (Test-Path $RoutingIndexFile)) {
-    Write-Fail ".ai/catalog/rules/_ROUTING_INDEX.md — file not found"
+    Write-Fail ".ai/catalog/rules/_ROUTING_INDEX.md - file not found"
+}
+elseif (-not (Test-Path $SkillRoutingIndexFile)) {
+    Write-Fail ".ai/catalog/skills/_SKILLS_ROUTING_INDEX.md - file not found"
 }
 else {
     $tempIndex = Join-Path ([System.IO.Path]::GetTempPath()) ("routing-index-" + [System.Guid]::NewGuid().ToString("N") + ".md")
+    $tempSkillIndex = Join-Path ([System.IO.Path]::GetTempPath()) ("skills-routing-index-" + [System.Guid]::NewGuid().ToString("N") + ".md")
     try {
-        $result = & $PowerShellExe -ExecutionPolicy Bypass -File $RoutingIndexScript -RepoRoot $RepoRoot -OutputPath $tempIndex 2>&1
+        $result = & $PowerShellExe -ExecutionPolicy Bypass -File $RoutingIndexScript -RepoRoot $RepoRoot -OutputPath $tempIndex -SkillsOutputPath $tempSkillIndex 2>&1
         if ($LASTEXITCODE -ne 0) {
-            Write-Fail "routing index generation — exit $LASTEXITCODE"
+            Write-Fail "routing index generation - exit $LASTEXITCODE"
             if ($Verbose -and $result) { Write-Host "  $result" -ForegroundColor DarkGray }
         }
         else {
             $existing = (Get-Content -Path $RoutingIndexFile -Raw -Encoding utf8) -replace "`r`n", "`n"
             $generated = (Get-Content -Path $tempIndex -Raw -Encoding utf8) -replace "`r`n", "`n"
             if ($existing -ceq $generated) {
-                if ($Verbose) { Write-Ok ".ai/catalog/rules/_ROUTING_INDEX.md — up to date" }
+                if ($Verbose) { Write-Ok ".ai/catalog/rules/_ROUTING_INDEX.md - up to date" }
                 else { $script:passed++ }
             }
             else {
-                Write-Fail ".ai/catalog/rules/_ROUTING_INDEX.md — out of date (run tools/generate-routing-index.ps1)"
+                Write-Fail ".ai/catalog/rules/_ROUTING_INDEX.md - out of date (run tools/generate-routing-index.ps1)"
+            }
+
+            $existingSkills = (Get-Content -Path $SkillRoutingIndexFile -Raw -Encoding utf8) -replace "`r`n", "`n"
+            $generatedSkills = (Get-Content -Path $tempSkillIndex -Raw -Encoding utf8) -replace "`r`n", "`n"
+            if ($existingSkills -ceq $generatedSkills) {
+                if ($Verbose) { Write-Ok ".ai/catalog/skills/_SKILLS_ROUTING_INDEX.md - up to date" }
+                else { $script:passed++ }
+            }
+            else {
+                Write-Fail ".ai/catalog/skills/_SKILLS_ROUTING_INDEX.md - out of date (run tools/generate-routing-index.ps1 -SkillsOutputPath)"
             }
         }
     }
     finally {
-        if (Test-Path $tempIndex) {
-            Remove-Item -Path $tempIndex -Force -ErrorAction SilentlyContinue
-        }
+        if (Test-Path $tempIndex) { Remove-Item -Path $tempIndex -Force -ErrorAction SilentlyContinue }
+        if (Test-Path $tempSkillIndex) { Remove-Item -Path $tempSkillIndex -Force -ErrorAction SilentlyContinue }
     }
 }
 
-# ─────────────────────────────────────────────
 # 6. catalog rules/*.md — inherits: trait 参照整合チェック
 # ─────────────────────────────────────────────
 Write-Host ""
@@ -884,10 +893,70 @@ else {
 }
 
 # ─────────────────────────────────────────────
-# 28. PowerShell script status glyph check
+# 28. skill capability metadata check
+# -------------------------------------------------
+Write-Host ""
+Write-Host "== 28. skill capability metadata check ======="
+if (-not (Test-Path $SkillCapabilityValidationScript)) {
+    Write-Fail "tools/validate-skill-capabilities.ps1 - file not found"
+}
+else {
+    $result = & $PowerShellExe -ExecutionPolicy Bypass -File $SkillCapabilityValidationScript -RepoRoot $RepoRoot 2>&1
+    if ($LASTEXITCODE -eq 0) {
+        if ($Verbose -and $result) { Write-Host "  $result" -ForegroundColor DarkGray }
+        $script:passed++
+    }
+    else {
+        Write-Fail "skill capability metadata - failed"
+        if ($result) { Write-Host "  $result" -ForegroundColor DarkGray }
+    }
+}
+
+# -------------------------------------------------
+# 29. active triad surface check
+# -------------------------------------------------
+Write-Host ""
+Write-Host "== 29. active triad surface check ============="
+$activeTriadDocs = @(
+    (Join-Path $RepoRoot "README.md"),
+    (Join-Path $RepoRoot ".ai\ARCHITECTURE.md"),
+    (Join-Path $RepoRoot ".ai\rule-routing-design.md"),
+    (Join-Path $RepoRoot ".ai\repo-map.md"),
+    (Join-Path $RepoRoot ".ai\catalog\README.md"),
+    (Join-Path $RepoRoot ".ai\catalog\rules\_ROUTING_INDEX.md"),
+    (Join-Path $RepoRoot ".ai\catalog\skills\_SKILLS_ROUTING_INDEX.md")
+) | Where-Object { Test-Path -LiteralPath $_ }
+$retiredSurfacePatterns = @(
+    "VS Code Copilot",
+    "GitHub Copilot CLI",
+    "Copilot CLI",
+    "gemini-cli",
+    "Antigravity",
+    ".github/copilot-instructions.md",
+    ".agents/skills",
+    ".gemini/"
+)
+$retiredHits = @()
+foreach ($doc in $activeTriadDocs) {
+    foreach ($pattern in $retiredSurfacePatterns) {
+        $matches = Select-String -LiteralPath $doc -SimpleMatch -Pattern $pattern -ErrorAction SilentlyContinue
+        foreach ($match in $matches) {
+            $relativePath = $match.Path.Replace($RepoRoot + "\", "")
+            $retiredHits += "${relativePath}:$($match.LineNumber): $pattern"
+        }
+    }
+}
+if ($retiredHits.Count -eq 0) {
+    if ($Verbose) { Write-Ok "active triad docs - no retired runtime surfaces" }
+    else { $script:passed++ }
+}
+else {
+    Write-Fail "active triad docs - retired runtime surfaces found: $($retiredHits -join '; ')"
+}
+
 # ─────────────────────────────────────────────
 Write-Host ""
-Write-Host "== 28. PowerShell script glyph check =========="
+Write-Host "== 30. PowerShell script glyph check =========="
 $PowerShellStatusGlyphPattern = '[\uD800-\uDBFF][\uDC00-\uDFFF]|[\u2600-\u26FF\u2700-\u27BF]'
 $PowerShellScriptFiles = Get-ChildItem -Path $RepoRoot -Recurse -File -Include *.ps1,*.psm1,*.psd1 -ErrorAction SilentlyContinue |
 Where-Object {

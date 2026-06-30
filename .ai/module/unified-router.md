@@ -177,7 +177,7 @@ confidence は候補順位を決める指標であり、単独では実行許可
 
 ## V6 CLI/IDE 統合仕上げ
 
-Codex / Claude Code / VS Code Copilot の生成 entrypoint は、同じ自然語返答契約を短く読める状態にする。
+Codex / Claude Code / Cursor の生成 entrypoint は、同じ自然語返答契約を短く読める状態にする。
 
 - 入口には `pied-piper` が単一 coordinator であることを載せる
 - `proposal_state.status = proposed|refined` の短い次発話を proposal reply として優先解釈することを載せる
@@ -294,7 +294,7 @@ research-analyst.absorbs = [docs-researcher, market-researcher, competitive-anal
 
 ```
 優先度（高 → 低）:
-  1. CLAUDE.local.md（薄い入口） / .claude/local/CLAUDE.local.md（実体） / AGENTS.local.md / GEMINI.local.md（gitignored ローカル）
+  1. CLAUDE.local.md（薄い入口） / .claude/local/CLAUDE.local.md（実体） / AGENTS.local.md（gitignored ローカル）
   2. ユーザーの当該ターン明示指定（"/skill X" "use agent Y"）
   3. unified-router 決定木 Step 0（alias 解決）
   4. unified-router 決定木 Step 1-6（routing_category 〜 phase 整合）

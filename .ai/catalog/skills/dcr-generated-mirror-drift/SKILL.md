@@ -1,15 +1,15 @@
 ---
 name: dcr-generated-mirror-drift
 routing_category: devops
-description: "DCR repo の generated mirror / tracked entrypoint drift を診断する。`deploy.ps1`、`deploy.ps1 -Check`、GitHub Actions の generated-entrypoint failure、`.agents/skills`、`.codex/agents`、`.claude/agents`、AGENTS/CLAUDE/Copilot instructions の同期ずれが出たときに使う。"
+description: "Diagnose drift between DCR source-of-truth files and generated Mac triad runtime outputs such as AGENTS.md, CLAUDE.md, .cursor/, .codex/agents/, and .claude/agents/."
 contract:
   preconditions:
-    - "deploy/check/CI/git status のいずれかに生成物 drift や mirror tracking の症状がある"
+    - "A deploy, check, validation, or git status result suggests generated output drift or stale runtime residue."
   postconditions:
-    - "症状、正本か生成物か、最小再現コマンド、修正先、検証コマンドが分かる"
+    - "The response identifies the source file, generated output, minimal repro, fix target, and verification command."
   invariants:
-    - "generated mirror を正本として手編集しない"
-    - "削除前に destination-only か source-of-truth かを分類する"
+    - "Do not edit generated mirrors as the source-of-truth."
+    - "Classify destination-only files as stale residue unless a current source file owns them."
 composable:
   input_type: failure
   output_type: diagnosis
@@ -19,59 +19,52 @@ composable:
     - documents-ops
 metadata:
   origin: local-codex-sessions
-  adapted_from: "runtime memory skill deploy-vscode-mirror-drift plus May 2026 DCR mirror/CI cleanup rollouts"
+  adapted_from: "DCR mirror and generated-entrypoint drift rollouts, updated for the Mac triad core."
   imported_at: "2026-05-24"
 runtime_targets:
   - codex
   - claude
-  - copilot
   - cursor
-  - gemini-cli
 ---
 
 # DCR Generated Mirror Drift
 
-## 目的
+## Purpose
 
-DCR repo の正本 (`.ai/catalog`, `.ai/book`, `.ai/kernel`, `.ai/environments`, `templates`) と、各 runtime の generated mirror / tracked entrypoint のズレを短時間で分類する。
+Use this skill when source files under `.ai/` and generated runtime outputs disagree.
 
-この skill は修正そのものより先に、どこを直すべきかを確定するために使う。`.agents/skills` などの生成先を見つけても、そこを正本として編集しない。
+Canonical source files live under:
 
-## Trigger
+- `.ai/book/`
+- `.ai/kernel/`
+- `.ai/catalog/`
+- `.ai/environments/`
+- `tools/`
 
-- `Deploy verification failed for VS Code Copilot skills`
-- `deploy.ps1 -Check` が `[EXTRA]`, `[MISSING]`, `[DRIFT]` を出す
-- GitHub Actions の `Check generated entrypoint drift` が失敗する
-- `Generated tracked entrypoints are stale.`
-- `Generated mirrors must stay untracked.`
-- `.github/copilot-instructions.md`, `AGENTS.md`, `CLAUDE.md` が生成後に dirty になる
-- `.codex/agents`, `.claude/agents`, `C:\Users\hacsa\.agents\skills` の扱いが怪しい
+Generated outputs include:
 
-## 初動
+- `AGENTS.md`
+- `CLAUDE.md`
+- `.cursor/`
+- `.codex/agents/`
+- `.claude/agents/`
 
-1. 症状と実行コマンドをそのまま控える。
-2. まず narrow check を使う。
-   - VS Code/Copilot skills: `.\deploy.ps1 -Check -Target vscode`
-   - 全体: `.\deploy.ps1 -Check`
-   - tracked entrypoint: `.github/workflows/validate.yml` の対象ファイルを確認
-3. 該当 path を分類する。
-   - source-of-truth: `.ai/catalog`, `.ai/book`, `.ai/kernel`, `.ai/environments`, `templates`, generator scripts
-   - generated mirror: `.codex/agents`, `.claude/agents`, `C:\Users\hacsa\.agents\skills`
-   - tracked generated entrypoint: `AGENTS.md`, `CLAUDE.md`, `.github/copilot-instructions.md`, routing indexes
-4. source に無い destination-only item は、昇格するか stale residue として消すかを判断する。
+## Triggers
 
-## 診断表
+- `deploy.ps1 -Check` reports `[EXTRA]`, `[MISSING]`, or `[DRIFT]`.
+- `validate.ps1` reports generated output or routing drift.
+- `git status --short` shows generated outputs changed after deploy.
+- A deleted runtime surface or local cache still appears in generated mirrors.
 
-| Symptom | Likely cause | First check | Fix target |
-|---|---|---|---|
-| `[EXTRA] ... exists only in destination` | destination-only mirror residue | `deploy.ps1 -Check -Target vscode` | deploy cleanup logic or user-level mirror |
-| `Generated tracked entrypoints are stale.` | tracked entrypoint regenerated with different content/newline | CI log, `git status --short`, `git ls-files --eol` | adapter / generator, not entrypoint by hand |
-| `Generated mirrors must stay untracked.` | `.codex/agents` or `.claude/agents` is tracked | `git ls-files .codex/agents .claude/agents` | `.gitignore` and Git index |
-| Removed tool still appears | hidden mirror or cache residue | hidden-aware search/enumeration | sync logic with `-Force`, or explicit residue cleanup |
+## Diagnosis Flow
 
-## Output
+1. Capture the failing command and exact output.
+2. Identify whether the path is source, generated output, or stale runtime residue.
+3. If source is wrong, edit the owning `.ai/` or `tools/` file.
+4. If generated output is stale, rerun `deploy.ps1`.
+5. If destination-only residue remains, remove it only after confirming the resolved path is inside the intended mirror.
 
-Always report in this compact shape:
+## Report Shape
 
 ```markdown
 DCR MIRROR DRIFT
@@ -84,13 +77,12 @@ DCR MIRROR DRIFT
 
 ## Verification
 
-Choose the smallest relevant set, then broaden only when needed:
+Choose the smallest relevant check first:
 
 ```powershell
-pwsh -ExecutionPolicy Bypass -File .\deploy.ps1 -Check -Target vscode
-pwsh -ExecutionPolicy Bypass -File .\validate.ps1
-pwsh -ExecutionPolicy Bypass -File .\deploy.ps1
+pwsh -ExecutionPolicy Bypass -File .\deploy.ps1 -Check -Target codex
+pwsh -ExecutionPolicy Bypass -File .\deploy.ps1 -Check -Target claude
+pwsh -ExecutionPolicy Bypass -File .\deploy.ps1 -Check -Target cursor
 pwsh -ExecutionPolicy Bypass -File .\deploy.ps1 -Check
+pwsh -ExecutionPolicy Bypass -File .\validate.ps1
 ```
-
-If a recursive cleanup is needed, verify the resolved target path stays under the intended mirror or workspace before deleting.

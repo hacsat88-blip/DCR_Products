@@ -31,8 +31,6 @@ metadata:
     - codex
     - claude
     - cursor
-    - copilot
-    - gemini-cli
 ---
 
 # Agent Memory Design

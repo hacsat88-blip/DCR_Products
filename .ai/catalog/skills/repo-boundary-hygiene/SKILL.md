@@ -34,9 +34,7 @@ package:
 runtime_targets:
   - codex
   - claude
-  - copilot
   - cursor
-  - gemini-cli
 ---
 
 # Repo Boundary Hygiene
@@ -50,7 +48,7 @@ runtime_targets:
 ## いつ使うか
 
 - root と `Product/` の責務が混ざって見えるとき
-- `.vscode/`, `docs/`, `templates/`, `.dcr/`, `rules/`, `skills/` の整理を検討するとき
+- `retired editor config`, `docs/`, `templates/`, `rules/`, `skills/` の整理を検討するとき
 - source-of-truth と generated output のどちらを直すべきか迷うとき
 - 不在 Product path や stale path を抱えた設定を片付けたいとき
 - legacy script を削除するか shim にするか判断したいとき
@@ -70,7 +68,7 @@ runtime_targets:
 | --------------- | ----------------------------- | ----------------------------------------------- |
 | source-of-truth | 正本。変更はここから始める    | `rules/*.md`, `skills/*/SKILL.md`, `templates/` |
 | generated       | 正本から派生する生成物        | `.cursor/rules/*.mdc`, generated docs |
-| runtime/config  | 実行時に効く設定や task       | `.vscode/settings.json`, `.vscode/tasks.json`   |
+| runtime/config  | 実行時に効く設定や task       | `retired editor configsettings.json`, `retired editor configtasks.json`   |
 | product-local   | 特定 Product にだけ属する資産 | `Product/<product>/**`, product overlay         |
 
 ## Secondary Tags
@@ -109,7 +107,7 @@ runtime_targets:
 
 - generated output を直す前に source-of-truth を確認する
 - `rg` または同等の検索で参照元を確認する
-- root `.vscode` に product-specific path が残っていないか確認する
+- root retired editor config に product-specific path が残っていないか確認する
 - destination 不在の move は defer に倒す
 - cleanup 完了主張の前に verification command を実行する
 
@@ -117,7 +115,7 @@ runtime_targets:
 
 - generated file を正本として編集する
 - docs / templates / scripts を未検索のまま削除する
-- root `.vscode` に product-specific interpreter や tasks を残す
+- root retired editor config に product-specific interpreter や tasks を残す
 - 実在しない `Product/<name>/` を仮定して資産を移す
 - legacy entrypoint を外部参照確認なしで削除する
 

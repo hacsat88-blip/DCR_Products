@@ -1,34 +1,19 @@
-# DCR Environments
+# Environment Diffs
 
-This directory contains thin capability declarations for each runtime environment.
+This directory keeps only thin environment-specific diffs for the Mac migration triad.
 
-The shared thinking source of truth is [../book/runtime.md](../book/runtime.md). Environment files must not redefine runtime logic, trigger semantics, gates, routing, permissions, or safety boundaries.
+- `codex/kernel.md`: Codex-specific behavior
+- `claude-code/kernel.md`: Claude Code-specific behavior
+- `cursor/kernel.md`: Cursor-specific behavior
 
-## Layout
+Runtime entrypoints remain in their tool-native locations:
 
-- `vscode-copilot/kernel.md`: VS Code Copilot Chat capability declaration
-- `claude-code/kernel.md`: Claude Code capability declaration
-- `copilot-cli/kernel.md`: GitHub Copilot CLI capability declaration
-- `codex/kernel.md`: Codex capability declaration
-- `cursor/kernel.md`: Cursor capability declaration
-- `devin/kernel.md`: Devin CLI, Devin Local, and Devin Desktop compatibility declaration
+- Codex: `AGENTS.md`
+- Claude Code: `CLAUDE.md`
+- Cursor: `.cursor/`
 
-## Runtime Entrypoints
+Do not edit generated entrypoints directly. Edit `.ai/book/`, `.ai/kernel/`, `.ai/catalog/rules/`, `.ai/catalog/skills/`, or `.ai/catalog/agents-source/`, then regenerate with:
 
-`AGENTS.md`, `CLAUDE.md`, `.github/copilot-instructions.md`, `.cursor/`, `.devin/`, and `.windsurf/` remain in their runtime-specific locations because tools auto-load those paths.
-
-## Runtime Loading Model
-
-- Claude Code: `CLAUDE.md` plus `.claude/settings.json` hooks. Hook enforcement is Claude-specific; shared policy still belongs in `.ai/book/` and `.ai/kernel/`.
-- Codex and GitHub Copilot CLI: `AGENTS.md` carries the thin shared entrypoint and links back to the shared book/kernel.
-- Cursor: `.cursor/rules/dcr-kernel.mdc` is generated from the shared kernel and `.cursorignore` keeps generated mirrors and deprecated aliases out of discovery.
-- VS Code Copilot: `.github/copilot-instructions.md` stays concise and points to the shared book, kernel, rules, and skills.
-- Devin CLI / Devin Local: `AGENTS.md` is always-on context, `.devin/config.json` holds project-safe config, and `.devin/skills/` mirrors skills, workflows, and agent perspectives.
-- Devin Desktop legacy Cascade: `.windsurf/` is a generated compatibility mirror, not a source of truth.
-
-## Rule
-
-- Put shared behavior in `.ai/book/`.
-- Put compatibility runtime mirrors in `.ai/kernel/`.
-- Put only entrypoint, capability, state storage, tone, and fallback notes here.
-- If a needed difference changes thinking or safety behavior, update `.ai/book/` instead of redefining it here.
+```powershell
+pwsh -ExecutionPolicy Bypass -File .\deploy.ps1
+```

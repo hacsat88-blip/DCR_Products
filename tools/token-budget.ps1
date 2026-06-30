@@ -9,7 +9,7 @@
   before/after comparison of consolidation work.
 
   Reports:
-    - Top-level entrypoint files (CLAUDE.md / AGENTS.md / copilot-instructions.md)
+    - Top-level entrypoint files (CLAUDE.md / AGENTS.md) and Cursor mirror
     - Active catalog: rules/skills/agents that ship to a target adapter
     - Deprecation aliases section (alias overhead)
     - Per-asset cost top 10 (find heavy outliers)
@@ -100,7 +100,7 @@ $report = [pscustomobject]@{
 $entrypoints = @(
     @{ name = 'CLAUDE.md'; path = 'CLAUDE.md' }
     @{ name = 'AGENTS.md'; path = 'AGENTS.md' }
-    @{ name = '.github/copilot-instructions.md'; path = '.github/copilot-instructions.md' }
+    @{ name = '.cursor/rules/dcr-kernel.mdc'; path = '.cursor/rules/dcr-kernel.mdc' }
 )
 $entrypointTotal = 0
 foreach ($e in $entrypoints) {
@@ -177,7 +177,7 @@ Write-Host ""
 Write-Host "=== Token Budget ===" -ForegroundColor Cyan
 Write-Host ""
 Write-Host "Entrypoints (top-level):" -ForegroundColor Yellow
-foreach ($k in @('CLAUDE.md', 'AGENTS.md', '.github/copilot-instructions.md')) {
+foreach ($k in @('CLAUDE.md', 'AGENTS.md', '.cursor/rules/dcr-kernel.mdc')) {
     Write-Host ("  {0,-40} {1,8:N0} tokens" -f $k, $report.entrypoints[$k])
 }
 Write-Host ("  {0,-40} {1,8:N0} tokens" -f '-- entrypoint total --', $entrypointTotal) -ForegroundColor DarkGray

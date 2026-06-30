@@ -1,45 +1,53 @@
 # Catalog Discovery Guide
 
-このフォルダは、サトシ開発における shared source-of-truth の親フォルダです。
-複数の AI エディタが同じ判断に到達したいときは、まずここから確認します。
+This directory is the shared source-of-truth for the Mac triad:
+
+- Codex
+- Claude Code
+- Cursor
+
+Use this folder when you need to inspect or change shared rules, skills, or agent sources. Do not edit generated runtime mirrors first.
 
 ## First Inspection Order
 
-0. `.ai/kernel/`
-   - 全環境共通の応答方針、権限、トリガー、runtime kernel を調べるとき
-1. `rules/`
-   - invariant、routing metadata、handoff policy、禁止事項を調べるとき
-2. `skills/`
-   - workflow、artifact generator、analysis method を調べるとき
-3. `agents-source/`
-   - runtime persona、execution specialist、handoff boundary を調べるとき
+1. `.ai/kernel/`
+   - Shared behavior, gates, permissions, triggers, and runtime kernel.
+2. `.ai/catalog/rules/`
+   - Durable invariants, routing metadata, handoff policy, and safety rules.
+3. `.ai/catalog/skills/`
+   - Reusable workflows, analysis methods, and artifact procedures.
+4. `.ai/catalog/agents-source/`
+   - Canonical agent definitions used to generate Codex and Claude mirrors.
 
 ## When To Start Here
 
-- shared rule / skill / agent source を編集したい
-- どの editor にも共通する behavior を変えたい
-- generated file ではなく正本を探したい
-- Product 固有ではなく repo 共通の contract を確認したい
+- You need to change shared behavior for Codex, Claude Code, or Cursor.
+- You need the source file behind a generated entrypoint or mirror.
+- You need to decide whether a skill, rule, or agent belongs in the shared triad.
+- You need to remove local, product-specific, or retired runtime assets from the canonical repo.
 
 ## When Not To Start Here
 
-- Product 固有の実装や local workflow を調べるとき
-  - その場合は `Product/README.md` を先に見る
-- generated output の実体を確認したいだけのとき
-  - `AGENTS.md`, `CLAUDE.md`, `.github/copilot-instructions.md`, `.claude/agents/`, `.codex/agents/` は deploy により再生成される mirror
+- You only need to inspect a generated output.
+- You are looking at local machine settings, secrets, caches, or user-specific runtime state.
+- You are changing product implementation files. Those are outside this triad source-of-truth.
+
+Generated outputs include `AGENTS.md`, `CLAUDE.md`, `.cursor/`, `.codex/agents/`, and `.claude/agents/`. Regenerate them from `.ai/` rather than editing them directly.
 
 ## Promotion Rule
 
-shared 化が必要な asset だけをここへ昇格します。
+Promote only reusable shared assets into this catalog:
 
-- rule は `rules/`
-- skill は `skills/`
-- agent source は `agents-source/`
+- rules go in `rules/`
+- skills go in `skills/`
+- agent definitions go in `agents-source/`
 
-Product 側の overlay や local setting をそのままここへ複製しません。
+Keep local settings, examples with private data, product implementation files, and retired runtime mirrors outside the canonical catalog.
 
 ## Related References
 
-- repo 全体の置き場所判断: `docs/dcr/reference/repo-layout.md`
-- 日常運用と検証順: `docs/dcr/development-workflow.md`
-- repo 全体の構造説明: `.ai/repo-map.md`
+- Repo map: `.ai/repo-map.md`
+- Shared book: `.ai/book/`
+- Kernel: `.ai/kernel/`
+- Deployment script: `deploy.ps1`
+- Validation script: `validate.ps1`

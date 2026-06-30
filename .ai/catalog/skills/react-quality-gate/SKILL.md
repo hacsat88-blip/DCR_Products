@@ -31,9 +31,7 @@ metadata:
   runtime_targets:
     - codex
     - claude
-    - copilot
     - cursor
-    - gemini-cli
 ---
 
 # React Quality Gate
@@ -109,7 +107,7 @@ Action 側が内部で `npx react-doctor@latest` を使う可能性があるた�
 理由:
 
 - `.ai/catalog/skills/` が正本で、生成 mirror は `deploy.ps1` が管理する
-- 自動 installer は Codex / Claude / Cursor / Copilot の差分を勝手に作りやすい
+- 自動 installer は Codex / Claude / Cursor の差分を勝手に作りやすい
 - upstream skill は短く有用だが、DCR では `react-quality-gate` として runtime-neutral に保持する
 
 ## 結果の読み方

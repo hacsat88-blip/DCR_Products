@@ -193,7 +193,6 @@ function Get-Classification {
     $origin = $Skill.Origin
 
     $dcrSpecific = @(
-        "ai-prompt-manager",
         "codex-app-server-integration",
         "dcr-generated-mirror-drift",
         "dcr-pipeline",
@@ -209,7 +208,6 @@ function Get-Classification {
         "oss-delegate",
         "react-quality-gate",
         "repo-boundary-hygiene",
-        "stock-skills-sla",
         "token-efficiency-advisor",
         "unified-router"
     )

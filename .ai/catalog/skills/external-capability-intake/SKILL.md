@@ -30,9 +30,7 @@ metadata:
   runtime_targets:
     - codex
     - claude
-    - copilot
     - cursor
-    - gemini-cli
 ---
 
 # External Capability Intake
@@ -107,7 +105,7 @@ metadata:
 
 - 外部 repo 全体を `.ai/catalog` に丸ごとコピーする
 - installer が作る generated mirror を正本として commit する
-- Claude / Cursor / Copilot など特定 runtime の slash command 前提をそのまま入れる
+- Codex / Claude Code / Cursor など特定 runtime の slash command 前提をそのまま入れる
 
 ### `immutable-upstream`
 

@@ -1,5 +1,5 @@
 param(
-    [ValidateSet("all", "vscode", "claude", "codex", "cursor", "devin", "windsurf", "agents")]
+    [ValidateSet("all", "claude", "codex", "cursor", "agents")]
     [string]$Target = "all",
     [switch]$DryRun
 )
@@ -11,14 +11,11 @@ Write-Host ""
 Write-Host "=== Unified Deployment Orchestrator ===" -ForegroundColor Cyan
 Write-Host ""
 
-$defaultAdapters = @("vscode", "claude", "codex", "cursor", "devin", "agents")
+$defaultAdapters = @("claude", "codex", "cursor", "agents")
 $allAdapters = $defaultAdapters
 $requestedAdapters = @(
     if ($Target -eq "all") {
         $defaultAdapters
-    }
-    elseif ($Target -eq "windsurf") {
-        @("devin")
     }
     else {
         $allAdapters | Where-Object { $Target -eq $_ }

@@ -35,6 +35,9 @@ function Write-CheckFail {
     Write-Host "[FAIL] $Message" -ForegroundColor Red
 }
 
+$emptyExcludesFile = if ($env:OS -eq "Windows_NT") { "NUL" } else { "/dev/null" }
+$gitBaseArgs = @("-c", "core.excludesFile=$emptyExcludesFile", "-C", $Path)
+
 if (-not (Test-Path -LiteralPath $Path)) {
     $message = "Superpowers checkout not found: $Path"
     if ($RequireInstalled) {
@@ -54,7 +57,7 @@ if (-not (Test-Path -LiteralPath (Join-Path $Path ".git"))) {
 $failures = @()
 
 try {
-    $origin = (& git -C $Path remote get-url origin 2>&1).Trim()
+    $origin = (& git @gitBaseArgs remote get-url origin 2>&1).Trim()
     if ($LASTEXITCODE -ne 0) { throw $origin }
 }
 catch {
@@ -66,7 +69,7 @@ if ($origin -ne $ExpectedOrigin) {
     $failures += "origin is '$origin' (expected '$ExpectedOrigin')"
 }
 
-$status = & git -C $Path status --porcelain 2>&1
+$status = & git @gitBaseArgs status --porcelain 2>&1
 if ($LASTEXITCODE -ne 0) {
     $failures += "git status failed: $status"
 }
@@ -74,12 +77,12 @@ elseif ($status) {
     $failures += "working tree has local changes: $($status -join '; ')"
 }
 
-$upstream = (& git -C $Path rev-parse --abbrev-ref --symbolic-full-name "@{u}" 2>$null).Trim()
+$upstream = (& git @gitBaseArgs rev-parse --abbrev-ref --symbolic-full-name "@{u}" 2>$null).Trim()
 if ($LASTEXITCODE -ne 0 -or [string]::IsNullOrWhiteSpace($upstream)) {
     $failures += "tracking branch is not configured"
 }
 else {
-    $counts = (& git -C $Path rev-list --left-right --count "HEAD...@{u}" 2>&1).Trim()
+    $counts = (& git @gitBaseArgs rev-list --left-right --count "HEAD...@{u}" 2>&1).Trim()
     if ($LASTEXITCODE -ne 0) {
         $failures += "unable to compare with upstream '$upstream': $counts"
     }
@@ -115,6 +118,6 @@ if ($failures.Count -gt 0) {
     exit 1
 }
 
-$head = (& git -C $Path log -1 --oneline 2>$null).Trim()
+$head = (& git @gitBaseArgs log -1 --oneline 2>$null).Trim()
 Write-CheckOk "Superpowers external checkout is clean and aligned ($head)"
 exit 0

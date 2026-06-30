@@ -22,7 +22,7 @@
 
 ## Constraints And Fallbacks
 
-- GitHub Copilot CLI also uses `AGENTS.md`; CLI-specific capability notes live in [../copilot-cli/kernel.md](../copilot-cli/kernel.md).
+- `AGENTS.md` is now the Codex entrypoint for the Mac triad source-of-truth.
 - If a tool is unavailable, follow [../../book/tool-contract.md](../../book/tool-contract.md) fallback rules.
 
 ## Tone

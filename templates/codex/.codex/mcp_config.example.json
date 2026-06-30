@@ -1,8 +1,0 @@
-{
-    "$schema": "https://raw.githubusercontent.com/modelcontextprotocol/spec/main/schema/mcp.schema.json",
-    "mcpServers": {},
-    "notes": {
-        "usage": "Adapt this example to your Codex runtime if MCP is enabled. The repository .codex/config.toml is the local working config.",
-        "security": "Do not include API keys here."
-    }
-}

@@ -10,10 +10,9 @@ keywords:
   - auto-select
   - orchestration
 targets:
-  - vscode
-  - cursor
-  - claude
   - codex
+  - claude
+  - cursor
 contract:
   preconditions:
     - "The request matches this skill's description or routing category."
@@ -29,9 +28,7 @@ composable:
 runtime_targets:
   - codex
   - claude
-  - copilot
   - cursor
-  - gemini-cli
 ---
 
 # unified-router
@@ -109,7 +106,7 @@ runtime_targets:
 
 状態は `.ai/kernel/gate-state.json`、監査履歴は `.ai/kernel/router-decisions.jsonl` に残します。分類の実装は `tools/lib/gate-state.ps1` の proposal state machine に従います。
 V5 では `tools/test-proposal-reply-vocabulary.ps1` で、自然語返答の実行時挙動を検証します。
-V6 では `tools/test-routing-entrypoint-contract.ps1` で、Codex / Claude Code / VS Code Copilot の生成入口が同じ自然語返答契約を読めることを検証します。
+V6 では `tools/test-routing-entrypoint-contract.ps1` で、Codex / Claude Code / Cursor の生成入口が同じ自然語返答契約を読めることを検証します。
 V7 では `tools/router-decisions-report.ps1` と `tools/reduction-advisor.ps1` が smoke/test/fixture 由来の synthetic telemetry を削減判断から除外し、実運用ログ不足時は `collect_real_usage` に留めます。
 V7.1 では `tools/shadow-routing-trial.ps1` で、実作業に近い依頼文とユーザー評価を `shadow_trial: true` として記録し、削減前の判断材料を集めます。
 V8 では `tools/display-policy-advisor.ps1` で、shadow trial を表示抑制・軽量化・裏側 asset 表示の提案に変換します。これは表示ポリシーの提案までで、削除や deprecated 追加は行いません。

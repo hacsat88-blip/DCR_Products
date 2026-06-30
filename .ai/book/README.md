@@ -36,7 +36,7 @@ All AI environments should read this book first. Environment files may describe 
 - [gates.md](gates.md): trigger and gate chain behavior
 - [permissions.md](permissions.md): P1 / P2 / P3 permissions and safety boundaries
 - [tool-contract.md](tool-contract.md): abstract tool operations and fallbacks across environments
-- [mac-migration.md](mac-migration.md): Windows to macOS migration, Product boundary, UTF-8/LF policy
+- [mac-migration.md](mac-migration.md): Windows to macOS migration for the Codex / Claude Code / Cursor triad, UTF-8/LF policy
 
 ## Compatibility Layer
 
@@ -45,4 +45,3 @@ The legacy runtime files under `.ai/kernel/` remain available for adapters and t
 - `.ai/kernel/_base.md` mirrors the runtime chapter for common execution behavior.
 - `.ai/kernel/dcr-kernel.md` is the inline runtime distributed to rule-loader style adapters.
 - `.ai/module/unified-router.md` remains the detailed router implementation referenced by [routing.md](routing.md).
-

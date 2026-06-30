@@ -54,7 +54,7 @@ function Get-ListValues {
                 if ($line -match '^(\s*)[a-zA-Z_][a-zA-Z0-9_-]*\s*:') {
                     if ($Matches[1].Length -le $baseIndent) { break }
                 }
-                if ($line -match '^\s*-\s*(.+)\s*$') { $values += $Matches[1].Trim().Trim('"').Trim("'") }
+                if ($line -match '^\s*-\s+(.+)\s*$') { $values += $Matches[1].Trim().Trim('"').Trim("'") }
                 $i++
             }
             break
@@ -89,7 +89,7 @@ $packageCount = 0
 $absorbsCount = 0
 $baselineOverlayCount = 0
 $runtimeTargetCount = 0
-$requiredRuntimeTargets = @("codex", "claude", "copilot", "cursor", "gemini-cli")
+$requiredRuntimeTargets = @("codex", "claude", "cursor")
 
 foreach ($dir in Get-ChildItem -Path $skillsDir -Directory | Where-Object { -not $_.Name.StartsWith("_") } | Sort-Object Name) {
     $skillFile = Join-Path $dir.FullName "SKILL.md"
@@ -130,6 +130,11 @@ foreach ($dir in Get-ChildItem -Path $skillsDir -Directory | Where-Object { -not
     $runtimeTargets = @(Get-ListValues -Frontmatter $frontmatter -Key "runtime_targets")
     if ($runtimeTargets.Count -gt 0) {
         $runtimeTargetCount++
+        foreach ($target in $runtimeTargets) {
+            if ($target -notin $requiredRuntimeTargets) {
+                $failures += "$($dir.Name): runtime_targets contains non-triad target $target"
+            }
+        }
         foreach ($target in $requiredRuntimeTargets) {
             if ($target -notin $runtimeTargets) {
                 $failures += "$($dir.Name): runtime_targets missing $target"
