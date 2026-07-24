@@ -121,7 +121,7 @@ try {
     }
     $gateState | ConvertTo-Json -Depth 4 | Set-Content -Path $GateStatePath -Encoding UTF8
 
-    $output = & powershell.exe -NoProfile -File $AdvisorScript -LogPath $LogPath -GateStatePath $GateStatePath -TopN 10 -MinEvidence 2 -MinRealDecisions 2 -OutputJson $OutputJson 2>&1
+    $output = & (Get-Process -Id $PID).Path -NoProfile -File $AdvisorScript -LogPath $LogPath -GateStatePath $GateStatePath -TopN 10 -MinEvidence 2 -MinRealDecisions 2 -OutputJson $OutputJson 2>&1
     if ($LASTEXITCODE -ne 0) {
         throw "reduction-advisor.ps1 exited with $LASTEXITCODE. Output: $output"
     }
@@ -171,7 +171,7 @@ try {
         user_reply_type = "approve"
         reason = "real decision"
     })
-    $lowOutput = & powershell.exe -NoProfile -File $AdvisorScript -LogPath $LowEvidenceLog -GateStatePath $GateStatePath -TopN 10 -MinEvidence 2 -MinRealDecisions 2 -OutputJson $LowEvidenceJson 2>&1
+    $lowOutput = & (Get-Process -Id $PID).Path -NoProfile -File $AdvisorScript -LogPath $LowEvidenceLog -GateStatePath $GateStatePath -TopN 10 -MinEvidence 2 -MinRealDecisions 2 -OutputJson $LowEvidenceJson 2>&1
     if ($LASTEXITCODE -ne 0) {
         throw "low evidence advisor run exited with $LASTEXITCODE. Output: $lowOutput"
     }

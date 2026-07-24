@@ -7,7 +7,7 @@
 
 | Suffix | 役割 | 権限 | 典型例 |
 |---|---|---|---|
-| `-steward` | **境界の番人**。ガバナンス・契約・traceability の維持を担当。範囲が広く、他ロールに対して「ノー」と言える | High | jira-workflow-steward, repo-boundary-steward, token-efficiency-steward, ai-prompt-manager-steward |
+| `-steward` | **境界の番人**。ガバナンス・契約・traceability の維持を担当。範囲が広く、他ロールに対して「ノー」と言える | High | jira-workflow-steward, repo-boundary-steward, token-efficiency-steward |
 | `-orchestrator` | **複数ロール調整**。ワークフロー全体の進行・ハンドオフを担う。**現状は pied-piper agent が唯一**（rules 側は agents-orchestrator のみ） | High | agents-orchestrator (rule), pied-piper (agent) |
 | `-architect` | **構造設計**。システム全体の骨格・契約・データフローを設計。実装は他に委譲 | Medium-High | backend-architect, agentic-identity-trust-architect, ux-architect (deprecated) |
 | `-engineer` | **実装の専門家**。ドメイン特化のコード・基盤を作る。日常的な実装が中心 | Medium | ai-engineer, data-engineer, devops-engineer, security-engineer, embedded-firmware-engineer, fintech-engineer |

@@ -164,7 +164,7 @@ $orphanCount = 0
 foreach ($kind in @("rules", "skills")) {
     $dir = Join-Path $catalogDir $kind
     if (-not (Test-Path $dir)) { continue }
-    $files = Get-ChildItem -Path $dir -File -Filter "*.md"
+    $files = Get-ChildItem -Path $dir -Force -File -Filter "*.md"
     foreach ($file in $files) {
         $name = $file.BaseName
         $referencedInIndex = $false

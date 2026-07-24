@@ -1,11 +1,25 @@
-param([string]$RepoRoot = ".")
+param(
+    [string]$RepoRoot = ".",
+    [string]$OutputRoot = "",
+    [switch]$Quiet
+)
 
-$outRoot = Join-Path $RepoRoot ".cursor"
+$outRoot = if ([string]::IsNullOrWhiteSpace($OutputRoot)) { Join-Path $RepoRoot ".cursor" } else { $OutputRoot }
 $outRulesDir = Join-Path $outRoot "rules"
 $runtimeKernel = Join-Path $RepoRoot ".ai\core\kernel.md"
-$cursorIgnorePath = Join-Path $RepoRoot ".cursorignore"
+$cursorIgnorePath = if ([string]::IsNullOrWhiteSpace($OutputRoot)) {
+    Join-Path $RepoRoot ".cursorignore"
+}
+else {
+    Join-Path (Split-Path $OutputRoot -Parent) ".cursorignore"
+}
 
-Write-Host "[cursor] Generating .cursor mirror..." -ForegroundColor Cyan
+function Write-CursorStatus {
+    param([string]$Message, [string]$Color = "Green")
+    if (-not $Quiet) { Write-Host $Message -ForegroundColor $Color }
+}
+
+Write-CursorStatus -Message "[cursor] Generating .cursor mirror..." -Color "Cyan"
 
 function Remove-LeadingFrontmatter {
     param([string]$Content)
@@ -50,30 +64,19 @@ Do not edit files here directly. Edit `.ai/` and regenerate.
 
 ## Regenerate
 
-Run: pwsh -ExecutionPolicy Bypass -File .\deploy.ps1 -Target cursor
+Run: pwsh -ExecutionPolicy Bypass -File ./deploy.ps1 -Target cursor
 "@
 
-Write-Utf8NoBom -Path (Join-Path $outRoot "README.md") -Content ($readme.TrimEnd() + "`r`n")
-Write-Host "  [OK] .cursor/README.md" -ForegroundColor Green
-
-$mcpConfig = @"
-{
-  "mcpServers": {}
-}
-"@
-
-Write-Utf8NoBom -Path (Join-Path $outRoot "mcp.json") -Content ($mcpConfig.TrimEnd() + "`r`n")
-Write-Host "  [OK] .cursor/mcp.json" -ForegroundColor Green
+Write-Utf8NoBom -Path (Join-Path $outRoot "README.md") -Content ($readme.TrimEnd() + "`n")
+Write-CursorStatus -Message "  [OK] .cursor/README.md"
 
 $cursorIgnore = @"
-# Generated/runtime mirrors
-.cursor/
-.codex/agents/
-.claude/agents/
+# Runtime-only state
+.ai/routing/state/
 "@
 
-Write-Utf8NoBom -Path $cursorIgnorePath -Content ($cursorIgnore.TrimEnd() + "`r`n")
-Write-Host "  [OK] .cursorignore" -ForegroundColor Green
+Write-Utf8NoBom -Path $cursorIgnorePath -Content ($cursorIgnore.TrimEnd() + "`n")
+Write-CursorStatus -Message "  [OK] .cursorignore"
 
 if (Test-Path $runtimeKernel) {
     $kernelRaw = Get-Content -Path $runtimeKernel -Raw -Encoding utf8
@@ -93,13 +96,13 @@ if (Test-Path $runtimeKernel) {
         ""
         $kernelBody.TrimEnd()
         ""
-    ) -join "`r`n"
+    ) -join "`n"
 
     Write-Utf8NoBom -Path (Join-Path $outRulesDir "dcr-kernel.mdc") -Content $kernelMdc
-    Write-Host "  [OK] .cursor/rules/dcr-kernel.mdc" -ForegroundColor Green
+    Write-CursorStatus -Message "  [OK] .cursor/rules/dcr-kernel.mdc"
 }
 else {
     Write-Warning ".ai/core/kernel.md not found; skipped .cursor/rules/dcr-kernel.mdc"
 }
 
-Write-Host ""
+Write-CursorStatus -Message ""

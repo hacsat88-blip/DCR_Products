@@ -27,8 +27,8 @@ if (-not (Test-Path $source)) {
 
 Write-AgentsStatus -Message "[agents] Generating .codex/agents/*.toml and .claude/agents/*.md..." -Color "Cyan"
 
-$tomlFiles = Get-ChildItem -Path $source -File -Filter '*.toml' | Sort-Object Name
-$mdFiles = Get-ChildItem -Path $source -File -Filter '*.md' |
+$tomlFiles = Get-ChildItem -Path $source -Force -File -Filter '*.toml' | Sort-Object Name
+$mdFiles = Get-ChildItem -Path $source -Force -File -Filter '*.md' |
     Where-Object { $_.Name -ne 'README.md' } |
     Sort-Object Name
 
@@ -43,17 +43,18 @@ function Sync-AgentFlatFiles {
 
     $sourceNames = @($SourceFiles | Select-Object -ExpandProperty Name)
     foreach ($file in $SourceFiles) {
-        Copy-Item -Path $file.FullName -Destination (Join-Path $Destination $file.Name) -Force
+        $destinationFile = Join-Path $Destination $file.Name
+        [System.IO.File]::Copy($file.FullName, $destinationFile, $true)
     }
 
     $destinationRoot = (Resolve-Path -LiteralPath $Destination).Path
-    $extraFiles = Get-ChildItem -Path $destinationRoot -File -Filter $Filter | Where-Object { $_.Name -notin $sourceNames }
+    $extraFiles = Get-ChildItem -Path $destinationRoot -Force -File -Filter $Filter | Where-Object { $_.Name -notin $sourceNames }
     foreach ($extra in $extraFiles) {
         $resolvedExtra = (Resolve-Path -LiteralPath $extra.FullName).Path
         if (-not $resolvedExtra.StartsWith($destinationRoot + [System.IO.Path]::DirectorySeparatorChar, [System.StringComparison]::OrdinalIgnoreCase)) {
             throw "Refusing to remove path outside agent mirror: $resolvedExtra"
         }
-        Remove-Item -LiteralPath $resolvedExtra -Force
+        [System.IO.File]::Delete($resolvedExtra)
     }
 }
 

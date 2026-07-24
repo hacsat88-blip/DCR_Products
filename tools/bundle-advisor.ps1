@@ -180,12 +180,12 @@ function Get-CatalogIndex {
     $agentsDir = Join-Path $Root ".ai/catalog/agents-source"
 
     if (Test-Path $rulesDir) {
-        foreach ($file in Get-ChildItem -Path $rulesDir -File -Filter "*.md" | Where-Object { -not $_.BaseName.StartsWith("_") }) {
+        foreach ($file in Get-ChildItem -Path $rulesDir -Force -File -Filter "*.md" | Where-Object { -not $_.BaseName.StartsWith("_") }) {
             Add-CatalogAsset -Catalog $catalog -Kind "rule" -Name $file.BaseName -Path $file.FullName -Frontmatter (Get-Frontmatter -Path $file.FullName)
         }
     }
     if (Test-Path $skillsDir) {
-        foreach ($dir in Get-ChildItem -Path $skillsDir -Directory | Where-Object { -not $_.Name.StartsWith("_") }) {
+        foreach ($dir in Get-ChildItem -Path $skillsDir -Force -Directory | Where-Object { -not $_.Name.StartsWith("_") }) {
             $skillFile = Join-Path $dir.FullName "SKILL.md"
             if (Test-Path $skillFile) {
                 Add-CatalogAsset -Catalog $catalog -Kind "skill" -Name $dir.Name -Path $skillFile -Frontmatter (Get-Frontmatter -Path $skillFile)
@@ -193,7 +193,7 @@ function Get-CatalogIndex {
         }
     }
     if (Test-Path $agentsDir) {
-        foreach ($file in Get-ChildItem -Path $agentsDir -File -Filter "*.md" | Where-Object { -not $_.BaseName.StartsWith("_") -and $_.BaseName -ne "README" }) {
+        foreach ($file in Get-ChildItem -Path $agentsDir -Force -File -Filter "*.md" | Where-Object { -not $_.BaseName.StartsWith("_") -and $_.BaseName -ne "README" }) {
             Add-CatalogAsset -Catalog $catalog -Kind "agent" -Name $file.BaseName -Path $file.FullName -Frontmatter (Get-Frontmatter -Path $file.FullName)
         }
     }

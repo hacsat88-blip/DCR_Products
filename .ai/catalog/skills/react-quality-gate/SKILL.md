@@ -31,9 +31,7 @@ metadata:
   runtime_targets:
     - codex
     - claude
-    - copilot
     - cursor
-    - gemini-cli
 ---
 
 # React Quality Gate

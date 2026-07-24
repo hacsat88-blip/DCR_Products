@@ -65,7 +65,7 @@ try {
         })
     }
 
-    $preview = & powershell.exe -NoProfile -File $ProposalScript -RepoRoot $TempRoot -LogPath $LogPath -TopN 3 -MinRealDecisions 3 -MinEvidence 2 -ProposalId "bundle-v101-preview" -OutputJson $PreviewJson 2>&1
+    $preview = & (Get-Process -Id $PID).Path -NoProfile -File $ProposalScript -RepoRoot $TempRoot -LogPath $LogPath -TopN 3 -MinRealDecisions 3 -MinEvidence 2 -ProposalId "bundle-v101-preview" -OutputJson $PreviewJson 2>&1
     if ($LASTEXITCODE -ne 0) {
         throw "preview bundle proposal failed with $LASTEXITCODE. Output: $preview"
     }
@@ -89,7 +89,7 @@ try {
         throw "preview unexpectedly created gate-state.json"
     }
 
-    $commit = & powershell.exe -NoProfile -File $ProposalScript -RepoRoot $TempRoot -LogPath $LogPath -GateStatePath $CustomGateStatePath -TopN 3 -MinRealDecisions 3 -MinEvidence 2 -ProposalId "bundle-v101-commit" -OutputJson $CommitJson -CommitState 2>&1
+    $commit = & (Get-Process -Id $PID).Path -NoProfile -File $ProposalScript -RepoRoot $TempRoot -LogPath $LogPath -GateStatePath $CustomGateStatePath -TopN 3 -MinRealDecisions 3 -MinEvidence 2 -ProposalId "bundle-v101-commit" -OutputJson $CommitJson -CommitState 2>&1
     if ($LASTEXITCODE -ne 0) {
         throw "commit bundle proposal failed with $LASTEXITCODE. Output: $commit"
     }

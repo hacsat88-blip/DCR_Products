@@ -125,7 +125,7 @@ try {
         })
     }
 
-    $output = & powershell.exe -NoProfile -File $AdvisorScript -LogPath $LogPath -TopN 10 -MinShadowTrials 3 -MinEvidence 2 -OutputJson $OutputJson 2>&1
+    $output = & (Get-Process -Id $PID).Path -NoProfile -File $AdvisorScript -LogPath $LogPath -TopN 10 -MinShadowTrials 3 -MinEvidence 2 -OutputJson $OutputJson 2>&1
     if ($LASTEXITCODE -ne 0) {
         throw "display-policy-advisor.ps1 exited with $LASTEXITCODE. Output: $output"
     }
@@ -164,7 +164,7 @@ try {
         user_judgement = "just_right"
         actual_asset = "skill:unified-router"
     })
-    $lowOutput = & powershell.exe -NoProfile -File $AdvisorScript -LogPath $LowEvidenceLog -TopN 10 -MinShadowTrials 2 -MinEvidence 2 -OutputJson $LowEvidenceJson 2>&1
+    $lowOutput = & (Get-Process -Id $PID).Path -NoProfile -File $AdvisorScript -LogPath $LowEvidenceLog -TopN 10 -MinShadowTrials 2 -MinEvidence 2 -OutputJson $LowEvidenceJson 2>&1
     if ($LASTEXITCODE -ne 0) {
         throw "low evidence display advisor run exited with $LASTEXITCODE. Output: $lowOutput"
     }

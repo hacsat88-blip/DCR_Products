@@ -17,9 +17,7 @@ composable:
 runtime_targets:
   - codex
   - claude
-  - copilot
   - cursor
-  - gemini-cli
 ---
 
 # mem-search — Cross-Tool Memory Search & Save

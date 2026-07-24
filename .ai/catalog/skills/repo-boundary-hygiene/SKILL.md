@@ -34,9 +34,7 @@ package:
 runtime_targets:
   - codex
   - claude
-  - copilot
   - cursor
-  - gemini-cli
 ---
 
 # Repo Boundary Hygiene
@@ -49,8 +47,8 @@ runtime_targets:
 
 ## いつ使うか
 
-- root と `Product/` の責務が混ざって見えるとき
-- root editor workspace 設定、`docs/`, `templates/`, `.dcr/`, `rules/`, `skills/` の整理を検討するとき
+- DCR 正本と外部 Product repository の責務が混ざって見えるとき
+- editor workspace 設定、`docs/`, `templates/`, `rules/`, `skills/` の整理を検討するとき
 - source-of-truth と generated output のどちらを直すべきか迷うとき
 - 不在 Product path や stale path を抱えた設定を片付けたいとき
 - legacy script を削除するか shim にするか判断したいとき
@@ -71,7 +69,7 @@ runtime_targets:
 | source-of-truth | 正本。変更はここから始める    | `rules/*.md`, `skills/*/SKILL.md`, `templates/` |
 | generated       | 正本から派生する生成物        | `.cursor/rules/*.mdc`, generated docs |
 | runtime/config  | 実行時に効く設定や task       | local editor settings, product-local task files |
-| product-local   | 特定 Product にだけ属する資産 | `Product/<product>/**`, product overlay         |
+| product-local   | 特定 Product にだけ属する資産 | 外部 Product repository, product overlay          |
 
 ## Secondary Tags
 
@@ -118,7 +116,7 @@ runtime_targets:
 - generated file を正本として編集する
 - docs / templates / scripts を未検索のまま削除する
 - root editor workspace 設定に product-specific interpreter や tasks を残す
-- 実在しない `Product/<name>/` を仮定して資産を移す
+- 実在しない Product repository を仮定して資産を移す
 - legacy entrypoint を外部参照確認なしで削除する
 
 ## Output Template

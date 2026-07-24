@@ -27,7 +27,7 @@ function Get-FrontmatterText {
 }
 
 $activeSkills = @()
-foreach ($dir in Get-ChildItem -Path $skillsDir -Directory | Where-Object { -not $_.Name.StartsWith("_") } | Sort-Object Name) {
+foreach ($dir in Get-ChildItem -Path $skillsDir -Force -Directory | Where-Object { -not $_.Name.StartsWith("_") } | Sort-Object Name) {
     $skillFile = Join-Path $dir.FullName "SKILL.md"
     if (-not (Test-Path -LiteralPath $skillFile)) { continue }
     $fm = Get-FrontmatterText -Path $skillFile

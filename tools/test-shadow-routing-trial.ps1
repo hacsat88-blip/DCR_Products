@@ -42,7 +42,7 @@ function Assert-Equal {
 }
 
 try {
-    $recordOutput = & powershell.exe -NoProfile -File $ShadowScript `
+    $recordOutput = & (Get-Process -Id $PID).Path -NoProfile -File $ShadowScript `
         -RepoRoot $TempRoot `
         -InputText "サトシ開発目線で軽く見て" `
         -Kind agent `
@@ -68,7 +68,7 @@ try {
     Assert-Equal -Actual $entry.user_judgement -Expected "just_right" -Message "user judgement mismatch"
     Assert-Equal -Actual $entry.actual_asset -Expected "agent:pied-piper" -Message "actual asset mismatch"
 
-    $reportOutput = & powershell.exe -NoProfile -File $ReportScript -LogPath $LogPath -TopN 5 -MinRealDecisions 1 -OutputJson $OutputJson 2>&1
+    $reportOutput = & (Get-Process -Id $PID).Path -NoProfile -File $ReportScript -LogPath $LogPath -TopN 5 -MinRealDecisions 1 -OutputJson $OutputJson 2>&1
     if ($LASTEXITCODE -ne 0) {
         throw "router-decisions-report.ps1 exited with $LASTEXITCODE. Output: $reportOutput"
     }

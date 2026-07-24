@@ -42,7 +42,7 @@ if ([string]::IsNullOrWhiteSpace($filePath)) { exit 0 }
 $plansDir = Join-Path $RepoRoot "docs\dcr\plans"
 if (-not (Test-Path $plansDir)) { exit 0 }
 
-$planFiles = Get-ChildItem -Path $plansDir -Filter "*.md" -File |
+$planFiles = Get-ChildItem -Path $plansDir -Force -Filter "*.md" -File |
     Sort-Object LastWriteTime -Descending |
     Select-Object -First 1
 

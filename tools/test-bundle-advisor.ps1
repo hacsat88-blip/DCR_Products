@@ -105,7 +105,7 @@ try {
         })
     }
 
-    $output = & powershell.exe -NoProfile -File $AdvisorScript -LogPath $LogPath -TopN 10 -MinRealDecisions 3 -MinEvidence 2 -OutputJson $OutputJson 2>&1
+    $output = & (Get-Process -Id $PID).Path -NoProfile -File $AdvisorScript -LogPath $LogPath -TopN 10 -MinRealDecisions 3 -MinEvidence 2 -OutputJson $OutputJson 2>&1
     if ($LASTEXITCODE -ne 0) {
         throw "bundle-advisor.ps1 exited with $LASTEXITCODE. Output: $output"
     }
@@ -146,7 +146,7 @@ try {
         reason = "real decision"
         actual_asset = "skill:unified-router"
     })
-    $lowOutput = & powershell.exe -NoProfile -File $AdvisorScript -LogPath $LowEvidenceLog -TopN 10 -MinRealDecisions 2 -MinEvidence 2 -OutputJson $LowEvidenceJson 2>&1
+    $lowOutput = & (Get-Process -Id $PID).Path -NoProfile -File $AdvisorScript -LogPath $LowEvidenceLog -TopN 10 -MinRealDecisions 2 -MinEvidence 2 -OutputJson $LowEvidenceJson 2>&1
     if ($LASTEXITCODE -ne 0) {
         throw "low evidence bundle advisor run exited with $LASTEXITCODE. Output: $lowOutput"
     }

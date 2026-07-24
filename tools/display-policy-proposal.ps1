@@ -132,7 +132,7 @@ try {
     if ($IncludeSynthetic) {
         $advisorArgs += "-IncludeSynthetic"
     }
-    $advisorOutput = & powershell.exe @advisorArgs 2>&1
+    $advisorOutput = & (Get-Process -Id $PID).Path @advisorArgs 2>&1
     if ($LASTEXITCODE -ne 0) {
         throw "display-policy-advisor.ps1 failed with $LASTEXITCODE. Output: $advisorOutput"
     }

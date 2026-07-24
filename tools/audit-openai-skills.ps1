@@ -61,7 +61,7 @@ function Get-FrontmatterMap {
 
 function Get-DcrSkills {
     $rows = @()
-    $dirs = Get-ChildItem -Path $skillsRoot -Directory |
+    $dirs = Get-ChildItem -Path $skillsRoot -Force -Directory |
         Where-Object { $_.Name -notlike "_*" } |
         Sort-Object Name
 
@@ -95,7 +95,7 @@ function Get-OpenAiSkillsFromRoot {
         return @()
     }
 
-    $files = Get-ChildItem -Path $Root -Recurse -Filter "SKILL.md" -File -ErrorAction SilentlyContinue
+    $files = Get-ChildItem -Path $Root -Force -Recurse -Filter "SKILL.md" -File -ErrorAction SilentlyContinue
     $rows = @()
 
     foreach ($file in $files) {
@@ -193,7 +193,6 @@ function Get-Classification {
     $origin = $Skill.Origin
 
     $dcrSpecific = @(
-        "ai-prompt-manager",
         "codex-app-server-integration",
         "dcr-generated-mirror-drift",
         "dcr-pipeline",
@@ -209,7 +208,6 @@ function Get-Classification {
         "oss-delegate",
         "react-quality-gate",
         "repo-boundary-hygiene",
-        "stock-skills-sla",
         "token-efficiency-advisor",
         "unified-router"
     )

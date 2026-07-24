@@ -22,7 +22,6 @@ inherits:
   - testing-standards
   - git-conventions
 targets:
-  - vscode
   - cursor
   - claude
   - codex

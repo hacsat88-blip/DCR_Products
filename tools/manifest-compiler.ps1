@@ -78,12 +78,12 @@ $skillDir = Resolve-DcrSourcePath -RepoRoot $resolvedRoot -AssetType "skills"
 $agentDir = Resolve-DcrSourcePath -RepoRoot $resolvedRoot -AssetType "agents-source"
 
 Write-Host "[1/3] Scanning $(Get-DcrCanonicalRelativePath -AssetType 'rules')/*.md..." -ForegroundColor Yellow
-$ruleFiles = @(Get-ChildItem -Path $ruleDir -Filter "*.md" -ErrorAction SilentlyContinue |
+$ruleFiles = @(Get-ChildItem -Path $ruleDir -Force -Filter "*.md" -ErrorAction SilentlyContinue |
     Where-Object { -not $_.BaseName.StartsWith("_") })
 foreach ($file in $ruleFiles) {
     $targets = @(Get-FrontmatterTargets -FilePath $file.FullName)
     if ($targets.Count -eq 0) {
-        $targets = @("vscode", "claude", "codex")
+        $targets = @("claude", "codex", "cursor")
     }
 
     $manifest.rules += @{
@@ -96,7 +96,7 @@ foreach ($file in $ruleFiles) {
 Write-Host "  [OK] Found $($manifest.rules.Count) rules" -ForegroundColor Green
 
 Write-Host "[2/3] Scanning $(Get-DcrCanonicalRelativePath -AssetType 'skills')/*/SKILL.md..." -ForegroundColor Yellow
-$skillDirs = @(Get-ChildItem -Path $skillDir -Directory -ErrorAction SilentlyContinue |
+$skillDirs = @(Get-ChildItem -Path $skillDir -Force -Directory -ErrorAction SilentlyContinue |
     Where-Object { -not $_.Name.StartsWith("_") })
 foreach ($dir in $skillDirs) {
     $skillFile = Join-Path $dir.FullName "SKILL.md"
@@ -106,7 +106,7 @@ foreach ($dir in $skillDirs) {
 
     $targets = @(Get-FrontmatterTargets -FilePath $skillFile)
     if ($targets.Count -eq 0) {
-        $targets = @("vscode", "claude", "codex")
+        $targets = @("claude", "codex", "cursor")
     }
 
     $manifest.skills += @{
@@ -119,7 +119,7 @@ foreach ($dir in $skillDirs) {
 Write-Host "  [OK] Found $($manifest.skills.Count) skills" -ForegroundColor Green
 
 Write-Host "[3/3] Scanning $(Get-DcrCanonicalRelativePath -AssetType 'agents-source')/*.md..." -ForegroundColor Yellow
-$agentFiles = @(Get-ChildItem -Path $agentDir -Filter "*.md" -ErrorAction SilentlyContinue |
+$agentFiles = @(Get-ChildItem -Path $agentDir -Force -Filter "*.md" -ErrorAction SilentlyContinue |
     Where-Object { $_.Name -ne "README.md" })
 foreach ($file in $agentFiles) {
     $targets = @(Get-FrontmatterTargets -FilePath $file.FullName)

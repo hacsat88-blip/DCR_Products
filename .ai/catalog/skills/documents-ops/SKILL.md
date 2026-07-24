@@ -27,9 +27,7 @@ metadata:
   runtime_targets:
     - codex
     - claude
-    - copilot
     - cursor
-    - gemini-cli
 absorbs:
   - adr-management
   - api-docs-automation

@@ -3,16 +3,14 @@ Generated from: .ai/core + .ai/routing + .ai/catalog/rules/ + .ai/catalog/skills
 To regenerate: Run pwsh -ExecutionPolicy Bypass -File .\deploy.ps1 or .\tools\deploy-all.ps1
 Any manual edits will be overwritten on next deploy. -->
 
-# Codex / GitHub Copilot CLI Entrypoint
+# Codex Entrypoint
 
-Unified entry point for Codex and GitHub Copilot CLI environments.
-
-GitHub Copilot CLI specific behavior lives in [.ai/adapters/copilot-cli/kernel.md](.ai/adapters/copilot-cli/kernel.md).
+Unified entry point for the Codex environment.
 
 ## Scope Summary
 
-- Active rules: 54
-- Active skills: 70
+- Active rules: 53
+- Active skills: 68
 - Active agents: 116
 - Deprecated aliases (rules/skills/agents): 0 / 0 / 0
 

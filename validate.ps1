@@ -69,6 +69,8 @@ $DisplayPolicyAdvisorTestScript = Join-Path $RepoRoot "tools\test-display-policy
 $DisplayPolicyProposalTestScript = Join-Path $RepoRoot "tools\test-display-policy-proposal.ps1"
 $BundleAdvisorTestScript = Join-Path $RepoRoot "tools\test-bundle-advisor.ps1"
 $BundleProposalTestScript = Join-Path $RepoRoot "tools\test-bundle-proposal.ps1"
+$AdapterManifestValidationScript = Join-Path $RepoRoot "tools\validate-adapter-manifest.ps1"
+$MacTriadBoundaryScript = Join-Path $RepoRoot "tools\validate-mac-triad-boundary.ps1"
 $RoutingIndexFile = Join-Path $SourceRules "_ROUTING_INDEX.md"
 function Resolve-DcrPowerShellExe {
     $pwshCommand = Get-Command pwsh -ErrorAction SilentlyContinue
@@ -99,7 +101,7 @@ Write-Host ""
 # 1. catalog rules/*.md — H1 見出し検証
 # ─────────────────────────────────────────────
 Write-Host "== 1. catalog rules/*.md H1 check =============="
-$ruleFiles = Get-ChildItem -Path $SourceRules -File -Filter *.md |
+$ruleFiles = Get-ChildItem -Path $SourceRules -Force -File -Filter *.md |
 Where-Object { $_.BaseName -notlike "_*" } |
 Sort-Object Name
 
@@ -120,7 +122,7 @@ Write-Host "  rules processed: $($ruleFiles.Count)" -ForegroundColor DarkGray
 # ─────────────────────────────────────────────
 Write-Host ""
 Write-Host "== 2. catalog skills/*/SKILL.md check =========="
-$skillDirs = Get-ChildItem -Path $SourceSkills -Directory |
+$skillDirs = Get-ChildItem -Path $SourceSkills -Force -Directory |
 Where-Object { $_.Name -notlike "_*" } |
 Sort-Object Name
 
@@ -167,22 +169,22 @@ Write-Host ""
 Write-Host "== 3. .ai/core + .ai/routing + playbooks + adapters H1 check ==="
 $coreFiles = @()
 if (Test-Path $CoreRoot) {
-    $coreFiles = Get-ChildItem -Path $CoreRoot -File -Filter *.md -Recurse | Sort-Object FullName
+    $coreFiles = Get-ChildItem -Path $CoreRoot -Force -File -Filter *.md -Recurse | Sort-Object FullName
 }
 $routingFiles = @()
 if (Test-Path $RoutingRoot) {
     # Exclude non-doc files under state/ (JSON, JSONL)
-    $routingFiles = Get-ChildItem -Path $RoutingRoot -File -Filter *.md -Recurse | Sort-Object FullName
+    $routingFiles = Get-ChildItem -Path $RoutingRoot -Force -File -Filter *.md -Recurse | Sort-Object FullName
 }
 $playbookFiles = @()
 if (Test-Path $PlaybooksRoot) {
-    $playbookFiles = Get-ChildItem -Path $PlaybooksRoot -File -Filter *.md | Sort-Object FullName
+    $playbookFiles = Get-ChildItem -Path $PlaybooksRoot -Force -File -Filter *.md | Sort-Object FullName
 }
 $adapterKernelFiles = @()
 if (Test-Path $AdaptersRoot) {
     # Validate adapter kernel.md files and top-level adapter docs (exclude templates subtree)
-    $adapterKernelFiles = Get-ChildItem -Path $AdaptersRoot -File -Filter *.md -Recurse |
-        Where-Object { $_.FullName -notmatch '\\templates\\' } |
+    $adapterKernelFiles = Get-ChildItem -Path $AdaptersRoot -Force -File -Filter *.md -Recurse |
+        Where-Object { $_.FullName -notmatch '[\\/]templates[\\/]' } |
         Sort-Object FullName
 }
 
@@ -206,28 +208,16 @@ Write-Host "  adapter docs processed: $($adapterKernelFiles.Count)" -ForegroundC
 # ─────────────────────────────────────────────
 Write-Host ""
 Write-Host "== 4. deploy.ps1 -DryRun check =================="
-$isWindowsPlatform = if (Get-Variable -Name IsWindows -ErrorAction SilentlyContinue) {
-    $IsWindows
-}
-else {
-    $env:OS -eq "Windows_NT" -or [System.IO.Path]::DirectorySeparatorChar -eq '\'
-}
-$deployDryRunTargets = @("vscode", "cursor", "agents", "dcr")
-if (-not $isWindowsPlatform) {
-    Write-Host "  [SKIP] deploy DryRun: Windows-only script (non-Windows CI skipped)" -ForegroundColor DarkGray
-    $script:passed += $deployDryRunTargets.Count
-}
-else {
-    foreach ($target in $deployDryRunTargets) {
-        $result = & $PowerShellExe -ExecutionPolicy Bypass -File $DeployScript -DryRun -Target $target 2>&1
-        if ($LASTEXITCODE -eq 0) {
-            if ($Verbose) { Write-Ok "deploy -Target $target — exit 0" }
-            else { $script:passed++ }
-        }
-        else {
-            Write-Fail "deploy -Target $target — exit $LASTEXITCODE"
-            if ($Verbose -and $result) { Write-Host "  $result" -ForegroundColor DarkGray }
-        }
+$deployDryRunTargets = @("codex", "claude", "cursor", "agents")
+foreach ($target in $deployDryRunTargets) {
+    $result = & $PowerShellExe -ExecutionPolicy Bypass -File $DeployScript -DryRun -Target $target 2>&1
+    if ($LASTEXITCODE -eq 0) {
+        if ($Verbose) { Write-Ok "deploy -Target $target — exit 0" }
+        else { $script:passed++ }
+    }
+    else {
+        Write-Fail "deploy -Target $target — exit $LASTEXITCODE"
+        if ($result) { Write-Host "  $result" -ForegroundColor DarkGray }
     }
 }
 
@@ -274,7 +264,7 @@ else {
 # ─────────────────────────────────────────────
 Write-Host ""
 Write-Host "== 6. catalog rules/*.md trait check =========="
-$traitFiles = Get-ChildItem -Path $SourceRules -File -Filter "_*.md" |
+$traitFiles = Get-ChildItem -Path $SourceRules -Force -File -Filter "_*.md" |
 Where-Object { $_.BaseName -ne "_METADATA" -and $_.BaseName -ne "_ROUTING_INDEX" } |
 ForEach-Object { $_.BaseName.TrimStart("_") }
 $traitCheckCount = 0
@@ -620,7 +610,7 @@ Write-Host "== 14. agents-source/*.toml version check ======="
 $agentVersionCheckCount = 0
 
 if (Test-Path $AgentsSource) {
-    $tomlFiles = Get-ChildItem -Path $AgentsSource -File -Filter '*.toml' | Sort-Object Name
+    $tomlFiles = Get-ChildItem -Path $AgentsSource -Force -File -Filter '*.toml' | Sort-Object Name
     foreach ($file in $tomlFiles) {
         $agentVersionCheckCount++
         $content = Get-Content -Path $file.FullName -Raw -Encoding utf8
@@ -908,7 +898,7 @@ else {
 Write-Host ""
 Write-Host "== 28. PowerShell script glyph check =========="
 $PowerShellStatusGlyphPattern = '[\uD800-\uDBFF][\uDC00-\uDFFF]|[\u2600-\u26FF\u2700-\u27BF]'
-$PowerShellScriptFiles = Get-ChildItem -Path $RepoRoot -Recurse -File -Include *.ps1,*.psm1,*.psd1 -ErrorAction SilentlyContinue |
+$PowerShellScriptFiles = Get-ChildItem -Path $RepoRoot -Force -Recurse -File -Include *.ps1,*.psm1,*.psd1 -ErrorAction SilentlyContinue |
 Where-Object {
     $_.FullName -notmatch '\\\.git\\' -and
     $_.FullName -notmatch '\\node_modules\\' -and
@@ -940,13 +930,108 @@ else {
 # ─────────────────────────────────────────────
 Write-Host ""
 Write-Host "== 29. external footprint ledger check ========="
-# external footprint ledger present and covers ~/.config/dcr
+# external footprint ledger is present and declares no external write.
 $footprint = Join-Path $RepoRoot ".ai/adapters/external-footprint.md"
 if (Test-Path $footprint) {
     $ledger = Get-Content $footprint -Raw
-    if ($ledger -match "config/dcr") { Write-Ok "external-footprint ledger covers ~/.config/dcr" }
-    else { Write-Fail "external-footprint ledger missing ~/.config/dcr entry" }
+    if ($ledger -match "リポ外へ書き込まない") { Write-Ok "external-footprint ledger declares repository-local deploy" }
+    else { Write-Fail "external-footprint ledger does not declare repository-local deploy" }
 } else { Write-Fail "external-footprint.md not found" }
+
+# ───────────────────────────────────────────
+# 30. skill capability metadata
+# ───────────────────────────────────────────
+Write-Host ""
+Write-Host "== 30. skill capability metadata ==============="
+$skillCapabilityScript = Join-Path $RepoRoot "tools/validate-skill-capabilities.ps1"
+$result = & $PowerShellExe -ExecutionPolicy Bypass -File $skillCapabilityScript -RepoRoot $RepoRoot 2>&1
+if ($LASTEXITCODE -eq 0) {
+    if ($Verbose -and $result) { Write-Host "  $result" -ForegroundColor DarkGray }
+    $script:passed++
+}
+else {
+    Write-Fail "skill capability metadata validation failed"
+    if ($result) { Write-Host "  $result" -ForegroundColor DarkGray }
+}
+
+# ───────────────────────────────────────────
+# 31. compiled manifest schema
+# ───────────────────────────────────────────
+Write-Host ""
+Write-Host "== 31. compiled manifest schema ================="
+$manifestPath = Join-Path ([System.IO.Path]::GetTempPath()) ("dcr-manifest-" + [guid]::NewGuid().ToString("N") + ".json")
+try {
+    $result = & $PowerShellExe -ExecutionPolicy Bypass -File (Join-Path $RepoRoot "tools/manifest-compiler.ps1") -RepoRoot $RepoRoot -OutputPath $manifestPath 2>&1
+    if ($LASTEXITCODE -ne 0) { throw ($result -join [Environment]::NewLine) }
+    $manifestJson = Get-Content -LiteralPath $manifestPath -Raw -Encoding utf8
+    if (-not ($manifestJson | Test-Json -SchemaFile (Join-Path $RepoRoot "tools/lib/manifest.schema.json"))) {
+        throw "compiled manifest does not match schema"
+    }
+    Write-Ok "compiled manifest matches triad schema"
+}
+catch {
+    Write-Fail "compiled manifest schema validation failed: $($_.Exception.Message)"
+}
+finally {
+    if (Test-Path -LiteralPath $manifestPath) { Remove-Item -LiteralPath $manifestPath -Force }
+}
+
+# ───────────────────────────────────────────
+# 32. adapter manifest contract
+# ───────────────────────────────────────────
+Write-Host ""
+Write-Host "== 32. adapter manifest contract ================"
+if (-not (Test-Path -LiteralPath $AdapterManifestValidationScript)) {
+    Write-Fail "adapter manifest validator not found"
+}
+else {
+    $result = & $PowerShellExe -ExecutionPolicy Bypass -File $AdapterManifestValidationScript -RepoRoot $RepoRoot 2>&1
+    if ($LASTEXITCODE -eq 0) {
+        if ($Verbose -and $result) { Write-Host "  $result" -ForegroundColor DarkGray }
+        $script:passed++
+    }
+    else {
+        Write-Fail "adapter manifest validation failed"
+        if ($result) { Write-Host "  $result" -ForegroundColor DarkGray }
+    }
+}
+
+# ───────────────────────────────────────────
+# 33. Mac triad boundary
+# ───────────────────────────────────────────
+Write-Host ""
+Write-Host "== 33. Mac triad boundary ======================="
+if (-not (Test-Path -LiteralPath $MacTriadBoundaryScript)) {
+    Write-Fail "Mac triad boundary validator not found"
+}
+else {
+    $result = & $PowerShellExe -ExecutionPolicy Bypass -File $MacTriadBoundaryScript -RepoRoot $RepoRoot 2>&1
+    if ($LASTEXITCODE -eq 0) {
+        if ($Verbose -and $result) { Write-Host "  $result" -ForegroundColor DarkGray }
+        $script:passed++
+    }
+    else {
+        Write-Fail "Mac triad boundary validation failed"
+        if ($result) { Write-Host "  $result" -ForegroundColor DarkGray }
+    }
+}
+
+# ───────────────────────────────────────────
+# 34. PowerShell parser
+# ───────────────────────────────────────────
+Write-Host ""
+Write-Host "== 34. PowerShell parser ========================"
+$parseFailures = @()
+foreach ($file in $PowerShellScriptFiles) {
+    $tokens = $null
+    $parseErrors = $null
+    [void][System.Management.Automation.Language.Parser]::ParseFile($file.FullName, [ref]$tokens, [ref]$parseErrors)
+    foreach ($parseError in @($parseErrors)) {
+        $parseFailures += "$($file.FullName):$($parseError.Extent.StartLineNumber): $($parseError.Message)"
+    }
+}
+if ($parseFailures.Count -eq 0) { Write-Ok "PowerShell scripts parse successfully" }
+else { Write-Fail "PowerShell parse errors: $($parseFailures -join '; ')" }
 
 # ─────────────────────────────────────────────
 # 結果サマリー

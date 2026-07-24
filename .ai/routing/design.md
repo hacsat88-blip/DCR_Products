@@ -14,7 +14,7 @@
 
 - ルートに `AGENTS.md` と `CLAUDE.md` がある
 - `.ai/catalog/rules/` にロール別のMarkdownがある
-- `.github/copilot-instructions.md` がある
+- `.cursor/rules/dcr-kernel.mdc` がある
 - `deploy.ps1` が同期の中心になっている
 
 ## 制約
@@ -33,7 +33,7 @@
 - ロールの正本: `.ai/catalog/rules/*.md`
 - エディタ固有ファイルは生成物または薄い入口に寄せる
 
-`AGENTS.md`、`CLAUDE.md`、`.github/copilot-instructions.md` は
+`AGENTS.md`、`CLAUDE.md`、`.cursor/rules/dcr-kernel.mdc` は
 できるだけ正本ではなく配布形にする。
 
 ### 2. 自動参照の安全条件
@@ -101,18 +101,12 @@
 - ロール適用: 高一致時に `.ai/catalog/rules/*.md` を参照する
 - 方針: `Codex` と同じ判断基準を使い、差分は権限周りだけに限定する
 
-### VS Code / Copilot
+### Cursor
 
-- 入口: `.github/copilot-instructions.md`
-- 方式: 既存の `.ai/` モジュール参照方式を維持する
+- 入口: `.cursor/rules/dcr-kernel.mdc`
+- 方式: `.ai/core/kernel.md` から always-on rule を生成する
 - ロール適用: まず共通カーネルを読み、必要時のみ `.ai/catalog/rules/*.md` を追加参照する
-- 方針: Copilot 固有の `.instructions.md` を増やしすぎない
-
-### Antigravity / Gemini
-
-- 状態: 現行 adapter なし
-- 方針: 実体がある `.gemini/` adapter を追加するまで、対応エディタ一覧には載せない
-- 再開条件: `deploy.ps1`, `validate.ps1`, `init-project.ps1` が `.gemini/` を生成・検証できること
+- 方針: DCR 管理外の `.cursor/` ファイルを削除・上書きしない
 
 ## 推奨する運用
 
@@ -136,7 +130,7 @@
 
 - `.ai/catalog/rules/` を正本とする方針を文書化する
 - `AGENTS.md` と `CLAUDE.md` に動的参照ポリシーを追記する
-- Codex / Claude / Copilot / Cursor の入口だけを現行対応範囲にする
+- Codex / Claude Code / Cursor の入口だけを現行対応範囲にする
 
 ### Phase 2: ずれ防止
 
@@ -157,8 +151,7 @@
 
 ## 未解決事項
 
-- Antigravity / Gemini adapter を追加するかどうか
-- VS Code 側で `.ai/catalog/rules/*.md` の追加参照をどこまで安定運用できるか
+- Cursor 側で `.ai/catalog/rules/*.md` の追加参照をどこまで安定運用できるか
 - 各ロールにどの粒度のメタデータを持たせるか
 
 ## 推奨決定

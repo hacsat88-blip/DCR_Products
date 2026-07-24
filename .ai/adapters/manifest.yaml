@@ -1,5 +1,5 @@
 # 配布地図: source(正本) -> entrypoint(生成物) / mirror(生成物)
-# deploy.ps1 と validate.ps1 はこの manifest を正として読み、INDEX.md §3 と突き合わせる。
+# validate.ps1 はこの配布契約と deploy 実装の完全一致を検証する。
 version: 1
 sources:
   core: .ai/core
@@ -15,14 +15,14 @@ entrypoints:
     out: AGENTS.md
     adapter: .ai/adapters/codex/kernel.md
     reads: [core, routing, catalog]
-  - tool: vscode-copilot
-    out: .github/copilot-instructions.md
-    adapter: .ai/adapters/vscode-copilot/kernel.md
+  - tool: cursor
+    out: .cursor/rules/dcr-kernel.mdc
+    adapter: .ai/adapters/cursor/kernel.md
     reads: [core, routing, catalog]
 mirrors:
-  - source: .ai/catalog/agents-source   # *.md
+  - source: .ai/catalog/agents-source
     out: .claude/agents
     generated: true
-  - source: .ai/catalog/agents-source   # *.toml
+  - source: .ai/catalog/agents-source
     out: .codex/agents
     generated: true

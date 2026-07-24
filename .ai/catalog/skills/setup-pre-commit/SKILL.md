@@ -34,9 +34,7 @@ metadata:
   runtime_targets:
     - codex
     - claude
-    - copilot
     - cursor
-    - gemini-cli
 ---
 
 # Setup Pre-Commit
