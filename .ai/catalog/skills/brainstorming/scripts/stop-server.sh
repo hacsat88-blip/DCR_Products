@@ -3,7 +3,7 @@
 # Usage: stop-server.sh <screen_dir>
 #
 # Kills the server process. Only deletes session directory if it's
-# under /tmp (ephemeral). Persistent directories (.dcr/) are
+# under /tmp (ephemeral). User-selected persistent directories are
 # kept so mockups can be reviewed later.
 
 SCREEN_DIR="$1"

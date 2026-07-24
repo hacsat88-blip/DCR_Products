@@ -27,9 +27,7 @@ metadata:
 runtime_targets:
   - codex
   - claude
-  - copilot
   - cursor
-  - gemini-cli
 ---
 
 # GitHub Bug Report Triage

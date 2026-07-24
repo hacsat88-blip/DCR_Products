@@ -33,8 +33,6 @@ metadata:
     - codex
     - claude
     - cursor
-    - copilot
-    - gemini-cli
 ---
 
 # Codex App-Server Integration

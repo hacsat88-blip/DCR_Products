@@ -11,7 +11,7 @@ function Get-ClaudeMemoryPaths {
     }
     $projectsRoot = Join-Path $env:USERPROFILE ".claude\projects"
     if (-not (Test-Path -LiteralPath $projectsRoot)) { return $null }
-    $candidates = Get-ChildItem -LiteralPath $projectsRoot -Filter "mem_cli.py" -File -Recurse -Depth 6 -ErrorAction SilentlyContinue |
+    $candidates = Get-ChildItem -LiteralPath $projectsRoot -Force -Filter "mem_cli.py" -File -Recurse -Depth 6 -ErrorAction SilentlyContinue |
         Where-Object { $_.Directory.Name -eq "memory" }
     if (-not $candidates) { return $null }
     $cli = @($candidates) | Sort-Object FullName | Select-Object -First 1

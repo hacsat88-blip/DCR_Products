@@ -104,7 +104,7 @@ try {
     }
     $gateState | ConvertTo-Json -Depth 8 | Set-Content -Path $GateStatePath -Encoding UTF8
 
-    $reportOutput = & powershell.exe -NoProfile -File $ReportScript -LogPath $LogPath -GateStatePath $GateStatePath -StaleHours 0 -MinRealDecisions 1 -OutputJson $OutputJson 2>&1
+    $reportOutput = & (Get-Process -Id $PID).Path -NoProfile -File $ReportScript -LogPath $LogPath -GateStatePath $GateStatePath -StaleHours 0 -MinRealDecisions 1 -OutputJson $OutputJson 2>&1
     if ($LASTEXITCODE -ne 0) {
         throw "router-decisions-report.ps1 exited with $LASTEXITCODE. Output: $reportOutput"
     }
@@ -157,7 +157,7 @@ try {
         reason = "fixture smoke"
     })
 
-    $syntheticOutput = & powershell.exe -NoProfile -File $ReportScript -LogPath $SyntheticLogPath -GateStatePath $GateStatePath -OutputJson $SyntheticJson 2>&1
+    $syntheticOutput = & (Get-Process -Id $PID).Path -NoProfile -File $ReportScript -LogPath $SyntheticLogPath -GateStatePath $GateStatePath -OutputJson $SyntheticJson 2>&1
     if ($LASTEXITCODE -ne 0) {
         throw "synthetic router-decisions-report.ps1 exited with $LASTEXITCODE. Output: $syntheticOutput"
     }

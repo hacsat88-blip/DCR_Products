@@ -129,6 +129,14 @@ Always get approval before:
 - P1 read-only の単独低リスク調査を除き、Skill / Agent / サブエージェント / 並列 orchestration / 外部 MCP/API は候補提示 -> ユーザー承認 -> 発火の順に進める
 - 曖昧な自然言語では、候補を2-3件に絞り、おすすめを先頭にして確認する
 
+## Unified Coordinator and proposal replies
+
+- 全タスクの単一入口は `pied-piper` agent。選定は `unified-router` skill と `.ai/routing/router.md` に従う
+- `.ai/routing/state/gate-state.json` の `proposal_state.status = proposed|refined` は、次の短い発話を通常ルーティングより先に proposal reply として解釈する
+- `おすすめで` / `推奨で` は対象が一意な場合だけ approve、`おまかせ` は確認、`キャンセル` は reject、`別案` / `軽く` は refine とする
+- 実行確定時は `tools/lib/gate-state.ps1` の proposal state machine に従う
+- 一意に承認できた場合のみ `OK` を承認として扱う
+
 ## Footer rule
 
 Suggest one next command only when a safety caveat, important uncertainty, or unresolved issue remains:
@@ -208,7 +216,7 @@ When the user triggers a mode, apply the corresponding behavior:
 
 ## Unified Integration
 
-VS Code の GitHub Copilot、GitHub Copilot CLI、Codex、Claude Code、Cursor の運用差分を最小化するため、
+Codex、Claude Code、Cursor の運用差分を最小化するため、
 共通仕様として `.ai/routing/integration.md` を参照すること。
 
 ### r/ - Recommendation

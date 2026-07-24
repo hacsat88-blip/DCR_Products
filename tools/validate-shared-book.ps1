@@ -103,7 +103,7 @@ if (Test-Path $toolContractPath) {
 
 # --- adapter kernel thin-environment check (.ai/adapters) ---
 if (Test-Path $AdapterRoot) {
-    $adapterKernelFiles = Get-ChildItem -Path $AdapterRoot -File -Filter "kernel.md" -Recurse | Sort-Object FullName
+    $adapterKernelFiles = Get-ChildItem -Path $AdapterRoot -Force -File -Filter "kernel.md" -Recurse | Sort-Object FullName
     $bannedPatterns = @(
         '(?im)^##\s+Signal protocol\b',
         '(?im)^##\s+Response behavior\b',

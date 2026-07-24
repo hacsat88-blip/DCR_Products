@@ -1,7 +1,7 @@
 ---
 name: dcr-generated-mirror-drift
 routing_category: devops
-description: "DCR repo の generated mirror / tracked entrypoint drift を診断する。`deploy.ps1`、`deploy.ps1 -Check`、GitHub Actions の generated-entrypoint failure、`.codex/agents`、`.claude/agents`、AGENTS/CLAUDE/Copilot instructions の同期ずれが出たときに使う。"
+description: "DCR repo の generated mirror / tracked entrypoint drift を診断する。`deploy.ps1`、`deploy.ps1 -Check`、GitHub Actions の generated-entrypoint failure、`.codex/agents`、`.claude/agents`、`.cursor/`、AGENTS/CLAUDE の同期ずれが出たときに使う。"
 contract:
   preconditions:
     - "deploy/check/CI/git status のいずれかに生成物 drift や mirror tracking の症状がある"
@@ -19,45 +19,43 @@ composable:
     - documents-ops
 metadata:
   origin: local-codex-sessions
-  adapted_from: "runtime memory skill deploy-vscode-mirror-drift plus May 2026 DCR mirror/CI cleanup rollouts"
+  adapted_from: "runtime memory skill for generated mirror drift plus May 2026 DCR mirror/CI cleanup rollouts"
   imported_at: "2026-05-24"
 runtime_targets:
   - codex
   - claude
-  - copilot
   - cursor
-  - gemini-cli
 ---
 
 # DCR Generated Mirror Drift
 
 ## 目的
 
-DCR repo の正本 (`.ai/catalog`, `.ai/book`, `.ai/kernel`, `.ai/environments`, `templates`) と、各 runtime の generated mirror / tracked entrypoint のズレを短時間で分類する。
+DCR repo の正本 (`.ai/core`, `.ai/routing`, `.ai/catalog`, `.ai/adapters`) と、Mac triad の generated mirror / tracked entrypoint のズレを短時間で分類する。
 
 この skill は修正そのものより先に、どこを直すべきかを確定するために使う。`.codex/agents` や `.claude/agents` などの生成先を見つけても、そこを正本として編集しない。
 
 ## Trigger
 
-- `Deploy verification failed for VS Code Copilot skills`
+- `Deploy verification failed`
 - `deploy.ps1 -Check` が `[EXTRA]`, `[MISSING]`, `[DRIFT]` を出す
 - GitHub Actions の `Check generated entrypoint drift` が失敗する
 - `Generated tracked entrypoints are stale.`
-- `Generated mirrors must stay untracked.`
-- `.github/copilot-instructions.md`, `AGENTS.md`, `CLAUDE.md` が生成後に dirty になる
+- `Generated tracked mirrors are stale.`
+- `.cursor/`, `AGENTS.md`, `CLAUDE.md` が生成後に dirty になる
 - `.codex/agents`, `.claude/agents`, tracked entrypoint の扱いが怪しい
 
 ## 初動
 
 1. 症状と実行コマンドをそのまま控える。
 2. まず narrow check を使う。
-   - VS Code/Copilot entrypoint: `.\deploy.ps1 -Target vscode` 後に `git status --short .github/copilot-instructions.md`
+   - Cursor entrypoint: `.\deploy.ps1 -Target cursor` 後に `git status --short .cursor .cursorignore`
    - 全体: `.\deploy.ps1 -Check`
    - tracked entrypoint: `.github/workflows/validate.yml` の対象ファイルを確認
 3. 該当 path を分類する。
-   - source-of-truth: `.ai/catalog`, `.ai/book`, `.ai/kernel`, `.ai/environments`, `templates`, generator scripts
-   - generated mirror: `.codex/agents`, `.claude/agents`
-   - tracked generated entrypoint: `AGENTS.md`, `CLAUDE.md`, `.github/copilot-instructions.md`, routing indexes
+   - source-of-truth: `.ai/core`, `.ai/routing`, `.ai/catalog`, `.ai/adapters`, generator scripts
+   - generated mirror: `.codex/agents`, `.claude/agents`, `.cursor`
+   - tracked generated entrypoint: `AGENTS.md`, `CLAUDE.md`, `.cursor`, routing indexes
 4. source に無い destination-only item は、昇格するか stale residue として消すかを判断する。
 
 ## 診断表
@@ -66,7 +64,7 @@ DCR repo の正本 (`.ai/catalog`, `.ai/book`, `.ai/kernel`, `.ai/environments`,
 |---|---|---|---|
 | `[EXTRA] ... exists only in destination` | destination-only mirror residue | `deploy.ps1 -Check` | deploy cleanup logic or generated mirror |
 | `Generated tracked entrypoints are stale.` | tracked entrypoint regenerated with different content/newline | CI log, `git status --short`, `git ls-files --eol` | adapter / generator, not entrypoint by hand |
-| `Generated mirrors must stay untracked.` | `.codex/agents` or `.claude/agents` is tracked | `git ls-files .codex/agents .claude/agents` | `.gitignore` and Git index |
+| Generated mirror is missing from a clean checkout | mirror is ignored or untracked | `git ls-files .codex/agents .claude/agents .cursor` | `.gitignore`, Git index, and adapter |
 | Removed tool still appears | hidden mirror or cache residue | hidden-aware search/enumeration | sync logic with `-Force`, or explicit residue cleanup |
 
 ## Output
@@ -87,7 +85,7 @@ DCR MIRROR DRIFT
 Choose the smallest relevant set, then broaden only when needed:
 
 ```powershell
-pwsh -ExecutionPolicy Bypass -File .\deploy.ps1 -Target vscode
+pwsh -ExecutionPolicy Bypass -File .\deploy.ps1 -Target cursor
 pwsh -ExecutionPolicy Bypass -File .\validate.ps1
 pwsh -ExecutionPolicy Bypass -File .\deploy.ps1
 pwsh -ExecutionPolicy Bypass -File .\deploy.ps1 -Check

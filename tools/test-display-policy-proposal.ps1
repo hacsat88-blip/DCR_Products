@@ -67,7 +67,7 @@ try {
         })
     }
 
-    $preview = & powershell.exe -NoProfile -File $ProposalScript -RepoRoot $TempRoot -LogPath $LogPath -TopN 3 -MinShadowTrials 3 -MinEvidence 2 -ProposalId "display-policy-v9-preview" -OutputJson $PreviewJson 2>&1
+    $preview = & (Get-Process -Id $PID).Path -NoProfile -File $ProposalScript -RepoRoot $TempRoot -LogPath $LogPath -TopN 3 -MinShadowTrials 3 -MinEvidence 2 -ProposalId "display-policy-v9-preview" -OutputJson $PreviewJson 2>&1
     if ($LASTEXITCODE -ne 0) {
         throw "preview proposal failed with $LASTEXITCODE. Output: $preview"
     }
@@ -91,7 +91,7 @@ try {
         throw "preview unexpectedly created gate-state.json"
     }
 
-    $commit = & powershell.exe -NoProfile -File $ProposalScript -RepoRoot $TempRoot -LogPath $LogPath -GateStatePath $CustomGateStatePath -TopN 3 -MinShadowTrials 3 -MinEvidence 2 -ProposalId "display-policy-v9-commit" -OutputJson $CommitJson -CommitState 2>&1
+    $commit = & (Get-Process -Id $PID).Path -NoProfile -File $ProposalScript -RepoRoot $TempRoot -LogPath $LogPath -GateStatePath $CustomGateStatePath -TopN 3 -MinShadowTrials 3 -MinEvidence 2 -ProposalId "display-policy-v9-commit" -OutputJson $CommitJson -CommitState 2>&1
     if ($LASTEXITCODE -ne 0) {
         throw "commit proposal failed with $LASTEXITCODE. Output: $commit"
     }

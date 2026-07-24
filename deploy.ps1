@@ -1,103 +1,46 @@
-﻿<#
+<#
 .SYNOPSIS
-  DCR Products - Deploy script
-  サトシ開発 (Git管理) の source-of-truth から runtime entrypoint / generated mirror へ一方向同期
+  DCR Products Mac triad deploy script.
 
 .DESCRIPTION
-  対象エディタと同期先:
-    VS Code Copilot : .github/copilot-instructions.md
-    Cursor          : .cursor/
-    Agents          : .ai/catalog/agents-source/ -> .codex/agents/ (toml) + .claude/agents/ (md)
+  Generates only the tracked Codex, Claude Code, and Cursor mirrors from .ai/:
+    - Codex: AGENTS.md and .codex/agents/
+    - Claude Code: CLAUDE.md and .claude/agents/
+    - Cursor: .cursor/README.md, .cursor/rules/dcr-kernel.mdc, and .cursorignore
+
+  Cursor files not owned by this adapter are preserved.
 
 .PARAMETER Target
-    同期先を指定: all | vscode | cursor | agents | dcr
-  デフォルト: all
+  Target to deploy or check: all | codex | claude | cursor | agents
 
 .PARAMETER DryRun
-  実際にはコピーせず、対象ファイルを表示するだけ
+  Prints planned adapter execution without writing files.
 
 .PARAMETER Check
-  エディタ側とリポジトリ側の差分を検出する（逆同期チェック）
-
-.EXAMPLE
-  .\deploy.ps1
-  .\deploy.ps1 -Target vscode
-  .\deploy.ps1 -Target agents
-  .\deploy.ps1 -Check
+  Generates expected output in a temporary directory and compares it with the
+  tracked triad mirrors without modifying the repository.
 #>
 
 param(
-    [ValidateSet("all", "vscode", "cursor", "agents", "dcr")]
+    [ValidateSet("all", "codex", "claude", "cursor", "agents")]
     [string]$Target = "all",
     [switch]$DryRun,
     [switch]$Check,
     [switch]$Watch,
-    [switch]$Backup,
     [switch]$EnforceGate
 )
 
 $ErrorActionPreference = "Stop"
-
-# UTF-8 enforcement: 非UTF-8(CP932)な PowerShell セッション（新PCの初回 bootstrap 等）で
-# 日本語 entrypoint が文字化けするのを防ぐ。書込は各 adapter が UTF8Encoding($false) で
-# 明示しているため、ここでは読み取りとコンソール/出力エンコーディングのみ UTF-8 に固定する。
-$utf8NoBom = New-Object System.Text.UTF8Encoding $false
-$OutputEncoding = $utf8NoBom
-try { [Console]::OutputEncoding = $utf8NoBom } catch {}
-try { [Console]::InputEncoding = $utf8NoBom } catch {}
-$PSDefaultParameterValues['Get-Content:Encoding'] = 'utf8'
-
 $RepoRoot = $PSScriptRoot
-$UserHome = $env:USERPROFILE
 $CatalogPaths = Join-Path $RepoRoot "tools\lib\catalog-paths.ps1"
 . $CatalogPaths
 $DeprecatedAliases = Join-Path $RepoRoot "tools\lib\deprecated-aliases.ps1"
 . $DeprecatedAliases
 
-# ── Gate enforcement ──
-if ($EnforceGate) {
-    $GateStateLib = Join-Path $RepoRoot "tools\lib\gate-state.ps1"
-    if (-not (Test-Path $GateStateLib)) {
-        Write-Host "STOP gate-state.ps1 が見つかりません: $GateStateLib" -ForegroundColor Red
-        exit 1
-    }
-    . $GateStateLib
-    if (-not (Test-GateReady -RepoRoot $RepoRoot -RequireGate 'qa_passed')) {
-        Write-Host "STOP q/ QA Gate 未通過。deploy をブロックします。" -ForegroundColor Red
-        Write-Host "   先に q/ トリガーで検証を完了してください。" -ForegroundColor Red
-        exit 1
-    }
-    $state = Read-GateState -RepoRoot $RepoRoot
-    if ($state.findings -and $state.findings.critical -gt 0) {
-        Write-Host "STOP Critical findings $($state.findings.critical) 件残存。deploy をブロックします。" -ForegroundColor Red
-        exit 1
-    }
-    Write-Host "PASS Gate check passed (qa_passed=true, critical=0)" -ForegroundColor Green
-}
-
-# ── Unified Adapter Framework (new) ──
-$DeployAll = Join-Path $RepoRoot "tools\deploy-all.ps1"
-if ((Test-Path $DeployAll) -and -not $Check -and ($Target -in @("all", "vscode", "cursor", "agents"))) {
-    Write-Host ""
-    Write-Host "=== Deploy Adapters (Unified Framework) ===" -ForegroundColor Cyan
-    $targetArg = if ($Target -eq "all") { "all" } else { $Target }
-    if ($DryRun) {
-        & $DeployAll -Target $targetArg -DryRun
-    }
-    else {
-        & $DeployAll -Target $targetArg
-    }
-    Write-Host ""
-}
-
-# ── Paths ──
-$SourceSkills = Resolve-DcrSourcePath -RepoRoot $RepoRoot -AssetType "skills"
-$SourceRules = Resolve-DcrSourcePath -RepoRoot $RepoRoot -AssetType "rules"
-$SourceRuntimeKernel = Join-Path $RepoRoot ".ai\core\kernel.md"
 $SourceAgents = Resolve-DcrSourcePath -RepoRoot $RepoRoot -AssetType "agents-source"
-
 $DestCodexAgents = Join-Path $RepoRoot ".codex\agents"
 $DestClaudeAgents = Join-Path $RepoRoot ".claude\agents"
+$DeployAll = Join-Path $RepoRoot "tools\deploy-all.ps1"
 
 function Get-TempDirectory {
     $tempDir = Join-Path ([System.IO.Path]::GetTempPath()) ("dcr-deploy-" + [System.Guid]::NewGuid().ToString("N"))
@@ -105,160 +48,39 @@ function Get-TempDirectory {
     return $tempDir
 }
 
-function Sync-DCRConfig {
+function Get-FileDrift {
     param(
-        [string]$Source,
-        [string]$ConfigPath
-    )
-
-    # .dcr/config.json をホーム ~/.config/dcr/ へレプリケート
-    # Phase 1 MVP: .dcr/config.json のみ（テンプレートは同期不要、動的に init される）
-    if (-not (Test-Path $ConfigPath)) {
-        Write-Warning ".dcr config not found: $ConfigPath"
-        return
-    }
-
-    $dcrConfigDest = Join-Path $HOME ".config/dcr"
-    try {
-        if ($DryRun) {
-            Write-Host "[DRY RUN] .dcr config : $ConfigPath -> $dcrConfigDest" -ForegroundColor Yellow
-            return
-        }
-
-        New-Item -ItemType Directory -Force -Path $dcrConfigDest | Out-Null
-        Copy-Item -Path $ConfigPath -Destination (Join-Path $dcrConfigDest "config.json") -Force
-        Write-Host "[OK] .dcr config : config.json -> $dcrConfigDest" -ForegroundColor Green
-    }
-    catch {
-        Write-Warning "Failed to sync .dcr config: $_"
-    }
-}
-
-function Sync-Directory {
-    param(
-        [string]$Source,
-        [string]$Destination,
+        [string]$ExpectedPath,
+        [string]$ActualPath,
         [string]$Label
     )
 
-    if (-not (Test-Path $Source)) {
-        Write-Warning "Source not found: $Source"
-        return
+    if (-not (Test-Path -LiteralPath $ExpectedPath)) { return @("[EXPECTED_MISSING] $Label") }
+    if (-not (Test-Path -LiteralPath $ActualPath)) { return @("[MISSING] $Label") }
+    if ((Get-FileHash -LiteralPath $ExpectedPath -Algorithm SHA256).Hash -ne (Get-FileHash -LiteralPath $ActualPath -Algorithm SHA256).Hash) {
+        return @("[MODIFIED] $Label")
     }
-
-    $sourceItems = Get-ChildItem $Source -Directory -Force |
-    Where-Object { $_.Name -notlike "_*" }
-    $sourceNames = @($sourceItems | Select-Object -ExpandProperty Name)
-    $count = $sourceItems.Count
-
-    if ($DryRun) {
-        Write-Host "[DRY RUN] $Label : $count items -> $Destination" -ForegroundColor Yellow
-        $sourceItems | ForEach-Object { Write-Host "  $_" }
-        if (Test-Path $Destination) {
-            $extraItems = Get-ChildItem $Destination -Directory -Force | Where-Object { $_.Name -notin $sourceNames }
-            $extraItems | ForEach-Object { Write-Host "  [REMOVE] $($_.FullName)" -ForegroundColor DarkYellow }
-        }
-        return
-    }
-
-    if (-not (Test-Path $Destination)) {
-        New-Item -ItemType Directory -Path $Destination -Force | Out-Null
-    }
-
-    foreach ($item in $sourceItems) {
-        Copy-Item -Path $item.FullName -Destination $Destination -Recurse -Force
-    }
-
-    $destinationRoot = (Resolve-Path -LiteralPath $Destination).Path
-    $extraItems = Get-ChildItem $destinationRoot -Directory -Force | Where-Object { $_.Name -notin $sourceNames }
-    foreach ($extra in $extraItems) {
-        $resolvedExtra = (Resolve-Path -LiteralPath $extra.FullName).Path
-        if (-not $resolvedExtra.StartsWith($destinationRoot + [System.IO.Path]::DirectorySeparatorChar, [System.StringComparison]::OrdinalIgnoreCase)) {
-            throw "Refusing to remove path outside deploy target: $resolvedExtra"
-        }
-        Remove-Item -LiteralPath $resolvedExtra -Recurse -Force
-    }
-
-    Write-Host "[OK] $Label : $count items -> $Destination" -ForegroundColor Green
+    return @()
 }
 
-function Write-DeprecationSummary {
+function Get-ManagedDirectoryDrift {
     param(
-        [string]$CatalogRoot
-    )
-
-    $deprecatedEntries = @(Get-DcrDeprecatedAliases -RepoRoot $RepoRoot |
-        ForEach-Object {
-            [pscustomobject]@{
-                Kind = $_.kind
-                Name = $_.name
-                Successor = $_.successor
-                State = $_.state
-            }
-        })
-
-    if ($deprecatedEntries.Count -eq 0) {
-        Write-Host "No deprecated aliases found." -ForegroundColor DarkGray
-        return
-    }
-
-    Write-Host "Deprecated alias summary:" -ForegroundColor Cyan
-    $deprecatedEntries | Group-Object Kind | ForEach-Object {
-        Write-Host "  $($_.Name): $($_.Count)" -ForegroundColor DarkGray
-    }
-
-    foreach ($entry in $deprecatedEntries | Sort-Object Kind, Name) {
-        $line = "  - $($entry.Kind): $($entry.Name)"
-        if ($entry.Successor) { $line += " -> $($entry.Successor)" }
-        if ($entry.State -eq "removed") { $line += " [removed]" }
-        Write-Host $line -ForegroundColor DarkGray
-    }
-}
-
-# ── Diff Check ──
-function Get-DirectoryDrift {
-    param(
-        [string]$Source,
-        [string]$Destination,
-        [string[]]$IgnoreNames = @()
+        [string]$ExpectedRoot,
+        [string]$ActualRoot
     )
 
     $diffs = @()
+    if (-not (Test-Path -LiteralPath $ExpectedRoot)) { return @("[EXPECTED_MISSING] $ExpectedRoot") }
+    if (-not (Test-Path -LiteralPath $ActualRoot)) { return @("[DESTINATION_MISSING] $ActualRoot") }
 
-    if (-not (Test-Path $Source)) {
-        $diffs += "[SOURCE_MISSING] $Source"
-        return $diffs
-    }
-
-    if (-not (Test-Path $Destination)) {
-        $diffs += "[DESTINATION_MISSING] $Destination"
-        return $diffs
-    }
-
-    $destFiles = Get-ChildItem $Destination -Recurse -File -Force | Where-Object { $_.Name -notin $IgnoreNames }
-    foreach ($df in $destFiles) {
-        $relativePath = $df.FullName.Substring($Destination.Length + 1)
-        $sourceFile = Join-Path $Source $relativePath
-        if (-not (Test-Path $sourceFile)) {
-            $diffs += "[EXTRA] $relativePath (exists only in destination)"
+    foreach ($expectedFile in Get-ChildItem -LiteralPath $ExpectedRoot -Recurse -File -Force) {
+        $relativePath = $expectedFile.FullName.Substring($ExpectedRoot.Length + 1)
+        $actualFile = Join-Path $ActualRoot $relativePath
+        if (-not (Test-Path -LiteralPath $actualFile)) {
+            $diffs += "[MISSING] $relativePath"
         }
-        else {
-            $sourceHash = (Get-FileHash $sourceFile -Algorithm MD5).Hash
-            $destHash = (Get-FileHash $df.FullName -Algorithm MD5).Hash
-            if ($sourceHash -ne $destHash) {
-                $diffs += "[MODIFIED] $relativePath (destination differs from source)"
-            }
-        }
-    }
-
-    $sourceFiles = Get-ChildItem $Source -Recurse -File -Force | Where-Object { $_.Name -notin $IgnoreNames }
-    foreach ($sf in $sourceFiles) {
-        $relativePath = $sf.FullName.Substring($Source.Length + 1)
-        # Skip root-level _* files - Sync-Directory copies only subdirectories (not root files)
-        if ($relativePath -notlike '*\*' -and $relativePath -like '_*') { continue }
-        $destFile = Join-Path $Destination $relativePath
-        if (-not (Test-Path $destFile)) {
-            $diffs += "[MISSING] $relativePath (not deployed to destination)"
+        elseif ((Get-FileHash -LiteralPath $expectedFile.FullName -Algorithm SHA256).Hash -ne (Get-FileHash -LiteralPath $actualFile -Algorithm SHA256).Hash) {
+            $diffs += "[MODIFIED] $relativePath"
         }
     }
 
@@ -274,342 +96,186 @@ function Get-FlatFileDrift {
     )
 
     $diffs = @()
+    if (-not (Test-Path -LiteralPath $Source)) { return @("[SOURCE_MISSING] $Source") }
+    if (-not (Test-Path -LiteralPath $Destination)) { return @("[DESTINATION_MISSING] $Destination") }
 
-    if (-not (Test-Path $Source)) {
-        $diffs += "[SOURCE_MISSING] $Source"
-        return $diffs
-    }
+    $sourceFiles = @(Get-ChildItem -LiteralPath $Source -File -Filter $Filter -Force | Where-Object { $_.Name -notin $IgnoreNames })
+    $destinationFiles = @(Get-ChildItem -LiteralPath $Destination -File -Filter $Filter -Force | Where-Object { $_.Name -notin $IgnoreNames })
+    $sourceNames = @($sourceFiles | Select-Object -ExpandProperty Name)
 
-    if (-not (Test-Path $Destination)) {
-        $diffs += "[DESTINATION_MISSING] $Destination"
-        return $diffs
-    }
-
-    $sourceFiles = Get-ChildItem $Source -File -Filter $Filter -Force | Where-Object { $_.Name -notin $IgnoreNames }
-    $destFiles = Get-ChildItem $Destination -File -Filter $Filter -Force | Where-Object { $_.Name -notin $IgnoreNames }
-
-    foreach ($sf in $sourceFiles) {
-        $destFile = Join-Path $Destination $sf.Name
-        if (-not (Test-Path $destFile)) {
-            $diffs += "[MISSING] $($sf.Name)"
+    foreach ($sourceFile in $sourceFiles) {
+        $destinationFile = Join-Path $Destination $sourceFile.Name
+        if (-not (Test-Path -LiteralPath $destinationFile)) {
+            $diffs += "[MISSING] $($sourceFile.Name)"
         }
-        elseif ((Get-FileHash $sf.FullName -Algorithm MD5).Hash -ne (Get-FileHash $destFile -Algorithm MD5).Hash) {
-            $diffs += "[MODIFIED] $($sf.Name)"
+        elseif ((Get-FileHash -LiteralPath $sourceFile.FullName -Algorithm SHA256).Hash -ne (Get-FileHash -LiteralPath $destinationFile -Algorithm SHA256).Hash) {
+            $diffs += "[MODIFIED] $($sourceFile.Name)"
         }
     }
 
-    $sourceNames = $sourceFiles | Select-Object -ExpandProperty Name
-    foreach ($df in $destFiles) {
-        if ($df.Name -notin $sourceNames) {
-            $diffs += "[EXTRA] $($df.Name)"
+    foreach ($destinationFile in $destinationFiles) {
+        if ($destinationFile.Name -notin $sourceNames) {
+            $diffs += "[EXTRA] $($destinationFile.Name)"
         }
     }
 
     return $diffs
 }
 
-function Get-FileDrift {
-    param(
-        [string]$SourcePath,
-        [string]$DestinationPath,
-        [string]$Label
-    )
-
-    $diffs = @()
-
-    if (-not (Test-Path $SourcePath)) {
-        $diffs += "[SOURCE_MISSING] $Label"
-        return $diffs
-    }
-
-    if (-not (Test-Path $DestinationPath)) {
-        $diffs += "[MISSING] $Label"
-        return $diffs
-    }
-
-    if ((Get-FileHash $SourcePath -Algorithm MD5).Hash -ne (Get-FileHash $DestinationPath -Algorithm MD5).Hash) {
-        $diffs += "[MODIFIED] $Label"
-    }
-
-    return $diffs
-}
-
-function Get-GitStatusDrift {
-    param(
-        [string[]]$Paths
-    )
-
-    $status = @(git -C $RepoRoot status --short -- $Paths 2>$null)
-    return @($status | ForEach-Object { "[DIRTY] $_" })
-}
-
-function Write-PrecheckSummary {
+function Write-CheckDrift {
     param(
         [string]$Label,
-        [string[]]$Diffs
+        [object[]]$Diffs
     )
 
     if ($Diffs.Count -eq 0) {
-        Write-Host "[PRECHECK] $Label : already in sync" -ForegroundColor DarkGray
-    }
-    else {
-        Write-Host "[PRECHECK] $Label : $($Diffs.Count) differences will be reconciled" -ForegroundColor Yellow
-    }
-}
-
-function Assert-NoDrift {
-    param(
-        [string]$Label,
-        [string[]]$Diffs
-    )
-
-    if ($Diffs.Count -eq 0) {
-        Write-Host "[VERIFY] $Label : in sync" -ForegroundColor Green
+        Write-Host "[OK] $Label : in sync" -ForegroundColor Green
         return
     }
 
-    Write-Host "[VERIFY] $Label : drift remains after deploy" -ForegroundColor Red
+    Write-Host "[DRIFT] $Label : $($Diffs.Count) differences" -ForegroundColor Red
     $Diffs | ForEach-Object { Write-Host "  $_" -ForegroundColor Yellow }
-    throw "Deploy verification failed for $Label"
+    $script:CheckFailed = $true
 }
 
-function Write-ManagedTargetNotice {
-    param(
-        [string]$Label,
-        [string]$Destination
-    )
+function Write-DeprecationSummary {
+    $deprecatedEntries = @(Get-DcrDeprecatedAliases -RepoRoot $RepoRoot)
+    if ($deprecatedEntries.Count -eq 0) { return }
 
-    Write-Host "[MANAGED] $Label : $Destination is deploy-managed. Local edits here may be overwritten." -ForegroundColor DarkYellow
-}
-
-function Compare-Directories {
-    param(
-        [string]$Source,
-        [string]$Destination,
-        [string]$Label,
-        [string[]]$IgnoreNames = @()
-    )
-
-    $diffs = Get-DirectoryDrift -Source $Source -Destination $Destination -IgnoreNames $IgnoreNames
-
-    if ($diffs.Count -eq 0) {
-        Write-Host "[OK] $Label : in sync" -ForegroundColor Green
-    }
-    else {
-        Write-Host "[DRIFT] $Label : $($diffs.Count) differences found" -ForegroundColor Red
-        $diffs | ForEach-Object { Write-Host "  $_" -ForegroundColor Yellow }
+    Write-Host "Deprecated alias summary:" -ForegroundColor Cyan
+    $deprecatedEntries | Group-Object Kind | ForEach-Object {
+        Write-Host "  $($_.Name): $($_.Count)" -ForegroundColor DarkGray
     }
 }
 
-# ── Backup ──
-function Backup-DeployTarget {
-    param(
-        [string]$TargetPath,
-        [string]$Label
-    )
-
-    if (-not (Test-Path $TargetPath)) { return }
-
-    $backupRoot = Join-Path $TargetPath ".bak"
-    $timestamp = Get-Date -Format "yyyyMMdd-HHmmss"
-    $backupDir = Join-Path $backupRoot $timestamp
-
-    New-Item -ItemType Directory -Path $backupDir -Force | Out-Null
-
-    $items = Get-ChildItem -Path $TargetPath -File | Where-Object { $_.Name -ne '.bak' -and $_.DirectoryName -ne $backupRoot }
-    foreach ($item in $items) {
-        Copy-Item -Path $item.FullName -Destination $backupDir -Force
-    }
-
-    # Keep only last 3 backups
-    $backups = Get-ChildItem -Path $backupRoot -Directory | Sort-Object Name -Descending
-    if ($backups.Count -gt 3) {
-        $backups | Select-Object -Skip 3 | ForEach-Object {
-            Remove-Item -Path $_.FullName -Recurse -Force
-        }
-    }
-
-    Write-Host "[BACKUP] $Label : $($items.Count) files -> $backupDir" -ForegroundColor DarkCyan
-}
-
-# ── Main ──
-Write-Host ""
-Write-Host "DCR Products Deploy" -ForegroundColor Cyan
-Write-Host "Source: $RepoRoot" -ForegroundColor DarkGray
-Write-Host ""
-
-# -- Gate Enforcement --
 if ($EnforceGate) {
     $GateStateLib = Join-Path $RepoRoot "tools\lib\gate-state.ps1"
-    if (-not (Test-Path $GateStateLib)) {
-        Write-Host "[EnforceGate] STOP: gate-state.ps1 not found: $GateStateLib" -ForegroundColor Red
+    if (-not (Test-Path -LiteralPath $GateStateLib)) {
+        Write-Host "STOP gate-state.ps1 not found: $GateStateLib" -ForegroundColor Red
         exit 1
     }
     . $GateStateLib
-
-    Write-Host "[EnforceGate] Checking gate chain..." -ForegroundColor Cyan
-
-    if (-not (Test-GateReady -RepoRoot $RepoRoot -RequireGate 'qa_passed')) {
-        Write-Host "[EnforceGate] STOP: q/ QA Gate not passed. Deploy blocked." -ForegroundColor Red
-        Write-Host "  Run q/ QA Gate first, then retry deploy." -ForegroundColor Yellow
+    if (-not (Test-GateReady -RepoRoot $RepoRoot -RequireGate "qa_passed")) {
+        Write-Host "STOP q/ QA Gate not passed." -ForegroundColor Red
         exit 1
     }
-
     $state = Read-GateState -RepoRoot $RepoRoot
-    if ($state.findings.critical -gt 0) {
-        Write-Host "[EnforceGate] STOP: $($state.findings.critical) critical finding(s) remain." -ForegroundColor Red
-        Write-Host "  Resolve all critical findings before deploying." -ForegroundColor Yellow
+    if ($state.findings -and $state.findings.critical -gt 0) {
+        Write-Host "STOP critical findings remain: $($state.findings.critical)" -ForegroundColor Red
         exit 1
-    }
-
-    Write-Host "[EnforceGate] GO: All gates passed. Proceeding with deploy." -ForegroundColor Green
-    Write-Host ""
-}
-
-if ($Check) {
-    Write-Host "Running drift check..." -ForegroundColor Cyan
-    Write-Host ""
-    $script:checkFailed = $false
-
-    function Write-CheckDrift {
-        param(
-            [string]$Label,
-            [object[]]$Diffs
-        )
-
-        if ($Diffs.Count -eq 0) {
-            Write-Host "[OK] $Label : in sync" -ForegroundColor Green
-            return
-        }
-
-        Write-Host "[DRIFT] $Label : $($Diffs.Count) differences" -ForegroundColor Red
-        $Diffs | ForEach-Object { Write-Host "  $_" -ForegroundColor Yellow }
-        $script:checkFailed = $true
-    }
-
-    if ($Target -eq "all" -or $Target -eq "agents") {
-        $codexDiffs = Get-FlatFileDrift -Source $SourceAgents -Destination $DestCodexAgents -Filter '*.toml'
-        Write-CheckDrift -Label "Codex agents" -Diffs $codexDiffs
-
-        $claudeDiffs = Get-FlatFileDrift -Source $SourceAgents -Destination $DestClaudeAgents -Filter '*.md' -IgnoreNames @('README.md')
-        Write-CheckDrift -Label "Claude agents" -Diffs $claudeDiffs
-    }
-    if ($Target -eq "all" -or $Target -eq "vscode") {
-        $vscodeEntryDiffs = Get-GitStatusDrift -Paths @(".github/copilot-instructions.md")
-        Write-CheckDrift -Label "VS Code Copilot entrypoint" -Diffs $vscodeEntryDiffs
-    }
-    if ($Target -eq "all") {
-        $sharedEntrypointDiffs = Get-GitStatusDrift -Paths @("AGENTS.md", "CLAUDE.md", ".ai/catalog/rules/_ROUTING_INDEX.md")
-        Write-CheckDrift -Label "Shared tracked entrypoints" -Diffs $sharedEntrypointDiffs
-    }
-    if ($Target -eq "all" -or $Target -eq "dcr") {
-        $dcrConfigPath = Join-Path $RepoRoot ".dcr\config.json"
-        $dcrConfigDest = Join-Path $HOME ".config\dcr\config.json"
-        if (-not (Test-Path $dcrConfigPath)) {
-            Write-Host "[SKIP] .dcr config : not found" -ForegroundColor Yellow
-        }
-        else {
-            $dcrDiffs = Get-FileDrift -SourcePath $dcrConfigPath -DestinationPath $dcrConfigDest -Label "config.json"
-            Write-CheckDrift -Label ".dcr config" -Diffs $dcrDiffs
-        }
-    }
-    Write-Host ""
-    Write-Host "Drift check complete." -ForegroundColor Cyan
-    if ($script:checkFailed) { exit 1 }
-    return
-}
-
-if ($Target -eq "all" -or $Target -eq "agents") {
-    if (-not $DryRun) {
-        Write-PrecheckSummary -Label "Codex agents" -Diffs (Get-FlatFileDrift -Source $SourceAgents -Destination $DestCodexAgents -Filter '*.toml')
-        Write-PrecheckSummary -Label "Claude agents" -Diffs (Get-FlatFileDrift -Source $SourceAgents -Destination $DestClaudeAgents -Filter '*.md' -IgnoreNames @('README.md'))
-    }
-    elseif ($DryRun) {
-        Write-Host "[DRY RUN] Agents mirror generation is delegated to tools/adapters/agents.ps1" -ForegroundColor Yellow
-    }
-    if (-not $DryRun) {
-        Assert-NoDrift -Label "Codex agents" -Diffs (Get-FlatFileDrift -Source $SourceAgents -Destination $DestCodexAgents -Filter '*.toml')
-        Assert-NoDrift -Label "Claude agents" -Diffs (Get-FlatFileDrift -Source $SourceAgents -Destination $DestClaudeAgents -Filter '*.md' -IgnoreNames @('README.md'))
-    }
-}
-
-if ($Target -eq "all" -or $Target -eq "dcr") {
-    $dcrConfigPath = Join-Path $RepoRoot ".dcr/config.json"
-    if ((-not $DryRun) -and (Test-Path $dcrConfigPath)) {
-        Write-ManagedTargetNotice -Label ".dcr config" -Destination (Join-Path $HOME ".config\dcr\config.json")
-        Write-PrecheckSummary -Label ".dcr config" -Diffs (Get-FileDrift -SourcePath $dcrConfigPath -DestinationPath (Join-Path $HOME ".config\dcr\config.json") -Label "config.json")
-    }
-    Sync-DCRConfig -Source $SourceRules -ConfigPath $dcrConfigPath
-    if ((-not $DryRun) -and (Test-Path $dcrConfigPath)) {
-        Assert-NoDrift -Label ".dcr config" -Diffs (Get-FileDrift -SourcePath $dcrConfigPath -DestinationPath (Join-Path $HOME ".config\dcr\config.json") -Label "config.json")
     }
 }
 
 Write-Host ""
+Write-Host "DCR Products Mac Triad Deploy" -ForegroundColor Cyan
+Write-Host "Source: $RepoRoot" -ForegroundColor DarkGray
+Write-Host ""
+
+if ($Check) {
+    $script:CheckFailed = $false
+
+    if ($Target -eq "all" -or $Target -eq "codex") {
+        $tempDir = Get-TempDirectory
+        try {
+            $expectedAgents = Join-Path $tempDir "AGENTS.md"
+            & (Join-Path $RepoRoot "tools\adapters\codex.ps1") -RepoRoot $RepoRoot -OutputPath $expectedAgents -Quiet
+            Write-CheckDrift -Label "Codex entrypoint" -Diffs (Get-FileDrift -ExpectedPath $expectedAgents -ActualPath (Join-Path $RepoRoot "AGENTS.md") -Label "AGENTS.md")
+        }
+        finally {
+            if (Test-Path -LiteralPath $tempDir) { Remove-Item -LiteralPath $tempDir -Recurse -Force }
+        }
+    }
+
+    if ($Target -eq "all" -or $Target -eq "claude") {
+        $tempDir = Get-TempDirectory
+        try {
+            $expectedClaude = Join-Path $tempDir "CLAUDE.md"
+            & (Join-Path $RepoRoot "tools\adapters\claude.ps1") -RepoRoot $RepoRoot -OutputPath $expectedClaude -Quiet
+            Write-CheckDrift -Label "Claude entrypoint" -Diffs (Get-FileDrift -ExpectedPath $expectedClaude -ActualPath (Join-Path $RepoRoot "CLAUDE.md") -Label "CLAUDE.md")
+        }
+        finally {
+            if (Test-Path -LiteralPath $tempDir) { Remove-Item -LiteralPath $tempDir -Recurse -Force }
+        }
+    }
+
+    if ($Target -eq "all" -or $Target -eq "cursor") {
+        $tempDir = Get-TempDirectory
+        try {
+            $expectedCursor = Join-Path $tempDir ".cursor"
+            & (Join-Path $RepoRoot "tools\adapters\cursor.ps1") -RepoRoot $RepoRoot -OutputRoot $expectedCursor -Quiet
+            Write-CheckDrift -Label "Cursor mirror" -Diffs (Get-ManagedDirectoryDrift -ExpectedRoot $expectedCursor -ActualRoot (Join-Path $RepoRoot ".cursor"))
+            Write-CheckDrift -Label "Cursor ignore" -Diffs (Get-FileDrift -ExpectedPath (Join-Path $tempDir ".cursorignore") -ActualPath (Join-Path $RepoRoot ".cursorignore") -Label ".cursorignore")
+        }
+        finally {
+            if (Test-Path -LiteralPath $tempDir) { Remove-Item -LiteralPath $tempDir -Recurse -Force }
+        }
+    }
+
+    if ($Target -eq "all" -or $Target -eq "agents") {
+        Write-CheckDrift -Label "Codex agents" -Diffs (Get-FlatFileDrift -Source $SourceAgents -Destination $DestCodexAgents -Filter "*.toml")
+        Write-CheckDrift -Label "Claude agents" -Diffs (Get-FlatFileDrift -Source $SourceAgents -Destination $DestClaudeAgents -Filter "*.md" -IgnoreNames @("README.md"))
+    }
+
+    Write-Host ""
+    Write-Host "Drift check complete." -ForegroundColor Cyan
+    if ($script:CheckFailed) { exit 1 }
+    return
+}
+
+if (-not (Test-Path -LiteralPath $DeployAll)) {
+    throw "Deploy orchestrator not found: $DeployAll"
+}
+
+& $DeployAll -Target $Target -DryRun:$DryRun
+
 if ($DryRun) {
-    Write-Host "Dry run complete. No files were copied." -ForegroundColor Yellow
+    Write-Host "Dry run complete. No files were written." -ForegroundColor Yellow
 }
 else {
     Write-Host "Deploy complete." -ForegroundColor Green
 }
 
-# ── Deprecation Aliases Summary (Phase A/B/C consolidation) ──
-$catalogRoot = Join-Path $RepoRoot ".ai\catalog"
-if (Test-Path $catalogRoot) {
-    Write-DeprecationSummary -CatalogRoot $catalogRoot
-}
+Write-DeprecationSummary
 
-# ── Watch Mode ──
 if ($Watch) {
     Write-Host ""
-    Write-Host "Watch mode active. Monitoring source catalog paths for changes..." -ForegroundColor Cyan
-    Write-Host "Press Ctrl+C to stop." -ForegroundColor DarkGray
-    Write-Host ""
+    Write-Host "Watch mode active. Monitoring triad source paths..." -ForegroundColor Cyan
+    $watchPaths = @(
+        (Resolve-DcrSourcePath -RepoRoot $RepoRoot -AssetType "rules"),
+        (Resolve-DcrSourcePath -RepoRoot $RepoRoot -AssetType "skills"),
+        (Resolve-DcrSourcePath -RepoRoot $RepoRoot -AssetType "agents-source"),
+        (Join-Path $RepoRoot ".ai\core"),
+        (Join-Path $RepoRoot ".ai\routing"),
+        (Join-Path $RepoRoot ".ai\adapters")
+    ) | Where-Object { Test-Path -LiteralPath $_ }
 
-    $watchPaths = @($SourceRules, $SourceSkills, $SourceAgents) | Where-Object { Test-Path $_ }
     $watchers = @()
-
     foreach ($watchPath in $watchPaths) {
         $watcher = New-Object System.IO.FileSystemWatcher
         $watcher.Path = $watchPath
         $watcher.Filter = "*.*"
         $watcher.IncludeSubdirectories = $true
         $watcher.NotifyFilter = [System.IO.NotifyFilters]::FileName -bor [System.IO.NotifyFilters]::LastWrite
-        $watcher.EnableRaisingEvents = $false
+        $watcher.EnableRaisingEvents = $true
         $watchers += $watcher
     }
 
-    $lastDeploy = [DateTime]::MinValue
-    $debounceSeconds = 2
-
     try {
-        foreach ($w in $watchers) { $w.EnableRaisingEvents = $true }
-
         while ($true) {
-            $changed = $false
-            foreach ($w in $watchers) {
-                $result = $w.WaitForChanged([System.IO.WatcherChangeTypes]::All, 1000)
-                if (-not $result.TimedOut) { $changed = $true }
-            }
-
-            if ($changed -and ([DateTime]::Now - $lastDeploy).TotalSeconds -ge $debounceSeconds) {
-                $lastDeploy = [DateTime]::Now
-                Write-Host ""
-                Write-Host "[WATCH] Change detected at $(Get-Date -Format 'HH:mm:ss'). Re-deploying..." -ForegroundColor Yellow
-
-                # Re-run deploy logic
-                if ($Target -eq "all" -or $Target -eq "agents") {
-                    & $DeployAll -Target agents
+            foreach ($watcher in $watchers) {
+                $result = $watcher.WaitForChanged([System.IO.WatcherChangeTypes]::All, 1000)
+                if (-not $result.TimedOut) {
+                    Write-Host "[WATCH] Change detected. Re-deploying..." -ForegroundColor Yellow
+                    & $DeployAll -Target $Target
+                    break
                 }
-                Write-Host "[WATCH] Deploy complete. Watching..." -ForegroundColor Green
             }
         }
     }
     finally {
-        foreach ($w in $watchers) {
-            $w.EnableRaisingEvents = $false
-            $w.Dispose()
+        foreach ($watcher in $watchers) {
+            $watcher.EnableRaisingEvents = $false
+            $watcher.Dispose()
         }
-        Write-Host "Watch mode stopped." -ForegroundColor DarkGray
     }
 }

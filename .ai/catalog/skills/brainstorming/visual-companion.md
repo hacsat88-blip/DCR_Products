@@ -37,14 +37,14 @@ The server watches a directory for HTML files and serves the newest one to the b
 scripts/start-server.sh --project-dir /path/to/project
 
 # Returns: {"type":"server-started","port":52341,"url":"http://localhost:52341",
-#           "screen_dir":"/path/to/project/.dcr/brainstorm/12345-1706000000"}
+#           "screen_dir":"/path/to/project/.brainstorm-sessions/12345-1706000000"}
 ```
 
 Save `screen_dir` from the response. Tell user to open the URL.
 
-**Finding connection info:** The server writes its startup JSON to `$SCREEN_DIR/.server-info`. If you launched the server in the background and didn't capture stdout, read that file to get the URL and port. When using `--project-dir`, check `<project>/.dcr/brainstorm/` for the session directory.
+**Finding connection info:** The server writes its startup JSON to `$SCREEN_DIR/.server-info`. If you launched the server in the background and didn't capture stdout, read that file to get the URL and port. When using `--project-dir`, check `<project>/.brainstorm-sessions/` for the session directory.
 
-**Note:** Pass the project root as `--project-dir` so mockups persist in `.dcr/brainstorm/` and survive server restarts. Without it, files go to `/tmp` and get cleaned up. Remind the user to add `.dcr/` to `.gitignore` if it's not already there.
+**Note:** Pass the project root as `--project-dir` so mockups persist in `.brainstorm-sessions/` and survive server restarts. Without it, files go to `/tmp` and get cleaned up. Remind the user to add `.brainstorm-sessions/` to that project's `.gitignore` if it is not already there.
 
 **Launching the server by platform:**
 
@@ -69,10 +69,9 @@ scripts/start-server.sh --project-dir /path/to/project
 scripts/start-server.sh --project-dir /path/to/project
 ```
 
-**Gemini CLI:**
+**Cursor:**
 ```bash
-# Use --foreground and set is_background: true on your shell tool call
-# so the process survives across turns
+# Use --foreground if the integrated terminal reaps background processes.
 scripts/start-server.sh --project-dir /path/to/project --foreground
 ```
 
@@ -277,7 +276,7 @@ If `.events` doesn't exist, the user didn't interact with the browser — use on
 scripts/stop-server.sh $SCREEN_DIR
 ```
 
-If the session used `--project-dir`, mockup files persist in `.dcr/brainstorm/` for later reference. Only `/tmp` sessions get deleted on stop.
+If the session used `--project-dir`, mockup files persist in `.brainstorm-sessions/` for later reference. Only `/tmp` sessions get deleted on stop.
 
 ## Reference
 

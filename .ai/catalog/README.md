@@ -19,14 +19,14 @@
 - shared rule / skill / agent source を編集したい
 - どの editor にも共通する behavior を変えたい
 - generated file ではなく正本を探したい
-- Product 固有ではなく repo 共通の contract を確認したい
+- repo 共通の contract を確認したい
 
 ## When Not To Start Here
 
-- Product 固有の実装や local workflow を調べるとき
-  - その場合は `Product/README.md` を先に見る
+- 別 repository の Product 固有実装や local workflow を調べるとき
+  - その Product repository の指示を先に見る
 - generated output の実体を確認したいだけのとき
-  - `AGENTS.md`, `CLAUDE.md`, `.github/copilot-instructions.md`, `.claude/agents/`, `.codex/agents/` は deploy により再生成される mirror
+  - `AGENTS.md`, `CLAUDE.md`, `.cursor/`, `.claude/agents/`, `.codex/agents/` は deploy により再生成される mirror
 
 ## Promotion Rule
 
@@ -36,7 +36,7 @@ shared 化が必要な asset だけをここへ昇格します。
 - skill は `skills/`
 - agent source は `agents-source/`
 
-Product 側の overlay や local setting をそのままここへ複製しません。
+個別アプリの overlay や local setting をそのままここへ複製しません。
 
 ## Related References
 

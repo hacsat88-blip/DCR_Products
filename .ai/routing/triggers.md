@@ -1,7 +1,7 @@
 # Unified Trigger System
 
-> **Source of Truth for All Environments** (VS Code, Claude Code, Codex, Copilot CLI, Cursor)
-> Included by: `.github/copilot-instructions.md`, `CLAUDE.md`, `AGENTS.md`
+> **Source of Truth for the Mac triad** (Claude Code, Codex, Cursor)
+> Included by: `CLAUDE.md`, `AGENTS.md`, `.cursor/rules/dcr-kernel.mdc`
 
 ## コマンド処理（Triggers）
 
@@ -30,7 +30,7 @@ Mode は a/i/r/s のうち最初の1つだけ有効。複数 Mode が同行に�
 
 ## Execution Modes (keyword-prefix)
 
-Activate by prefixing a message. Works in VS Code Copilot Chat, Copilot CLI, and any editor.
+Activate by prefixing a message in Codex, Claude Code, or Cursor.
 
 | Keyword           | Mode               | Behavior                                                 |
 | ----------------- | ------------------ | -------------------------------------------------------- |

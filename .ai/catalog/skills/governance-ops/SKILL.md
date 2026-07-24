@@ -26,9 +26,7 @@ metadata:
   runtime_targets:
     - codex
     - claude
-    - copilot
     - cursor
-    - gemini-cli
 absorbs:
   - advanced-evaluation
   - agent-evaluation

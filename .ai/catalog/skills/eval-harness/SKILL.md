@@ -19,9 +19,7 @@ composable:
 runtime_targets:
   - codex
   - claude
-  - copilot
   - cursor
-  - gemini-cli
 ---
 
 # Eval Harness — 構造品質の継続検証

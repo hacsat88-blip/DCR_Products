@@ -6,7 +6,8 @@
 .DESCRIPTION
   This is an idempotent source-of-truth normalizer. It does not change
   deprecated skills. Existing hand-written contract, composable, package,
-  baseline, absorbs, and runtime_targets blocks are preserved.
+  baseline, and absorbs blocks are preserved. runtime_targets is normalized
+  to the supported Mac triad.
 #>
 
 param(
@@ -19,7 +20,7 @@ $resolvedRoot = (Resolve-Path -LiteralPath $RepoRoot).Path
 . (Join-Path $resolvedRoot "tools\lib\catalog-paths.ps1")
 
 $skillsDir = Resolve-DcrSourcePath -RepoRoot $resolvedRoot -AssetType "skills"
-$runtimeTargets = @("codex", "claude", "copilot", "cursor", "gemini-cli")
+$runtimeTargets = @("codex", "claude", "cursor")
 $changed = New-Object System.Collections.Generic.List[string]
 
 function Get-FrontmatterMatch {
@@ -63,7 +64,26 @@ function New-RuntimeTargetsBlock {
     return ($lines -join "`n")
 }
 
-foreach ($dir in Get-ChildItem -Path $skillsDir -Directory | Where-Object { -not $_.Name.StartsWith("_") } | Sort-Object Name) {
+function Set-RuntimeTargetsBlock {
+    param(
+        [string]$Frontmatter,
+        [string[]]$Targets
+    )
+
+    $pattern = '(?m)^([ \t]*)runtime_targets:\r?\n(?:\1[ \t]+-[^\r\n]*(?:\r?\n|\z))+'
+    $match = [regex]::Match($Frontmatter, $pattern)
+    if (-not $match.Success) { return $Frontmatter }
+
+    $indent = $match.Groups[1].Value
+    $lines = @("${indent}runtime_targets:")
+    foreach ($target in $Targets) {
+        $lines += "${indent}  - $target"
+    }
+    $replacement = ($lines -join "`n") + "`n"
+    return $Frontmatter.Substring(0, $match.Index) + $replacement + $Frontmatter.Substring($match.Index + $match.Length)
+}
+
+foreach ($dir in Get-ChildItem -Path $skillsDir -Force -Directory | Where-Object { -not $_.Name.StartsWith("_") } | Sort-Object Name) {
     $skillFile = Join-Path $dir.FullName "SKILL.md"
     if (-not (Test-Path -LiteralPath $skillFile)) { continue }
 
@@ -74,6 +94,7 @@ foreach ($dir in Get-ChildItem -Path $skillsDir -Directory | Where-Object { -not
     $frontmatter = $match.Groups[1].Value
     if ($frontmatter -match '(?m)^\s*deprecated\s*:\s*true\s*$') { continue }
 
+    $normalizedFrontmatter = Set-RuntimeTargetsBlock -Frontmatter $frontmatter -Targets $runtimeTargets
     $blocks = @()
     if (-not (Test-FrontmatterBlock -Frontmatter $frontmatter -Name "contract")) {
         $blocks += New-ContractBlock
@@ -85,9 +106,13 @@ foreach ($dir in Get-ChildItem -Path $skillsDir -Directory | Where-Object { -not
         $blocks += New-RuntimeTargetsBlock -Targets $runtimeTargets
     }
 
-    if ($blocks.Count -eq 0) { continue }
+    if ($blocks.Count -eq 0 -and $normalizedFrontmatter.TrimEnd() -ceq $frontmatter.TrimEnd()) { continue }
 
-    $newFrontmatter = $frontmatter.TrimEnd() + "`n" + ($blocks -join "`n") + "`n"
+    $newFrontmatter = $normalizedFrontmatter.TrimEnd()
+    if ($blocks.Count -gt 0) {
+        $newFrontmatter += "`n" + ($blocks -join "`n")
+    }
+    $newFrontmatter += "`n"
     $body = $raw.Substring($match.Length)
     $newRaw = "---`n$newFrontmatter---`n$body"
     $changed.Add($dir.Name) | Out-Null

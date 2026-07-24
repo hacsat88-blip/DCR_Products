@@ -1,4 +1,17 @@
-param([string]$RepoRoot = ".")
+param(
+    [string]$RepoRoot = ".",
+    [string]$OutputPath = "",
+    [switch]$Quiet
+)
+
+if ([string]::IsNullOrWhiteSpace($OutputPath)) {
+    $OutputPath = Join-Path $RepoRoot "AGENTS.md"
+}
+
+function Write-CodexStatus {
+    param([string]$Message, [string]$Color = "Green")
+    if (-not $Quiet) { Write-Host $Message -ForegroundColor $Color }
+}
 
 $CatalogPaths = Join-Path (Split-Path $PSScriptRoot -Parent) "lib\catalog-paths.ps1"
 . $CatalogPaths
@@ -9,7 +22,7 @@ $rulesDir = Resolve-DcrSourcePath -RepoRoot $RepoRoot -AssetType "rules"
 $skillsDir = Resolve-DcrSourcePath -RepoRoot $RepoRoot -AssetType "skills"
 $agentsDir = Resolve-DcrSourcePath -RepoRoot $RepoRoot -AssetType "agents-source"
 
-Write-Host "[codex] Generating AGENTS.md..." -ForegroundColor Cyan
+Write-CodexStatus -Message "[codex] Generating AGENTS.md..." -Color "Cyan"
 
 function Get-Targets($file) {
     $text = Get-Content $file.FullName -Raw
@@ -40,21 +53,21 @@ function Get-DeprecationInfo($kind, $name) {
 }
 
 # Collect codex-targeted items
-foreach ($f in Get-ChildItem $rulesDir -Filter "*.md" | Where-Object { -not $_.BaseName.StartsWith("_") }) {
+foreach ($f in Get-ChildItem -Path $rulesDir -Force -Filter "*.md" | Where-Object { -not $_.BaseName.StartsWith("_") }) {
     $targets = Get-Targets $f
-    if (-not $targets) { $targets = @("vscode", "claude", "codex") }
+    if (-not $targets) { $targets = @("claude", "codex", "cursor") }
     if ($targets -contains "codex") {
         $dep = Get-DeprecationInfo "rule" $f.BaseName
         if ($dep.Deprecated) { $deprecatedRules += [pscustomobject]@{ Name = $f.BaseName; Successor = $dep.Successor } } else { $activeRules += $f.BaseName }
     }
 }
 
-foreach ($dir in Get-ChildItem $skillsDir -Directory | Where-Object { -not $_.Name.StartsWith("_") }) {
+foreach ($dir in Get-ChildItem -Path $skillsDir -Force -Directory | Where-Object { -not $_.Name.StartsWith("_") }) {
     $sf = Join-Path $dir.FullName "SKILL.md"
     if (Test-Path $sf) {
-        $sfItem = Get-Item $sf
+        $sfItem = Get-Item -LiteralPath $sf -Force
         $targets = Get-Targets $sfItem
-        if (-not $targets) { $targets = @("vscode", "claude", "codex") }
+        if (-not $targets) { $targets = @("claude", "codex", "cursor") }
         if ($targets -contains "codex") {
             $dep = Get-DeprecationInfo "skill" $dir.Name
             if ($dep.Deprecated) { $deprecatedSkills += [pscustomobject]@{ Name = $dir.Name; Successor = $dep.Successor } } else { $activeSkills += $dir.Name }
@@ -62,7 +75,7 @@ foreach ($dir in Get-ChildItem $skillsDir -Directory | Where-Object { -not $_.Na
     }
 }
 
-foreach ($f in Get-ChildItem $agentsDir -Filter "*.md" | Where-Object { $_.Name -ne "README.md" }) {
+foreach ($f in Get-ChildItem -Path $agentsDir -Force -Filter "*.md" | Where-Object { $_.Name -ne "README.md" }) {
     $targets = Get-Targets $f
     if (-not $targets) { $targets = @("codex", "claude") }
     if ($targets -contains "codex") {
@@ -90,11 +103,9 @@ Generated from: .ai/core + .ai/routing + .ai/catalog/rules/ + .ai/catalog/skills
 To regenerate: Run pwsh -ExecutionPolicy Bypass -File .\deploy.ps1 or .\tools\deploy-all.ps1
 Any manual edits will be overwritten on next deploy. -->
 
-# Codex / GitHub Copilot CLI Entrypoint
+# Codex Entrypoint
 
-Unified entry point for Codex and GitHub Copilot CLI environments.
-
-GitHub Copilot CLI specific behavior lives in [.ai/adapters/copilot-cli/kernel.md](.ai/adapters/copilot-cli/kernel.md).
+Unified entry point for the Codex environment.
 
 ## Scope Summary
 
@@ -150,7 +161,7 @@ agentmemory 互換 backend が使える場合は、同種タスク、関連フ�
 "@
 
 $utf8 = New-Object System.Text.UTF8Encoding $false
-[System.IO.File]::WriteAllText("$RepoRoot/AGENTS.md", ($content.TrimEnd() + [Environment]::NewLine), $utf8)
+[System.IO.File]::WriteAllText($OutputPath, ($content.TrimEnd() + [Environment]::NewLine), $utf8)
 
-Write-Host "  [OK] AGENTS.md" -ForegroundColor Green
-Write-Host ""
+Write-CodexStatus -Message "  [OK] AGENTS.md"
+Write-CodexStatus -Message ""

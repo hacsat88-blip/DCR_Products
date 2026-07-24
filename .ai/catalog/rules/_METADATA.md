@@ -219,8 +219,8 @@ composable:
 
 ### Predefined compositions
 
-Standard workflow chains are defined in `.dcr/compositions.yaml`.
-The skill-router references these when detecting multi-step intent.
+Standard workflow chains are defined by each skill's `composable.chains_with` frontmatter.
+The skill-router reads that metadata when detecting multi-step intent.
 
 ### Example
 
@@ -284,7 +284,7 @@ challenge:
   - `manual`: only when explicitly requested
 - The challenged agent does not block the primary — it produces a separate findings report
 - The skill-router presents adversarial findings with `⚔️` prefix to distinguish from primary output
-- Adversarial pairs are also defined centrally in `.dcr/adversarial-pairs.yaml`
+- Adversarial pairs are defined by each rule's `challenge.targets` frontmatter
 - Rules without `challenge:` are never auto-invoked as challengers
 
 ### Example
@@ -327,7 +327,7 @@ package:
 - `tags`: discovery tags used by the federated registry
 - Skills without `package:` are local-only and not listed in the registry
 - `validate.ps1` checks that `dependencies` reference existing skill directories
-- The registry manifest is maintained in `.dcr/registry.yaml`
+- Package metadata is maintained in each skill's `package` frontmatter
 
 ### Example
 

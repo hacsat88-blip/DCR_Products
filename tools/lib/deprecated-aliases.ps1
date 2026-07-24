@@ -120,7 +120,7 @@ function Get-DcrDeprecatedAliases {
     $agentsDir = Resolve-DcrSourcePath -RepoRoot $resolvedRoot -AssetType "agents-source"
 
     if ($Kind -in @("all", "rule")) {
-        foreach ($file in Get-ChildItem -Path $rulesDir -Filter "*.md" -File | Where-Object { -not $_.BaseName.StartsWith("_") }) {
+        foreach ($file in Get-ChildItem -Path $rulesDir -Force -Filter "*.md" -File | Where-Object { -not $_.BaseName.StartsWith("_") }) {
             $fm = Get-DcrAliasFrontmatterMap -Path $file.FullName
             if ($fm -and $fm["deprecated"] -eq "true") {
                 Add-DcrDeprecatedAliasRow -RowsByKey $rowsByKey -Row (New-DcrDeprecatedAliasRow `
@@ -136,7 +136,7 @@ function Get-DcrDeprecatedAliases {
     }
 
     if ($Kind -in @("all", "skill")) {
-        foreach ($dir in Get-ChildItem -Path $skillsDir -Directory | Where-Object { -not $_.Name.StartsWith("_") }) {
+        foreach ($dir in Get-ChildItem -Path $skillsDir -Force -Directory | Where-Object { -not $_.Name.StartsWith("_") }) {
             $skillFile = Join-Path $dir.FullName "SKILL.md"
             if (-not (Test-Path -LiteralPath $skillFile)) {
                 continue
@@ -156,7 +156,7 @@ function Get-DcrDeprecatedAliases {
     }
 
     if ($Kind -in @("all", "agent")) {
-        foreach ($file in Get-ChildItem -Path $agentsDir -Filter "*.md" -File | Where-Object { -not $_.BaseName.StartsWith("_") -and $_.BaseName -ne "README" }) {
+        foreach ($file in Get-ChildItem -Path $agentsDir -Force -Filter "*.md" -File | Where-Object { -not $_.BaseName.StartsWith("_") -and $_.BaseName -ne "README" }) {
             $fm = Get-DcrAliasFrontmatterMap -Path $file.FullName
             if ($fm -and $fm["deprecated"] -eq "true") {
                 Add-DcrDeprecatedAliasRow -RowsByKey $rowsByKey -Row (New-DcrDeprecatedAliasRow `

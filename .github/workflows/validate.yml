@@ -8,14 +8,41 @@ on:
 
 jobs:
   validate:
-    runs-on: windows-latest
+    runs-on: macos-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Check changed-file whitespace
+        shell: pwsh
+        run: |
+          if ("${{ github.event_name }}" -eq "pull_request") {
+            $base = "${{ github.event.pull_request.base.sha }}"
+          }
+          else {
+            $base = "${{ github.event.before }}"
+          }
+
+          if ([string]::IsNullOrWhiteSpace($base) -or $base -match '^0+$') {
+            git show --check --format= HEAD
+          }
+          else {
+            git diff --check $base HEAD
+          }
+
+          if ($LASTEXITCODE -ne 0) {
+            throw "Changed-file whitespace validation failed."
+          }
 
       - name: Run validate script
         shell: pwsh
         run: pwsh -ExecutionPolicy Bypass -File ./validate.ps1
+
+      - name: Validate skill capabilities
+        shell: pwsh
+        run: pwsh -ExecutionPolicy Bypass -File ./tools/validate-skill-capabilities.ps1 -RepoRoot .
 
       - name: Generate deploy mirrors
         shell: pwsh
@@ -25,19 +52,25 @@ jobs:
         shell: pwsh
         run: pwsh -ExecutionPolicy Bypass -File ./deploy.ps1 -Check
 
-      - name: Ensure generated mirrors stay untracked
+      - name: Ensure generated mirrors are tracked
         shell: pwsh
         run: |
-          $tracked = @(git ls-files .codex/agents .claude/agents)
-          if ($tracked.Count -gt 0) {
-            $tracked | ForEach-Object { Write-Host $_ }
-            throw "Generated mirrors must stay untracked."
+          $required = @(
+            "AGENTS.md",
+            "CLAUDE.md",
+            ".cursor/README.md",
+            ".cursor/rules/dcr-kernel.mdc",
+            ".cursorignore"
+          )
+          foreach ($path in $required) {
+            git ls-files --error-unmatch -- $path | Out-Null
+            if ($LASTEXITCODE -ne 0) { throw "Generated mirror is not tracked: $path" }
           }
 
       - name: Check generated entrypoint drift
         shell: pwsh
         run: |
-          $diff = @(git status --short AGENTS.md CLAUDE.md .github/copilot-instructions.md .ai/catalog/rules/_ROUTING_INDEX.md)
+          $diff = @(git status --short AGENTS.md CLAUDE.md .cursor .cursorignore .codex/agents .claude/agents .ai/catalog/rules/_ROUTING_INDEX.md .ai/catalog/skills/_SKILLS_ROUTING_INDEX.md)
           if ($diff.Count -gt 0) {
             $diff | ForEach-Object { Write-Host $_ }
             throw "Generated tracked entrypoints are stale."

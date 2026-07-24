@@ -19,20 +19,13 @@ if (-not (Test-Path $WorktreePath)) {
     exit 1
 }
 
-# Determine template path (relative to script or from .dcr/).
-# The inline templates below remain the functional fallback.
-$dcr_templates = Join-Path (Get-Location) ".dcr/templates"
-if (-not (Test-Path $dcr_templates)) {
-    Write-Warning ".dcr/templates not found; continuing with inline templates"
-}
-
 # Replace placeholders in templates
 $task_plan_content = @"
 # $FeatureName Implementation Plan — Manus Session
 
 **Session context:** Git worktree at $WorktreePath  
 **Session files:** task_plan.md, findings.md, progress.md  
-**Commit strategy:** See .dcr/config.json
+**Commit strategy:** Follow the repository instructions and user-approved plan.
 
 ## Goal
 [Edit: One sentence describing what this builds]

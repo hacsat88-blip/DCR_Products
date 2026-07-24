@@ -33,16 +33,13 @@ package:
     - planning
     - workflow
 targets:
-  - vscode
   - cursor
   - claude
   - codex
 runtime_targets:
   - codex
   - claude
-  - copilot
   - cursor
-  - gemini-cli
 ---
 
 # Writing Plans

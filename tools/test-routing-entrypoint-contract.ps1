@@ -37,7 +37,7 @@ function Assert-Contains {
 $files = @(
     @{ label = "Codex entrypoint"; path = "AGENTS.md" },
     @{ label = "Claude entrypoint"; path = "CLAUDE.md" },
-    @{ label = "VS Code Copilot entrypoint"; path = ".github\copilot-instructions.md" },
+    @{ label = "Cursor entrypoint"; path = ".cursor\rules\dcr-kernel.mdc" },
     @{ label = "unified-router skill"; path = ".ai\catalog\skills\unified-router\SKILL.md" }
 )
 

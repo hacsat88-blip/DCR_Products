@@ -9,7 +9,7 @@
   before/after comparison of consolidation work.
 
   Reports:
-    - Top-level entrypoint files (CLAUDE.md / AGENTS.md / copilot-instructions.md)
+    - Top-level entrypoint files (CLAUDE.md / AGENTS.md) and Cursor mirror
     - Active catalog: rules/skills/agents that ship to a target adapter
     - Deprecation aliases section (alias overhead)
     - Per-asset cost top 10 (find heavy outliers)
@@ -42,7 +42,7 @@ $RepoRoot = (Resolve-Path (Join-Path $PSScriptRoot "..")).Path
 function Estimate-Tokens {
     param([string]$Path)
     if (-not (Test-Path $Path)) { return 0 }
-    $bytes = (Get-Item $Path).Length
+    $bytes = (Get-Item -LiteralPath $Path -Force).Length
     $text = [System.IO.File]::ReadAllText((Resolve-Path $Path).Path)
     $charCount = $text.Length
     return [int][math]::Ceiling($charCount / 3.5)
@@ -53,22 +53,22 @@ function Get-ActiveAssets {
     switch ($Kind) {
         'rule' {
             $dir = Join-Path $RepoRoot ".ai/catalog/rules"
-            return Get-ChildItem -Path $dir -Filter '*.md' | Where-Object {
+            return Get-ChildItem -Path $dir -Force -Filter '*.md' | Where-Object {
                 -not $_.BaseName.StartsWith('_') -and
                 -not (Test-Deprecated $_.FullName)
             }
         }
         'skill' {
             $dir = Join-Path $RepoRoot ".ai/catalog/skills"
-            return Get-ChildItem -Path $dir -Directory | Where-Object {
+            return Get-ChildItem -Path $dir -Force -Directory | Where-Object {
                 -not $_.Name.StartsWith('_') -and
                 (Test-Path (Join-Path $_.FullName "SKILL.md")) -and
                 -not (Test-Deprecated (Join-Path $_.FullName "SKILL.md"))
-            } | ForEach-Object { Get-Item (Join-Path $_.FullName "SKILL.md") }
+            } | ForEach-Object { Get-Item -LiteralPath (Join-Path $_.FullName "SKILL.md") -Force }
         }
         'agent' {
             $dir = Join-Path $RepoRoot ".ai/catalog/agents-source"
-            return Get-ChildItem -Path $dir -Filter '*.md' | Where-Object {
+            return Get-ChildItem -Path $dir -Force -Filter '*.md' | Where-Object {
                 $_.Name -ne 'README.md' -and
                 -not (Test-Deprecated $_.FullName)
             }
@@ -100,7 +100,7 @@ $report = [pscustomobject]@{
 $entrypoints = @(
     @{ name = 'CLAUDE.md'; path = 'CLAUDE.md' }
     @{ name = 'AGENTS.md'; path = 'AGENTS.md' }
-    @{ name = '.github/copilot-instructions.md'; path = '.github/copilot-instructions.md' }
+    @{ name = '.cursor/rules/dcr-kernel.mdc'; path = '.cursor/rules/dcr-kernel.mdc' }
 )
 $entrypointTotal = 0
 foreach ($e in $entrypoints) {
@@ -135,7 +135,7 @@ foreach ($kind in @('rule', 'skill', 'agent')) {
     switch ($kind) {
         'rule' {
             $dir = Join-Path $RepoRoot ".ai/catalog/rules"
-            foreach ($f in (Get-ChildItem -Path $dir -Filter '*.md' | Where-Object { -not $_.BaseName.StartsWith('_') })) {
+            foreach ($f in (Get-ChildItem -Path $dir -Force -Filter '*.md' | Where-Object { -not $_.BaseName.StartsWith('_') })) {
                 if (Test-Deprecated $f.FullName) {
                     $tokens += Estimate-Tokens -Path $f.FullName
                     $count++
@@ -144,7 +144,7 @@ foreach ($kind in @('rule', 'skill', 'agent')) {
         }
         'skill' {
             $dir = Join-Path $RepoRoot ".ai/catalog/skills"
-            foreach ($d in (Get-ChildItem -Path $dir -Directory | Where-Object { -not $_.Name.StartsWith('_') })) {
+            foreach ($d in (Get-ChildItem -Path $dir -Force -Directory | Where-Object { -not $_.Name.StartsWith('_') })) {
                 $sf = Join-Path $d.FullName "SKILL.md"
                 if ((Test-Path $sf) -and (Test-Deprecated $sf)) {
                     $tokens += Estimate-Tokens -Path $sf
@@ -154,7 +154,7 @@ foreach ($kind in @('rule', 'skill', 'agent')) {
         }
         'agent' {
             $dir = Join-Path $RepoRoot ".ai/catalog/agents-source"
-            foreach ($f in (Get-ChildItem -Path $dir -Filter '*.md' | Where-Object { $_.Name -ne 'README.md' })) {
+            foreach ($f in (Get-ChildItem -Path $dir -Force -Filter '*.md' | Where-Object { $_.Name -ne 'README.md' })) {
                 if (Test-Deprecated $f.FullName) {
                     $tokens += Estimate-Tokens -Path $f.FullName
                     $count++
@@ -177,7 +177,7 @@ Write-Host ""
 Write-Host "=== Token Budget ===" -ForegroundColor Cyan
 Write-Host ""
 Write-Host "Entrypoints (top-level):" -ForegroundColor Yellow
-foreach ($k in @('CLAUDE.md', 'AGENTS.md', '.github/copilot-instructions.md')) {
+foreach ($k in @('CLAUDE.md', 'AGENTS.md', '.cursor/rules/dcr-kernel.mdc')) {
     Write-Host ("  {0,-40} {1,8:N0} tokens" -f $k, $report.entrypoints[$k])
 }
 Write-Host ("  {0,-40} {1,8:N0} tokens" -f '-- entrypoint total --', $entrypointTotal) -ForegroundColor DarkGray

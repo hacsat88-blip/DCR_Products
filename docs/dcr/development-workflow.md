@@ -1,50 +1,16 @@
-# Development Workflow Standard
+# Mac Triad Maintenance Workflow
 
-DCR Products の最小運用フローです。迷ったときはこのファイルを正本にします。
+## Standard Flow
 
-## 日常フロー
+1. `.ai/` の source of truth だけを編集する。
+2. `pwsh -ExecutionPolicy Bypass -File ./deploy.ps1` で mirror を生成する。
+3. `pwsh -ExecutionPolicy Bypass -File ./deploy.ps1 -Check` で同期を確認する。
+4. `pwsh -ExecutionPolicy Bypass -File ./tools/validate-skill-capabilities.ps1 -RepoRoot .` を実行する。
+5. `pwsh -ExecutionPolicy Bypass -File ./validate.ps1` を実行する。
+6. `git diff HEAD --check` と `git status --short` を確認する。
 
-1. 正本層だけを編集する
-2. `pwsh -ExecutionPolicy Bypass -File .\validate.ps1` を実行する
-3. 生成物に影響する変更なら `pwsh -ExecutionPolicy Bypass -File .\deploy.ps1` を実行する
-4. `pwsh -ExecutionPolicy Bypass -File .\deploy.ps1 -Check` でドリフトを確認する
-5. 問題がなければコミットする
+## Rules
 
-## 正本層
-
-- `.ai/catalog/rules/`
-- `.ai/catalog/skills/`
-- `.ai/catalog/agents-source/`
-- `templates/`
-- `.ai/kernel/`, `.ai/module/`
-- `.dcr/` の設定ファイルとテンプレート
-
-## 生成物層
-
-以下は直接編集しません。
-
-- `AGENTS.md`
-- `CLAUDE.md`
-- `.github/copilot-instructions.md`
-- `.claude/agents/` (Git 管理外)
-- `.codex/agents/` (Git 管理外)
-
-## 計画と仕様の保存先
-
-- 実装計画: `docs/dcr/plans/`
-- 設計仕様: `docs/dcr/specs/`
-
-active な計画と仕様は上記の直下へ保存し、完了済み・低頻度参照文書だけ `docs/dcr/plans/archive/` と `docs/dcr/specs/archive/` へ移す。
-
-## Repo Layout Reference
-
-- stable reference: `docs/dcr/reference/repo-layout.md`
-- control surface reference: `docs/dcr/reference/control-surface.md`
-- root DCR core に置くか `Product/<product>/` に置くか迷ったら、先にこの reference を確認する
-
-## 変更の原則
-
-- 小さく直す
-- 正本を直してから deploy する
-- 生成物を手編集しない
-- パス移行は旧パス併存期間を置く
+- `AGENTS.md`, `CLAUDE.md`, `.codex/agents/`, `.claude/agents/`, `.cursor/` を直接編集しない。
+- Product 開発、アプリ追加、旧 runtime 復活を同じ変更へ含めない。
+- 完了済み plan / spec は archive と明示し、現行運用の正本にしない。

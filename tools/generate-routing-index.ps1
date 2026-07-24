@@ -79,10 +79,26 @@ function Get-FrontmatterMap {
     return $map
 }
 
+function Sort-FileSystemInfoOrdinal {
+    param([System.IO.FileSystemInfo[]]$Items)
+
+    $list = [System.Collections.Generic.List[System.IO.FileSystemInfo]]::new()
+    foreach ($item in $Items) {
+        $list.Add($item)
+    }
+    $comparison = [System.Comparison[System.IO.FileSystemInfo]] {
+        param($left, $right)
+        return [System.StringComparer]::Ordinal.Compare($left.Name, $right.Name)
+    }
+    $list.Sort($comparison)
+    return $list.ToArray()
+}
+
 $rows = @()
-$files = Get-ChildItem -Path $rulesDir -File -Filter *.md |
-    Where-Object { $_.BaseName -notlike "_*" } |
-    Sort-Object Name
+$files = Sort-FileSystemInfoOrdinal -Items @(
+    Get-ChildItem -Path $rulesDir -Force -File -Filter *.md |
+        Where-Object { $_.BaseName -notlike "_*" }
+)
 
 foreach ($file in $files) {
     $fm = Get-FrontmatterMap -FilePath $file.FullName
@@ -135,9 +151,10 @@ if (-not [string]::IsNullOrWhiteSpace($SkillsOutputPath)) {
         Write-Warning "skills directory not found: $skillsDir — skipping skills index"
     } else {
         $skillRows = @()
-        $skillDirs = Get-ChildItem -Path $skillsDir -Directory |
-            Where-Object { $_.Name -notlike "_*" } |
-            Sort-Object Name
+        $skillDirs = Sort-FileSystemInfoOrdinal -Items @(
+            Get-ChildItem -Path $skillsDir -Force -Directory |
+                Where-Object { $_.Name -notlike "_*" }
+        )
 
         foreach ($dir in $skillDirs) {
             $sf = Join-Path $dir.FullName "SKILL.md"

@@ -12,8 +12,16 @@ templates/obsidian/.obsidian/workspace-mobile.json
 Thumbs.db
 desktop.ini
 
-# Removed from Git (local delete when unlocked); prevents accidental re-add
-/Product/cyber-stock-dashboard/
+# Mac triad repository exclusions
+/Product/
+/.dcr/
+/.devin/
+/.windsurf/
+/.vscode/
+/.github/copilot-instructions.md
+/reports/
+/docs/snapshots/
+/templates/product/
 
 # Node
 node_modules/
@@ -42,26 +50,9 @@ __pycache__/
 /autotrader.xlsm
 /~$autotrader.xlsm
 
-# Generated adapter outputs (not source of truth)
-/.cursor/
-/.codex/agents/
-/.claude/agents/
+# Generated triad mirrors are tracked so a clean checkout can pass deploy -Check.
+# Edit .ai/ first and regenerate; do not edit mirrors directly.
 
-# Ignore all .dcr directories by default (runtime/session files)
-**/.dcr/
-
-# Track only the repository-level Manus Pattern source files
-!/.dcr/
-/.dcr/*
-!/.dcr/config.json
-!/.dcr/templates/
-!/.dcr/templates/*.md
-!/.dcr/phase.yaml
-!/.dcr/intent-log-schema.md
-!/.dcr/compositions.yaml
-!/.dcr/adversarial-pairs.yaml
-!/.dcr/registry.yaml
-# intent-log.jsonl and intent-weights.md are local runtime data (not tracked)
 codex_Product/
 
 # Nested git repos (unregistered submodules)

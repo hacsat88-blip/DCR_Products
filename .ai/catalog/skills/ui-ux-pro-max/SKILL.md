@@ -18,9 +18,7 @@ composable:
 runtime_targets:
   - codex
   - claude
-  - copilot
   - cursor
-  - gemini-cli
 ---
 
 # UI/UX Pro Max - Design Intelligence

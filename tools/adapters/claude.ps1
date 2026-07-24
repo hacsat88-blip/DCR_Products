@@ -1,4 +1,17 @@
-param([string]$RepoRoot = ".")
+param(
+    [string]$RepoRoot = ".",
+    [string]$OutputPath = "",
+    [switch]$Quiet
+)
+
+if ([string]::IsNullOrWhiteSpace($OutputPath)) {
+    $OutputPath = Join-Path $RepoRoot "CLAUDE.md"
+}
+
+function Write-ClaudeStatus {
+    param([string]$Message, [string]$Color = "Green")
+    if (-not $Quiet) { Write-Host $Message -ForegroundColor $Color }
+}
 
 $CatalogPaths = Join-Path (Split-Path $PSScriptRoot -Parent) "lib\catalog-paths.ps1"
 . $CatalogPaths
@@ -9,7 +22,7 @@ $rulesDir = Resolve-DcrSourcePath -RepoRoot $RepoRoot -AssetType "rules"
 $skillsDir = Resolve-DcrSourcePath -RepoRoot $RepoRoot -AssetType "skills"
 $agentsDir = Resolve-DcrSourcePath -RepoRoot $RepoRoot -AssetType "agents-source"
 
-Write-Host "[claude] Generating CLAUDE.md..." -ForegroundColor Cyan
+Write-ClaudeStatus -Message "[claude] Generating CLAUDE.md..." -Color "Cyan"
 
 function Get-Targets($file) {
     $text = Get-Content $file.FullName -Raw
@@ -49,9 +62,9 @@ function Get-DeprecationInfo($kind, $name) {
 }
 
 # Collect claude-targeted items (separate active vs deprecated)
-foreach ($f in Get-ChildItem $rulesDir -Filter "*.md" | Where-Object { -not $_.BaseName.StartsWith("_") }) {
+foreach ($f in Get-ChildItem -Path $rulesDir -Force -Filter "*.md" | Where-Object { -not $_.BaseName.StartsWith("_") }) {
     $targets = Get-Targets $f
-    if (-not $targets) { $targets = @("vscode", "claude", "codex") }
+    if (-not $targets) { $targets = @("claude", "codex", "cursor") }
     if ($targets -contains "claude") {
         $dep = Get-DeprecationInfo "rule" $f.BaseName
         if ($dep.Deprecated) {
@@ -62,12 +75,12 @@ foreach ($f in Get-ChildItem $rulesDir -Filter "*.md" | Where-Object { -not $_.B
     }
 }
 
-foreach ($dir in Get-ChildItem $skillsDir -Directory | Where-Object { -not $_.Name.StartsWith("_") }) {
+foreach ($dir in Get-ChildItem -Path $skillsDir -Force -Directory | Where-Object { -not $_.Name.StartsWith("_") }) {
     $sf = Join-Path $dir.FullName "SKILL.md"
     if (Test-Path $sf) {
-        $sfItem = Get-Item $sf
+        $sfItem = Get-Item -LiteralPath $sf -Force
         $targets = Get-Targets $sfItem
-        if (-not $targets) { $targets = @("vscode", "claude", "codex") }
+        if (-not $targets) { $targets = @("claude", "codex", "cursor") }
         if ($targets -contains "claude") {
             $dep = Get-DeprecationInfo "skill" $dir.Name
             if ($dep.Deprecated) {
@@ -79,7 +92,7 @@ foreach ($dir in Get-ChildItem $skillsDir -Directory | Where-Object { -not $_.Na
     }
 }
 
-foreach ($f in Get-ChildItem $agentsDir -Filter "*.md" | Where-Object { $_.Name -ne "README.md" }) {
+foreach ($f in Get-ChildItem -Path $agentsDir -Force -Filter "*.md" | Where-Object { $_.Name -ne "README.md" }) {
     $targets = Get-Targets $f
     if (-not $targets) { $targets = @("codex", "claude") }
     if ($targets -contains "claude") {
@@ -162,7 +175,7 @@ agentmemory 互換 backend が使える場合は、同種タスク、関連フ�
 "@
 
 $utf8 = New-Object System.Text.UTF8Encoding $false
-[System.IO.File]::WriteAllText("$RepoRoot/CLAUDE.md", ($content.TrimEnd() + [Environment]::NewLine), $utf8)
+[System.IO.File]::WriteAllText($OutputPath, ($content.TrimEnd() + [Environment]::NewLine), $utf8)
 
-Write-Host "  [OK] CLAUDE.md" -ForegroundColor Green
-Write-Host ""
+Write-ClaudeStatus -Message "  [OK] CLAUDE.md"
+Write-ClaudeStatus -Message ""

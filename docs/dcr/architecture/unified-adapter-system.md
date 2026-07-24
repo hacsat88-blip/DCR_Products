@@ -1,32 +1,19 @@
-# Unified Adapter System
+# Mac Triad Adapter System
 
-このリポジトリは、正本を1か所に集約し、各ツール向けの生成物へ配布する方式を採用しています。
+## Contract
 
-## Source Of Truth
+`.ai/` の正本から、次の3環境だけへ一方向に配布します。
 
-- `.ai/catalog/rules/`
-- `.ai/catalog/skills/`
-- `.ai/catalog/agents-source/`
-- `templates/`
+- Codex: `AGENTS.md`, `.codex/agents/`
+- Claude Code: `CLAUDE.md`, `.claude/agents/`
+- Cursor: `.cursor/`, `.cursorignore`
 
-## Generated Outputs
+配布対応は `.ai/adapters/manifest.yaml` に宣言し、`validate.ps1` が実装との一致を検査します。
 
-- `.github/copilot-instructions.md`
-- `AGENTS.md`
-- `CLAUDE.md`
-- `.claude/agents/` (local generated mirror, Git 管理外)
-- `.codex/agents/` (local generated mirror, Git 管理外)
+## Deployment
 
-## Deployment Path
+1. `.ai/` を変更する。
+2. `deploy.ps1` を実行する。
+3. `deploy.ps1 -Check` と `validate.ps1` を実行する。
 
-1. 正本を編集する
-2. `deploy.ps1` を実行する
-3. `tools/deploy-all.ps1` が各 adapter を呼び出す
-4. 生成物を上書きする
-
-## Design Rules
-
-- 生成物は read-only とみなす
-- 大量生成 mirror は Git で追跡せず、必要時に `deploy.ps1` で再生成する
-- path migration は旧新両対応期間を設ける
-- adapter の変更は generated file ではなく `tools/adapters/` 側で行う
+生成mirrorは追跡しますが、直接編集しません。Cursor adapterは管理対象外の利用者ファイルを保持します。

@@ -22,10 +22,8 @@
 
 ## Constraints And Fallbacks
 
-- GitHub Copilot CLI also uses `AGENTS.md`; CLI-specific capability notes live in [../copilot-cli/kernel.md](../copilot-cli/kernel.md).
 - If a tool is unavailable, follow [../../core/tool-contract.md](../../core/tool-contract.md) fallback rules.
 
 ## Tone
 
 - Keep Codex output concise, implementation-oriented, and evidence-based.
-

@@ -1,4 +1,2 @@
-# Generated/runtime mirrors
-.cursor/
-.codex/agents/
-.claude/agents/
+# Runtime-only state
+.ai/routing/state/

@@ -89,9 +89,9 @@ $packageCount = 0
 $absorbsCount = 0
 $baselineOverlayCount = 0
 $runtimeTargetCount = 0
-$requiredRuntimeTargets = @("codex", "claude", "copilot", "cursor", "gemini-cli")
+$requiredRuntimeTargets = @("codex", "claude", "cursor")
 
-foreach ($dir in Get-ChildItem -Path $skillsDir -Directory | Where-Object { -not $_.Name.StartsWith("_") } | Sort-Object Name) {
+foreach ($dir in Get-ChildItem -Path $skillsDir -Force -Directory | Where-Object { -not $_.Name.StartsWith("_") } | Sort-Object Name) {
     $skillFile = Join-Path $dir.FullName "SKILL.md"
     if (-not (Test-Path -LiteralPath $skillFile)) { continue }
 
@@ -133,6 +133,11 @@ foreach ($dir in Get-ChildItem -Path $skillsDir -Directory | Where-Object { -not
         foreach ($target in $requiredRuntimeTargets) {
             if ($target -notin $runtimeTargets) {
                 $failures += "$($dir.Name): runtime_targets missing $target"
+            }
+        }
+        foreach ($target in $runtimeTargets) {
+            if ($target -notin $requiredRuntimeTargets) {
+                $failures += "$($dir.Name): unsupported runtime_target $target"
             }
         }
     }

@@ -31,9 +31,7 @@ package:
 runtime_targets:
   - codex
   - claude
-  - copilot
   - cursor
-  - gemini-cli
 ---
 
 # Database Schema Design

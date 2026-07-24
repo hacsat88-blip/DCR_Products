@@ -117,7 +117,7 @@ if (Test-SourcePresent -Path $marketsPath -Label "known_marketplaces.json") {
 # --- 3. Loose agents (no lock; count snapshot only) ---
 $agentsDir = Join-Path $UserHome ".claude\agents"
 if (Test-SourcePresent -Path $agentsDir -Label "~/.claude/agents") {
-    $agentCount = @(Get-ChildItem -LiteralPath $agentsDir -Filter *.md -File -ErrorAction SilentlyContinue).Count
+    $agentCount = @(Get-ChildItem -LiteralPath $agentsDir -Force -Filter *.md -File -ErrorAction SilentlyContinue).Count
     if ($agentCount -eq $ExpectedAgentCount) { Write-CheckOk "agents count = $ExpectedAgentCount" }
     else { Write-CheckWarn "agents count = $agentCount (baseline $ExpectedAgentCount; loose .md, no lock - update registry if intentional)" }
 }
