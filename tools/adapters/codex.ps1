@@ -17,10 +17,13 @@ $CatalogPaths = Join-Path (Split-Path $PSScriptRoot -Parent) "lib\catalog-paths.
 . $CatalogPaths
 $DeprecatedAliases = Join-Path (Split-Path $PSScriptRoot -Parent) "lib\deprecated-aliases.ps1"
 . $DeprecatedAliases
+$EntrypointOperatingPrinciples = Join-Path (Split-Path $PSScriptRoot -Parent) "lib\entrypoint-operating-principles.ps1"
+. $EntrypointOperatingPrinciples
 
 $rulesDir = Resolve-DcrSourcePath -RepoRoot $RepoRoot -AssetType "rules"
 $skillsDir = Resolve-DcrSourcePath -RepoRoot $RepoRoot -AssetType "skills"
 $agentsDir = Resolve-DcrSourcePath -RepoRoot $RepoRoot -AssetType "agents-source"
+$sharedOperatingPrinciples = Get-DcrEntrypointOperatingPrinciples -RepoRoot $RepoRoot
 
 Write-CodexStatus -Message "[codex] Generating AGENTS.md..." -Color "Cyan"
 
@@ -124,6 +127,8 @@ Unified entry point for the Codex environment.
 - Environment diff (Codex): [.ai/adapters/codex/kernel.md](.ai/adapters/codex/kernel.md)
 
 ---
+
+$sharedOperatingPrinciples
 
 ## Unified Coordinator
 
