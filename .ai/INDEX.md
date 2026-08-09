@@ -20,6 +20,7 @@
 | 安全境界・禁止事項       | core/safety.md                  |
 | 権限モデル P1/P2/P3     | core/permissions.md             |
 | 不変の中核(identity)     | core/identity.md                |
+| 共通実行原則             | core/operating-principles.md    |
 | いつ何を発火するか       | routing/router.md               |
 | 設計背景・単一ソース原則 | routing/design.md               |
 | Gate/Trigger            | routing/gates/ + routing/triggers.md |

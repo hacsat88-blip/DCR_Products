@@ -17,10 +17,13 @@ $CatalogPaths = Join-Path (Split-Path $PSScriptRoot -Parent) "lib\catalog-paths.
 . $CatalogPaths
 $DeprecatedAliases = Join-Path (Split-Path $PSScriptRoot -Parent) "lib\deprecated-aliases.ps1"
 . $DeprecatedAliases
+$EntrypointOperatingPrinciples = Join-Path (Split-Path $PSScriptRoot -Parent) "lib\entrypoint-operating-principles.ps1"
+. $EntrypointOperatingPrinciples
 
 $rulesDir = Resolve-DcrSourcePath -RepoRoot $RepoRoot -AssetType "rules"
 $skillsDir = Resolve-DcrSourcePath -RepoRoot $RepoRoot -AssetType "skills"
 $agentsDir = Resolve-DcrSourcePath -RepoRoot $RepoRoot -AssetType "agents-source"
+$sharedOperatingPrinciples = Get-DcrEntrypointOperatingPrinciples -RepoRoot $RepoRoot
 
 Write-ClaudeStatus -Message "[claude] Generating CLAUDE.md..." -Color "Cyan"
 
@@ -144,6 +147,8 @@ Unified entry point for Claude Code environment.
 - Environment diff (Claude Code): [.ai/adapters/claude-code/kernel.md](.ai/adapters/claude-code/kernel.md)
 ---
 
+$sharedOperatingPrinciples
+
 ## Unified Coordinator
 
 全タスクの単一入口は **pied-piper** agent。
@@ -172,6 +177,12 @@ agentmemory 互換 backend が使える場合は、同種タスク、関連フ�
 - [.ai/routing/coordinator.md](.ai/routing/coordinator.md)
 - [.ai/routing/router.md](.ai/routing/router.md)
 - [.ai/routing/integration.md](.ai/routing/integration.md)
+
+---
+
+## Response Language
+
+ユーザーへの回答、説明、CLI 出力の要約、エラー原因・影響・修正案は、ユーザーが別言語を明示しない限り日本語で行う。
 "@
 
 $utf8 = New-Object System.Text.UTF8Encoding $false

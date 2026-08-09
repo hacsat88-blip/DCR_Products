@@ -34,6 +34,36 @@ function Assert-Contains {
     }
 }
 
+function Assert-CanonicalSection {
+    param(
+        [Parameter(Mandatory)][string]$Label,
+        [Parameter(Mandatory)][string]$Text,
+        [Parameter(Mandatory)][string]$Expected
+    )
+
+    $sectionPattern = '(?ms)^## Shared Operating Principles[ \t]*\r?\n.*?(?=^#{1,2}[ \t]+|\z)'
+    $sectionMatches = [regex]::Matches($Text, $sectionPattern)
+    if ($sectionMatches.Count -ne 1) {
+        throw "$Label must contain exactly one Shared Operating Principles section; found $($sectionMatches.Count)"
+    }
+
+    $actualNormalized = $sectionMatches[0].Value.Trim().Replace("`r`n", "`n")
+    $expectedNormalized = $Expected.Trim().Replace("`r`n", "`n")
+    if (-not [string]::Equals($actualNormalized, $expectedNormalized, [System.StringComparison]::Ordinal)) {
+        throw "$Label Shared Operating Principles section differs from the canonical source"
+    }
+}
+
+$canonicalOperatingPrinciplesPath = Join-Path $RepoRoot ".ai\core\operating-principles.md"
+if (-not (Test-Path -LiteralPath $canonicalOperatingPrinciplesPath -PathType Leaf)) {
+    throw "Shared operating principles not found: $canonicalOperatingPrinciplesPath"
+}
+$canonicalOperatingPrinciples = (Get-Content -LiteralPath $canonicalOperatingPrinciplesPath -Raw -Encoding UTF8).Trim()
+if (-not $canonicalOperatingPrinciples.StartsWith("# Shared Operating Principles")) {
+    throw "Shared operating principles must start with '# Shared Operating Principles': $canonicalOperatingPrinciplesPath"
+}
+$expectedOperatingPrinciplesBlock = "#$canonicalOperatingPrinciples"
+
 $files = @(
     @{ label = "Codex entrypoint"; path = "AGENTS.md" },
     @{ label = "Claude entrypoint"; path = "CLAUDE.md" },
@@ -71,6 +101,13 @@ foreach ($entry in $files) {
     foreach ($term in $requiredTerms) {
         Assert-Contains -Label $entry.label -Text $text -Needle $term
     }
+}
+
+$generatedEntrypoints = @($files | Where-Object { $_.label -ne "unified-router skill" })
+foreach ($entry in $generatedEntrypoints) {
+    $fullPath = Join-Path $RepoRoot $entry.path
+    $text = Get-Content -Path $fullPath -Raw -Encoding UTF8
+    Assert-CanonicalSection -Label $entry.label -Text $text -Expected $expectedOperatingPrinciplesBlock
 }
 
 Write-Host "routing entrypoint contract V6 smoke passed"

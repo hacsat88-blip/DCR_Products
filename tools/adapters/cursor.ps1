@@ -7,6 +7,9 @@ param(
 $outRoot = if ([string]::IsNullOrWhiteSpace($OutputRoot)) { Join-Path $RepoRoot ".cursor" } else { $OutputRoot }
 $outRulesDir = Join-Path $outRoot "rules"
 $runtimeKernel = Join-Path $RepoRoot ".ai\core\kernel.md"
+$EntrypointOperatingPrinciples = Join-Path (Split-Path $PSScriptRoot -Parent) "lib\entrypoint-operating-principles.ps1"
+. $EntrypointOperatingPrinciples
+$sharedOperatingPrinciples = Get-DcrEntrypointOperatingPrinciples -RepoRoot $RepoRoot
 $cursorIgnorePath = if ([string]::IsNullOrWhiteSpace($OutputRoot)) {
     Join-Path $RepoRoot ".cursorignore"
 }
@@ -93,6 +96,8 @@ if (Test-Path $runtimeKernel) {
         "# DCR Kernel Baseline"
         ""
         'Primary source: ../.ai/core/ and ../.ai/core/kernel.md'
+        ""
+        $sharedOperatingPrinciples
         ""
         $kernelBody.TrimEnd()
         ""
