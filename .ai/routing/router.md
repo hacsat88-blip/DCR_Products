@@ -68,6 +68,25 @@ secret、PII、ログ全文、中間推論、正本に書くべき内容は保�
    → phase は kernel/gate-state.json から取得
 ```
 
+## Work Unit Classification Lens
+
+自動化・業務設計では、候補確定前に任意の `work_unit` を付け、仕事の置き場所を先に揃える。これは asset 選定の補助軸であり、confidence、P1/P2/P3、発火承認を上書きしない。
+
+| `work_unit` | 主な判定シグナル | DCR の標準配置 |
+|---|---|---|
+| `repeatable-job` | 同じ手順と完了条件で反復できる | script / automation |
+| `reusable-judgment` | 複数回使う判断基準や手順を固定する | Skill。全体不変条件は rule |
+| `specialist-responsibility` | 文脈・権限・責任を分離する | Agent |
+| `outcome-bundle` | 複数作業を成果と完了条件まで束ねる | plan / pipeline。環境固有 goal は adapter 側で対応 |
+| `enforcement-guard` | 必須検証、安全制御、操作前後の強制処理 | permission / gate / hook |
+| `external-connection` | 外部サービス、データ、UI、API へ接続する | tool / connector / MCP |
+
+- 単一の主分類を優先し、必要な場合だけ副分類を1つ追加する。結果は `primary_work_unit` と任意の `secondary_work_unit` で表す。
+- `repeatable-job` は定型処理の反復であり、`ralph:` や `team-fix` の検証・修正ループとは区別する。
+- 3種類以上にまたがる場合は先に分解する。分解できない場合だけ `primary_work_unit: mixed`、`secondary_work_unit: null` とする。
+- 該当しない通常タスクは `primary_work_unit: none`、`secondary_work_unit: null` とする。
+- `external-connection`、設定変更、hook 追加などの実行は、分類結果に関係なく既存の承認境界に従う。
+
 ## confidence 計算
 
 ```
@@ -265,7 +284,9 @@ research-analyst.absorbs = [docs-researcher, market-researcher, competitive-anal
     "risk": "low|medium|high",
     "phase": "plan|impl|qa|ship",
     "scale": "small|medium|large",
-    "ambiguity": "low|medium|high"
+    "ambiguity": "low|medium|high",
+    "primary_work_unit": "repeatable-job|reusable-judgment|specialist-responsibility|outcome-bundle|enforcement-guard|external-connection|mixed|none",
+    "secondary_work_unit": "repeatable-job|reusable-judgment|specialist-responsibility|outcome-bundle|enforcement-guard|external-connection|null"
   },
   "selected": [
     {

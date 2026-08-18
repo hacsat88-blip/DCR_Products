@@ -41,7 +41,7 @@ runtime_targets:
 
 `unified-router` は旧 `skill-router` を置き換えるルーティング基盤の統合窓口です。候補を増やす司令塔ではなく、候補を減らして束ねる入口として振る舞います。
 
-- **入力分類**: intent / domain / risk / phase / scale / ambiguity の6軸でタスクを分類
+- **入力分類**: intent / domain / risk / phase / scale / ambiguity の6軸でタスクを分類し、自動化・業務設計では `work_unit` を補助判定
 - **アセット選定**: 決定木（Step 0–6）で Rule / Skill / Agent をユーザー表示最大3件に圧縮
 - **発火判定**: confidence は候補順位に使い、auto / propose / approve_required で実行可否を決める
 
@@ -56,6 +56,21 @@ runtime_targets:
 | Step 4 | `domain` 一致 | ↓ |
 | Step 5 | `risk` 整合性 | ↓ |
 | Step 6 | `phase` 整合性 | 低 |
+
+## Work Unit Classification
+
+自動化・業務設計では、`work_unit` を asset 選定の補助軸として使う。
+
+| `work_unit` | DCR の標準配置 |
+|---|---|
+| `repeatable-job` | script / automation |
+| `reusable-judgment` | Skill。全体不変条件は rule |
+| `specialist-responsibility` | Agent |
+| `outcome-bundle` | plan / pipeline。環境固有 goal は adapter で対応 |
+| `enforcement-guard` | permission / gate / hook |
+| `external-connection` | tool / connector / MCP |
+
+主分類は `primary_work_unit`、必要な副分類は `secondary_work_unit` として最大1つに絞る。通常タスクは `primary_work_unit: none`、分解できない3分類以上の複合タスクだけ `primary_work_unit: mixed` とし、どちらも `secondary_work_unit: null` にする。`repeatable-job` は定型反復であり、検証・修正を収束させる `ralph:` / `team-fix` loop と混同しない。分類は confidence、P1/P2/P3、承認境界を上書きしない。詳細は正本の [router.md](../../../routing/router.md) を参照する。
 
 ## 実行フロー
 
