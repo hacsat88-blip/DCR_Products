@@ -25,6 +25,16 @@
 
 `~/.claude/`（個人 skills 50・loose agents 85・plugins）と各 marketplace は **DCR の正本ではなく外部 vendor/marketplace 由来**であり、`.ai/catalog` にコピーして正本化しない（`external-capability-intake` の `immutable-upstream` 扱い）。これらは更新が upstream 側で進むため、DCR 側は「出所・件数・管理方針」を [docs/dcr/external-ecosystem-registry.md](../../docs/dcr/external-ecosystem-registry.md) に台帳化し、`tools/check-external-ecosystem.ps1` で drift を監視するだけにする。価値が高く完全管理したい少数のみ `selective-source-import` で provenance 付き取込する。
 
+## Work Unit Classification Lens
+
+自動化・業務設計の入口では、プロンプトや asset を増やす前に `work_unit` を分類する。共通分類は `repeatable-job / reusable-judgment / specialist-responsibility / outcome-bundle / enforcement-guard / external-connection` とし、それぞれ既存の script / Skill / Agent / pipeline / gate / tool へ割り当てる。
+
+- Codex / Claude Code / Cursor 共通の判断軸とし、環境固有機能は adapter で対応する。
+- 新しい `/loop` command や独立 runtime は追加しない。
+- `repeatable-job` と、DCR の verify -> fix completion loop を区別する。
+- `work_unit` は routing の補助情報であり、source-of-truth、P1/P2/P3、承認、検証を上書きしない。
+- provenance: KAWAI, "AI自動化OSの設計図", https://x.com/kawai_design/status/2064137190331035688
+
 ## Common Flow
 
 1. `p/` Plan Gate
