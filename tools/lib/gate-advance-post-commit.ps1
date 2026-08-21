@@ -8,7 +8,7 @@
   コミット成功後、gate-state.json に最新コミット SHA を記録し phase を更新する。
 
 .EXAMPLE
-  powershell -ExecutionPolicy Bypass -File tools/lib/gate-advance-post-commit.ps1
+  pwsh -NoProfile -ExecutionPolicy Bypass -File tools/lib/gate-advance-post-commit.ps1
 #>
 
 $ErrorActionPreference = 'Stop'

@@ -18,8 +18,8 @@
 
 4. 検証する。
 - 問題再現手順を再実行
-- `powershell -ExecutionPolicy Bypass -File .\\validate.ps1`
-- `powershell -ExecutionPolicy Bypass -File .\\deploy.ps1 -Check`
+- `pwsh -NoProfile -ExecutionPolicy Bypass -File .\\validate.ps1`
+- `pwsh -NoProfile -ExecutionPolicy Bypass -File .\\deploy.ps1 -Check`
 
 5. 結果を報告する。
 - 何を直したか

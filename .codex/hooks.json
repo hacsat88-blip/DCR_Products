@@ -6,7 +6,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "powershell -ExecutionPolicy Bypass -File .\\validate.ps1; if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }; powershell -ExecutionPolicy Bypass -File .\\deploy.ps1 -Check; exit $LASTEXITCODE",
+            "command": "pwsh -NoProfile -ExecutionPolicy Bypass -File ./validate.ps1 && pwsh -NoProfile -ExecutionPolicy Bypass -File ./deploy.ps1 -Check",
             "statusMessage": "Hook gate: running validate and deploy check before git commit"
           }
         ]
@@ -16,7 +16,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "powershell -ExecutionPolicy Bypass -File .\\validate.ps1; if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }; powershell -ExecutionPolicy Bypass -File .\\deploy.ps1 -Check; exit $LASTEXITCODE",
+            "command": "pwsh -NoProfile -ExecutionPolicy Bypass -File ./validate.ps1 && pwsh -NoProfile -ExecutionPolicy Bypass -File ./deploy.ps1 -Check",
             "statusMessage": "Hook gate: running validate and deploy check before git push"
           }
         ]

@@ -9,7 +9,7 @@
   未完了セッションがあれば継続を提示する。
 
 .EXAMPLE
-  powershell -ExecutionPolicy Bypass -File tools/lib/gate-auto-init.ps1
+  pwsh -NoProfile -ExecutionPolicy Bypass -File tools/lib/gate-auto-init.ps1
 #>
 
 $ErrorActionPreference = 'Stop'

@@ -9,7 +9,7 @@
   既存ファイルの編集は許可する。
 
 .EXAMPLE
-  powershell -ExecutionPolicy Bypass -File tools/lib/enforce-tdd.ps1
+  pwsh -NoProfile -ExecutionPolicy Bypass -File tools/lib/enforce-tdd.ps1
 #>
 
 $ErrorActionPreference = 'Stop'

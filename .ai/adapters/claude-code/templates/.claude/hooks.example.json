@@ -4,7 +4,7 @@
         "PostToolUse": [
             {
                 "name": "Run deploy check manually after major changes",
-                "command": "powershell -ExecutionPolicy Bypass -File .\\deploy.ps1 -Check"
+                "command": "pwsh -NoProfile -ExecutionPolicy Bypass -File .\\deploy.ps1 -Check"
             }
         ]
     },

@@ -5,8 +5,8 @@ Codex では Claude と同名の hooks 機構がない環境があります。
 
 ## Post-change checks
 
-- `powershell -ExecutionPolicy Bypass -File .\\validate.ps1`
-- `powershell -ExecutionPolicy Bypass -File .\\deploy.ps1 -Check`
+- `pwsh -NoProfile -ExecutionPolicy Bypass -File .\\validate.ps1`
+- `pwsh -NoProfile -ExecutionPolicy Bypass -File .\\deploy.ps1 -Check`
 
 ## Suggested automation entry points
 

@@ -10,7 +10,7 @@
   3回超過でエスカレーション推奨メッセージを表示する。
 
 .EXAMPLE
-  powershell -ExecutionPolicy Bypass -File tools/lib/detect-scope-drift.ps1
+  pwsh -NoProfile -ExecutionPolicy Bypass -File tools/lib/detect-scope-drift.ps1
 #>
 
 $ErrorActionPreference = 'Stop'

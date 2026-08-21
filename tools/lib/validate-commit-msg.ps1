@@ -10,7 +10,7 @@
 
 .EXAMPLE
   # hooks から呼び出し
-  powershell -ExecutionPolicy Bypass -File tools/lib/validate-commit-msg.ps1
+  pwsh -NoProfile -ExecutionPolicy Bypass -File tools/lib/validate-commit-msg.ps1
 #>
 
 $ErrorActionPreference = 'Stop'

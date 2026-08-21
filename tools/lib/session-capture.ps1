@@ -1,4 +1,4 @@
-#Requires -Version 5.1
+#Requires -Version 7.0
 <#
 .SYNOPSIS
   git push 成功後にセッションの学習内容を mem_cli.py へ記録する
@@ -8,17 +8,20 @@
   gate-state.json からセッション情報を読み取り、mem_cli.py quick-save で永続化する。
 
 .EXAMPLE
-  powershell -ExecutionPolicy Bypass -File tools/lib/session-capture.ps1
+  pwsh -NoProfile -ExecutionPolicy Bypass -File tools/lib/session-capture.ps1
 #>
 
 $ErrorActionPreference = 'SilentlyContinue'  # 非同期フックなのでエラーで止めない
 
 $RepoRoot = (Resolve-Path (Join-Path $PSScriptRoot "..\..")).Path
-$MemCliPath = "C:\Users\hacsa\.claude\projects\C--Users-hacsa-Desktop------\memory\mem_cli.py"
+. (Join-Path $PSScriptRoot "resolve-claude-memory.ps1")
+$MemPaths = Get-ClaudeMemoryPaths
+$MemCliPath = if ($MemPaths) { $MemPaths.MemCli } else { $null }
+$Python = Get-ClaudePython
 $GateStateLib = Join-Path $RepoRoot "tools\lib\gate-state.ps1"
 
 # mem_cli.py が存在しなければスキップ
-if (-not (Test-Path $MemCliPath)) { exit 0 }
+if (-not $MemCliPath -or -not $Python) { exit 0 }
 
 $sessionSummary = "push 完了"
 
@@ -40,7 +43,7 @@ $today = Get-Date -Format 'yyyy-MM-dd'
 $title = "session-capture-$today"
 
 try {
-    $result = & python -X utf8 $MemCliPath quick-save `
+    $result = & $Python -X utf8 $MemCliPath quick-save `
         --title $title `
         --type "project" `
         --description "git push 完了時のセッション記録" `
