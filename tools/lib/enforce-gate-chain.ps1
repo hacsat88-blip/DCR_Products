@@ -5,8 +5,8 @@
 
 .DESCRIPTION
   Claude Code の PreToolUse フック (Bash(git push *)) から呼び出される。
-  指定フェーズの前提ゲートが通過していない場合は exit 1 でブロックする。
-  gate-state.json が存在しない場合: plan フェーズなら自動初期化、他は exit 1。
+  指定フェーズの前提ゲートが通過していない場合は exit 2 でブロックする。
+  gate-state.json が存在しない場合: plan フェーズなら自動初期化、他は exit 2。
 
 .PARAMETER RequiredPhase
   確認するフェーズ: plan | qa | ship
@@ -15,8 +15,8 @@
   指定した場合、ブロックではなく警告のみ (exit 0)
 
 .EXAMPLE
-  powershell -File tools/lib/enforce-gate-chain.ps1 -RequiredPhase ship
-  powershell -File tools/lib/enforce-gate-chain.ps1 -RequiredPhase qa -SoftWarn
+  pwsh -NoProfile -ExecutionPolicy Bypass -File tools/lib/enforce-gate-chain.ps1 -RequiredPhase ship
+  pwsh -NoProfile -ExecutionPolicy Bypass -File tools/lib/enforce-gate-chain.ps1 -RequiredPhase qa -SoftWarn
 #>
 
 param(
@@ -49,7 +49,7 @@ function Block-Or-Warn {
         exit 0
     } else {
         Write-Host "[STOP] $Message" -ForegroundColor Red
-        exit 1
+        exit 2
     }
 }
 

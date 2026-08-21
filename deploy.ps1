@@ -44,9 +44,14 @@ $DestClaudeSkills = Join-Path $RepoRoot ".claude\skills"
 $DeployAll = Join-Path $RepoRoot "tools\deploy-all.ps1"
 
 function Get-ClaudeSkillsLinkTarget {
+    param([string]$RepoRoot)
+
     # .claude/skills is a symlink into the catalog rather than a copy, so the
-    # 69 skill directories stay single-sourced under .ai/catalog/skills.
-    return "../.ai/catalog/skills"
+    # skill directories stay single-sourced. The target is derived from the
+    # resolved catalog path (not hardcoded) so a repo still on the legacy
+    # layout links to where its skills actually live.
+    $skillsRoot = Resolve-DcrSourcePath -RepoRoot $RepoRoot -AssetType "skills"
+    return [System.IO.Path]::GetRelativePath((Join-Path $RepoRoot ".claude"), $skillsRoot)
 }
 
 function Get-SymlinkDrift {
@@ -68,11 +73,28 @@ function Get-SymlinkDrift {
 }
 
 function Set-ClaudeSkillsLink {
-    param([string]$LinkPath, [string]$ExpectedTarget)
+    param(
+        [string]$LinkPath,
+        [string]$ExpectedTarget,
+        [string]$ResolvedRoot
+    )
+
+    if (-not (Test-Path -LiteralPath $ResolvedRoot)) {
+        Write-Warning "Skills source not found; skipped .claude/skills link: $ResolvedRoot"
+        return
+    }
 
     $item = Get-Item -LiteralPath $LinkPath -Force -ErrorAction SilentlyContinue
     if ($item -and $item.LinkType -and ($item.Target -contains $ExpectedTarget)) { return }
-    if ($item) { Remove-Item -LiteralPath $LinkPath -Force -Recurse }
+
+    # .claude/skills is also the standard home for hand-authored skills. Never
+    # recursively delete a real directory here - report it and let a human decide.
+    if ($item -and -not $item.LinkType) {
+        Write-Warning "[NOT_A_LINK] $LinkPath is a real directory; refusing to replace it. Move or remove it, then re-run deploy."
+        return
+    }
+
+    if ($item) { Remove-Item -LiteralPath $LinkPath -Force }
     New-Item -ItemType SymbolicLink -Path $LinkPath -Target $ExpectedTarget | Out-Null
     Write-Host "  [OK] .claude/skills -> $ExpectedTarget" -ForegroundColor Green
 }
@@ -227,6 +249,7 @@ if ($Check) {
             $expectedClaude = Join-Path $tempDir "CLAUDE.md"
             & (Join-Path $RepoRoot "tools\adapters\claude.ps1") -RepoRoot $RepoRoot -OutputPath $expectedClaude -Quiet
             Write-CheckDrift -Label "Claude entrypoint" -Diffs (Get-FileDrift -ExpectedPath $expectedClaude -ActualPath (Join-Path $RepoRoot "CLAUDE.md") -Label "CLAUDE.md")
+            Write-CheckDrift -Label "Claude skills" -Diffs (Get-SymlinkDrift -LinkPath $DestClaudeSkills -ExpectedTarget (Get-ClaudeSkillsLinkTarget -RepoRoot $RepoRoot) -ResolvedRoot (Resolve-DcrSourcePath -RepoRoot $RepoRoot -AssetType "skills"))
         }
         finally {
             if (Test-Path -LiteralPath $tempDir) { Remove-Item -LiteralPath $tempDir -Recurse -Force }
@@ -249,7 +272,6 @@ if ($Check) {
     if ($Target -eq "all" -or $Target -eq "agents") {
         Write-CheckDrift -Label "Codex agents" -Diffs (Get-FlatFileDrift -Source $SourceAgents -Destination $DestCodexAgents -Filter "*.toml")
         Write-CheckDrift -Label "Claude agents" -Diffs (Get-FlatFileDrift -Source $SourceAgents -Destination $DestClaudeAgents -Filter "*.md" -IgnoreNames @("README.md"))
-        Write-CheckDrift -Label "Claude skills" -Diffs (Get-SymlinkDrift -LinkPath $DestClaudeSkills -ExpectedTarget (Get-ClaudeSkillsLinkTarget) -ResolvedRoot (Resolve-DcrSourcePath -RepoRoot $RepoRoot -AssetType "skills"))
     }
 
     Write-Host ""
@@ -264,8 +286,10 @@ if (-not (Test-Path -LiteralPath $DeployAll)) {
 
 & $DeployAll -Target $Target -DryRun:$DryRun
 
-if (-not $DryRun -and ($Target -eq "all" -or $Target -eq "claude" -or $Target -eq "agents")) {
-    Set-ClaudeSkillsLink -LinkPath $DestClaudeSkills -ExpectedTarget (Get-ClaudeSkillsLinkTarget)
+if (-not $DryRun -and ($Target -eq "all" -or $Target -eq "claude")) {
+    Set-ClaudeSkillsLink -LinkPath $DestClaudeSkills `
+        -ExpectedTarget (Get-ClaudeSkillsLinkTarget -RepoRoot $RepoRoot) `
+        -ResolvedRoot (Resolve-DcrSourcePath -RepoRoot $RepoRoot -AssetType "skills")
 }
 
 if ($DryRun) {

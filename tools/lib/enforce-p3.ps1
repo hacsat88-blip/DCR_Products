@@ -15,8 +15,8 @@
   ゲートチェックをスキップして強制実行（要ログ）
 
 .EXAMPLE
-  powershell -File tools/lib/enforce-p3.ps1 -Operation delete
-  powershell -File tools/lib/enforce-p3.ps1 -Operation config -Force
+  pwsh -NoProfile -ExecutionPolicy Bypass -File tools/lib/enforce-p3.ps1 -Operation delete
+  pwsh -NoProfile -ExecutionPolicy Bypass -File tools/lib/enforce-p3.ps1 -Operation config -Force
 #>
 
 param(
@@ -70,7 +70,7 @@ if (-not (Test-Path $gateFile)) {
     Write-Host "   p/ で計画を策定・承認してから実行してください。" -ForegroundColor Yellow
     Write-Host "   緊急時: -Force フラグで回避可能（要ログ記録）" -ForegroundColor DarkGray
     Write-Host ""
-    exit 1
+    exit 2
 }
 
 $state = Read-GateState -RepoRoot $RepoRoot
@@ -82,7 +82,7 @@ if (-not $state.gates.plan_passed) {
     Write-Host "   p/ で計画を策定・承認してから実行してください。" -ForegroundColor Yellow
     Write-Host "   緊急時: -Force フラグで回避可能（要ログ記録）" -ForegroundColor DarkGray
     Write-Host ""
-    exit 1
+    exit 2
 }
 
 Write-Host "[OK] P3ゲート通過: $Label を許可します" -ForegroundColor Green

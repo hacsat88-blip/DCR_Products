@@ -30,11 +30,20 @@ Claude Code / Cursor / Codex 間で**同一DBを共有**する。
 
 **CLIパス（macOS）:**
 ```
-~/.claude/projects/<sanitized-cwd>/memory/mem_cli.py
+~/.claude/projects/<project>/memory/mem_cli.py
 ```
-パスは固定せず `tools/lib/resolve-claude-memory.ps1` で解決する。以下の例では
-`export DCR_MEM="$HOME/.claude/projects/-Users-dcr3104-DCR-Products/memory"` を前提とする。
-別の場所に置く場合は環境変数 `DCR_MEMORY_ROOT` にその `memory` ディレクトリを指定する。
+DB はワークスペースごとではなく**マシンで1つ**。`tools/lib/resolve-claude-memory.ps1`
+は `~/.claude/projects` 配下から `memory/mem_cli.py` を探し、名前順で最初の1件を返す。
+そのため DCR_Products とサトシ開発は同じ DB を共有する（それが本スキルの狙い）。
+
+複数候補が生まれると解決先が名前順で変わってしまうため、**`DCR_MEMORY_ROOT` に
+`memory` ディレクトリを明示的に指定して固定することを推奨する**。指定すると
+再帰探索自体もスキップされる。以下の例は次を前提とする：
+
+```bash
+export DCR_MEMORY_ROOT="$HOME/.claude/projects/-Users-dcr3104-DCR-Products/memory"
+export DCR_MEM="$DCR_MEMORY_ROOT"
+```
 
 **DBパス:** 同ディレクトリの `mem.db`
 

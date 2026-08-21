@@ -17,10 +17,10 @@ Claude Code システム全体の健全性をチェックします。
 ## 実行方法
 
 ```
-powershell -File tools/audit-system.ps1
+pwsh -NoProfile -ExecutionPolicy Bypass -File tools/audit-system.ps1
 ```
 
-問題が見つかった場合: `powershell -File tools/audit-system.ps1 -Fix`
+問題が見つかった場合: `pwsh -NoProfile -ExecutionPolicy Bypass -File tools/audit-system.ps1 -Fix`
 
 ## 推奨実行タイミング
 

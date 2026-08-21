@@ -39,8 +39,10 @@ if (Test-Path $GateStateLib) {
     } catch { }
 }
 
-$today = Get-Date -Format 'yyyy-MM-dd'
-$title = "session-capture-$today"
+# Include the time: a date-only title makes every push after the first
+# overwrite that day's record instead of adding one.
+$stamp = Get-Date -Format 'yyyy-MM-dd-HHmm'
+$title = "session-capture-$stamp"
 
 try {
     $result = & $Python -X utf8 $MemCliPath quick-save `

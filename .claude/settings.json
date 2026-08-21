@@ -31,66 +31,73 @@
   "hooks": {
     "PreToolUse": [
       {
-        "matcher": "Bash(git commit *)",
+        "matcher": "Bash",
         "hooks": [
           {
             "type": "command",
-            "command": "pwsh -NoProfile -ExecutionPolicy Bypass -File tools/lib/validate-commit-msg.ps1",
-            "statusMessage": "コミットメッセージ規約チェック"
+            "command": "pwsh -NoProfile -ExecutionPolicy Bypass -File \"${CLAUDE_PROJECT_DIR:-.}\"/tools/lib/validate-commit-msg.ps1",
+            "statusMessage": "コミットメッセージ規約チェック",
+            "if": "Bash(git commit *)"
           },
           {
             "type": "command",
-            "command": "pwsh -NoProfile -ExecutionPolicy Bypass -File validate.ps1 && pwsh -NoProfile -ExecutionPolicy Bypass -File deploy.ps1 -Check",
-            "statusMessage": "カタログ検証 + デプロイチェック"
+            "command": "pwsh -NoProfile -ExecutionPolicy Bypass -File \"${CLAUDE_PROJECT_DIR:-.}\"/validate.ps1 && pwsh -NoProfile -ExecutionPolicy Bypass -File \"${CLAUDE_PROJECT_DIR:-.}\"/deploy.ps1 -Check",
+            "statusMessage": "カタログ検証 + デプロイチェック",
+            "if": "Bash(git commit *)"
           }
         ]
       },
       {
-        "matcher": "Bash(git push *)",
+        "matcher": "Bash",
         "hooks": [
           {
             "type": "command",
-            "command": "pwsh -NoProfile -ExecutionPolicy Bypass -File tools/lib/enforce-gate-chain.ps1 -RequiredPhase ship",
-            "statusMessage": "ゲートチェーン: ship gate 確認"
+            "command": "pwsh -NoProfile -ExecutionPolicy Bypass -File \"${CLAUDE_PROJECT_DIR:-.}\"/tools/lib/enforce-gate-chain.ps1 -RequiredPhase ship",
+            "statusMessage": "ゲートチェーン: ship gate 確認",
+            "if": "Bash(git push *)"
           },
           {
             "type": "command",
-            "command": "pwsh -NoProfile -ExecutionPolicy Bypass -File validate.ps1 && pwsh -NoProfile -ExecutionPolicy Bypass -File deploy.ps1 -Check",
-            "statusMessage": "カタログ検証 + デプロイチェック"
+            "command": "pwsh -NoProfile -ExecutionPolicy Bypass -File \"${CLAUDE_PROJECT_DIR:-.}\"/validate.ps1 && pwsh -NoProfile -ExecutionPolicy Bypass -File \"${CLAUDE_PROJECT_DIR:-.}\"/deploy.ps1 -Check",
+            "statusMessage": "カタログ検証 + デプロイチェック",
+            "if": "Bash(git push *)"
           }
         ]
       },
       {
-        "matcher": "Bash(rm *)|Bash(del *)|Bash(Remove-Item *)",
+        "matcher": "Bash",
         "hooks": [
           {
             "type": "command",
-            "command": "pwsh -NoProfile -ExecutionPolicy Bypass -File tools/lib/enforce-p3.ps1 -Operation delete",
-            "statusMessage": "P3ゲート: 破壊的操作チェック"
+            "command": "pwsh -NoProfile -ExecutionPolicy Bypass -File \"${CLAUDE_PROJECT_DIR:-.}\"/tools/lib/enforce-p3.ps1 -Operation delete",
+            "statusMessage": "P3ゲート: 破壊的操作チェック",
+            "if": "Bash(rm *)|Bash(del *)|Bash(Remove-Item *)"
           }
         ]
       }
     ],
     "PostToolUse": [
       {
-        "matcher": "Bash(git commit *)",
+        "matcher": "Bash",
         "hooks": [
           {
             "type": "command",
-            "command": "pwsh -NoProfile -ExecutionPolicy Bypass -File tools/lib/gate-advance-post-commit.ps1",
+            "command": "pwsh -NoProfile -ExecutionPolicy Bypass -File \"${CLAUDE_PROJECT_DIR:-.}\"/tools/lib/gate-advance-post-commit.ps1",
             "statusMessage": "ゲート状態: コミット後自動進行",
-            "async": true
+            "async": true,
+            "if": "Bash(git commit *)"
           }
         ]
       },
       {
-        "matcher": "Bash(git push *)",
+        "matcher": "Bash",
         "hooks": [
           {
             "type": "command",
-            "command": "pwsh -NoProfile -ExecutionPolicy Bypass -File tools/lib/session-capture.ps1",
+            "command": "pwsh -NoProfile -ExecutionPolicy Bypass -File \"${CLAUDE_PROJECT_DIR:-.}\"/tools/lib/session-capture.ps1",
             "statusMessage": "セッション学習キャプチャ",
-            "async": true
+            "async": true,
+            "if": "Bash(git push *)"
           }
         ]
       },
@@ -99,7 +106,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "pwsh -NoProfile -ExecutionPolicy Bypass -File tools/lib/detect-scope-drift.ps1",
+            "command": "pwsh -NoProfile -ExecutionPolicy Bypass -File \"${CLAUDE_PROJECT_DIR:-.}\"/tools/lib/detect-scope-drift.ps1",
             "statusMessage": "スコープドリフト検知",
             "async": true
           }
@@ -112,12 +119,12 @@
         "hooks": [
           {
             "type": "command",
-            "command": "pwsh -NoProfile -ExecutionPolicy Bypass -File tools/lib/mem-search-hook.ps1",
+            "command": "pwsh -NoProfile -ExecutionPolicy Bypass -File \"${CLAUDE_PROJECT_DIR:-.}\"/tools/lib/mem-search-hook.ps1",
             "statusMessage": "メモリ検索"
           },
           {
             "type": "command",
-            "command": "pwsh -NoProfile -ExecutionPolicy Bypass -File tools/lib/gate-auto-init.ps1",
+            "command": "pwsh -NoProfile -ExecutionPolicy Bypass -File \"${CLAUDE_PROJECT_DIR:-.}\"/tools/lib/gate-auto-init.ps1",
             "statusMessage": "ゲート状態チェック",
             "async": true
           }
