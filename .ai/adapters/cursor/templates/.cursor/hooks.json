@@ -3,7 +3,7 @@
   "hooks": {
     "beforeShellExecution": [
       {
-        "command": "powershell -NoProfile -ExecutionPolicy Bypass -File .cursor/hooks/risky-shell.ps1",
+        "command": "pwsh -NoProfile -ExecutionPolicy Bypass -File .cursor/hooks/risky-shell.ps1",
         "timeout": 8
       }
     ]

@@ -60,7 +60,8 @@ jobs:
             "CLAUDE.md",
             ".cursor/README.md",
             ".cursor/rules/dcr-kernel.mdc",
-            ".cursorignore"
+            ".cursorignore",
+            ".claude/skills"
           )
           foreach ($path in $required) {
             git ls-files --error-unmatch -- $path | Out-Null

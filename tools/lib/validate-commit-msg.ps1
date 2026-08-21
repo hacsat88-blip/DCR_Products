@@ -10,7 +10,7 @@
 
 .EXAMPLE
   # hooks から呼び出し
-  powershell -ExecutionPolicy Bypass -File tools/lib/validate-commit-msg.ps1
+  pwsh -NoProfile -ExecutionPolicy Bypass -File tools/lib/validate-commit-msg.ps1
 #>
 
 $ErrorActionPreference = 'Stop'
@@ -75,7 +75,7 @@ if ($subject -notmatch $ConventionalPattern) {
     Write-Host "       fix(auth): ログインエラーを修正" -ForegroundColor Green
     Write-Host "       feat!: 破壊的変更を含む新機能" -ForegroundColor Green
     Write-Host ""
-    exit 1
+    exit 2
 }
 
 Write-Host "[OK] コミットメッセージ規約: 適合" -ForegroundColor Green

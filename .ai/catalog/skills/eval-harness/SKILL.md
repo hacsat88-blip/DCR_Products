@@ -50,10 +50,10 @@ rules/*.md と skills/*/SKILL.md の構造品質を機械的に保証する。
 
 ```powershell
 # 基本実行（PASS/FAIL サマリーのみ）
-powershell -ExecutionPolicy Bypass -File .\validate.ps1
+pwsh -NoProfile -ExecutionPolicy Bypass -File .\validate.ps1
 
 # 詳細出力（各ファイルの [OK] / [FAIL] を表示）
-powershell -ExecutionPolicy Bypass -File .\validate.ps1 -Verbose
+pwsh -NoProfile -ExecutionPolicy Bypass -File .\validate.ps1 -Verbose
 ```
 
 ### 結果の解釈

@@ -5,10 +5,10 @@
 ## 実行手順
 
 1. 検証を実行する。
-- `powershell -ExecutionPolicy Bypass -File .\\validate.ps1`
+- `pwsh -NoProfile -ExecutionPolicy Bypass -File .\\validate.ps1`
 
 2. 失敗時に追加確認する。
-- `powershell -ExecutionPolicy Bypass -File .\\deploy.ps1 -Check`
+- `pwsh -NoProfile -ExecutionPolicy Bypass -File .\\deploy.ps1 -Check`
 
 3. 結果を報告する。
 - 成功/失敗

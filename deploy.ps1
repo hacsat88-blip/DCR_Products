@@ -40,7 +40,64 @@ $DeprecatedAliases = Join-Path $RepoRoot "tools\lib\deprecated-aliases.ps1"
 $SourceAgents = Resolve-DcrSourcePath -RepoRoot $RepoRoot -AssetType "agents-source"
 $DestCodexAgents = Join-Path $RepoRoot ".codex\agents"
 $DestClaudeAgents = Join-Path $RepoRoot ".claude\agents"
+$DestClaudeSkills = Join-Path $RepoRoot ".claude\skills"
 $DeployAll = Join-Path $RepoRoot "tools\deploy-all.ps1"
+
+function Get-ClaudeSkillsLinkTarget {
+    param([string]$RepoRoot)
+
+    # .claude/skills is a symlink into the catalog rather than a copy, so the
+    # skill directories stay single-sourced. The target is derived from the
+    # resolved catalog path (not hardcoded) so a repo still on the legacy
+    # layout links to where its skills actually live.
+    $skillsRoot = Resolve-DcrSourcePath -RepoRoot $RepoRoot -AssetType "skills"
+    return [System.IO.Path]::GetRelativePath((Join-Path $RepoRoot ".claude"), $skillsRoot)
+}
+
+function Get-SymlinkDrift {
+    param(
+        [string]$LinkPath,
+        [string]$ExpectedTarget,
+        [string]$ResolvedRoot
+    )
+
+    if (-not (Test-Path -LiteralPath $ResolvedRoot)) { return @("[SOURCE_MISSING] $ResolvedRoot") }
+    $item = Get-Item -LiteralPath $LinkPath -Force -ErrorAction SilentlyContinue
+    if (-not $item) { return @("[MISSING] $LinkPath") }
+    if (-not $item.LinkType) { return @("[NOT_A_LINK] $LinkPath") }
+    if ($item.Target -notcontains $ExpectedTarget) {
+        return @("[WRONG_TARGET] $LinkPath -> $($item.Target -join ',')")
+    }
+    if (-not (Test-Path -LiteralPath $LinkPath)) { return @("[BROKEN_LINK] $LinkPath") }
+    return @()
+}
+
+function Set-ClaudeSkillsLink {
+    param(
+        [string]$LinkPath,
+        [string]$ExpectedTarget,
+        [string]$ResolvedRoot
+    )
+
+    if (-not (Test-Path -LiteralPath $ResolvedRoot)) {
+        Write-Warning "Skills source not found; skipped .claude/skills link: $ResolvedRoot"
+        return
+    }
+
+    $item = Get-Item -LiteralPath $LinkPath -Force -ErrorAction SilentlyContinue
+    if ($item -and $item.LinkType -and ($item.Target -contains $ExpectedTarget)) { return }
+
+    # .claude/skills is also the standard home for hand-authored skills. Never
+    # recursively delete a real directory here - report it and let a human decide.
+    if ($item -and -not $item.LinkType) {
+        Write-Warning "[NOT_A_LINK] $LinkPath is a real directory; refusing to replace it. Move or remove it, then re-run deploy."
+        return
+    }
+
+    if ($item) { Remove-Item -LiteralPath $LinkPath -Force }
+    New-Item -ItemType SymbolicLink -Path $LinkPath -Target $ExpectedTarget | Out-Null
+    Write-Host "  [OK] .claude/skills -> $ExpectedTarget" -ForegroundColor Green
+}
 
 function Get-TempDirectory {
     $tempDir = Join-Path ([System.IO.Path]::GetTempPath()) ("dcr-deploy-" + [System.Guid]::NewGuid().ToString("N"))
@@ -192,6 +249,7 @@ if ($Check) {
             $expectedClaude = Join-Path $tempDir "CLAUDE.md"
             & (Join-Path $RepoRoot "tools\adapters\claude.ps1") -RepoRoot $RepoRoot -OutputPath $expectedClaude -Quiet
             Write-CheckDrift -Label "Claude entrypoint" -Diffs (Get-FileDrift -ExpectedPath $expectedClaude -ActualPath (Join-Path $RepoRoot "CLAUDE.md") -Label "CLAUDE.md")
+            Write-CheckDrift -Label "Claude skills" -Diffs (Get-SymlinkDrift -LinkPath $DestClaudeSkills -ExpectedTarget (Get-ClaudeSkillsLinkTarget -RepoRoot $RepoRoot) -ResolvedRoot (Resolve-DcrSourcePath -RepoRoot $RepoRoot -AssetType "skills"))
         }
         finally {
             if (Test-Path -LiteralPath $tempDir) { Remove-Item -LiteralPath $tempDir -Recurse -Force }
@@ -227,6 +285,12 @@ if (-not (Test-Path -LiteralPath $DeployAll)) {
 }
 
 & $DeployAll -Target $Target -DryRun:$DryRun
+
+if (-not $DryRun -and ($Target -eq "all" -or $Target -eq "claude")) {
+    Set-ClaudeSkillsLink -LinkPath $DestClaudeSkills `
+        -ExpectedTarget (Get-ClaudeSkillsLinkTarget -RepoRoot $RepoRoot) `
+        -ResolvedRoot (Resolve-DcrSourcePath -RepoRoot $RepoRoot -AssetType "skills")
+}
 
 if ($DryRun) {
     Write-Host "Dry run complete. No files were written." -ForegroundColor Yellow

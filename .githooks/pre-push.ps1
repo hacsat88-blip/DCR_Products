@@ -1,4 +1,4 @@
-#Requires -Version 5.1
+#Requires -Version 7.0
 
 $ErrorActionPreference = "Stop"
 $upstream = git rev-parse --abbrev-ref --symbolic-full-name '@{u}' 2>$null
@@ -16,4 +16,7 @@ if ($changed.Count -eq 0) {
 }
 
 Write-Host "[dcr] Running deploy drift check before push..."
-pwsh -ExecutionPolicy Bypass -File ./deploy.ps1 -Check
+pwsh -NoProfile -ExecutionPolicy Bypass -File ./deploy.ps1 -Check
+# pwsh does not adopt a native command's exit code, so propagate it
+# explicitly - otherwise drift is reported but the hook still passes.
+exit $LASTEXITCODE

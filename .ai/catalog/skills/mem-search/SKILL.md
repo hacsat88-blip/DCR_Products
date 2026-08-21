@@ -28,11 +28,22 @@ runtime_targets:
 Claude Code / Cursor / Codex 間で**同一DBを共有**する。
 外部依存ゼロ（Python stdlib のみ）。
 
-**CLIパス（ユーザー固有 — 環境に合わせて置き換える）:**
+**CLIパス（macOS）:**
 ```
-C:/Users/hacsa/.claude/projects/C--Users-hacsa-Desktop------/memory/mem_cli.py
+~/.claude/projects/<project>/memory/mem_cli.py
 ```
-実際のパスを確認するには：`python -c "import mem_cli; print(mem_cli.__file__)"`
+DB はワークスペースごとではなく**マシンで1つ**。`tools/lib/resolve-claude-memory.ps1`
+は `~/.claude/projects` 配下から `memory/mem_cli.py` を探し、名前順で最初の1件を返す。
+そのため DCR_Products とサトシ開発は同じ DB を共有する（それが本スキルの狙い）。
+
+複数候補が生まれると解決先が名前順で変わってしまうため、**`DCR_MEMORY_ROOT` に
+`memory` ディレクトリを明示的に指定して固定することを推奨する**。指定すると
+再帰探索自体もスキップされる。以下の例は次を前提とする：
+
+```bash
+export DCR_MEMORY_ROOT="$HOME/.claude/projects/-Users-dcr3104-DCR-Products/memory"
+export DCR_MEM="$DCR_MEMORY_ROOT"
+```
 
 **DBパス:** 同ディレクトリの `mem.db`
 
@@ -49,21 +60,22 @@ C:/Users/hacsa/.claude/projects/C--Users-hacsa-Desktop------/memory/mem_cli.py
     "UserPromptSubmit": [{
       "hooks": [{
         "type": "command",
-        "command": "python -X utf8 \"C:/Users/hacsa/.claude/projects/C--Users-hacsa-Desktop------/memory/mem_cli.py\" search-hook"
+        "command": "pwsh -NoProfile -ExecutionPolicy Bypass -File tools/lib/mem-search-hook.ps1"
       }]
     }]
   }
 }
 ```
 
-> `-X utf8` は Windows で日本語出力を正しく扱うために必須。
+> `-X utf8` は日本語出力を確実に扱うために付けている。
+> フックは `mem_cli.py` や `python3` が無い環境では無出力で exit 0 する（フェイルオープン）。
 
 ---
 
 ## 手動検索
 
 ```bash
-python -X utf8 "C:/Users/hacsa/.claude/projects/C--Users-hacsa-Desktop------/memory/mem_cli.py" search "クエリ" --top 5
+python3 -X utf8 "$DCR_MEM/mem_cli.py" search "クエリ" --top 5
 ```
 
 出力例：
@@ -81,7 +93,7 @@ python -X utf8 "C:/Users/hacsa/.claude/projects/C--Users-hacsa-Desktop------/mem
 ユーザーが「覚えておいて」「保存して」などと言ったとき、または設計決定・フィードバックが固まったとき：
 
 ```bash
-python -X utf8 "C:/Users/hacsa/.claude/projects/C--Users-hacsa-Desktop------/memory/mem_cli.py" quick-save \
+python3 -X utf8 "$DCR_MEM/mem_cli.py" quick-save \
   --title "メモリ名" \
   --type project \
   --description "一行説明（MEMORY.md インデックスにも掲載）" \
@@ -112,10 +124,10 @@ python -X utf8 "C:/Users/hacsa/.claude/projects/C--Users-hacsa-Desktop------/mem
 
 ```bash
 # 初回セットアップ
-python -X utf8 "...mem_cli.py" migrate
+python3 -X utf8 "$DCR_MEM/mem_cli.py" migrate
 
 # 再構築
-python -X utf8 "...mem_cli.py" reindex
+python3 -X utf8 "$DCR_MEM/mem_cli.py" reindex
 ```
 
 ---
@@ -130,10 +142,10 @@ python -X utf8 "...mem_cli.py" reindex
 ```markdown
 ## Memory Search
 Before responding, run:
-python -X utf8 "C:/Users/hacsa/.claude/projects/C--Users-hacsa-Desktop------/memory/mem_cli.py" search "{user_query}" --top 3
+python3 -X utf8 "$DCR_MEM/mem_cli.py" search "{user_query}" --top 3
 
 To save a memory:
-python -X utf8 "...mem_cli.py" quick-save --title "..." --type project --description "..." --body "..."
+python3 -X utf8 "$DCR_MEM/mem_cli.py" quick-save --title "..." --type project --description "..." --body "..."
 ```
 
 ### Codex

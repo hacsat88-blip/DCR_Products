@@ -8,7 +8,7 @@
 - `git status --short`
 
 2. デプロイ整合チェックを実行する。
-- `powershell -ExecutionPolicy Bypass -File .\\deploy.ps1 -Check`
+- `pwsh -NoProfile -ExecutionPolicy Bypass -File .\\deploy.ps1 -Check`
 
 3. 結果を報告する。
 - pass/fail

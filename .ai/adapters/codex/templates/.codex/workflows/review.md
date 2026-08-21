@@ -9,8 +9,8 @@
 - `git diff --name-status`
 
 2. 必須検証を実行する。
-- `powershell -ExecutionPolicy Bypass -File .\\validate.ps1`
-- `powershell -ExecutionPolicy Bypass -File .\\deploy.ps1 -Check`
+- `pwsh -NoProfile -ExecutionPolicy Bypass -File .\\validate.ps1`
+- `pwsh -NoProfile -ExecutionPolicy Bypass -File .\\deploy.ps1 -Check`
 
 3. レビュー結果を重要度順で出力する。
 - Critical / Important / Minor の順で列挙
