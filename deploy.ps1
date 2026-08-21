@@ -40,7 +40,42 @@ $DeprecatedAliases = Join-Path $RepoRoot "tools\lib\deprecated-aliases.ps1"
 $SourceAgents = Resolve-DcrSourcePath -RepoRoot $RepoRoot -AssetType "agents-source"
 $DestCodexAgents = Join-Path $RepoRoot ".codex\agents"
 $DestClaudeAgents = Join-Path $RepoRoot ".claude\agents"
+$DestClaudeSkills = Join-Path $RepoRoot ".claude\skills"
 $DeployAll = Join-Path $RepoRoot "tools\deploy-all.ps1"
+
+function Get-ClaudeSkillsLinkTarget {
+    # .claude/skills is a symlink into the catalog rather than a copy, so the
+    # 69 skill directories stay single-sourced under .ai/catalog/skills.
+    return "../.ai/catalog/skills"
+}
+
+function Get-SymlinkDrift {
+    param(
+        [string]$LinkPath,
+        [string]$ExpectedTarget,
+        [string]$ResolvedRoot
+    )
+
+    if (-not (Test-Path -LiteralPath $ResolvedRoot)) { return @("[SOURCE_MISSING] $ResolvedRoot") }
+    $item = Get-Item -LiteralPath $LinkPath -Force -ErrorAction SilentlyContinue
+    if (-not $item) { return @("[MISSING] $LinkPath") }
+    if (-not $item.LinkType) { return @("[NOT_A_LINK] $LinkPath") }
+    if ($item.Target -notcontains $ExpectedTarget) {
+        return @("[WRONG_TARGET] $LinkPath -> $($item.Target -join ',')")
+    }
+    if (-not (Test-Path -LiteralPath $LinkPath)) { return @("[BROKEN_LINK] $LinkPath") }
+    return @()
+}
+
+function Set-ClaudeSkillsLink {
+    param([string]$LinkPath, [string]$ExpectedTarget)
+
+    $item = Get-Item -LiteralPath $LinkPath -Force -ErrorAction SilentlyContinue
+    if ($item -and $item.LinkType -and ($item.Target -contains $ExpectedTarget)) { return }
+    if ($item) { Remove-Item -LiteralPath $LinkPath -Force -Recurse }
+    New-Item -ItemType SymbolicLink -Path $LinkPath -Target $ExpectedTarget | Out-Null
+    Write-Host "  [OK] .claude/skills -> $ExpectedTarget" -ForegroundColor Green
+}
 
 function Get-TempDirectory {
     $tempDir = Join-Path ([System.IO.Path]::GetTempPath()) ("dcr-deploy-" + [System.Guid]::NewGuid().ToString("N"))
@@ -214,6 +249,7 @@ if ($Check) {
     if ($Target -eq "all" -or $Target -eq "agents") {
         Write-CheckDrift -Label "Codex agents" -Diffs (Get-FlatFileDrift -Source $SourceAgents -Destination $DestCodexAgents -Filter "*.toml")
         Write-CheckDrift -Label "Claude agents" -Diffs (Get-FlatFileDrift -Source $SourceAgents -Destination $DestClaudeAgents -Filter "*.md" -IgnoreNames @("README.md"))
+        Write-CheckDrift -Label "Claude skills" -Diffs (Get-SymlinkDrift -LinkPath $DestClaudeSkills -ExpectedTarget (Get-ClaudeSkillsLinkTarget) -ResolvedRoot (Resolve-DcrSourcePath -RepoRoot $RepoRoot -AssetType "skills"))
     }
 
     Write-Host ""
@@ -227,6 +263,10 @@ if (-not (Test-Path -LiteralPath $DeployAll)) {
 }
 
 & $DeployAll -Target $Target -DryRun:$DryRun
+
+if (-not $DryRun -and ($Target -eq "all" -or $Target -eq "claude" -or $Target -eq "agents")) {
+    Set-ClaudeSkillsLink -LinkPath $DestClaudeSkills -ExpectedTarget (Get-ClaudeSkillsLinkTarget)
+}
 
 if ($DryRun) {
     Write-Host "Dry run complete. No files were written." -ForegroundColor Yellow
