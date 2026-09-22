@@ -1,0 +1,4 @@
+#!/bin/sh
+set -eu
+
+pwsh -NoProfile -ExecutionPolicy Bypass -File ./tools/lib/validate-commit-msg-file.ps1 "$1"
