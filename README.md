@@ -49,3 +49,4 @@ Cursor adapter は DCR 管理下の `README.md`、`rules/dcr-kernel.mdc`、`.cur
 
 この正本に Product 開発やアプリを追加しません。`Product/`、`.dcr/`、`.devin/`、`.windsurf/`、
 `.vscode/`、旧 assistant 用 entrypoint、生成レポートや snapshot を復活させないでください。
+# trade_journal
