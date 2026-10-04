@@ -25,7 +25,7 @@ metadata:
   runtime_targets:
     - codex
     - claude
-    - cursor
+    - antigravity
 absorbs:
   - ad-creative
   - ai-seo

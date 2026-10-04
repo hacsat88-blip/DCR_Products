@@ -15,10 +15,6 @@ entrypoints:
     out: AGENTS.md
     adapter: .ai/adapters/codex/kernel.md
     reads: [core, routing, catalog]
-  - tool: cursor
-    out: .cursor/rules/dcr-kernel.mdc
-    adapter: .ai/adapters/cursor/kernel.md
-    reads: [core, routing, catalog]
 mirrors:
   - source: .ai/catalog/agents-source
     out: .claude/agents

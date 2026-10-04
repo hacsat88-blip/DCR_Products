@@ -10,7 +10,7 @@ keywords:
   - auto-select
   - orchestration
 targets:
-  - cursor
+  - antigravity
   - claude
   - codex
 contract:
@@ -28,7 +28,7 @@ composable:
 runtime_targets:
   - codex
   - claude
-  - cursor
+  - antigravity
 ---
 
 # unified-router

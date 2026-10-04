@@ -113,7 +113,6 @@ $expectedOperatingPrinciplesBlock = "#$canonicalOperatingPrinciples"
 $files = @(
     @{ label = "Codex entrypoint"; path = "AGENTS.md" },
     @{ label = "Claude entrypoint"; path = "CLAUDE.md" },
-    @{ label = "Cursor entrypoint"; path = ".cursor\rules\dcr-kernel.mdc" },
     @{ label = "unified-router skill"; path = ".ai\catalog\skills\unified-router\SKILL.md" }
 )
 
@@ -193,8 +192,6 @@ $canonicalRouterText = Get-Content -LiteralPath (Join-Path $RepoRoot ".ai\routin
 Assert-Contains -Label "canonical router" -Text $canonicalRouterText -Needle '"primary_work_unit"'
 Assert-Contains -Label "canonical router" -Text $canonicalRouterText -Needle '"secondary_work_unit"'
 
-$cursorText = Get-Content -LiteralPath (Join-Path $RepoRoot ".cursor\rules\dcr-kernel.mdc") -Raw -Encoding UTF8
-Assert-Contains -Label "Cursor entrypoint" -Text $cursorText -Needle ".ai/routing/router.md"
 
 Assert-FilesEqual `
     -Label "Claude coordinator" `

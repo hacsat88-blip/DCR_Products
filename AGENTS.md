@@ -10,7 +10,7 @@ Unified entry point for the Codex environment.
 ## Scope Summary
 
 - Active rules: 53
-- Active skills: 68
+- Active skills: 70
 - Active agents: 116
 - Deprecated aliases (rules/skills/agents): 0 / 0 / 0
 

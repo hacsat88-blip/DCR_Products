@@ -22,7 +22,7 @@ inherits:
   - testing-standards
   - git-conventions
 targets:
-  - cursor
+  - antigravity
   - claude
   - codex
 ---

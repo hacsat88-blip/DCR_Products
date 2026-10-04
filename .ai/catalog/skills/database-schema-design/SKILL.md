@@ -31,7 +31,7 @@ package:
 runtime_targets:
   - codex
   - claude
-  - cursor
+  - antigravity
 ---
 
 # Database Schema Design

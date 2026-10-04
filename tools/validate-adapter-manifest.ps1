@@ -79,8 +79,7 @@ function Assert-ExactSet {
 $entrypoints = @(Get-ManifestSectionItems -Lines $manifestLines -Section "entrypoints")
 $expectedEntrypoints = @(
     @{ tool = "claude-code"; out = "CLAUDE.md"; adapter = ".ai/adapters/claude-code/kernel.md" },
-    @{ tool = "codex"; out = "AGENTS.md"; adapter = ".ai/adapters/codex/kernel.md" },
-    @{ tool = "cursor"; out = ".cursor/rules/dcr-kernel.mdc"; adapter = ".ai/adapters/cursor/kernel.md" }
+    @{ tool = "codex"; out = "AGENTS.md"; adapter = ".ai/adapters/codex/kernel.md" }
 )
 
 Assert-ExactSet -Actual @($entrypoints | ForEach-Object { $_["tool"] }) -Expected @($expectedEntrypoints | ForEach-Object { $_.tool }) -Label "manifest entrypoint tools"
@@ -131,7 +130,7 @@ foreach ($expected in $expectedMirrors) {
 
 $deployText = Get-Content -LiteralPath (Join-Path $resolvedRoot "deploy.ps1") -Raw -Encoding utf8
 $deployAllText = Get-Content -LiteralPath (Join-Path $resolvedRoot "tools/deploy-all.ps1") -Raw -Encoding utf8
-$expectedTargets = @("all", "codex", "claude", "cursor", "agents")
+$expectedTargets = @("all", "codex", "claude", "agents")
 
 $deployValidateSet = [regex]::Match($deployText, '\[ValidateSet\(([^)]+)\)\]')
 if (-not $deployValidateSet.Success) {
@@ -154,7 +153,7 @@ if (-not $defaultAdaptersMatch.Success) {
     $failures.Add("tools/deploy-all.ps1 defaultAdapters not found")
 }
 else {
-    Assert-ExactSet -Actual (Get-QuotedValues -Text $defaultAdaptersMatch.Groups[1].Value) -Expected @("codex", "claude", "cursor", "agents") -Label "deploy-all default adapters"
+    Assert-ExactSet -Actual (Get-QuotedValues -Text $defaultAdaptersMatch.Groups[1].Value) -Expected @("codex", "claude", "agents") -Label "deploy-all default adapters"
 }
 
 Write-Host "== Adapter Manifest Validation ==" -ForegroundColor Cyan

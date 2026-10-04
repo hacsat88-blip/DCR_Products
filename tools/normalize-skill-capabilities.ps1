@@ -20,7 +20,7 @@ $resolvedRoot = (Resolve-Path -LiteralPath $RepoRoot).Path
 . (Join-Path $resolvedRoot "tools\lib\catalog-paths.ps1")
 
 $skillsDir = Resolve-DcrSourcePath -RepoRoot $resolvedRoot -AssetType "skills"
-$runtimeTargets = @("codex", "claude", "cursor")
+$runtimeTargets = @("codex", "claude", "antigravity")
 $changed = New-Object System.Collections.Generic.List[string]
 
 function Get-FrontmatterMatch {

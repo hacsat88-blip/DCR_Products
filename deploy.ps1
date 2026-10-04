@@ -3,15 +3,13 @@
   DCR Products Mac triad deploy script.
 
 .DESCRIPTION
-  Generates only the tracked Codex, Claude Code, and Cursor mirrors from .ai/:
+  Generates only the tracked Codex, Claude Code, and Antigravity mirrors from .ai/:
     - Codex: AGENTS.md and .codex/agents/
-    - Claude Code: CLAUDE.md and .claude/agents/
-    - Cursor: .cursor/README.md, .cursor/rules/dcr-kernel.mdc, and .cursorignore
-
-  Cursor files not owned by this adapter are preserved.
+    - Claude Code: CLAUDE.md, .claude/agents/, and .claude/skills
+    - Antigravity: .agents/skills
 
 .PARAMETER Target
-  Target to deploy or check: all | codex | claude | cursor | agents
+  Target to deploy or check: all | codex | claude | agents
 
 .PARAMETER DryRun
   Prints planned adapter execution without writing files.
@@ -22,7 +20,7 @@
 #>
 
 param(
-    [ValidateSet("all", "codex", "claude", "cursor", "agents")]
+    [ValidateSet("all", "codex", "claude", "agents")]
     [string]$Target = "all",
     [switch]$DryRun,
     [switch]$Check,
@@ -41,6 +39,7 @@ $SourceAgents = Resolve-DcrSourcePath -RepoRoot $RepoRoot -AssetType "agents-sou
 $DestCodexAgents = Join-Path $RepoRoot ".codex\agents"
 $DestClaudeAgents = Join-Path $RepoRoot ".claude\agents"
 $DestClaudeSkills = Join-Path $RepoRoot ".claude\skills"
+$DestAgentsSkills = Join-Path $RepoRoot ".agents\skills"
 $DeployAll = Join-Path $RepoRoot "tools\deploy-all.ps1"
 
 function Get-ClaudeSkillsLinkTarget {
@@ -52,6 +51,13 @@ function Get-ClaudeSkillsLinkTarget {
     # layout links to where its skills actually live.
     $skillsRoot = Resolve-DcrSourcePath -RepoRoot $RepoRoot -AssetType "skills"
     return [System.IO.Path]::GetRelativePath((Join-Path $RepoRoot ".claude"), $skillsRoot)
+}
+
+function Get-AgentsSkillsLinkTarget {
+    param([string]$RepoRoot)
+
+    $skillsRoot = Resolve-DcrSourcePath -RepoRoot $RepoRoot -AssetType "skills"
+    return [System.IO.Path]::GetRelativePath((Join-Path $RepoRoot ".agents"), $skillsRoot)
 }
 
 function Get-SymlinkDrift {
@@ -97,6 +103,36 @@ function Set-ClaudeSkillsLink {
     if ($item) { Remove-Item -LiteralPath $LinkPath -Force }
     New-Item -ItemType SymbolicLink -Path $LinkPath -Target $ExpectedTarget | Out-Null
     Write-Host "  [OK] .claude/skills -> $ExpectedTarget" -ForegroundColor Green
+}
+
+function Set-AgentsSkillsLink {
+    param(
+        [string]$LinkPath,
+        [string]$ExpectedTarget,
+        [string]$ResolvedRoot
+    )
+
+    if (-not (Test-Path -LiteralPath $ResolvedRoot)) {
+        Write-Warning "Skills source not found; skipped .agents/skills link: $ResolvedRoot"
+        return
+    }
+
+    $item = Get-Item -LiteralPath $LinkPath -Force -ErrorAction SilentlyContinue
+    if ($item -and $item.LinkType -and ($item.Target -contains $ExpectedTarget)) { return }
+
+    if ($item -and -not $item.LinkType) {
+        Write-Warning "[NOT_A_LINK] $LinkPath is a real directory; refusing to replace it. Move or remove it, then re-run deploy."
+        return
+    }
+
+    $agentsDir = Split-Path $LinkPath -Parent
+    if (-not (Test-Path -LiteralPath $agentsDir)) {
+        New-Item -ItemType Directory -Path $agentsDir -Force | Out-Null
+    }
+
+    if ($item) { Remove-Item -LiteralPath $LinkPath -Force }
+    New-Item -ItemType SymbolicLink -Path $LinkPath -Target $ExpectedTarget | Out-Null
+    Write-Host "  [OK] .agents/skills -> $ExpectedTarget" -ForegroundColor Green
 }
 
 function Get-TempDirectory {
@@ -256,22 +292,10 @@ if ($Check) {
         }
     }
 
-    if ($Target -eq "all" -or $Target -eq "cursor") {
-        $tempDir = Get-TempDirectory
-        try {
-            $expectedCursor = Join-Path $tempDir ".cursor"
-            & (Join-Path $RepoRoot "tools\adapters\cursor.ps1") -RepoRoot $RepoRoot -OutputRoot $expectedCursor -Quiet
-            Write-CheckDrift -Label "Cursor mirror" -Diffs (Get-ManagedDirectoryDrift -ExpectedRoot $expectedCursor -ActualRoot (Join-Path $RepoRoot ".cursor"))
-            Write-CheckDrift -Label "Cursor ignore" -Diffs (Get-FileDrift -ExpectedPath (Join-Path $tempDir ".cursorignore") -ActualPath (Join-Path $RepoRoot ".cursorignore") -Label ".cursorignore")
-        }
-        finally {
-            if (Test-Path -LiteralPath $tempDir) { Remove-Item -LiteralPath $tempDir -Recurse -Force }
-        }
-    }
-
     if ($Target -eq "all" -or $Target -eq "agents") {
         Write-CheckDrift -Label "Codex agents" -Diffs (Get-FlatFileDrift -Source $SourceAgents -Destination $DestCodexAgents -Filter "*.toml")
         Write-CheckDrift -Label "Claude agents" -Diffs (Get-FlatFileDrift -Source $SourceAgents -Destination $DestClaudeAgents -Filter "*.md" -IgnoreNames @("README.md"))
+        Write-CheckDrift -Label "Antigravity skills" -Diffs (Get-SymlinkDrift -LinkPath $DestAgentsSkills -ExpectedTarget (Get-AgentsSkillsLinkTarget -RepoRoot $RepoRoot) -ResolvedRoot (Resolve-DcrSourcePath -RepoRoot $RepoRoot -AssetType "skills"))
     }
 
     Write-Host ""
@@ -289,6 +313,12 @@ if (-not (Test-Path -LiteralPath $DeployAll)) {
 if (-not $DryRun -and ($Target -eq "all" -or $Target -eq "claude")) {
     Set-ClaudeSkillsLink -LinkPath $DestClaudeSkills `
         -ExpectedTarget (Get-ClaudeSkillsLinkTarget -RepoRoot $RepoRoot) `
+        -ResolvedRoot (Resolve-DcrSourcePath -RepoRoot $RepoRoot -AssetType "skills")
+}
+
+if (-not $DryRun -and ($Target -eq "all" -or $Target -eq "agents")) {
+    Set-AgentsSkillsLink -LinkPath $DestAgentsSkills `
+        -ExpectedTarget (Get-AgentsSkillsLinkTarget -RepoRoot $RepoRoot) `
         -ResolvedRoot (Resolve-DcrSourcePath -RepoRoot $RepoRoot -AssetType "skills")
 }
 

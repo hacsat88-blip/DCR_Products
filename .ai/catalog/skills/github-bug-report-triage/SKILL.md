@@ -27,7 +27,7 @@ metadata:
 runtime_targets:
   - codex
   - claude
-  - cursor
+  - antigravity
 ---
 
 # GitHub Bug Report Triage

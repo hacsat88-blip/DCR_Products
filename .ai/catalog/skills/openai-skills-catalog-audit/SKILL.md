@@ -31,7 +31,7 @@ metadata:
   runtime_targets:
     - codex
     - claude
-    - cursor
+    - antigravity
 ---
 
 # OpenAI Skills Catalog Audit

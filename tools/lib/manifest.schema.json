@@ -35,7 +35,7 @@
                             "enum": [
                                 "claude",
                                 "codex",
-                                "cursor"
+                                "antigravity"
                             ]
                         },
                         "minItems": 1
@@ -73,7 +73,7 @@
                             "enum": [
                                 "claude",
                                 "codex",
-                                "cursor"
+                                "antigravity"
                             ]
                         },
                         "minItems": 1
