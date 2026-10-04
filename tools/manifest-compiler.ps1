@@ -83,7 +83,7 @@ $ruleFiles = @(Get-ChildItem -Path $ruleDir -Force -Filter "*.md" -ErrorAction S
 foreach ($file in $ruleFiles) {
     $targets = @(Get-FrontmatterTargets -FilePath $file.FullName)
     if ($targets.Count -eq 0) {
-        $targets = @("claude", "codex", "cursor")
+        $targets = @("claude", "codex", "antigravity")
     }
 
     $manifest.rules += @{
@@ -106,7 +106,7 @@ foreach ($dir in $skillDirs) {
 
     $targets = @(Get-FrontmatterTargets -FilePath $skillFile)
     if ($targets.Count -eq 0) {
-        $targets = @("claude", "codex", "cursor")
+        $targets = @("claude", "codex", "antigravity")
     }
 
     $manifest.skills += @{

@@ -33,13 +33,13 @@ package:
     - planning
     - workflow
 targets:
-  - cursor
+  - antigravity
   - claude
   - codex
 runtime_targets:
   - codex
   - claude
-  - cursor
+  - antigravity
 ---
 
 # Writing Plans

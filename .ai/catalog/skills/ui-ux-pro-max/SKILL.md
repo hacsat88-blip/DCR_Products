@@ -18,7 +18,7 @@ composable:
 runtime_targets:
   - codex
   - claude
-  - cursor
+  - antigravity
 ---
 
 # UI/UX Pro Max - Design Intelligence

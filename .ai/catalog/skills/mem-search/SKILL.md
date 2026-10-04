@@ -17,7 +17,7 @@ composable:
 runtime_targets:
   - codex
   - claude
-  - cursor
+  - antigravity
 ---
 
 # mem-search — Cross-Tool Memory Search & Save

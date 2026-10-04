@@ -100,7 +100,6 @@ $report = [pscustomobject]@{
 $entrypoints = @(
     @{ name = 'CLAUDE.md'; path = 'CLAUDE.md' }
     @{ name = 'AGENTS.md'; path = 'AGENTS.md' }
-    @{ name = '.cursor/rules/dcr-kernel.mdc'; path = '.cursor/rules/dcr-kernel.mdc' }
 )
 $entrypointTotal = 0
 foreach ($e in $entrypoints) {
@@ -177,7 +176,7 @@ Write-Host ""
 Write-Host "=== Token Budget ===" -ForegroundColor Cyan
 Write-Host ""
 Write-Host "Entrypoints (top-level):" -ForegroundColor Yellow
-foreach ($k in @('CLAUDE.md', 'AGENTS.md', '.cursor/rules/dcr-kernel.mdc')) {
+foreach ($k in @('CLAUDE.md', 'AGENTS.md')) {
     Write-Host ("  {0,-40} {1,8:N0} tokens" -f $k, $report.entrypoints[$k])
 }
 Write-Host ("  {0,-40} {1,8:N0} tokens" -f '-- entrypoint total --', $entrypointTotal) -ForegroundColor DarkGray

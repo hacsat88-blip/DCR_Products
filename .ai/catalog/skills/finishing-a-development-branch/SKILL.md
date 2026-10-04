@@ -25,7 +25,7 @@ composable:
 runtime_targets:
   - codex
   - claude
-  - cursor
+  - antigravity
 ---
 
 # Finishing a Development Branch

@@ -67,7 +67,7 @@ function Get-DeprecationInfo($kind, $name) {
 # Collect claude-targeted items (separate active vs deprecated)
 foreach ($f in Get-ChildItem -Path $rulesDir -Force -Filter "*.md" | Where-Object { -not $_.BaseName.StartsWith("_") }) {
     $targets = Get-Targets $f
-    if (-not $targets) { $targets = @("claude", "codex", "cursor") }
+    if (-not $targets) { $targets = @("claude", "codex", "antigravity") }
     if ($targets -contains "claude") {
         $dep = Get-DeprecationInfo "rule" $f.BaseName
         if ($dep.Deprecated) {
@@ -83,7 +83,7 @@ foreach ($dir in Get-ChildItem -Path $skillsDir -Force -Directory | Where-Object
     if (Test-Path $sf) {
         $sfItem = Get-Item -LiteralPath $sf -Force
         $targets = Get-Targets $sfItem
-        if (-not $targets) { $targets = @("claude", "codex", "cursor") }
+        if (-not $targets) { $targets = @("claude", "codex", "antigravity") }
         if ($targets -contains "claude") {
             $dep = Get-DeprecationInfo "skill" $dir.Name
             if ($dep.Deprecated) {

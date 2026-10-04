@@ -208,7 +208,7 @@ Write-Host "  adapter docs processed: $($adapterKernelFiles.Count)" -ForegroundC
 # ─────────────────────────────────────────────
 Write-Host ""
 Write-Host "== 4. deploy.ps1 -DryRun check =================="
-$deployDryRunTargets = @("codex", "claude", "cursor", "agents")
+$deployDryRunTargets = @("codex", "claude", "agents")
 foreach ($target in $deployDryRunTargets) {
     $result = & $PowerShellExe -ExecutionPolicy Bypass -File $DeployScript -DryRun -Target $target 2>&1
     if ($LASTEXITCODE -eq 0) {

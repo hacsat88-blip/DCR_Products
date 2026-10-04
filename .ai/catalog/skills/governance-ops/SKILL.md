@@ -26,7 +26,7 @@ metadata:
   runtime_targets:
     - codex
     - claude
-    - cursor
+    - antigravity
 absorbs:
   - advanced-evaluation
   - agent-evaluation

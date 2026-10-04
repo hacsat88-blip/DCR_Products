@@ -19,7 +19,7 @@ composable:
 runtime_targets:
   - codex
   - claude
-  - cursor
+  - antigravity
 ---
 
 # Eval Harness — 構造品質の継続検証

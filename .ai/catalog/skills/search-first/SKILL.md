@@ -19,7 +19,7 @@ composable:
 runtime_targets:
   - codex
   - claude
-  - cursor
+  - antigravity
 ---
 
 # Search First — 実装前に調査する

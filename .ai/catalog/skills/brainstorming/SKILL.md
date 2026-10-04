@@ -35,7 +35,7 @@ package:
 runtime_targets:
   - codex
   - claude
-  - cursor
+  - antigravity
 ---
 
 # Brainstorming Ideas Into Designs

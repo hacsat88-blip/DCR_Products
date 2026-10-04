@@ -19,7 +19,7 @@ composable:
 runtime_targets:
   - codex
   - claude
-  - cursor
+  - antigravity
 ---
 
 # TDD Workflow — テスト駆動開発

@@ -34,7 +34,7 @@ package:
 runtime_targets:
   - codex
   - claude
-  - cursor
+  - antigravity
 ---
 
 # Repo Boundary Hygiene

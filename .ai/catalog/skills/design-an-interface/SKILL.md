@@ -33,7 +33,7 @@ metadata:
   runtime_targets:
     - codex
     - claude
-    - cursor
+    - antigravity
 ---
 
 # Design an Interface
