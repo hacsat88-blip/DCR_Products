@@ -58,10 +58,8 @@ jobs:
           $required = @(
             "AGENTS.md",
             "CLAUDE.md",
-            ".cursor/README.md",
-            ".cursor/rules/dcr-kernel.mdc",
-            ".cursorignore",
-            ".claude/skills"
+            ".claude/skills",
+            ".agents/skills"
           )
           foreach ($path in $required) {
             git ls-files --error-unmatch -- $path | Out-Null
@@ -71,7 +69,7 @@ jobs:
       - name: Check generated entrypoint drift
         shell: pwsh
         run: |
-          $diff = @(git status --short AGENTS.md CLAUDE.md .cursor .cursorignore .codex/agents .claude/agents .ai/catalog/rules/_ROUTING_INDEX.md .ai/catalog/skills/_SKILLS_ROUTING_INDEX.md)
+          $diff = @(git status --short AGENTS.md CLAUDE.md .codex/agents .claude/agents .agents/skills .ai/catalog/rules/_ROUTING_INDEX.md .ai/catalog/skills/_SKILLS_ROUTING_INDEX.md)
           if ($diff.Count -gt 0) {
             $diff | ForEach-Object { Write-Host $_ }
             throw "Generated tracked entrypoints are stale."
